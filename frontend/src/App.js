@@ -54,7 +54,7 @@ function App() {
 }
 
 function CoinRedirect() {
-  // makers.fun uses /coin/<mint> for desk-less coins; route into explore search
+  // upstream uses /coin/<mint> for desk-less coins; route into explore search
   return <Navigate to="/explore" replace />;
 }
 

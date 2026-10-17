@@ -168,7 +168,7 @@ export default function Launch() {
         kicker="Launch"
         title="Mint a coin."
         accent="Wire the maker."
-        sub="One approval mints the coin on pump.fun, locks its fee split and funds its market maker. Every dial stays yours afterwards. Market making can lose money."
+        sub="One approval mints the coin, locks its fee split and funds its market maker. Every dial stays yours afterwards. Market making can lose money."
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_320px] gap-8">
@@ -199,7 +199,7 @@ export default function Launch() {
           {step === 0 && (
             <div className="space-y-6" data-testid="launch-step-coin">
               <h2 className="text-xl font-medium text-white">Identity</h2>
-              <p className="text-[13px] font-light text-[#8ca3b8]">The face of your coin on pump.fun — name, ticker, artwork. It trades against SOL while its own fees power the maker.</p>
+              <p className="text-[13px] font-light text-[#8ca3b8]">The face of your coin — name, ticker, artwork. It trades against SOL while its own fees power the maker.</p>
               <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-6">
                 <div>
                   <button onClick={() => fileRef.current?.click()} data-testid="launch-image-upload"
@@ -326,7 +326,7 @@ export default function Launch() {
                       </div>
                     </div>
                     <ul className="mt-5 space-y-2 border-t border-white/5 pt-4 text-[12px] font-light text-[#8ca3b8] list-none">
-                      <li>1. Mints the coin on pump.fun.</li>
+                      <li>1. Mints the coin on the bonding curve.</li>
                       <li>2. Locks the fee split for good: 80% maker · 20% platform.</li>
                       <li>{devBuySol > 0 ? `3. Buys ${devBuySol} SOL of your coin inside the same transaction.` : "3. No opening buy — everyone gets the same open."}</li>
                       <li>{fundSol > 0 ? `4. Wires ${fundSol} SOL into the maker's vault.` : "4. Sends nothing to the vault — the maker lives off the coin's own fees."}</li>

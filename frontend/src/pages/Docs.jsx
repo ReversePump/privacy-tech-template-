@@ -7,7 +7,7 @@ const SECTIONS = [
     id: "what",
     title: "What MakeMarkets does",
     body: [
-      "MakeMarkets gives every coin its own market maker on Solana. Launch a fresh coin here, or onboard one that already trades on pump.fun — either way it gets a dedicated set of public trading wallets that accumulate on dips and distribute into strength.",
+      "MakeMarkets gives every coin its own market maker on Solana. Launch a fresh coin here, or onboard one that already trades on a bonding curve — either way it gets a dedicated set of public trading wallets that accumulate on dips and distribute into strength.",
       "The maker feeds itself: the coin's own creator fees keep it running, topped up by whatever SOL you wire in at launch. It never reaches back into your wallet — SOL only flows out to your payout address, plus a fixed 20% profit cut that is destroyed forever.",
     ],
   },
@@ -33,7 +33,7 @@ const SECTIONS = [
     id: "transparency",
     title: "Nothing to hide",
     body: [
-      "Every wallet a maker uses is listed on its page. Every buy, sell, claim and payout links straight to its transaction on Solscan.",
+      "Every wallet a maker uses is listed on its page. Every buy, sell, claim and payout links straight to its on-chain transaction.",
       "A maker's own wallets never fill each other — one position per coin across the whole desk, enforced by the engine.",
     ],
   },

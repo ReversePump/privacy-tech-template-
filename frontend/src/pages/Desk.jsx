@@ -91,9 +91,9 @@ export default function Desk() {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <ExtLink href={pumpCoin(desk.mint)} className="rounded-[3px] border border-white/10 px-3.5 py-2 text-xs">pump.fun</ExtLink>
-          <ExtLink href={dexscreener(desk.mint)} className="rounded-[3px] border border-white/10 px-3.5 py-2 text-xs">DexScreener</ExtLink>
-          <ExtLink href={solscanAcct(desk.mint)} className="rounded-[3px] border border-white/10 px-3.5 py-2 text-xs">Solscan</ExtLink>
+          <ExtLink href={pumpCoin(desk.mint)} className="rounded-[3px] border border-white/10 px-3.5 py-2 text-xs">Market</ExtLink>
+          <ExtLink href={dexscreener(desk.mint)} className="rounded-[3px] border border-white/10 px-3.5 py-2 text-xs">Chart</ExtLink>
+          <ExtLink href={solscanAcct(desk.mint)} className="rounded-[3px] border border-white/10 px-3.5 py-2 text-xs">Explorer</ExtLink>
           {isOwner && (
             <Link to={`/dashboard/${desk.id}`} className="rounded-[3px] bg-[#8AF5D0] px-4 py-2 text-xs font-medium text-[#07111f] hover:bg-[#7CFFC8]" data-testid="desk-dashboard-btn">
               Dashboard

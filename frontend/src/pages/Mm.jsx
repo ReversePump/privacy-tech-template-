@@ -42,7 +42,7 @@ export default function Mm() {
 
   const check = async (raw) => {
     const mint = extractMint(raw ?? input);
-    if (!mint) { toast.error("Paste a pump.fun link or a mint address"); return; }
+    if (!mint) { toast.error("Paste the coin's link or a mint address"); return; }
     setChecking(true);
     setResult(null);
     setCreated(null);
@@ -121,21 +121,21 @@ export default function Mm() {
         kicker="Onboard"
         title="Bring your"
         accent="own coin."
-        sub="Drop in any pump.fun coin — link or mint — and it gets its own market maker, same as the coins born here. Every wallet and fill publicly auditable."
+        sub="Drop in any coin — link or mint — and it gets its own market maker, same as the coins born here. Every wallet and fill publicly auditable."
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl">
         <div className="space-y-6">
           <Panel className="p-6" data-testid="mm-check-panel">
             <div className="mb-1 font-mono text-[10px] uppercase tracking-[0.18em] text-[#556b82]">1 · Which coin?</div>
-            <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-[#556b82]">pump.fun link or mint</label>
+            <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-[#556b82]">Coin link or mint</label>
             <div className="flex gap-2">
               <input
                 data-testid="mm-mint-input"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && check()}
-                placeholder="https://pump.fun/coin/… or mint address"
+                placeholder="https://…/coin/… or the mint address"
                 className="h-11 flex-1 rounded-lg border border-white/10 bg-white/5 px-3.5 font-mono text-[13px] text-white outline-none focus:border-[#8AF5D0]/40"
               />
               <button onClick={() => check()} disabled={checking} data-testid="mm-check-btn"

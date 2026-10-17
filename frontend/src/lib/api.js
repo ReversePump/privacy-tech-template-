@@ -1,4 +1,4 @@
-const BASE = `${process.env.REACT_APP_BACKEND_URL}/api/mf`;
+const BASE = `${process.env.REACT_APP_BACKEND_URL}/api/relay`;
 
 export class ApiError extends Error {
   constructor(status, code, message, field) {

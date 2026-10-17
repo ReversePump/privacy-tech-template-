@@ -42,7 +42,7 @@ def _client() -> httpx.AsyncClient:
 
 @api_router.get("/")
 async def root():
-    return {"message": "makers.fun proxy relay", "upstream": UPSTREAM}
+    return {"message": "MakeMarkets relay", "status": "ok"}
 
 
 @api_router.get("/our/desks")
@@ -64,7 +64,7 @@ async def _record_our_desk(desk_id: str, origin: str):
         logger.warning(f"failed to record desk {desk_id}: {e}")
 
 
-@api_router.api_route("/mf/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
+@api_router.api_route("/relay/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
 async def proxy(path: str, request: Request):
     body = await request.body()
     headers = {

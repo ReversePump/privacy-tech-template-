@@ -88,7 +88,7 @@ export default function Home() {
             <div className="min-w-0 flex-1">
               <div className="mb-5 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-[#8ca3b8]">
                 <span className="h-1.5 w-1.5 rounded-[3px] bg-[#8AF5D0] pip-blink" />
-                Market makers for memecoins · pump.fun · Solana
+                Market makers for memecoins · bonding curve native · Solana
               </div>
               <h1 className="text-[44px] leading-[0.98] md:text-[76px] font-medium tracking-tighter text-white" data-testid="hero-headline">
                 your coin, with a<br /><em className="font-serif italic text-[#8AF5D0]">market maker</em> built in.
@@ -201,7 +201,7 @@ export default function Home() {
             ["Your wallet", "Approves the launch. SOL only ever flows out to you — plus a fixed 20% profit cut that gets torched forever.", "YOU"],
             ["The maker's vault", "Holds the market maker's capital and your pending payouts. Claims the coin's fees by itself.", "VAULT"],
             ["Trading wallets", "One to ten of them, each running its own book and price lines. All public, all on-chain.", "WALLETS"],
-            ["The coin's market", "Buys below its reference lines, sells above entry. Bonding curve first, PumpSwap after.", "PUMP.FUN"],
+            ["The coin's market", "Buys below its reference lines, sells above entry. Bonding curve first, then its liquidity pool.", "THE CURVE"],
           ].map(([t, b, k], i) => (
             <Panel key={t} className="p-5 hover:border-[#8AF5D0]/25 transition-colors">
               <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#556b82]">{String(i + 1).padStart(2, "0")} · {k}</div>
@@ -244,7 +244,7 @@ export default function Home() {
             Ship your coin with a <em className="font-serif italic text-[#8AF5D0]">market maker</em> built in.
           </h2>
           <p className="relative mx-auto mt-4 max-w-lg text-sm font-light text-[#8ca3b8]">
-            One approval from your wallet mints the coin on pump.fun, locks its fee split and funds the maker. Every dial remains yours after that.
+            One approval from your wallet mints the coin, locks its fee split and funds the maker. Every dial remains yours after that.
           </p>
           <div className="relative mt-8 flex justify-center gap-3">
             <Link to="/launch" data-testid="cta-launch-btn"

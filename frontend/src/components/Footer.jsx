@@ -20,18 +20,12 @@ export default function Footer() {
               <span className="uppercase tracking-[0.15em] text-[#556b82]">Platform</span>
               <Link className="text-[#8ca3b8] hover:text-[#8AF5D0]" to="/explore">Explore</Link>
               <Link className="text-[#8ca3b8] hover:text-[#8AF5D0]" to="/launch">Launch</Link>
-              <Link className="text-[#8ca3b8] hover:text-[#8AF5D0]" to="/mm">Any coin</Link>
+              <Link className="text-[#8ca3b8] hover:text-[#8AF5D0]" to="/mm">Onboard a coin</Link>
               <Link className="text-[#8ca3b8] hover:text-[#8AF5D0]" to="/live">Live</Link>
             </div>
             <div className="flex flex-col gap-2.5">
               <span className="uppercase tracking-[0.15em] text-[#556b82]">Learn</span>
               <Link className="text-[#8ca3b8] hover:text-[#8AF5D0]" to="/docs">Docs</Link>
-            </div>
-            <div className="flex flex-col gap-2.5">
-              <span className="uppercase tracking-[0.15em] text-[#556b82]">Chain</span>
-              <a className="text-[#8ca3b8] hover:text-[#8AF5D0]" href="https://pump.fun" target="_blank" rel="noopener noreferrer">pump.fun</a>
-              <a className="text-[#8ca3b8] hover:text-[#8AF5D0]" href="https://solscan.io" target="_blank" rel="noopener noreferrer">Solscan</a>
-              <a className="text-[#8ca3b8] hover:text-[#8AF5D0]" href="https://dexscreener.com/solana" target="_blank" rel="noopener noreferrer">DexScreener</a>
             </div>
           </div>
         </div>
