@@ -24,7 +24,7 @@ function MyDesks() {
     return (
       <Empty>
         <p className="mb-4">Connect your wallet to see your makers.</p>
-        <button onClick={() => setVisible(true)} className="rounded-full bg-[#8AF5D0] px-5 py-2 text-sm font-medium text-[#07111f]" data-testid="dash-connect-btn">Connect</button>
+        <button onClick={() => setVisible(true)} className="rounded-[3px] bg-[#8AF5D0] px-5 py-2 text-sm font-medium text-[#07111f]" data-testid="dash-connect-btn">Connect</button>
       </Empty>
     );
   }
@@ -32,7 +32,7 @@ function MyDesks() {
     return (
       <Empty>
         <p className="mb-4">Sign in with your wallet to prove ownership.</p>
-        <button onClick={async () => { try { await signIn(); } catch (e) { toast.error(errorMessage(e)); } }} className="rounded-full bg-[#8AF5D0] px-5 py-2 text-sm font-medium text-[#07111f]" data-testid="dash-signin-btn">Sign in</button>
+        <button onClick={async () => { try { await signIn(); } catch (e) { toast.error(errorMessage(e)); } }} className="rounded-[3px] bg-[#8AF5D0] px-5 py-2 text-sm font-medium text-[#07111f]" data-testid="dash-signin-btn">Sign in</button>
       </Empty>
     );
   }
@@ -99,7 +99,7 @@ function DeskDashboard({ id }) {
           <SettingsEditor values={form} onChange={(k, v) => setForm({ ...form, [k]: v })} />
         </div>
         <button onClick={save} disabled={busy} data-testid="dash-save-btn"
-          className="mt-6 h-10 rounded-full bg-[#8AF5D0] px-6 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] disabled:opacity-50">
+          className="mt-6 h-10 rounded-[3px] bg-[#8AF5D0] px-6 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] disabled:opacity-50">
           {busy ? "Saving…" : "Save changes"}
         </button>
         <p className="mt-3 text-[11px] font-light text-[#556b82]">Changes may require a wallet approval before they apply.</p>

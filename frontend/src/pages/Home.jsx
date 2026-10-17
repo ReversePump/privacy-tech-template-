@@ -23,7 +23,7 @@ function HeroActivity({ ourIds, hasOurs }) {
     <Panel className="w-full lg:w-[420px] shrink-0 overflow-hidden" data-testid="hero-activity-panel">
       <div className="flex items-center justify-between border-b border-white/5 px-4 py-3">
         <span className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.15em] text-[#8AF5D0]">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#8AF5D0] pip-blink" /> Live maker activity
+          <span className="h-1.5 w-1.5 rounded-[3px] bg-[#8AF5D0] pip-blink" /> Live maker activity
         </span>
         <Link to="/live" className="font-mono text-[11px] uppercase tracking-wider text-[#556b82] hover:text-[#8AF5D0]" data-testid="hero-all-activity-link">
           All activity →
@@ -50,7 +50,7 @@ function HeroActivity({ ourIds, hasOurs }) {
             <p className="mt-2 text-[11px] font-light leading-relaxed text-[#556b82]">
               Only coins launched here — or makers added here — show up in this feed. Launch one and watch it land here the moment it finalizes on chain.
             </p>
-            <Link to="/launch" className="mt-4 inline-flex h-8 items-center rounded-full bg-[#8AF5D0] px-4 text-xs font-medium text-[#07111f] hover:bg-[#7CFFC8]" data-testid="hero-empty-launch-btn">
+            <Link to="/launch" className="mt-4 inline-flex h-8 items-center rounded-[3px] bg-[#8AF5D0] px-4 text-xs font-medium text-[#07111f] hover:bg-[#7CFFC8]" data-testid="hero-empty-launch-btn">
               Launch the first coin
             </Link>
           </div>
@@ -87,7 +87,7 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row lg:items-start gap-10">
             <div className="min-w-0 flex-1">
               <div className="mb-5 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-[#8ca3b8]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#8AF5D0] pip-blink" />
+                <span className="h-1.5 w-1.5 rounded-[3px] bg-[#8AF5D0] pip-blink" />
                 Market maker launchpad · pump.fun · Solana
               </div>
               <h1 className="text-[52px] leading-[0.95] md:text-[92px] font-medium tracking-tighter text-white" data-testid="hero-headline">
@@ -100,11 +100,11 @@ export default function Home() {
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 <Link to="/launch" data-testid="hero-launch-btn"
-                  className="inline-flex h-11 items-center gap-2 rounded-full bg-[#8AF5D0] px-6 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] hover:shadow-[0_0_24px_rgba(138,245,208,0.4)] transition-all">
+                  className="inline-flex h-11 items-center gap-2 rounded-[3px] bg-[#8AF5D0] px-6 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] hover:shadow-[0_0_24px_rgba(138,245,208,0.4)] transition-all">
                   <Rocket size={15} /> Launch a coin
                 </Link>
                 <Link to="/mm" data-testid="hero-anycoin-btn"
-                  className="inline-flex h-11 items-center gap-2 rounded-full border border-white/15 px-6 text-sm text-white hover:border-[#8AF5D0]/40 hover:text-[#8AF5D0] transition-colors">
+                  className="inline-flex h-11 items-center gap-2 rounded-[3px] border border-white/15 px-6 text-sm text-white hover:border-[#8AF5D0]/40 hover:text-[#8AF5D0] transition-colors">
                   <Plus size={15} /> Add a maker to any coin
                 </Link>
               </div>
@@ -145,10 +145,10 @@ export default function Home() {
               This board only lists coins launched through this site or makers added through this site. Be the first — it shows up here the moment it lands on chain.
             </p>
             <div className="mt-6 flex justify-center gap-3">
-              <Link to="/launch" className="inline-flex h-10 items-center gap-2 rounded-full bg-[#8AF5D0] px-5 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8]" data-testid="makers-empty-launch-btn">
+              <Link to="/launch" className="inline-flex h-10 items-center gap-2 rounded-[3px] bg-[#8AF5D0] px-5 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8]" data-testid="makers-empty-launch-btn">
                 <Rocket size={14} /> Launch a coin
               </Link>
-              <Link to="/mm" className="inline-flex h-10 items-center gap-2 rounded-full border border-white/15 px-5 text-sm text-white hover:border-[#8AF5D0]/40 hover:text-[#8AF5D0]" data-testid="makers-empty-mm-btn">
+              <Link to="/mm" className="inline-flex h-10 items-center gap-2 rounded-[3px] border border-white/15 px-5 text-sm text-white hover:border-[#8AF5D0]/40 hover:text-[#8AF5D0]" data-testid="makers-empty-mm-btn">
                 <Plus size={14} /> Add a maker
               </Link>
             </div>
@@ -165,7 +165,7 @@ export default function Home() {
                     <div className="truncate text-white group-hover:text-[#8AF5D0] transition-colors">{d.name}</div>
                     <div className="font-mono text-[11px] text-[#556b82]">${d.ticker}</div>
                   </div>
-                  <span className={`ml-auto h-1.5 w-1.5 rounded-full ${d.status === "running" ? "bg-[#38c973] pip-blink" : "bg-[#556b82]"}`} />
+                  <span className={`ml-auto h-1.5 w-1.5 rounded-[3px] ${d.status === "running" ? "bg-[#38c973] pip-blink" : "bg-[#556b82]"}`} />
                 </div>
                 <div className="mt-4 grid grid-cols-3 gap-2 font-mono text-xs">
                   <div>
@@ -248,10 +248,10 @@ export default function Home() {
           </p>
           <div className="relative mt-8 flex justify-center gap-3">
             <Link to="/launch" data-testid="cta-launch-btn"
-              className="inline-flex h-11 items-center gap-2 rounded-full bg-[#8AF5D0] px-6 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] hover:shadow-[0_0_24px_rgba(138,245,208,0.4)] transition-all">
+              className="inline-flex h-11 items-center gap-2 rounded-[3px] bg-[#8AF5D0] px-6 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] hover:shadow-[0_0_24px_rgba(138,245,208,0.4)] transition-all">
               <Rocket size={15} /> Launch a coin
             </Link>
-            <Link to="/docs" className="inline-flex h-11 items-center gap-2 rounded-full border border-white/15 px-6 text-sm text-white hover:border-[#8AF5D0]/40 hover:text-[#8AF5D0] transition-colors" data-testid="cta-docs-btn">
+            <Link to="/docs" className="inline-flex h-11 items-center gap-2 rounded-[3px] border border-white/15 px-6 text-sm text-white hover:border-[#8AF5D0]/40 hover:text-[#8AF5D0] transition-colors" data-testid="cta-docs-btn">
               Read the docs
             </Link>
           </div>

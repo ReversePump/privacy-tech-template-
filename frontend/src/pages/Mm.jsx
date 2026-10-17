@@ -139,7 +139,7 @@ export default function Mm() {
                 className="h-11 flex-1 rounded-lg border border-white/10 bg-white/5 px-3.5 font-mono text-[13px] text-white outline-none focus:border-[#8AF5D0]/40"
               />
               <button onClick={() => check()} disabled={checking} data-testid="mm-check-btn"
-                className="inline-flex h-11 items-center gap-2 rounded-full bg-[#8AF5D0] px-5 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] disabled:opacity-50">
+                className="inline-flex h-11 items-center gap-2 rounded-[3px] bg-[#8AF5D0] px-5 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] disabled:opacity-50">
                 {checking ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />} {checking ? "Checking…" : "Check"}
               </button>
             </div>
@@ -185,9 +185,9 @@ export default function Mm() {
                   : "Deposit SOL to its treasury to start trading."}
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
-                <Link to={`/desk/${created.id}`} className="rounded-full bg-[#8AF5D0] px-5 py-2 text-sm font-medium text-[#07111f]" data-testid="mm-open-desk">Open the maker →</Link>
+                <Link to={`/desk/${created.id}`} className="rounded-[3px] bg-[#8AF5D0] px-5 py-2 text-sm font-medium text-[#07111f]" data-testid="mm-open-desk">Open the maker →</Link>
                 {depositState === "failed" && (
-                  <button onClick={() => deposit(created, fundSol)} className="rounded-full border border-white/15 px-5 py-2 text-sm text-white" data-testid="mm-retry-deposit">
+                  <button onClick={() => deposit(created, fundSol)} className="rounded-[3px] border border-white/15 px-5 py-2 text-sm text-white" data-testid="mm-retry-deposit">
                     Retry deposit
                   </button>
                 )}
@@ -230,7 +230,7 @@ export default function Mm() {
           </ul>
           {!created && (
             <button onClick={add} disabled={!result?.ok || busy} data-testid="mm-add-btn"
-              className="mt-6 inline-flex h-11 items-center gap-2 rounded-full bg-[#8AF5D0] px-6 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] disabled:opacity-40 transition-all">
+              className="mt-6 inline-flex h-11 items-center gap-2 rounded-[3px] bg-[#8AF5D0] px-6 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] disabled:opacity-40 transition-all">
               {connected ? (busy ? "Creating…" : "Create the maker") : "Connect to add"} <ArrowRight size={14} />
             </button>
           )}

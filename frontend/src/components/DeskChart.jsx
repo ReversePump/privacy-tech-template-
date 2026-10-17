@@ -30,7 +30,7 @@ export default function DeskChart({ deskId, height = 300 }) {
         <div className="flex gap-1">
           {[["price", "Price"], ["mcap", "Mcap"]].map(([k, l]) => (
             <button key={k} data-testid={`chart-mode-${k}`} onClick={() => setMode(k)}
-              className={`rounded-full px-3 py-1 font-mono text-[11px] uppercase ${mode === k ? "bg-[#8AF5D0] text-[#07111f]" : "text-[#8ca3b8] hover:bg-white/5"}`}>
+              className={`rounded-[3px] px-3 py-1 font-mono text-[11px] uppercase ${mode === k ? "bg-[#8AF5D0] text-[#07111f]" : "text-[#8ca3b8] hover:bg-white/5"}`}>
               {l}
             </button>
           ))}
@@ -38,7 +38,7 @@ export default function DeskChart({ deskId, height = 300 }) {
         <div className="flex gap-1">
           {["1h", "6h", "24h", "7d"].map((r) => (
             <button key={r} data-testid={`chart-range-${r}`} onClick={() => setRange(r)}
-              className={`rounded-full px-2.5 py-1 font-mono text-[11px] uppercase ${range === r ? "bg-white/10 text-white" : "text-[#556b82] hover:text-white"}`}>
+              className={`rounded-[3px] px-2.5 py-1 font-mono text-[11px] uppercase ${range === r ? "bg-white/10 text-white" : "text-[#556b82] hover:text-white"}`}>
               {r}
             </button>
           ))}

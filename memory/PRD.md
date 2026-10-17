@@ -54,3 +54,6 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 
 ## Update 2026-10-17 (revision 7)
 - Typography switched to angular/blocky: Archivo Black (display accents), Chakra Petch (UI/body), Space Mono (mono/data). Removed Outfit/Playfair/JetBrains everywhere (incl. wallet modal reskin, toaster, chart tooltip).
+
+## Update 2026-10-17 (revision 8)
+- Squared all interactive shapes (rounded-full -> rounded-[3px]) across pages/components + wallet adapter buttons, matching the angular type system.

@@ -97,9 +97,9 @@ const Toggle = ({ checked, onChange, testId }) => (
     aria-checked={!!checked}
     data-testid={testId}
     onClick={() => onChange(!checked)}
-    className={`relative h-6 w-11 rounded-full transition-colors ${checked ? "bg-[#8AF5D0]" : "bg-white/10 border border-white/15"}`}
+    className={`relative h-6 w-11 rounded-[3px] transition-colors ${checked ? "bg-[#8AF5D0]" : "bg-white/10 border border-white/15"}`}
   >
-    <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${checked ? "left-[22px]" : "left-0.5"}`} />
+    <span className={`absolute top-0.5 h-5 w-5 rounded-[3px] bg-white shadow transition-all ${checked ? "left-[22px]" : "left-0.5"}`} />
   </button>
 );
 
@@ -119,7 +119,7 @@ const PctSlider = ({ value, onChange, min = 0, max = 100, nullable, testId }) =>
       </span>
       {nullable && (
         <button type="button" onClick={() => onChange(off ? min : null)} data-testid={`${testId}-toggle`}
-          className={`rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase ${off ? "border-white/15 text-[#8ca3b8]" : "border-[#8AF5D0]/40 text-[#8AF5D0]"}`}>
+          className={`rounded-[3px] border px-2 py-0.5 font-mono text-[10px] uppercase ${off ? "border-white/15 text-[#8ca3b8]" : "border-[#8AF5D0]/40 text-[#8AF5D0]"}`}>
           {off ? "set" : "off"}
         </button>
       )}
@@ -144,7 +144,7 @@ const NumInput = ({ value, onChange, unit, step = 1, min, nullable, testId }) =>
       </div>
       {nullable && (
         <button type="button" onClick={() => onChange(off ? 0 : null)} data-testid={`${testId}-toggle`}
-          className={`rounded-full border px-2 py-1 font-mono text-[10px] uppercase ${off ? "border-white/15 text-[#8ca3b8]" : "border-[#8AF5D0]/40 text-[#8AF5D0]"}`}>
+          className={`rounded-[3px] border px-2 py-1 font-mono text-[10px] uppercase ${off ? "border-white/15 text-[#8ca3b8]" : "border-[#8AF5D0]/40 text-[#8AF5D0]"}`}>
           {off ? "set" : "off"}
         </button>
       )}
@@ -201,7 +201,7 @@ export function SettingsEditor({ values, onChange, compactKeys }) {
               className="flex w-full items-center gap-3 px-5 py-4 text-left hover:bg-white/[0.02] transition-colors">
               <span className={`font-mono text-[10px] uppercase tracking-[0.18em] ${isOpen ? "text-[#8AF5D0]" : "text-[#556b82]"}`}>{g.title}</span>
               <span className="text-[11px] font-light text-[#556b82] hidden sm:inline">{g.blurb}</span>
-              <span className="ml-auto rounded-full border border-white/10 px-2 py-0.5 font-mono text-[10px] text-[#8ca3b8]">{activeCount} set</span>
+              <span className="ml-auto rounded-[3px] border border-white/10 px-2 py-0.5 font-mono text-[10px] text-[#8ca3b8]">{activeCount} set</span>
               <span className={`text-[#556b82] transition-transform ${isOpen ? "rotate-180" : ""}`}>▾</span>
             </button>
             {isOpen && (
@@ -249,7 +249,7 @@ export function SettingsSummary({ settings }) {
             <div className="mb-2 font-mono text-[9px] uppercase tracking-[0.18em] text-[#556b82]">{g.title}</div>
             <div className="flex flex-wrap gap-1.5">
               {items.map(([label, val]) => (
-                <span key={label} className={`rounded-full border px-2.5 py-1 font-mono text-[10px] ${val === "off" ? "border-white/5 text-[#3d4f63]" : "border-white/10 text-[#8ca3b8]"}`}>
+                <span key={label} className={`rounded-[3px] border px-2.5 py-1 font-mono text-[10px] ${val === "off" ? "border-white/5 text-[#3d4f63]" : "border-white/10 text-[#8ca3b8]"}`}>
                   {label} <span className={val === "off" ? "" : "text-white"}>{val}</span>
                 </span>
               ))}

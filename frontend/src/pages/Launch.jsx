@@ -184,7 +184,7 @@ export default function Launch() {
                     i === step ? "border-[#8AF5D0] text-white" : i < step ? "border-transparent text-[#8AF5D0]" : "border-transparent text-[#556b82]"
                   }`}
                 >
-                  <span className={`flex h-5 w-5 items-center justify-center rounded-full border font-mono text-[10px] ${i === step ? "border-[#8AF5D0] text-[#8AF5D0]" : i < step ? "border-[#8AF5D0]/40 bg-[#8AF5D0]/10 text-[#8AF5D0]" : "border-white/15"}`}>
+                  <span className={`flex h-5 w-5 items-center justify-center rounded-[3px] border font-mono text-[10px] ${i === step ? "border-[#8AF5D0] text-[#8AF5D0]" : i < step ? "border-[#8AF5D0]/40 bg-[#8AF5D0]/10 text-[#8AF5D0]" : "border-white/15"}`}>
                     {i < step ? <Check size={10} /> : i + 1}
                   </span>
                   {s}
@@ -252,7 +252,7 @@ export default function Launch() {
               <div className="flex gap-2">
                 {[0, 0.5, 1, 2, 5].map((v) => (
                   <button key={v} data-testid={`fund-preset-${v}`} onClick={() => setFundSol(v)}
-                    className={`rounded-full px-4 py-1.5 font-mono text-xs ${fundSol === v ? "bg-[#8AF5D0] text-[#07111f]" : "border border-white/10 text-[#8ca3b8] hover:border-[#8AF5D0]/40"}`}>
+                    className={`rounded-[3px] px-4 py-1.5 font-mono text-xs ${fundSol === v ? "bg-[#8AF5D0] text-[#07111f]" : "border border-white/10 text-[#8ca3b8] hover:border-[#8AF5D0]/40"}`}>
                     {v} SOL
                   </button>
                 ))}
@@ -311,8 +311,8 @@ export default function Launch() {
                   <div className="flex items-center gap-2 text-[#8AF5D0]"><Check size={18} /><span className="font-medium">The coin is on chain.</span></div>
                   <p className="mt-2 text-[13px] font-light text-[#8ca3b8]">Its maker starts as soon as the treasury has SOL. Every trade will show on its page.</p>
                   <div className="mt-5 flex gap-3">
-                    <Link to={`/desk/${liveDesk.id}`} className="rounded-full bg-[#8AF5D0] px-5 py-2 text-sm font-medium text-[#07111f]" data-testid="launch-open-desk">Open the maker →</Link>
-                    <Link to="/explore" className="rounded-full border border-white/15 px-5 py-2 text-sm text-white">Explore</Link>
+                    <Link to={`/desk/${liveDesk.id}`} className="rounded-[3px] bg-[#8AF5D0] px-5 py-2 text-sm font-medium text-[#07111f]" data-testid="launch-open-desk">Open the maker →</Link>
+                    <Link to="/explore" className="rounded-[3px] border border-white/15 px-5 py-2 text-sm text-white">Explore</Link>
                   </div>
                 </Panel>
               ) : (
@@ -334,7 +334,7 @@ export default function Launch() {
                   </Panel>
                   {err && <Panel className="border-[#ff4d4f]/30 bg-[#ff4d4f]/5 p-4 text-[13px] text-[#ff8a8a]" data-testid="launch-error">{err}</Panel>}
                   <button onClick={launch} disabled={phase !== "idle" && phase !== "failed"} data-testid="launch-sign-btn"
-                    className="inline-flex h-12 items-center gap-2 rounded-full bg-[#8AF5D0] px-8 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] hover:shadow-[0_0_28px_rgba(138,245,208,0.4)] disabled:opacity-50 transition-all">
+                    className="inline-flex h-12 items-center gap-2 rounded-[3px] bg-[#8AF5D0] px-8 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] hover:shadow-[0_0_28px_rgba(138,245,208,0.4)] disabled:opacity-50 transition-all">
                     <Rocket size={16} />
                     {phase === "idle" || phase === "failed" ? (connected ? "Sign & launch" : "Connect wallet to launch") : phase === "signing" ? "Approve in your wallet…" : phase === "sending" ? "Sending…" : "Working…"}
                   </button>
@@ -348,12 +348,12 @@ export default function Launch() {
             <div className="mt-10 flex items-center gap-3">
               {step > 0 && (
                 <button onClick={() => setStep(step - 1)} data-testid="launch-back-btn"
-                  className="inline-flex h-10 items-center gap-1.5 rounded-full border border-white/15 px-5 text-sm text-white hover:border-[#8AF5D0]/40">
+                  className="inline-flex h-10 items-center gap-1.5 rounded-[3px] border border-white/15 px-5 text-sm text-white hover:border-[#8AF5D0]/40">
                   <ArrowLeft size={14} /> Back
                 </button>
               )}
               <button onClick={() => setStep(step + 1)} disabled={!stepOk[step]} data-testid="launch-next-btn"
-                className="inline-flex h-10 items-center gap-1.5 rounded-full bg-[#8AF5D0] px-6 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] disabled:opacity-40">
+                className="inline-flex h-10 items-center gap-1.5 rounded-[3px] bg-[#8AF5D0] px-6 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] disabled:opacity-40">
                 Next <ArrowRight size={14} />
               </button>
               {!stepOk[step] && step === 0 && <span className="font-mono text-[11px] text-[#556b82]">name, ticker and image required</span>}

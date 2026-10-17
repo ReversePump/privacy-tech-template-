@@ -81,13 +81,13 @@ export default function Explore() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder='Name, ticker, mint, or "paired"'
-              className="h-9 w-64 rounded-full border border-white/10 bg-white/5 pl-9 pr-3 text-[13px] text-white placeholder-[#556b82] outline-none focus:border-[#8AF5D0]/40"
+              className="h-9 w-64 rounded-[3px] border border-white/10 bg-white/5 pl-9 pr-3 text-[13px] text-white placeholder-[#556b82] outline-none focus:border-[#8AF5D0]/40"
             />
           </div>
           <div className="flex flex-wrap gap-1" data-testid="explore-filters">
             {FILTERS.map(([k, l]) => (
               <button key={k} data-testid={`filter-${k}`} onClick={() => setFilter(k)}
-                className={`rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide transition-colors ${filter === k ? "bg-[#8AF5D0] text-[#07111f]" : "text-[#8ca3b8] hover:bg-white/5"}`}>
+                className={`rounded-[3px] px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide transition-colors ${filter === k ? "bg-[#8AF5D0] text-[#07111f]" : "text-[#8ca3b8] hover:bg-white/5"}`}>
                 {l}
               </button>
             ))}
@@ -95,7 +95,7 @@ export default function Explore() {
           <div className="ml-auto flex items-center gap-2">
             <ArrowUpDown size={12} className="text-[#556b82]" />
             <select data-testid="explore-sort" value={sort} onChange={(e) => setSort(e.target.value)}
-              className="h-9 rounded-full border border-white/10 bg-white/5 px-3 font-mono text-[11px] uppercase text-[#8ca3b8] outline-none">
+              className="h-9 rounded-[3px] border border-white/10 bg-white/5 px-3 font-mono text-[11px] uppercase text-[#8ca3b8] outline-none">
               {SORTS.map(([k, l]) => <option key={k} value={k} className="bg-[#0d1b2a]">{l}</option>)}
             </select>
           </div>

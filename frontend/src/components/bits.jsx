@@ -106,7 +106,7 @@ export const PageHead = ({ kicker, title, accent, sub, right }) => (
   <div className="mb-8 md:mb-10">
     {kicker && (
       <div className="mb-3 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-[#8AF5D0]">
-        <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#8AF5D0] pip-blink" />
+        <span className="inline-block h-1.5 w-1.5 rounded-[3px] bg-[#8AF5D0] pip-blink" />
         {kicker}
       </div>
     )}
@@ -123,7 +123,7 @@ export const PageHead = ({ kicker, title, accent, sub, right }) => (
 export const TypeBadge = ({ desk }) => {
   const t = desk.origin === "native" ? "NATIVE" : desk.origin === "mm" || desk.origin === "external" ? "ANY COIN" : desk.burnSplit ? "HALF BURNS" : desk.quoteMint ? "PAIRED" : "LAUNCH";
   return (
-    <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-[#8ca3b8]">
+    <span className="rounded-[3px] border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-[#8ca3b8]">
       {t}
     </span>
   );
@@ -133,7 +133,7 @@ export const StatusDot = ({ status }) => {
   const live = status === "running";
   return (
     <span className="inline-flex items-center gap-1.5 font-mono text-xs text-[#8ca3b8]">
-      <span className={`h-1.5 w-1.5 rounded-full ${live ? "bg-[#38c973] pip-blink" : "bg-[#556b82]"}`} />
+      <span className={`h-1.5 w-1.5 rounded-[3px] ${live ? "bg-[#38c973] pip-blink" : "bg-[#556b82]"}`} />
       {live ? "Running" : status || "—"}
     </span>
   );

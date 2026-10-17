@@ -86,8 +86,8 @@ export default function Docs() {
             <h2 className="text-xl font-medium text-white">Ready?</h2>
             <p className="mt-2 text-sm font-light text-[#8ca3b8]">Launch a coin with its own maker, or put one on any pump.fun coin.</p>
             <div className="mt-5 flex gap-3">
-              <Link to="/launch" className="inline-flex h-10 items-center rounded-full bg-[#8AF5D0] px-5 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8]" data-testid="docs-launch-btn">Launch a coin</Link>
-              <Link to="/mm" className="inline-flex h-10 items-center rounded-full border border-white/15 px-5 text-sm text-white hover:border-[#8AF5D0]/40 hover:text-[#8AF5D0]" data-testid="docs-mm-btn">Any coin</Link>
+              <Link to="/launch" className="inline-flex h-10 items-center rounded-[3px] bg-[#8AF5D0] px-5 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8]" data-testid="docs-launch-btn">Launch a coin</Link>
+              <Link to="/mm" className="inline-flex h-10 items-center rounded-[3px] border border-white/15 px-5 text-sm text-white hover:border-[#8AF5D0]/40 hover:text-[#8AF5D0]" data-testid="docs-mm-btn">Any coin</Link>
             </div>
           </Panel>
         </div>

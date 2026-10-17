@@ -158,13 +158,13 @@ a { color: inherit; }
 .wallet-adapter-modal-middle-button {
     background: #8af5d0 !important;
     color: #07111f !important;
-    border-radius: 999px !important;
+    border-radius: 3px !important;
     font-family: "Chakra Petch", sans-serif !important;
 }
 .wallet-adapter-button {
     background: #8af5d0 !important;
     color: #07111f !important;
-    border-radius: 999px !important;
+    border-radius: 3px !important;
     font-family: "Chakra Petch", sans-serif !important;
     font-size: 13px !important;
     font-weight: 500 !important;

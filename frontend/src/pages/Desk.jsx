@@ -91,11 +91,11 @@ export default function Desk() {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <ExtLink href={pumpCoin(desk.mint)} className="rounded-full border border-white/10 px-3.5 py-2 text-xs">pump.fun</ExtLink>
-          <ExtLink href={dexscreener(desk.mint)} className="rounded-full border border-white/10 px-3.5 py-2 text-xs">DexScreener</ExtLink>
-          <ExtLink href={solscanAcct(desk.mint)} className="rounded-full border border-white/10 px-3.5 py-2 text-xs">Solscan</ExtLink>
+          <ExtLink href={pumpCoin(desk.mint)} className="rounded-[3px] border border-white/10 px-3.5 py-2 text-xs">pump.fun</ExtLink>
+          <ExtLink href={dexscreener(desk.mint)} className="rounded-[3px] border border-white/10 px-3.5 py-2 text-xs">DexScreener</ExtLink>
+          <ExtLink href={solscanAcct(desk.mint)} className="rounded-[3px] border border-white/10 px-3.5 py-2 text-xs">Solscan</ExtLink>
           {isOwner && (
-            <Link to={`/dashboard/${desk.id}`} className="rounded-full bg-[#8AF5D0] px-4 py-2 text-xs font-medium text-[#07111f] hover:bg-[#7CFFC8]" data-testid="desk-dashboard-btn">
+            <Link to={`/dashboard/${desk.id}`} className="rounded-[3px] bg-[#8AF5D0] px-4 py-2 text-xs font-medium text-[#07111f] hover:bg-[#7CFFC8]" data-testid="desk-dashboard-btn">
               Dashboard
             </Link>
           )}
@@ -162,17 +162,17 @@ export default function Desk() {
               <div className="mt-4 flex flex-wrap gap-2">
                 {desk.status === "running" ? (
                   <button data-testid="desk-pause-btn" disabled={!!acting} onClick={() => act("Pause", () => makers.pause(desk.id))}
-                    className="inline-flex h-9 items-center gap-1.5 rounded-full border border-white/15 px-4 text-xs text-white hover:border-[#ff4d4f]/50 hover:text-[#ff4d4f] disabled:opacity-50">
+                    className="inline-flex h-9 items-center gap-1.5 rounded-[3px] border border-white/15 px-4 text-xs text-white hover:border-[#ff4d4f]/50 hover:text-[#ff4d4f] disabled:opacity-50">
                     <Pause size={12} /> Pause
                   </button>
                 ) : (
                   <button data-testid="desk-resume-btn" disabled={!!acting} onClick={() => act("Resume", () => makers.resume(desk.id))}
-                    className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[#8AF5D0]/30 px-4 text-xs text-[#8AF5D0] hover:bg-[#8AF5D0]/10 disabled:opacity-50">
+                    className="inline-flex h-9 items-center gap-1.5 rounded-[3px] border border-[#8AF5D0]/30 px-4 text-xs text-[#8AF5D0] hover:bg-[#8AF5D0]/10 disabled:opacity-50">
                     <Play size={12} /> Resume
                   </button>
                 )}
                 <button data-testid="desk-withdraw-btn" disabled={!!acting} onClick={() => act("Withdraw", () => makers.withdraw(desk.id, "profits"))}
-                  className="inline-flex h-9 items-center gap-1.5 rounded-full border border-white/15 px-4 text-xs text-white hover:border-[#8AF5D0]/40 hover:text-[#8AF5D0] disabled:opacity-50">
+                  className="inline-flex h-9 items-center gap-1.5 rounded-[3px] border border-white/15 px-4 text-xs text-white hover:border-[#8AF5D0]/40 hover:text-[#8AF5D0] disabled:opacity-50">
                   <CircleDollarSign size={12} /> Withdraw profits
                 </button>
               </div>

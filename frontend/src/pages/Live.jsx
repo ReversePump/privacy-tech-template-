@@ -58,7 +58,7 @@ export default function Live() {
           <div className="flex gap-1" data-testid="activity-filters">
             {KINDS.map(([k, l]) => (
               <button key={k || "all"} data-testid={`activity-filter-${k || "all"}`} onClick={() => setKind(k)}
-                className={`rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide transition-colors ${kind === k ? "bg-[#8AF5D0] text-[#07111f]" : "text-[#8ca3b8] hover:bg-white/5"}`}>
+                className={`rounded-[3px] px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide transition-colors ${kind === k ? "bg-[#8AF5D0] text-[#07111f]" : "text-[#8ca3b8] hover:bg-white/5"}`}>
                 {l}
               </button>
             ))}

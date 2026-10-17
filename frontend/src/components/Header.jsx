@@ -60,7 +60,7 @@ export default function Header() {
               to={n.to}
               data-testid={`nav-${n.label.replace(/[^a-z]/gi, "").toLowerCase()}`}
               className={({ isActive }) =>
-                `rounded-full px-3.5 py-1.5 text-[13px] transition-colors ${
+                `rounded-[3px] px-3.5 py-1.5 text-[13px] transition-colors ${
                   isActive
                     ? "bg-[#8AF5D0] text-[#07111f] font-medium"
                     : "text-[#8ca3b8] hover:text-white hover:bg-white/5"
@@ -82,7 +82,7 @@ export default function Header() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Search makers"
-                className="h-9 w-44 lg:w-52 rounded-full border border-white/10 bg-white/5 pl-9 pr-10 text-[13px] text-white placeholder-[#556b82] outline-none focus:border-[#8AF5D0]/40 transition-colors"
+                className="h-9 w-44 lg:w-52 rounded-[3px] border border-white/10 bg-white/5 pl-9 pr-10 text-[13px] text-white placeholder-[#556b82] outline-none focus:border-[#8AF5D0]/40 transition-colors"
               />
               <kbd className="absolute right-3 top-1/2 -translate-y-1/2 rounded border border-white/10 px-1 font-mono text-[10px] text-[#556b82]">⌘K</kbd>
             </div>
@@ -93,9 +93,9 @@ export default function Header() {
               <button
                 data-testid="wallet-chip"
                 onClick={() => setMenu((m) => !m)}
-                className="flex h-9 items-center gap-2 rounded-full border border-[#8AF5D0]/30 bg-[#8AF5D0]/10 px-4 font-mono text-xs text-[#8AF5D0] hover:bg-[#8AF5D0]/20 transition-colors"
+                className="flex h-9 items-center gap-2 rounded-[3px] border border-[#8AF5D0]/30 bg-[#8AF5D0]/10 px-4 font-mono text-xs text-[#8AF5D0] hover:bg-[#8AF5D0]/20 transition-colors"
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-[#8AF5D0]" />
+                <span className="h-1.5 w-1.5 rounded-[3px] bg-[#8AF5D0]" />
                 {short(publicKey.toBase58())}
                 {signedIn && <KeyRound size={12} />}
               </button>
@@ -132,7 +132,7 @@ export default function Header() {
             <button
               data-testid="connect-wallet-btn"
               onClick={() => setVisible(true)}
-              className="flex h-9 items-center gap-2 rounded-full bg-[#8AF5D0] px-4 text-[13px] font-medium text-[#07111f] hover:bg-[#7CFFC8] hover:shadow-[0_0_20px_rgba(138,245,208,0.35)] transition-all"
+              className="flex h-9 items-center gap-2 rounded-[3px] bg-[#8AF5D0] px-4 text-[13px] font-medium text-[#07111f] hover:bg-[#7CFFC8] hover:shadow-[0_0_20px_rgba(138,245,208,0.35)] transition-all"
             >
               <Wallet size={14} /> Connect
             </button>
@@ -144,7 +144,7 @@ export default function Header() {
         {NAV.map((n) => (
           <NavLink key={n.to} to={n.to}
             className={({ isActive }) =>
-              `whitespace-nowrap rounded-full px-3 py-1 text-xs ${isActive ? "bg-[#8AF5D0] text-[#07111f]" : "text-[#8ca3b8]"}`
+              `whitespace-nowrap rounded-[3px] px-3 py-1 text-xs ${isActive ? "bg-[#8AF5D0] text-[#07111f]" : "text-[#8ca3b8]"}`
             }>
             {n.label}
           </NavLink>
