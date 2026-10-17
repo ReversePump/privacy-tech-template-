@@ -4,7 +4,7 @@ import { Rocket, Plus } from "lucide-react";
 import { makers } from "../lib/api";
 import { fmtSol, fmtSolSigned, fmtUsd, fmtNum, lamportsToSol, solscanTx, short } from "../lib/format";
 import { Panel, Stat, StatRow, KindPill, CoinAvatar, Loading, ExtLink } from "../components/bits";
-import { useOurDesks } from "../lib/useOurDesks";
+import { useOurDesks, feedItemBlocked } from "../lib/useOurDesks";
 
 function HeroActivity({ ourIds, hasOurs }) {
   const [items, setItems] = useState(null);
@@ -13,7 +13,7 @@ function HeroActivity({ ourIds, hasOurs }) {
     let live = true;
     const load = () =>
       makers.feed(100)
-        .then((d) => live && setItems((d.items || []).filter((it) => ourIds.has(it.deskId)).slice(0, 9)))
+        .then((d) => live && setItems((d.items || []).filter((it) => ourIds.has(it.deskId) && !feedItemBlocked(it)).slice(0, 9)))
         .catch(() => live && setItems([]));
     load();
     const t = setInterval(load, 10000);

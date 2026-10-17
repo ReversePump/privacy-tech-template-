@@ -121,7 +121,7 @@ export const PageHead = ({ kicker, title, accent, sub, right }) => (
 );
 
 export const TypeBadge = ({ desk }) => {
-  const t = desk.origin === "native" ? "NATIVE" : desk.origin === "mm" || desk.origin === "external" ? "ANY COIN" : desk.burnSplit ? "HALF BURNS" : desk.quoteMint ? "PAIRED" : "LAUNCH";
+  const t = desk.origin === "launch" ? "LAUNCHED HERE" : "ONBOARDED";
   return (
     <span className="rounded-[3px] border border-white/10 bg-white/5 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-[#8ca3b8]">
       {t}

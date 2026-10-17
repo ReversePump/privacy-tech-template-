@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { makers } from "../lib/api";
 import { fmtSol, fmtNum, fmtAge, lamportsToSol, short, solscanTx } from "../lib/format";
 import { PageHead, Panel, Stat, StatRow, KindPill, CoinAvatar, Loading, Empty, ExtLink } from "../components/bits";
-import { useOurDesks } from "../lib/useOurDesks";
+import { useOurDesks, feedItemBlocked } from "../lib/useOurDesks";
 
 const KINDS = [
   ["", "All"],
@@ -26,7 +26,7 @@ export default function Live() {
     setItems(null);
     const load = () =>
       makers.feed(100, kind || undefined)
-        .then((d) => live && setItems((d.items || []).filter((it) => ourIds.has(it.deskId))))
+        .then((d) => live && setItems((d.items || []).filter((it) => ourIds.has(it.deskId) && !feedItemBlocked(it))))
         .catch(() => live && setItems([]));
     load();
     const t = setInterval(load, 10000);

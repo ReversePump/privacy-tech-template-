@@ -1,7 +1,17 @@
 import { useEffect, useState, useMemo } from "react";
 import { makers } from "./api";
 
-// Desks launched or added through THIS site (recorded by the proxy in Mongo).
+// Coins that must never surface on MakeMarkets (upstream's own token etc.)
+const BLOCKED_TICKERS = new Set(["MAKERS"]);
+const BLOCKED_ORIGINS = new Set(["native"]);
+
+const isBlocked = (d) =>
+  !d || BLOCKED_ORIGINS.has(d.origin) || BLOCKED_TICKERS.has((d.ticker || "").toUpperCase());
+
+export const feedItemBlocked = (it) =>
+  BLOCKED_TICKERS.has((it?.ticker || "").toUpperCase());
+
+// Desks launched or added through THIS site (recorded by the relay in Mongo).
 export function useOurDesks(pollMs = 30000) {
   const [ourDesks, setOurDesks] = useState(null); // recorded rows
   const [details, setDetails] = useState(null);   // enriched desk objects
@@ -22,11 +32,15 @@ export function useOurDesks(pollMs = 30000) {
     if (!ourDesks) return;
     if (!ourDesks.length) { setDetails([]); return; }
     Promise.all(ourDesks.map((d) => makers.desk(d.deskId).catch(() => null)))
-      .then((arr) => setDetails(arr.filter(Boolean)))
+      .then((arr) => setDetails(arr.filter((d) => d && !isBlocked(d))))
       .catch(() => setDetails([]));
   }, [ourDesks]);
 
-  const ourIds = useMemo(() => new Set((ourDesks || []).map((d) => d.deskId)), [ourDesks]);
+  const ourIds = useMemo(
+    () => new Set((details || []).map((d) => d.id)),
+    [details]
+  );
 
   return { ourDesks, ours: details, ourIds, loading: ourDesks === null };
 }
+

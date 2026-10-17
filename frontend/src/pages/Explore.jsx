@@ -1,17 +1,14 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { Search, ArrowUpDown } from "lucide-react";
-import { makers } from "../lib/api";
+import React, { useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { Search, ArrowUpDown, Rocket, Plus } from "lucide-react";
 import { fmtSol, fmtSolSigned, fmtUsd, fmtNum, fmtAge, lamportsToSol } from "../lib/format";
 import { PageHead, Panel, CoinCell, StatusDot, TypeBadge, Loading, Empty } from "../components/bits";
+import { useOurDesks } from "../lib/useOurDesks";
 
 const FILTERS = [
   ["all", "All"],
   ["launch", "Launched here"],
-  ["mm", "Any coin"],
-  ["native", "Native"],
-  ["paired", "Paired"],
-  ["burn", "Half burns"],
+  ["mm", "Onboarded"],
 ];
 
 const SORTS = [
@@ -26,9 +23,6 @@ const matchFilter = (d, f) => {
   if (f === "all") return true;
   if (f === "launch") return d.origin === "launch";
   if (f === "mm") return d.origin === "mm" || d.origin === "external";
-  if (f === "native") return d.origin === "native";
-  if (f === "paired") return !!d.quoteMint;
-  if (f === "burn") return !!d.burnSplit;
   return true;
 };
 
@@ -42,26 +36,20 @@ const sortVal = (d, s) => {
 };
 
 export default function Explore() {
-  const [params, setParams] = useSearchParams();
-  const [desks, setDesks] = useState(null);
+  const [params] = useSearchParams();
+  const { ours } = useOurDesks();
   const [q, setQ] = useState(params.get("q") || "");
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("volume");
 
-  useEffect(() => {
-    makers.desks().then((d) => setDesks(d.desks || [])).catch(() => setDesks([]));
-  }, []);
-
-  useEffect(() => { setQ(params.get("q") || ""); }, [params]);
-
   const rows = useMemo(() => {
-    if (!desks) return null;
+    if (!ours) return null;
     const needle = q.trim().toLowerCase();
-    return desks
+    return ours
       .filter((d) => matchFilter(d, filter))
       .filter((d) => !needle || d.name?.toLowerCase().includes(needle) || d.ticker?.toLowerCase().includes(needle) || d.mint?.toLowerCase().startsWith(needle))
       .sort((a, b) => sortVal(b, sort) - sortVal(a, sort));
-  }, [desks, q, filter, sort]);
+  }, [ours, q, filter, sort]);
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 md:px-8 pt-10 md:pt-14" data-testid="explore-page">
@@ -69,7 +57,7 @@ export default function Explore() {
         kicker="Explore"
         title="Every maker."
         accent="Every market."
-        sub="Open any row to inspect its wallets, fills, fee claims and the dials it runs on. See a temperament you like? Launch with it."
+        sub="Only coins launched or onboarded through MakeMarkets. Open any row to inspect its wallets, fills, fee claims and the dials it runs on."
       />
 
       <Panel className="overflow-hidden" data-testid="explore-table-panel">
@@ -80,7 +68,7 @@ export default function Explore() {
               data-testid="explore-search"
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder='Name, ticker, mint, or "paired"'
+              placeholder="Name, ticker or mint"
               className="h-9 w-64 rounded-[3px] border border-white/10 bg-white/5 pl-9 pr-3 text-[13px] text-white placeholder-[#556b82] outline-none focus:border-[#8AF5D0]/40"
             />
           </div>
@@ -102,7 +90,22 @@ export default function Explore() {
         </div>
 
         {!rows && <Loading label="Loading makers" />}
-        {rows && rows.length === 0 && <Empty>No makers match.</Empty>}
+        {rows && rows.length === 0 && (
+          <Empty>
+            <p className="mb-1 font-mono text-xs uppercase tracking-[0.15em] text-[#8AF5D0]">Nothing here yet</p>
+            <p className="mx-auto mb-5 max-w-md text-[12px] font-light leading-relaxed">
+              This board only lists coins with a market maker created through MakeMarkets. Be the first — it appears here the moment it lands on chain.
+            </p>
+            <div className="flex justify-center gap-3">
+              <Link to="/launch" className="inline-flex h-9 items-center gap-2 rounded-[3px] bg-[#8AF5D0] px-4 text-xs font-medium text-[#07111f] hover:bg-[#7CFFC8]" data-testid="explore-empty-launch">
+                <Rocket size={13} /> Launch a coin
+              </Link>
+              <Link to="/mm" className="inline-flex h-9 items-center gap-2 rounded-[3px] border border-white/15 px-4 text-xs text-white hover:border-[#8AF5D0]/40 hover:text-[#8AF5D0]" data-testid="explore-empty-mm">
+                <Plus size={13} /> Onboard a coin
+              </Link>
+            </div>
+          </Empty>
+        )}
         {rows && rows.length > 0 && (
           <div className="overflow-x-auto">
             <table className="dtable" data-testid="explore-table">
@@ -127,7 +130,7 @@ export default function Explore() {
                       <td className={`text-right font-mono tnum ${realized > 0 ? "text-[#38c973]" : realized < 0 ? "text-[#ff4d4f]" : "text-[#8ca3b8]"}`}>
                         {d.totals?.realizedLamports != null ? fmtSolSigned(d.totals.realizedLamports, 3) : "—"}
                       </td>
-                      <td className="text-right font-mono text-[#8ca3b8] tnum">{d.origin === "mm" || d.origin === "external" ? "no rewards" : fmtSol(d.totals?.claimedLamports, 2)}</td>
+                      <td className="text-right font-mono text-[#8ca3b8] tnum">{d.origin === "mm" || d.origin === "external" ? "no fees" : fmtSol(d.totals?.claimedLamports, 2)}</td>
                       <td className="text-right font-mono text-white tnum">{fmtSol(d.totals?.volumeLamports, 1)}</td>
                       <td className="text-right font-mono text-[#8ca3b8] tnum">{fmtNum(d.totals?.trades24h)}</td>
                       <td className="text-right font-mono text-[#8ca3b8] tnum">{d.walletCount ?? "—"}</td>

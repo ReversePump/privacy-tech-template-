@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { makers } from "../lib/api";
 import { lamportsToSol } from "../lib/format";
-import { useOurDesks } from "../lib/useOurDesks";
+import { useOurDesks, feedItemBlocked } from "../lib/useOurDesks";
 
 const KIND_MARK = {
   buy: ["▼", "#38c973", "BUY"],
@@ -22,7 +22,7 @@ export default function Ticker() {
     let live = true;
     const load = () =>
       makers.feed(100)
-        .then((d) => live && setItems((d.items || []).filter((it) => ourIds.has(it.deskId))))
+        .then((d) => live && setItems((d.items || []).filter((it) => ourIds.has(it.deskId) && !feedItemBlocked(it))))
         .catch(() => {});
     load();
     const t = setInterval(load, 30000);
