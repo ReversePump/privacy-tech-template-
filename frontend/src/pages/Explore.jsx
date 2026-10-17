@@ -44,14 +44,12 @@ const sortVal = (d, s) => {
 export default function Explore() {
   const [params, setParams] = useSearchParams();
   const [desks, setDesks] = useState(null);
-  const [crown, setCrown] = useState(null);
   const [q, setQ] = useState(params.get("q") || "");
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("volume");
 
   useEffect(() => {
     makers.desks().then((d) => setDesks(d.desks || [])).catch(() => setDesks([]));
-    makers.crown().then(setCrown).catch(() => {});
   }, []);
 
   useEffect(() => { setQ(params.get("q") || ""); }, [params]);
@@ -73,19 +71,6 @@ export default function Explore() {
         accent="every coin."
         sub="Open one to see its wallets, every trade and claim, and the settings it runs on. Or see which strategies work and copy one."
       />
-
-      {crown?.enabled && (
-        <Panel className="mb-6 flex flex-wrap items-center gap-3 px-5 py-3.5 border-[#8AF5D0]/20" data-testid="crown-banner">
-          <span className="h-2 w-2 rounded-sm bg-[#8AF5D0]" />
-          <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-[#8AF5D0]">King of the burn</span>
-          <span className="text-[13px] text-[#8ca3b8]">
-            {crown.king ? "A king holds the crown." : "No king yet. Burn the platform token for a coin to take the crown."}
-          </span>
-          <a href="/crown" className="ml-auto rounded-full bg-[#8AF5D0] px-4 py-1.5 text-xs font-medium text-[#07111f] hover:bg-[#7CFFC8]" data-testid="crown-how-btn">
-            How it works
-          </a>
-        </Panel>
-      )}
 
       <Panel className="overflow-hidden" data-testid="explore-table-panel">
         <div className="flex flex-wrap items-center gap-3 border-b border-white/5 px-4 py-3">

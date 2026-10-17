@@ -36,3 +36,7 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Desk page read-only settings now a grouped chip summary (SettingsSummary).
 - Launch wizard strategy step uses the same editor with core keys.
 - Verified via browser automation: launch wizard image upload + 3-step navigation + strategy editor render; desk page grouped summary with live values.
+
+## Update 2026-10-17 (revision 4)
+- Burn and Crown removed entirely: nav tabs, routes (redirect home), pages deleted, footer links, explore crown banner.
+- Live page stats reworked to launch-focused: Makers running / Coins launched (origin launch+native) / Makers added (origin mm+external) / Trading wallets / Volume / Trades 24h. Rewards/P&L/payout stats removed. Feed unchanged (fully live via proxy).

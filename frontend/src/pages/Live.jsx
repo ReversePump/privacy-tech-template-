@@ -14,10 +14,14 @@ const KINDS = [
 
 export default function Live() {
   const [stats, setStats] = useState(null);
+  const [desks, setDesks] = useState(null);
   const [items, setItems] = useState(null);
   const [kind, setKind] = useState("");
 
-  useEffect(() => { makers.stats().then(setStats).catch(() => {}); }, []);
+  useEffect(() => {
+    makers.stats().then(setStats).catch(() => {});
+    makers.desks().then((d) => setDesks(d.desks || [])).catch(() => setDesks([]));
+  }, []);
 
   useEffect(() => {
     let live = true;
@@ -35,16 +39,15 @@ export default function Live() {
         kicker="Live"
         title="Live maker"
         accent="activity."
-        sub="Every maker's buys, sells, reward claims, payouts and launches, the moment they finalize on chain. Every row links to its maker and its transaction."
+        sub="Coins launched here and makers added to existing coins — every buy, sell, reward claim and launch, the moment it finalizes on chain."
       />
 
       <StatRow className="mb-8" >
-        <Stat testId="live-stat-makers" label="Makers running" value={stats ? fmtNum(stats.liveDesks) : "—"} sub={stats ? `${fmtNum(stats.desks)} launched or added` : ""} />
+        <Stat testId="live-stat-makers" label="Makers running" value={stats ? fmtNum(stats.liveDesks) : "—"} sub="trading right now" />
+        <Stat testId="live-stat-launched" label="Coins launched" value={desks ? fmtNum(desks.filter((d) => d.origin === "launch" || d.origin === "native").length) : "—"} sub="created on this launchpad" />
+        <Stat testId="live-stat-added" label="Makers added" value={desks ? fmtNum(desks.filter((d) => d.origin === "mm" || d.origin === "external").length) : "—"} sub="put on existing coins" />
         <Stat testId="live-stat-wallets" label="Trading wallets" value={stats ? fmtNum(stats.wallets) : "—"} sub="every one public" />
         <Stat testId="live-stat-volume" label="Volume traded" value={stats ? fmtSol(stats.volumeLamports, 1) : "—"} />
-        <Stat testId="live-stat-claimed" label="Rewards claimed" value={stats ? fmtSol(stats.claimedLamports, 1) : "—"} />
-        <Stat testId="live-stat-realized" label="Realized P&L" value={stats ? fmtSol(stats.realizedLamports, 3) : "—"} />
-        <Stat testId="live-stat-paid" label="Paid to owners" value={stats ? fmtSol(stats.paidOutLamports, 2) : "—"} />
         <Stat testId="live-stat-trades" label="Trades 24h" value={stats ? fmtNum(stats.trades24h) : "—"} sub="finalized on chain" />
       </StatRow>
 

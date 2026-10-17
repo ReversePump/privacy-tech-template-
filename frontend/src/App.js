@@ -12,8 +12,6 @@ import Explore from "./pages/Explore";
 import Live from "./pages/Live";
 import Launch from "./pages/Launch";
 import Mm from "./pages/Mm";
-import Burn from "./pages/Burn";
-import Crown from "./pages/Crown";
 import Docs from "./pages/Docs";
 import Desk from "./pages/Desk";
 import Dashboard from "./pages/Dashboard";
@@ -34,8 +32,8 @@ function App() {
                 <Route path="/launch" element={<Launch />} />
                 <Route path="/mm" element={<Mm />} />
                 <Route path="/token" element={<Navigate to="/" replace />} />
-                <Route path="/burn" element={<Burn />} />
-                <Route path="/crown" element={<Crown />} />
+                <Route path="/burn" element={<Navigate to="/" replace />} />
+                <Route path="/crown" element={<Navigate to="/" replace />} />
                 <Route path="/docs" element={<Docs />} />
                 <Route path="/desk/:id" element={<Desk />} />
                 <Route path="/coin/:id" element={<CoinRedirect />} />
