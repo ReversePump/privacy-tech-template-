@@ -1,0 +1,145 @@
+{
+  "build_manifest": {
+    "direction": {
+      "app_type": "hybrid_fullstack",
+      "ambition": "A3 EXPRESSIVE",
+      "mode": "dark",
+      "name": "EmpireX Inspired Dark Mode",
+      "tone": "cinematic, premium, dark, technical",
+      "axes": ["premium over casual", "dark over light", "technical over playful"]
+    },
+    "tone_tokens": {
+      "colors": {
+        "background": {
+          "base": "#07111f",
+          "surface": "#0d1b2a",
+          "glass": "rgba(255, 255, 255, 0.03)"
+        },
+        "text": {
+          "primary": "#ffffff",
+          "secondary": "#8ca3b8",
+          "muted": "#556b82"
+        },
+        "accents": {
+          "primary": "#8AF5D0",
+          "primary_glow": "#7CFFC8",
+          "buy": "#38c973",
+          "sell": "#ff4d4f"
+        },
+        "border": {
+          "light": "rgba(255, 255, 255, 0.08)",
+          "active": "rgba(138, 245, 208, 0.3)"
+        }
+      },
+      "typography": {
+        "families": {
+          "display": "'Outfit', sans-serif",
+          "body": "'Outfit', sans-serif",
+          "accent_serif": "'Playfair Display', serif",
+          "mono": "'JetBrains Mono', monospace"
+        },
+        "scale": {
+          "h1": "text-5xl md:text-6xl tracking-tighter font-medium",
+          "h2": "text-3xl md:text-4xl tracking-tight font-medium",
+          "h3": "text-xl md:text-2xl font-medium",
+          "body": "text-base font-light leading-relaxed",
+          "mono_numbers": "text-sm md:text-base font-mono tracking-tight"
+        }
+      },
+      "shapes": {
+        "radius_card": "rounded-xl",
+        "radius_button": "rounded-full",
+        "radius_pill": "rounded-full"
+      },
+      "spacing": "generous (Tailwind p-6, p-8, p-12 for sections)",
+      "shadows": {
+        "glow": "0 0 20px rgba(138, 245, 208, 0.15)",
+        "glass": "0 8px 32px rgba(0, 0, 0, 0.2)"
+      }
+    },
+    "fabrication_guardrails": [
+      "DO NOT break the existing proxy of api.makers.fun.",
+      "ALL data, numbers, and stats MUST come from the proxied API.",
+      "No invented stats, testimonials, or fake metrics."
+    ],
+    "conversion_wiring": [
+      "Wallet connect button in header (right-aligned pill).",
+      "Launch signing flow & wizard steps.",
+      "Phantom/Solana wallet connection."
+    ],
+    "pages_to_build": [
+      "Explore (markets-style table)",
+      "Live (activity feed)",
+      "Launch wizard",
+      "Any coin / $MAKERS token page (with chart)",
+      "Burn",
+      "Crown",
+      "Docs",
+      "Desk detail (chart, wallets, settings)"
+    ]
+  },
+  "typography": {
+    "headline": "'Outfit', sans-serif",
+    "body": "'Outfit', sans-serif",
+    "accent": "'Playfair Display', serif (use italic for accent words)",
+    "monospace": "'JetBrains Mono', monospace (for live stats and crypto numbers)"
+  },
+  "colors": {
+    "background": "#07111f",
+    "surface": "#0d1b2a",
+    "primary": "#8AF5D0",
+    "primary_hover": "#7CFFC8",
+    "text": "#ffffff",
+    "text_muted": "#8ca3b8",
+    "border": "rgba(255, 255, 255, 0.08)",
+    "buy": "#38c973",
+    "sell": "#ff4d4f"
+  },
+  "visual_enhancers": {
+    "cards": "Glassy dark cards (bg-white/5 backdrop-blur-xl) with hairline light borders (border-white/10).",
+    "buttons": "Pill-shaped (rounded-full). Primary buttons use mint accent.",
+    "active_states": "Glowing mint active states for nav pills and inputs.",
+    "typography_accents": "Use italic serif ('Playfair Display') for specific accent words in headlines (e.g., 'Your *Empire*.')."
+  },
+  "layouts": {
+    "hero": "Dark cinematic hero with big statement headline, italic serif accents, and live stats overlay.",
+    "tables": "Sortable markets-style table for maker desks. Use mono font for data. Glassy container.",
+    "navigation": "Top nav with rounded pill active state, right-aligned wallet chip + 'Connect wallet' mint pill button."
+  },
+  "motion": {
+    "hover": "Subtle translate-y lift for cards with increased glow.",
+    "entrance": "Fade in and slide up for table rows and live activity feed.",
+    "buttons": "Scale up slightly on hover with intensified mint glow."
+  },
+  "accessibility": {
+    "contrast": "Ensure white and mint text pass contrast against #07111f and #0d1b2a backgrounds."
+  },
+  "image_urls": [
+    {
+      "url": "https://images.unsplash.com/photo-1644343262170-e40d72e19a84?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTB8MHwxfHNlYXJjaHwzfHxkYXJrJTIwY2luZW1hdGljJTIwYWJzdHJhY3QlMjBjcnlwdG98ZW58MHx8fHwxNzkyMjU2MDgwfDA&ixlib=rb-4.1.0&q=85",
+      "category": "Hero Background",
+      "description": "Dark cinematic abstract grid texture for hero background layering."
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1645516484419-35a747c99474?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTB8MHwxfHNlYXJjaHwxfHxkYXJrJTIwY2luZW1hdGljJTIwYWJzdHJhY3QlMjBjcnlwdG98ZW58MHx8fHwxNzkyMjU2MDgwfDA&ixlib=rb-4.1.0&q=85",
+      "category": "Accent Image",
+      "description": "Ethereum dark diamond abstract to be used as a subtle graphic overlay or empty state."
+    }
+  ],
+  "components": {
+    "buttons": "Shadcn based, heavily modified to be pill-shaped (rounded-full), mint background for primary (#8AF5D0 text-[#07111f]).",
+    "cards": "Shadcn based, flat with transparent/glassy backgrounds and thin border-white/10.",
+    "tables": "Shadcn tables, transparent rows, mono font numbers, red/green for price changes.",
+    "tabs": "Pill-shaped active state in navigation/tabs."
+  },
+  "instructions_to_main_agent": "Implement a dark cinematic 'empire' theme. Overwrite the previous makers cream theme. The background is a deep navy-black (#07111f). Use white for headings and mint (#8AF5D0) for primary buttons/accents. Mix 'Outfit' for most text with 'Playfair Display' (italic) for emphasis in large headings, and 'JetBrains Mono' for all numerical data. Use pill-shapes (rounded-full) for buttons and glassy cards (rounded-xl, border-white/10). Maintain 100% of the existing proxy API logic to api.makers.fun—do not invent data. All components must have data-testid attributes for testing.",
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Do not use dark colors as gradients.",
+    "Avoid generic centered layouts. Use depth through layered design elements and glass-morphism.",
+    "Do NOT apply universal transition (e.g., transition: all).",
+    "Do NOT center align the app container (.App { text-align: center; }).",
+    "Never use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯 etc. for icons.",
+    "Use Phosphor Icons or Lucide React for crisp, technical iconography.",
+    "Add 'data-testid' to all interactive and key informational elements."
+  ]
+}
