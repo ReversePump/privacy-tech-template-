@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { makers, errorMessage } from "../lib/api";
 import { fmtSol, fmtAge, short } from "../lib/format";
 import { PageHead, Panel, CoinCell, Loading, Empty, StatusDot } from "../components/bits";
+import { SettingsEditor } from "../components/SettingsEditor";
 import { useAuth } from "../solana/AuthContext";
 
 function MyDesks() {
@@ -71,15 +72,6 @@ function DeskDashboard({ id }) {
 
   if (!desk || !form) return <Loading label="Loading dashboard" />;
 
-  const num = (k, label, step = 1) => (
-    <div key={k}>
-      <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-[#556b82]">{label}</label>
-      <input type="number" step={step} value={form[k] ?? ""} data-testid={`set-${k}`}
-        onChange={(e) => setForm({ ...form, [k]: e.target.value === "" ? null : Number(e.target.value) })}
-        className="h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 font-mono text-sm text-white outline-none focus:border-[#8AF5D0]/40" />
-    </div>
-  );
-
   const save = async () => {
     if (!signedIn) { try { await signIn(); } catch (e) { toast.error(errorMessage(e)); return; } }
     setBusy(true);
@@ -99,35 +91,18 @@ function DeskDashboard({ id }) {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <Panel className="lg:col-span-2 p-6" data-testid="dash-settings-panel">
         <div className="flex items-baseline justify-between">
-          <span className="text-white font-medium">Strategy settings</span>
+          <span className="text-white font-medium">Engine controls</span>
           <span className="font-mono text-[10px] text-[#556b82]">version {desk.settingsVersion ?? 1}</span>
         </div>
-        <div className="mt-5 grid grid-cols-2 md:grid-cols-3 gap-4">
-          {num("buyTriggerPct", "Buy trigger %")}
-          {num("sellTriggerPct", "Sell trigger %")}
-          {num("buyIntensityPct", "Buy intensity %")}
-          {num("sellIntensityPct", "Sell intensity %")}
-          {num("profitTargetPct", "Profit target %")}
-          {num("stopLossPct", "Stop-loss %")}
-          {num("cooldownSeconds", "Cooldown (s)")}
-          {num("maxTradeSol", "Max trade SOL", 0.01)}
-          {num("payoutMinSol", "Auto payout from SOL", 0.01)}
-        </div>
-        <div className="mt-5 flex items-center gap-4">
-          <label className="flex items-center gap-2 font-mono text-xs text-[#8ca3b8]">
-            <input type="checkbox" checked={!!form.averageDown} onChange={(e) => setForm({ ...form, averageDown: e.target.checked })} data-testid="set-averageDown" className="accent-[#8AF5D0]" />
-            Average down
-          </label>
-          <label className="flex items-center gap-2 font-mono text-xs text-[#8ca3b8]">
-            <input type="checkbox" checked={!!form.trendFilter} onChange={(e) => setForm({ ...form, trendFilter: e.target.checked })} data-testid="set-trendFilter" className="accent-[#8AF5D0]" />
-            Trend filter
-          </label>
+        <p className="mt-1 text-[12px] font-light text-[#556b82]">Six dials, yours alone. Every change is logged publicly and takes effect within one engine pass.</p>
+        <div className="mt-5">
+          <SettingsEditor values={form} onChange={(k, v) => setForm({ ...form, [k]: v })} />
         </div>
         <button onClick={save} disabled={busy} data-testid="dash-save-btn"
           className="mt-6 h-10 rounded-full bg-[#8AF5D0] px-6 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] disabled:opacity-50">
           {busy ? "Saving…" : "Save changes"}
         </button>
-        <p className="mt-3 text-[11px] font-light text-[#556b82]">Changes are logged publicly and may require a wallet approval.</p>
+        <p className="mt-3 text-[11px] font-light text-[#556b82]">Changes may require a wallet approval before they apply.</p>
       </Panel>
 
       <Panel className="p-6" data-testid="dash-info-panel">

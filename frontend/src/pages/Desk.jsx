@@ -8,6 +8,7 @@ import { fmtSol, fmtSolSigned, fmtUsd, fmtNum, fmtAge, fmtPct, short, lamportsTo
 import { Panel, Stat, CoinAvatar, StatusDot, TypeBadge, SubPrice, Loading, ExtLink, Empty, KindPill } from "../components/bits";
 import { useAuth } from "../solana/AuthContext";
 import DeskChart from "../components/DeskChart";
+import { SettingsSummary } from "../components/SettingsEditor";
 
 const stratLine = (s) => {
   if (!s) return "";
@@ -147,16 +148,11 @@ export default function Desk() {
 
           <Panel className="p-5" data-testid="desk-settings-panel">
             <div className="flex items-baseline justify-between">
-              <span className="text-white font-medium">Settings</span>
+              <span className="text-white font-medium">Engine controls</span>
               <span className="font-mono text-[10px] text-[#556b82]">v{desk.settingsVersion ?? 1} · {desk.preset || "custom"}</span>
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2.5 font-mono text-[11px]">
-              {Object.entries(desk.settings || desk.strategy || {}).filter(([, v]) => v !== null && typeof v !== "object").slice(0, 12).map(([k, v]) => (
-                <div key={k} className="flex justify-between gap-2">
-                  <span className="text-[#556b82]">{k.replace(/([A-Z])/g, " $1").replace(/Pct|Sol|Seconds|Bps/g, (m) => ` ${m.toLowerCase()}`)}</span>
-                  <span className="text-white tnum">{typeof v === "boolean" ? (v ? "on" : "off") : String(v)}</span>
-                </div>
-              ))}
+            <div className="mt-4">
+              <SettingsSummary settings={desk.settings || desk.strategy} />
             </div>
           </Panel>
 

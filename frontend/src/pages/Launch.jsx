@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { makers, errorMessage } from "../lib/api";
 import { b64ToBytes, bytesToB64, fmtSol, short } from "../lib/format";
 import { PageHead, Panel, CoinAvatar } from "../components/bits";
+import { SettingsEditor } from "../components/SettingsEditor";
 import { useAuth } from "../solana/AuthContext";
 
 const STEPS = ["Coin", "Dev buy", "Maker funding", "Strategy", "Treasury", "Review & sign"];
@@ -272,14 +273,13 @@ export default function Launch() {
                   </button>
                 ))}
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {[["buyTriggerPct", "Buy trigger %"], ["sellTriggerPct", "Sell trigger %"], ["buyIntensityPct", "Buy intensity %"], ["sellIntensityPct", "Sell intensity %"], ["profitTargetPct", "Profit target %"], ["stopLossPct", "Stop-loss %"], ["cooldownSeconds", "Cooldown (s)"]].map(([k, l]) => (
-                  <div key={k}>
-                    <label className="mb-1 block font-mono text-[10px] uppercase tracking-wider text-[#556b82]">{l}</label>
-                    <input type="number" data-testid={`launch-${k}`} value={settings[k] ?? ""} onChange={(e) => { setPreset("custom"); setSettings({ ...settings, [k]: e.target.value === "" ? null : Number(e.target.value) }); }}
-                      className="h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 font-mono text-sm text-white outline-none focus:border-[#8AF5D0]/40" />
-                  </div>
-                ))}
+              <div>
+                <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#556b82]">Fine-tune the engine</div>
+                <SettingsEditor
+                  values={settings}
+                  compactKeys={["buyTriggerPct", "buyIntensityPct", "averageDown", "sellTriggerPct", "sellIntensityPct", "profitTargetPct", "stopLossPct", "cooldownSeconds"]}
+                  onChange={(k, v) => { setPreset("custom"); setSettings({ ...settings, [k]: v }); }}
+                />
               </div>
             </div>
           )}

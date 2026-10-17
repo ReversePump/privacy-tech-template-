@@ -29,3 +29,10 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Launch verified SOL-only (pairing/half-burn removed everywhere). Payload matches upstream: name/ticker/description/imageUrl/links/initialBuySol/fundSol/settings diff (defaults incl. rewardsToMmPct, payoutMinSol).
 - Removed ALL static $MAKERS references: nav item + /token page + route deleted, home/docs/footer/burn/crown/explore copy neutralized ("the platform token"); token tickers shown only as live API data.
 - Verified: proxy returns 401 "Wallet login required" for /launches and /desks without auth (correct); checkCoin ok:true with market data; launch wizard validation + summary rail; mm UI check flow end-to-end.
+
+## Update 2026-10-17 (revision 3)
+- Settings UX redesigned to avoid looking like a direct copy: new SettingsEditor component (src/components/SettingsEditor.jsx) groups the same API keys under our own labels/groups (Dip buying / Taking profit / Protection / Rhythm & size / Wallets & capital / Your payouts) with sliders, toggles, off/set pills.
+- Dashboard settings editor rebuilt on it (PATCH /desks/{id}/settings unchanged, only changed keys sent).
+- Desk page read-only settings now a grouped chip summary (SettingsSummary).
+- Launch wizard strategy step uses the same editor with core keys.
+- Verified via browser automation: launch wizard image upload + 3-step navigation + strategy editor render; desk page grouped summary with live values.
