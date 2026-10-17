@@ -45,6 +45,25 @@ async def root():
     return {"message": "makers.fun proxy relay", "upstream": UPSTREAM}
 
 
+@api_router.get("/our/desks")
+async def our_desks():
+    """Desks that were launched or added through THIS site (recorded by the proxy)."""
+    docs = await db.our_desks.find({}, {"_id": 0}).sort("createdAt", -1).to_list(500)
+    return {"desks": docs}
+
+
+async def _record_our_desk(desk_id: str, origin: str):
+    try:
+        from datetime import datetime, timezone
+        await db.our_desks.update_one(
+            {"deskId": desk_id},
+            {"$set": {"deskId": desk_id, "origin": origin, "createdAt": datetime.now(timezone.utc).isoformat()}},
+            upsert=True,
+        )
+    except Exception as e:
+        logger.warning(f"failed to record desk {desk_id}: {e}")
+
+
 @api_router.api_route("/mf/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
 async def proxy(path: str, request: Request):
     body = await request.body()
@@ -78,6 +97,23 @@ async def proxy(path: str, request: Request):
     for sc in r.headers.get_list("set-cookie"):
         parts = [p for p in sc.split(";") if not p.strip().lower().startswith("domain=")]
         resp.headers.append("set-cookie", ";".join(parts))
+
+    # Record desks created through this site (launch submit = actually on chain; desk create = maker added)
+    if request.method == "POST" and 200 <= r.status_code < 300:
+        try:
+            import re as _re, json as _json
+            if _re.fullmatch(r"launches/[^/]+/submit", path):
+                await _record_our_desk(path.split("/")[1], "launch")
+            elif path == "desks":
+                data = _json.loads(r.content.decode("utf-8", "ignore"))
+                desk = data.get("desk") if isinstance(data, dict) else None
+                desk = desk if isinstance(desk, dict) else data
+                did = desk.get("id") if isinstance(desk, dict) else None
+                if did:
+                    await _record_our_desk(did, "mm")
+        except Exception as e:
+            logger.warning(f"desk recording failed: {e}")
+
     return resp
 
 

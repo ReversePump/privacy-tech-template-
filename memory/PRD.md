@@ -40,3 +40,8 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 ## Update 2026-10-17 (revision 4)
 - Burn and Crown removed entirely: nav tabs, routes (redirect home), pages deleted, footer links, explore crown banner.
 - Live page stats reworked to launch-focused: Makers running / Coins launched (origin launch+native) / Makers added (origin mm+external) / Trading wallets / Volume / Trades 24h. Rewards/P&L/payout stats removed. Feed unchanged (fully live via proxy).
+
+## Update 2026-10-17 (revision 5)
+- Live page is now scoped to OUR platform only: proxy records deskIds in Mongo (db.our_desks) on POST /desks success (origin=mm) and POST /launches/{id}/submit success (origin=launch). New endpoint GET /api/our/desks.
+- Live stats + feed filter to recorded desks only; stats enriched via per-desk detail fetch (pagination-safe). Empty state until first real launch through this clone.
+- Home ticker/hero feed remain global (landing showcase). Explore remains the global market browser.
