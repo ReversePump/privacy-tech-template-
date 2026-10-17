@@ -45,3 +45,9 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Live page is now scoped to OUR platform only: proxy records deskIds in Mongo (db.our_desks) on POST /desks success (origin=mm) and POST /launches/{id}/submit success (origin=launch). New endpoint GET /api/our/desks.
 - Live stats + feed filter to recorded desks only; stats enriched via per-desk detail fetch (pagination-safe). Empty state until first real launch through this clone.
 - Home ticker/hero feed remain global (landing showcase). Explore remains the global market browser.
+
+## Update 2026-10-17 (revision 6)
+- Scoped ALL live displays site-wide to this platform's coins: new shared hook src/lib/useOurDesks.js (polls /api/our/desks every 30s, enriches per-desk).
+- Ticker: filtered to our desks, hidden when none. Home hero activity: filtered, "waiting for first coin" empty state with CTA. Home stats strip: computed from our desks (running/wallets/volume/claimed/realized/paid/trades24h), labeled "Coins launched or added through this site". Home Live makers grid: ours-only with empty-state CTA.
+- Live.jsx refactored onto the shared hook.
+- Verified via screenshots: home shows zeros + empty states, no proxy-global data anywhere on landing/live.

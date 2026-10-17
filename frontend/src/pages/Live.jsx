@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { makers } from "../lib/api";
 import { fmtSol, fmtNum, fmtAge, lamportsToSol, short, solscanTx } from "../lib/format";
 import { PageHead, Panel, Stat, StatRow, KindPill, CoinAvatar, Loading, Empty, ExtLink } from "../components/bits";
+import { useOurDesks } from "../lib/useOurDesks";
 
 const KINDS = [
   ["", "All"],
@@ -13,27 +14,10 @@ const KINDS = [
 ];
 
 export default function Live() {
-  const [ourDesks, setOurDesks] = useState(null);
-  const [globalDesks, setGlobalDesks] = useState(null);
+  const { ourDesks, ours, ourIds } = useOurDesks();
   const [items, setItems] = useState(null);
   const [kind, setKind] = useState("");
 
-  const ourApi = `${process.env.REACT_APP_BACKEND_URL}/api/our/desks`;
-
-  useEffect(() => {
-    fetch(ourApi).then((r) => r.json()).then((d) => setOurDesks(d.desks || [])).catch(() => setOurDesks([]));
-  }, []);
-
-  useEffect(() => {
-    if (!ourDesks) return;
-    if (!ourDesks.length) { setGlobalDesks([]); return; }
-    Promise.all(ourDesks.map((d) => makers.desk(d.deskId).catch(() => null)))
-      .then((arr) => setGlobalDesks(arr.filter(Boolean)))
-      .catch(() => setGlobalDesks([]));
-  }, [ourDesks]);
-
-  const ourIds = new Set((ourDesks || []).map((d) => d.deskId));
-  const ours = globalDesks || [];
   const sum = (arr, fn) => arr.reduce((a, d) => a + (fn(d) || 0), 0);
 
   useEffect(() => {
@@ -60,12 +44,12 @@ export default function Live() {
       />
 
       <StatRow className="mb-8" >
-        <Stat testId="live-stat-makers" label="Makers running" value={ourDesks ? fmtNum(ours.filter((d) => d.status === "running").length) : "—"} sub="launched or added here" />
+        <Stat testId="live-stat-makers" label="Makers running" value={ourDesks ? fmtNum((ours || []).filter((d) => d.status === "running").length) : "—"} sub="launched or added here" />
         <Stat testId="live-stat-launched" label="Coins launched here" value={ourDesks ? fmtNum(ourDesks.filter((d) => d.origin === "launch").length) : "—"} sub="created through this site" />
         <Stat testId="live-stat-added" label="Makers added here" value={ourDesks ? fmtNum(ourDesks.filter((d) => d.origin === "mm").length) : "—"} sub="put on existing coins" />
-        <Stat testId="live-stat-wallets" label="Trading wallets" value={globalDesks ? fmtNum(sum(ours, (d) => d.walletCount || 0)) : "—"} sub="every one public" />
-        <Stat testId="live-stat-volume" label="Volume traded" value={globalDesks ? fmtSol(String(sum(ours, (d) => lamportsToSol(d.totals?.volumeLamports) || 0) * 1e9), 1) : "—"} />
-        <Stat testId="live-stat-trades" label="Trades 24h" value={globalDesks ? fmtNum(sum(ours, (d) => d.totals?.trades24h || 0)) : "—"} sub="finalized on chain" />
+        <Stat testId="live-stat-wallets" label="Trading wallets" value={ours !== null ? fmtNum(sum(ours, (d) => d.walletCount || 0)) : "—"} sub="every one public" />
+        <Stat testId="live-stat-volume" label="Volume traded" value={ours !== null ? fmtSol(String(sum(ours, (d) => lamportsToSol(d.totals?.volumeLamports) || 0) * 1e9), 1) : "—"} />
+        <Stat testId="live-stat-trades" label="Trades 24h" value={ours !== null ? fmtNum(sum(ours, (d) => d.totals?.trades24h || 0)) : "—"} sub="finalized on chain" />
       </StatRow>
 
       <Panel className="overflow-hidden" data-testid="activity-panel">

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { makers } from "../lib/api";
-import { fmtSol, lamportsToSol } from "../lib/format";
+import { lamportsToSol } from "../lib/format";
+import { useOurDesks } from "../lib/useOurDesks";
 
 const KIND_MARK = {
   buy: ["▼", "#38c973", "BUY"],
@@ -12,16 +13,21 @@ const KIND_MARK = {
 };
 
 export default function Ticker() {
+  const { ourIds, loading } = useOurDesks();
   const [items, setItems] = useState([]);
 
   useEffect(() => {
+    if (loading) return;
+    if (!ourIds.size) { setItems([]); return; }
     let live = true;
     const load = () =>
-      makers.feed(24).then((d) => live && setItems(d.items || [])).catch(() => {});
+      makers.feed(100)
+        .then((d) => live && setItems((d.items || []).filter((it) => ourIds.has(it.deskId))))
+        .catch(() => {});
     load();
     const t = setInterval(load, 30000);
     return () => { live = false; clearInterval(t); };
-  }, []);
+  }, [ourIds, loading]);
 
   if (!items.length) return null;
 

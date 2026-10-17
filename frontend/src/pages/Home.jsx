@@ -2,18 +2,23 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Rocket, Plus } from "lucide-react";
 import { makers } from "../lib/api";
-import { fmtSol, fmtUsd, fmtNum, fmtAge, lamportsToSol, solscanTx, short } from "../lib/format";
+import { fmtSol, fmtSolSigned, fmtUsd, fmtNum, lamportsToSol, solscanTx, short } from "../lib/format";
 import { Panel, Stat, StatRow, KindPill, CoinAvatar, Loading, ExtLink } from "../components/bits";
+import { useOurDesks } from "../lib/useOurDesks";
 
-function HeroActivity() {
+function HeroActivity({ ourIds, hasOurs }) {
   const [items, setItems] = useState(null);
   useEffect(() => {
+    if (!hasOurs) { setItems([]); return; }
     let live = true;
-    const load = () => makers.feed(9).then((d) => live && setItems(d.items || [])).catch(() => live && setItems([]));
+    const load = () =>
+      makers.feed(100)
+        .then((d) => live && setItems((d.items || []).filter((it) => ourIds.has(it.deskId)).slice(0, 9)))
+        .catch(() => live && setItems([]));
     load();
     const t = setInterval(load, 10000);
     return () => { live = false; clearInterval(t); };
-  }, []);
+  }, [ourIds, hasOurs]);
   return (
     <Panel className="w-full lg:w-[420px] shrink-0 overflow-hidden" data-testid="hero-activity-panel">
       <div className="flex items-center justify-between border-b border-white/5 px-4 py-3">
@@ -39,24 +44,36 @@ function HeroActivity() {
             )}
           </div>
         ))}
-        {items && !items.length && <div className="px-4 py-8 text-center font-mono text-xs text-[#556b82]">No activity yet</div>}
+        {items && !items.length && (
+          <div className="px-6 py-10 text-center" data-testid="hero-activity-empty">
+            <div className="font-mono text-xs text-[#8AF5D0]">Waiting for the first coin from this site</div>
+            <p className="mt-2 text-[11px] font-light leading-relaxed text-[#556b82]">
+              Only coins launched here — or makers added here — show up in this feed. Launch one and watch it land here the moment it finalizes on chain.
+            </p>
+            <Link to="/launch" className="mt-4 inline-flex h-8 items-center rounded-full bg-[#8AF5D0] px-4 text-xs font-medium text-[#07111f] hover:bg-[#7CFFC8]" data-testid="hero-empty-launch-btn">
+              Launch the first coin
+            </Link>
+          </div>
+        )}
       </div>
     </Panel>
   );
 }
 
 export default function Home() {
-  const [stats, setStats] = useState(null);
   const [config, setConfig] = useState(null);
-  const [desks, setDesks] = useState(null);
+  const { ours, ourIds, loading } = useOurDesks();
 
   useEffect(() => {
-    makers.stats().then(setStats).catch(() => {});
     makers.config().then(setConfig).catch(() => {});
-    makers.desks().then((d) => setDesks((d.desks || []).slice(0, 6))).catch(() => setDesks([]));
   }, []);
 
   const presets = config?.presets ? Object.entries(config.presets) : [];
+  const desks = ours;
+  const hasOurs = ourIds.size > 0;
+  const sum = (fn) => (desks || []).reduce((a, d) => a + (fn(d) || 0), 0);
+  const sumSol = (fn) => sum((d) => lamportsToSol(fn(d)) || 0);
+  const statsReady = desks !== null;
 
   return (
     <div data-testid="home-page">
@@ -92,25 +109,26 @@ export default function Home() {
                 </Link>
               </div>
             </div>
-            <HeroActivity />
+            <HeroActivity ourIds={ourIds} hasOurs={hasOurs && !loading} />
           </div>
         </div>
       </section>
 
-      {/* STATS */}
+      {/* STATS — this site's coins only */}
       <section className="mx-auto max-w-[1440px] px-4 md:px-8" data-testid="home-stats">
+        <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-[#556b82]">Coins launched or added through this site</div>
         <StatRow>
-          <Stat testId="stat-makers" label="Makers running" value={stats ? fmtNum(stats.liveDesks) : "—"} sub={stats ? `${fmtNum(stats.desks)} launched or added` : ""} />
-          <Stat testId="stat-wallets" label="Trading wallets" value={stats ? fmtNum(stats.wallets) : "—"} sub="every one public" />
-          <Stat testId="stat-volume" label="Volume traded" value={stats ? fmtSol(stats.volumeLamports, 1) : "—"} />
-          <Stat testId="stat-claimed" label="Rewards claimed" value={stats ? fmtSol(stats.claimedLamports, 1) : "—"} />
-          <Stat testId="stat-realized" label="Realized P&L" value={stats ? fmtSol(stats.realizedLamports, 3) : "—"} />
-          <Stat testId="stat-paidout" label="Paid to owners" value={stats ? fmtSol(stats.paidOutLamports, 2) : "—"} />
-          <Stat testId="stat-trades24" label="Trades 24h" value={stats ? fmtNum(stats.trades24h) : "—"} sub="finalized on chain" />
+          <Stat testId="stat-makers" label="Makers running" value={statsReady ? fmtNum((desks || []).filter((d) => d.status === "running").length) : "—"} sub={statsReady ? `${fmtNum((desks || []).length)} launched or added` : ""} />
+          <Stat testId="stat-wallets" label="Trading wallets" value={statsReady ? fmtNum(sum((d) => d.walletCount || 0)) : "—"} sub="every one public" />
+          <Stat testId="stat-volume" label="Volume traded" value={statsReady ? fmtSol(String(sumSol((d) => d.totals?.volumeLamports) * 1e9), 1) : "—"} />
+          <Stat testId="stat-claimed" label="Rewards claimed" value={statsReady ? fmtSol(String(sumSol((d) => d.totals?.claimedLamports) * 1e9), 1) : "—"} />
+          <Stat testId="stat-realized" label="Realized P&L" value={statsReady ? fmtSolSigned(String(sumSol((d) => d.totals?.realizedLamports) * 1e9), 3) : "—"} />
+          <Stat testId="stat-paidout" label="Paid to owners" value={statsReady ? fmtSol(String(sumSol((d) => d.totals?.paidOutLamports) * 1e9), 2) : "—"} />
+          <Stat testId="stat-trades24" label="Trades 24h" value={statsReady ? fmtNum(sum((d) => d.totals?.trades24h || 0)) : "—"} sub="finalized on chain" />
         </StatRow>
       </section>
 
-      {/* LIVE MAKERS */}
+      {/* LIVE MAKERS — this site's coins only */}
       <section className="mx-auto max-w-[1440px] px-4 md:px-8 mt-16" data-testid="home-makers">
         <div className="mb-6 flex items-end justify-between">
           <h2 className="text-2xl md:text-3xl font-medium tracking-tight text-white">
@@ -120,8 +138,24 @@ export default function Home() {
             Explore all →
           </Link>
         </div>
+        {statsReady && !desks.length && (
+          <Panel className="px-6 py-14 text-center" data-testid="home-makers-empty">
+            <div className="font-mono text-xs uppercase tracking-[0.15em] text-[#8AF5D0]">No coins from this site yet</div>
+            <p className="mx-auto mt-3 max-w-md text-[13px] font-light leading-relaxed text-[#8ca3b8]">
+              This board only lists coins launched through this site or makers added through this site. Be the first — it shows up here the moment it lands on chain.
+            </p>
+            <div className="mt-6 flex justify-center gap-3">
+              <Link to="/launch" className="inline-flex h-10 items-center gap-2 rounded-full bg-[#8AF5D0] px-5 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8]" data-testid="makers-empty-launch-btn">
+                <Rocket size={14} /> Launch a coin
+              </Link>
+              <Link to="/mm" className="inline-flex h-10 items-center gap-2 rounded-full border border-white/15 px-5 text-sm text-white hover:border-[#8AF5D0]/40 hover:text-[#8AF5D0]" data-testid="makers-empty-mm-btn">
+                <Plus size={14} /> Add a maker
+              </Link>
+            </div>
+          </Panel>
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {!desks && <Loading label="Loading makers" />}
+          {!statsReady && <Loading label="Loading makers" />}
           {desks?.map((d) => (
             <Link key={d.id} to={`/desk/${d.id}`} data-testid={`home-desk-${d.ticker}`}>
               <Panel className="group h-full p-5 hover:border-[#8AF5D0]/30 hover:-translate-y-0.5 transition-all">
