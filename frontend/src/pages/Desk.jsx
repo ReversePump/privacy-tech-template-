@@ -7,7 +7,7 @@ import { makers, errorMessage } from "../lib/api";
 import { fmtSol, fmtSolSigned, fmtUsd, fmtNum, fmtAge, fmtPct, short, lamportsToSol, solscanAcct, solscanTx, pumpCoin, dexscreener } from "../lib/format";
 import { Panel, Stat, CoinAvatar, StatusDot, TypeBadge, SubPrice, Loading, ExtLink, Empty, KindPill } from "../components/bits";
 import { useAuth } from "../solana/AuthContext";
-import { DeskChart } from "./Token";
+import DeskChart from "../components/DeskChart";
 
 const stratLine = (s) => {
   if (!s) return "";

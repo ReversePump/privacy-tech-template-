@@ -54,13 +54,13 @@ export default function Crown() {
         kicker="Crown"
         title="King of the"
         accent="burn."
-        sub={`Burn $MAKERS for a coin and it wears the crown for ${data.windowHours || 24}h — the biggest burn in the window wins the spotlight everywhere on the site.`}
+        sub={`Burn the platform token for a coin and it wears the crown for ${data.windowHours || 24}h — the biggest burn in the window wins the spotlight everywhere on the site.`}
         right={<CrownIcon size={40} className="text-[#8AF5D0] opacity-60" />}
       />
 
       <StatRow className="mb-8">
         <Stat testId="crown-window" label="Window" value={`${data.windowHours || 24}h`} />
-        <Stat testId="crown-min" label="Min burn" value={`${fmtNum(data.minTokens)} $MAKERS`} />
+        <Stat testId="crown-min" label="Min burn" value={`${fmtNum(data.minTokens)} tokens`} />
         <Stat testId="crown-24h" label="Burned 24h" value={fmtNum(Number(data.burned24hQuote || 0) / 1e6, 0)} sub={`${data.burns24h || 0} burns`} />
         <Stat testId="crown-total" label="Burned for crowns" value={fmtNum(Number(data.burnedQuote || 0) / 1e6, 0)} />
       </StatRow>
@@ -80,7 +80,7 @@ export default function Crown() {
               </select>
             </div>
             <div>
-              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-[#556b82]">$MAKERS to burn</label>
+              <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-[#556b82]">Tokens to burn</label>
               <input data-testid="crown-amount-input" type="number" min={data.minTokens} max={data.maxTokens}
                 value={amount} onChange={(e) => setAmount(e.target.value)} placeholder={`${fmtNum(data.minTokens)} – ${fmtNum(data.maxTokens)}`}
                 className="h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 font-mono text-sm text-white outline-none focus:border-[#8AF5D0]/40" />
@@ -113,7 +113,7 @@ export default function Crown() {
               <span className="w-6 font-mono text-xs text-[#556b82]">{String(i + 1).padStart(2, "0")}</span>
               <CoinAvatar url={b.imageUrl} name={b.name || b.ticker} size={28} />
               <span className="text-[13px] text-white">{b.name || `$${b.ticker}`}</span>
-              <span className="ml-auto font-mono text-xs text-[#8AF5D0] tnum">{fmtNum(Number(b.burnedQuote || 0) / 1e6, 0)} $MAKERS</span>
+              <span className="ml-auto font-mono text-xs text-[#8AF5D0] tnum">{fmtNum(Number(b.burnedQuote || 0) / 1e6, 0)} {data.ticker ? `$${data.ticker}` : "tokens"}</span>
             </div>
           ))}
           {data.recent?.length > 0 && (

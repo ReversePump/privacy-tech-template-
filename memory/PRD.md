@@ -23,3 +23,9 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - P1: Desk settings approval flow (POST /desks/{id}/approvals) UI.
 - P2: Pagination via `next` cursor on explore; trades `before` cursor.
 - P2: Strategy leaderboard page, share card.
+
+## Update 2026-10-17 (revision 2)
+- /mm rewritten to match real upstream flow: checkCoin -> createDesk(mint, settingsDiff) -> deposit SOL via wallet transfer to desk treasury. Preset picker added; ?mint= deep link supported.
+- Launch verified SOL-only (pairing/half-burn removed everywhere). Payload matches upstream: name/ticker/description/imageUrl/links/initialBuySol/fundSol/settings diff (defaults incl. rewardsToMmPct, payoutMinSol).
+- Removed ALL static $MAKERS references: nav item + /token page + route deleted, home/docs/footer/burn/crown/explore copy neutralized ("the platform token"); token tickers shown only as live API data.
+- Verified: proxy returns 401 "Wallet login required" for /launches and /desks without auth (correct); checkCoin ok:true with market data; launch wizard validation + summary rail; mm UI check flow end-to-end.

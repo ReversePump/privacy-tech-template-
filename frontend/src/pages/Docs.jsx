@@ -8,7 +8,7 @@ const SECTIONS = [
     title: "What Makers is",
     body: [
       "Makers is a market maker launchpad on Solana. Every coin launched here — or added from pump.fun — gets its own market maker: a set of public trading wallets that buy the dips and sell the rises.",
-      "The maker is funded by the coin's own creator rewards, plus any SOL you fund it with at launch. It never touches your wallet after launch: the only place SOL ever leaves a maker to is your payout address, apart from the 20% of realized profit that buys back and burns $MAKERS.",
+      "The maker is funded by the coin's own creator rewards, plus any SOL you fund it with at launch. It never touches your wallet after launch: the only place SOL ever leaves a maker to is your payout address, apart from the 20% profit fee that is burned for good.",
     ],
   },
   {
@@ -41,7 +41,7 @@ const SECTIONS = [
     id: "fees",
     title: "Fees",
     body: [
-      "20% of realized profit across every maker buys $MAKERS on the open market and burns it.",
+      "20% of realized profit across every maker is bought back and burned on the open market.",
       "Launches and desk operations carry the platform fee shown in the launch terms before you sign. Nothing is signed or spent until your wallet approves.",
     ],
   },

@@ -79,7 +79,7 @@ export default function Explore() {
           <span className="h-2 w-2 rounded-sm bg-[#8AF5D0]" />
           <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-[#8AF5D0]">King of the burn</span>
           <span className="text-[13px] text-[#8ca3b8]">
-            {crown.king ? "A king holds the crown." : "No king yet. Burn $MAKERS for a coin to take the crown."}
+            {crown.king ? "A king holds the crown." : "No king yet. Burn the platform token for a coin to take the crown."}
           </span>
           <a href="/crown" className="ml-auto rounded-full bg-[#8AF5D0] px-4 py-1.5 text-xs font-medium text-[#07111f] hover:bg-[#7CFFC8]" data-testid="crown-how-btn">
             How it works

@@ -12,7 +12,6 @@ import Explore from "./pages/Explore";
 import Live from "./pages/Live";
 import Launch from "./pages/Launch";
 import Mm from "./pages/Mm";
-import Token from "./pages/Token";
 import Burn from "./pages/Burn";
 import Crown from "./pages/Crown";
 import Docs from "./pages/Docs";
@@ -34,7 +33,7 @@ function App() {
                 <Route path="/live" element={<Live />} />
                 <Route path="/launch" element={<Launch />} />
                 <Route path="/mm" element={<Mm />} />
-                <Route path="/token" element={<Token />} />
+                <Route path="/token" element={<Navigate to="/" replace />} />
                 <Route path="/burn" element={<Burn />} />
                 <Route path="/crown" element={<Crown />} />
                 <Route path="/docs" element={<Docs />} />

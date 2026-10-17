@@ -25,7 +25,6 @@ export default function Footer() {
             </div>
             <div className="flex flex-col gap-2.5">
               <span className="uppercase tracking-[0.15em] text-[#556b82]">Token</span>
-              <Link className="text-[#8ca3b8] hover:text-[#8AF5D0]" to="/token">$MAKERS</Link>
               <Link className="text-[#8ca3b8] hover:text-[#8AF5D0]" to="/burn">Burn</Link>
               <Link className="text-[#8ca3b8] hover:text-[#8AF5D0]" to="/crown">Crown</Link>
               <Link className="text-[#8ca3b8] hover:text-[#8AF5D0]" to="/docs">Docs</Link>

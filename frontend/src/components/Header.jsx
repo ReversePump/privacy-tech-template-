@@ -11,7 +11,6 @@ const NAV = [
   { to: "/live", label: "Live" },
   { to: "/launch", label: "Launch" },
   { to: "/mm", label: "Any coin" },
-  { to: "/token", label: "$MAKERS" },
   { to: "/burn", label: "Burn" },
   { to: "/crown", label: "Crown" },
   { to: "/docs", label: "Docs" },

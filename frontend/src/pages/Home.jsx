@@ -102,7 +102,7 @@ export default function Home() {
         <StatRow>
           <Stat testId="stat-makers" label="Makers running" value={stats ? fmtNum(stats.liveDesks) : "—"} sub={stats ? `${fmtNum(stats.desks)} launched or added` : ""} />
           <Stat testId="stat-wallets" label="Trading wallets" value={stats ? fmtNum(stats.wallets) : "—"} sub="every one public" />
-          <Stat testId="stat-volume" label="Volume traded" value={stats ? fmtSol(stats.volumeLamports, 1) : "—"} sub={stats ? fmtUsd(0) && "" : ""} />
+          <Stat testId="stat-volume" label="Volume traded" value={stats ? fmtSol(stats.volumeLamports, 1) : "—"} />
           <Stat testId="stat-claimed" label="Rewards claimed" value={stats ? fmtSol(stats.claimedLamports, 1) : "—"} />
           <Stat testId="stat-realized" label="Realized P&L" value={stats ? fmtSol(stats.realizedLamports, 3) : "—"} />
           <Stat testId="stat-paidout" label="Paid to owners" value={stats ? fmtSol(stats.paidOutLamports, 2) : "—"} />
@@ -164,7 +164,7 @@ export default function Home() {
         </p>
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            ["Your wallet", "Signs the launch. The only place SOL ever leaves a maker to, apart from the 20% of realized profit that buys back and burns $MAKERS.", "OWNER"],
+            ["Your wallet", "Signs the launch. The only place SOL ever leaves a maker to, apart from the 20% profit fee that is burned for good.", "OWNER"],
             ["The maker's treasury", "Holds capital and what it owes you. Signs its own reward claims.", "TREASURY"],
             ["Trading wallets", "1–10 wallets. Each keeps its own book and lines. All listed publicly.", "WALLETS"],
             ["The coin's market", "Buys dips under their reference, sells rises over their entry. Bonding curve, then its PumpSwap pool.", "PUMP.FUN"],
