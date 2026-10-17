@@ -125,7 +125,7 @@ export default function Desk() {
             <div className="flex items-baseline justify-between">
               <span className="text-white font-medium">Wallets · {desk.wallets?.length ?? desk.walletCount}</span>
             </div>
-            <p className="mt-1 text-[11px] font-light text-[#556b82]">All public. A maker's wallets never trade against each other.</p>
+            <p className="mt-1 text-[11px] font-light text-[#556b82]">All public — and a maker's wallets never fill each other.</p>
             <div className="mt-4 space-y-3">
               {(desk.wallets || []).map((w) => (
                 <div key={w.address} className="rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2.5">
@@ -148,7 +148,7 @@ export default function Desk() {
 
           <Panel className="p-5" data-testid="desk-settings-panel">
             <div className="flex items-baseline justify-between">
-              <span className="text-white font-medium">Engine controls</span>
+              <span className="text-white font-medium">Maker controls</span>
               <span className="font-mono text-[10px] text-[#556b82]">v{desk.settingsVersion ?? 1} · {desk.preset || "custom"}</span>
             </div>
             <div className="mt-4">

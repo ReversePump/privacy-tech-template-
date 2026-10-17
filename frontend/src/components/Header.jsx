@@ -2,15 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
-import { Search, Wallet, LogOut, LayoutDashboard, KeyRound } from "lucide-react";
+import { Search, Wallet, LogOut, LayoutDashboard, KeyRound, Plus, Rocket } from "lucide-react";
 import { useAuth } from "../solana/AuthContext";
 import { short } from "../lib/format";
 
 const NAV = [
   { to: "/explore", label: "Explore" },
   { to: "/live", label: "Live" },
-  { to: "/launch", label: "Launch" },
-  { to: "/mm", label: "Any coin" },
   { to: "/docs", label: "Docs" },
 ];
 
@@ -50,7 +48,7 @@ export default function Header() {
       <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-4 px-4 md:px-8">
         <Link to="/" className="flex items-center gap-2.5 shrink-0" data-testid="logo-link">
           <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[#8AF5D0] font-mono text-sm font-bold text-[#07111f]">M</span>
-          <span className="text-[17px] font-medium tracking-tight text-white">makers<span className="text-[#8AF5D0]">.</span></span>
+          <span className="text-[17px] font-medium tracking-tight text-white">Make<span className="text-[#8AF5D0]">Markets</span></span>
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1 ml-4" data-testid="main-nav">
@@ -87,6 +85,15 @@ export default function Header() {
               <kbd className="absolute right-3 top-1/2 -translate-y-1/2 rounded border border-white/10 px-1 font-mono text-[10px] text-[#556b82]">⌘K</kbd>
             </div>
           </form>
+
+          <Link to="/mm" data-testid="header-onboard-btn"
+            className="hidden md:inline-flex h-9 items-center gap-1.5 rounded-[3px] border border-white/15 px-4 text-[13px] text-[#c4d2df] hover:border-[#8AF5D0]/40 hover:text-[#8AF5D0] transition-colors">
+            <Plus size={14} /> Onboard
+          </Link>
+          <Link to="/launch" data-testid="header-launch-btn"
+            className="hidden md:inline-flex h-9 items-center gap-1.5 rounded-[3px] bg-white px-4 text-[13px] font-medium text-[#07111f] hover:bg-[#8AF5D0] transition-colors">
+            <Rocket size={14} /> Launch
+          </Link>
 
           {connected && publicKey ? (
             <div className="relative" ref={menuRef}>
@@ -141,7 +148,7 @@ export default function Header() {
       </div>
 
       <nav className="flex lg:hidden items-center gap-1 overflow-x-auto px-4 pb-2" data-testid="main-nav-mobile">
-        {NAV.map((n) => (
+        {[...NAV, { to: "/mm", label: "Onboard" }, { to: "/launch", label: "Launch" }].map((n) => (
           <NavLink key={n.to} to={n.to}
             className={({ isActive }) =>
               `whitespace-nowrap rounded-[3px] px-3 py-1 text-xs ${isActive ? "bg-[#8AF5D0] text-[#07111f]" : "text-[#8ca3b8]"}`

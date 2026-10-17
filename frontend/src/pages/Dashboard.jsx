@@ -91,10 +91,10 @@ function DeskDashboard({ id }) {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <Panel className="lg:col-span-2 p-6" data-testid="dash-settings-panel">
         <div className="flex items-baseline justify-between">
-          <span className="text-white font-medium">Engine controls</span>
+          <span className="text-white font-medium">Maker controls</span>
           <span className="font-mono text-[10px] text-[#556b82]">version {desk.settingsVersion ?? 1}</span>
         </div>
-        <p className="mt-1 text-[12px] font-light text-[#556b82]">Six dials, yours alone. Every change is logged publicly and takes effect within one engine pass.</p>
+        <p className="mt-1 text-[12px] font-light text-[#556b82]">Every dial is yours, every change is public, applied within one engine pass.</p>
         <div className="mt-5">
           <SettingsEditor values={form} onChange={(k, v) => setForm({ ...form, [k]: v })} />
         </div>
@@ -123,8 +123,8 @@ export default function Dashboard() {
   const { id } = useParams();
   return (
     <div className="mx-auto max-w-[1440px] px-4 md:px-8 pt-10 md:pt-14" data-testid="dashboard-page">
-      <PageHead kicker="Dashboard" title={id ? "Maker" : "Your"} accent={id ? "settings." : "makers."}
-        sub={id ? "Tune the strategy. The owner wallet is the only one that can." : "Every maker your wallet owns, in one place."} />
+      <PageHead kicker="Dashboard" title={id ? "Maker" : "Command"} accent={id ? "controls." : "room."}
+        sub={id ? "Retune the temperament. The owner wallet is the only one that can." : "Every market maker your wallet controls, in one room."} />
       {id ? <DeskDashboard id={id} /> : <MyDesks />}
     </div>
   );

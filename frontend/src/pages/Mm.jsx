@@ -118,10 +118,10 @@ export default function Mm() {
   return (
     <div className="mx-auto max-w-[1440px] px-4 md:px-8 pt-10 md:pt-14" data-testid="mm-page">
       <PageHead
-        kicker="Any coin"
-        title="Put a maker on"
-        accent="any coin."
-        sub="Paste any pump.fun coin — link or mint — and it gets the same market maker the coins launched here get. Its page lists every wallet and every trade."
+        kicker="Onboard"
+        title="Bring your"
+        accent="own coin."
+        sub="Drop in any pump.fun coin — link or mint — and it gets its own market maker, same as the coins born here. Every wallet and fill publicly auditable."
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl">
@@ -204,7 +204,7 @@ export default function Mm() {
               onChange={(e) => setFundSol(Number(e.target.value) || 0)}
               className="h-11 w-48 rounded-lg border border-white/10 bg-white/5 px-3.5 font-mono text-sm text-white outline-none focus:border-[#8AF5D0]/40" />
             <p className="mt-2 text-[11px] font-light text-[#556b82]">
-              Coins not launched here have no locked reward split — the maker trades with what you deposit to its treasury.
+              Onboarded coins have no locked fee split — the maker trades with whatever you deposit into its vault.
             </p>
           </div>
 
@@ -224,9 +224,9 @@ export default function Mm() {
           )}
 
           <ul className="mt-6 space-y-2 border-t border-white/5 pt-4 text-[12px] font-light text-[#8ca3b8]">
-            <li>· Tune every number from your dashboard after.</li>
-            <li>· Every wallet public, every trade on its page.</li>
-            <li>· Only your wallet can pause, resume, or withdraw.</li>
+            <li>· Starts on the Balanced temperament — retune every dial afterwards.</li>
+            <li>· All wallets public, every fill on its page.</li>
+            <li>· Your wallet alone can pause, resume or withdraw.</li>
           </ul>
           {!created && (
             <button onClick={add} disabled={!result?.ok || busy} data-testid="mm-add-btn"

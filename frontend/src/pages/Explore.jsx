@@ -67,9 +67,9 @@ export default function Explore() {
     <div className="mx-auto max-w-[1440px] px-4 md:px-8 pt-10 md:pt-14" data-testid="explore-page">
       <PageHead
         kicker="Explore"
-        title="Every maker,"
-        accent="every coin."
-        sub="Open one to see its wallets, every trade and claim, and the settings it runs on. Or see which strategies work and copy one."
+        title="Every maker."
+        accent="Every market."
+        sub="Open any row to inspect its wallets, fills, fee claims and the dials it runs on. See a temperament you like? Launch with it."
       />
 
       <Panel className="overflow-hidden" data-testid="explore-table-panel">

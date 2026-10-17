@@ -9,10 +9,10 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2.5">
               <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[#8AF5D0] font-mono text-sm font-bold text-[#07111f]">M</span>
-              <span className="text-[17px] font-medium tracking-tight text-white">makers<span className="text-[#8AF5D0]">.</span></span>
+              <span className="text-[17px] font-medium tracking-tight text-white">Make<span className="text-[#8AF5D0]">Markets</span></span>
             </div>
             <p className="mt-3 max-w-sm text-[13px] font-light leading-relaxed text-[#556b82]">
-              Every coin gets a market maker. It buys the dips, sells the rises, funded by its own creator rewards. Market making can lose money.
+              Market makers for every coin. They buy the dips, sell the rips, and run on the coin's own fees. Market making can lose money.
             </p>
           </div>
           <div className="flex gap-14 font-mono text-xs">
@@ -36,7 +36,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-10 border-t border-white/5 pt-5 font-mono text-[11px] text-[#556b82]">
-          Every wallet is public · a maker's wallets never trade against each other · market making can lose money
+          All wallets public · a maker's wallets never fill each other · market making can lose money
         </div>
       </div>
     </footer>

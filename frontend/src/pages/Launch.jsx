@@ -11,7 +11,7 @@ import { PageHead, Panel, CoinAvatar } from "../components/bits";
 import { SettingsEditor } from "../components/SettingsEditor";
 import { useAuth } from "../solana/AuthContext";
 
-const STEPS = ["Coin", "Dev buy", "Maker funding", "Strategy", "Treasury", "Review & sign"];
+const STEPS = ["Identity", "Opening buy", "Maker fuel", "Temperament", "Your payouts", "Review & launch"];
 
 const DEFAULT_SETTINGS = {
   buyTriggerPct: 10, sellTriggerPct: 10, buyIntensityPct: 50, sellIntensityPct: 50,
@@ -166,9 +166,9 @@ export default function Launch() {
     <div className="mx-auto max-w-[1440px] px-4 md:px-8 pt-10 md:pt-14" data-testid="launch-page">
       <PageHead
         kicker="Launch"
-        title="Launch a coin"
-        accent="with a maker."
-        sub="One wallet signature creates the coin on pump.fun, locks its reward split and funds its maker. Every setting stays yours to change after launch. Market making can lose money."
+        title="Mint a coin."
+        accent="Wire the maker."
+        sub="One approval mints the coin on pump.fun, locks its fee split and funds its market maker. Every dial stays yours afterwards. Market making can lose money."
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_320px] gap-8">
@@ -198,8 +198,8 @@ export default function Launch() {
         <div className="min-w-0">
           {step === 0 && (
             <div className="space-y-6" data-testid="launch-step-coin">
-              <h2 className="text-xl font-medium text-white">Coin</h2>
-              <p className="text-[13px] font-light text-[#8ca3b8]">What pump.fun will show: its name, ticker and image. Trades against SOL, its creator rewards fund a market maker that trades it.</p>
+              <h2 className="text-xl font-medium text-white">Identity</h2>
+              <p className="text-[13px] font-light text-[#8ca3b8]">The face of your coin on pump.fun — name, ticker, artwork. It trades against SOL while its own fees power the maker.</p>
               <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-6">
                 <div>
                   <button onClick={() => fileRef.current?.click()} data-testid="launch-image-upload"
@@ -218,8 +218,8 @@ export default function Launch() {
                 </div>
               </div>
               <Panel className="border-[#8AF5D0]/20 bg-[#8AF5D0]/5 p-4">
-                <span className="font-mono text-[10px] uppercase tracking-wider text-[#8AF5D0]">Permanent</span>
-                <p className="mt-1 text-[12px] font-light text-[#8ca3b8]">The name, ticker and image are written into the coin on pump.fun. Nobody can change them after launch, including you.</p>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-[#8AF5D0]">Set in stone</span>
+                <p className="mt-1 text-[12px] font-light text-[#8ca3b8]">Name, ticker and artwork are written into the coin itself at mint. No one edits them later — not even you.</p>
               </Panel>
               {field(`Description · optional · ${byteLen(coin.description)} / 1000`,
                 <textarea data-testid="launch-description" rows={3} className="w-full rounded-lg border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none focus:border-[#8AF5D0]/40" placeholder="What the coin is about, in a sentence or two." value={coin.description} onChange={(e) => setCoin({ ...coin, description: e.target.value })} />)}
@@ -233,20 +233,20 @@ export default function Launch() {
 
           {step === 1 && (
             <div className="space-y-6" data-testid="launch-step-devbuy">
-              <h2 className="text-xl font-medium text-white">Dev buy</h2>
-              <p className="text-[13px] font-light text-[#8ca3b8]">Buy your own coin in the launch transaction, before anyone else can. Leave at zero for a fair open.</p>
-              {field("Dev buy (SOL)",
+              <h2 className="text-xl font-medium text-white">Opening buy</h2>
+              <p className="text-[13px] font-light text-[#8ca3b8]">Grab your own coin inside the mint transaction, ahead of the crowd. Zero means everyone gets the same open.</p>
+              {field("Opening buy (SOL)",
                 <input data-testid="launch-devbuy" type="number" min={0} step={0.1} value={devBuySol} onChange={(e) => setDevBuySol(Number(e.target.value) || 0)}
                   className="h-11 w-56 rounded-lg border border-white/10 bg-white/5 px-3.5 font-mono text-sm text-white outline-none focus:border-[#8AF5D0]/40" />,
-                "A dev buy leaves no room for the funding in the launch transaction, so your wallet signs two: the launch, then a plain transfer to the maker's treasury.")}
+                "An opening buy leaves no room for fuel in the mint transaction, so your wallet signs twice: the mint, then a plain transfer to the maker's vault.")}
             </div>
           )}
 
           {step === 2 && (
             <div className="space-y-6" data-testid="launch-step-funding">
-              <h2 className="text-xl font-medium text-white">Maker funding</h2>
-              <p className="text-[13px] font-light text-[#8ca3b8]">SOL sent to the maker's treasury with the launch. With zero, the maker runs on the coin's creator rewards only.</p>
-              {field("Fund the maker (SOL)",
+              <h2 className="text-xl font-medium text-white">Maker fuel</h2>
+              <p className="text-[13px] font-light text-[#8ca3b8]">SOL wired into the maker's vault at mint. At zero, the market maker runs purely on the coin's own creator fees.</p>
+              {field("Fuel the maker (SOL)",
                 <input data-testid="launch-fund" type="number" min={0} step={0.1} value={fundSol} onChange={(e) => setFundSol(Number(e.target.value) || 0)}
                   className="h-11 w-56 rounded-lg border border-white/10 bg-white/5 px-3.5 font-mono text-sm text-white outline-none focus:border-[#8AF5D0]/40" />)}
               <div className="flex gap-2">
@@ -262,8 +262,8 @@ export default function Launch() {
 
           {step === 3 && (
             <div className="space-y-6" data-testid="launch-step-strategy">
-              <h2 className="text-xl font-medium text-white">Strategy</h2>
-              <p className="text-[13px] font-light text-[#8ca3b8]">Start from a preset. Every number stays changeable after launch.</p>
+              <h2 className="text-xl font-medium text-white">Temperament</h2>
+              <p className="text-[13px] font-light text-[#8ca3b8]">Choose how the market maker behaves out of the gate. Retune every dial later.</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {presets.map(([key, p]) => (
                   <button key={key} data-testid={`preset-${key}`} onClick={() => pickPreset(key)}
@@ -274,7 +274,7 @@ export default function Launch() {
                 ))}
               </div>
               <div>
-                <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#556b82]">Fine-tune the engine</div>
+                <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#556b82]">Fine-tune the maker</div>
                 <SettingsEditor
                   values={settings}
                   compactKeys={["buyTriggerPct", "buyIntensityPct", "averageDown", "sellTriggerPct", "sellIntensityPct", "profitTargetPct", "stopLossPct", "cooldownSeconds"]}
@@ -286,18 +286,18 @@ export default function Launch() {
 
           {step === 4 && (
             <div className="space-y-6" data-testid="launch-step-treasury">
-              <h2 className="text-xl font-medium text-white">Treasury</h2>
-              <p className="text-[13px] font-light text-[#8ca3b8]">Your share of the rewards the maker claims, and when they're paid out to you.</p>
+              <h2 className="text-xl font-medium text-white">Your payouts</h2>
+              <p className="text-[13px] font-light text-[#8ca3b8]">How much of each fee claim stays in the maker — and when the rest lands in your wallet.</p>
               <div>
-                <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-[#556b82]">Rewards kept by the maker · {rewardsKeptPct}%</label>
+                <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-[#556b82]">Fees the maker keeps · {rewardsKeptPct}%</label>
                 <input type="range" min={0} max={100} value={rewardsKeptPct} data-testid="launch-rewards-range"
                   onChange={(e) => setRewardsKeptPct(Number(e.target.value))} className="w-full accent-[#8AF5D0]" />
                 <div className="mt-1 flex justify-between font-mono text-[10px] text-[#556b82]">
                   <span>{rewardsKeptPct}% maker</span>
-                  <span>{100 - rewardsKeptPct}% payable to you</span>
+                  <span>{100 - rewardsKeptPct}% flows to you</span>
                 </div>
               </div>
-              {field("Auto payout from (SOL)",
+              {field("Auto payout above (SOL)",
                 <input data-testid="launch-payoutmin" type="number" min={0.01} step={0.01} value={payoutMinSol} onChange={(e) => setPayoutMinSol(Number(e.target.value) || 0)}
                   className="h-11 w-56 rounded-lg border border-white/10 bg-white/5 px-3.5 font-mono text-sm text-white outline-none focus:border-[#8AF5D0]/40" />)}
             </div>
@@ -305,11 +305,11 @@ export default function Launch() {
 
           {step === 5 && (
             <div className="space-y-6" data-testid="launch-step-review">
-              <h2 className="text-xl font-medium text-white">Review & sign</h2>
+              <h2 className="text-xl font-medium text-white">Review & launch</h2>
               {phase === "live" && liveDesk ? (
                 <Panel className="border-[#8AF5D0]/30 bg-[#8AF5D0]/5 p-6" data-testid="launch-success">
-                  <div className="flex items-center gap-2 text-[#8AF5D0]"><Check size={18} /><span className="font-medium">The coin is on chain.</span></div>
-                  <p className="mt-2 text-[13px] font-light text-[#8ca3b8]">Its maker starts as soon as the treasury has SOL. Every trade will show on its page.</p>
+                  <div className="flex items-center gap-2 text-[#8AF5D0]"><Check size={18} /><span className="font-medium">Your coin is on chain.</span></div>
+                  <p className="mt-2 text-[13px] font-light text-[#8ca3b8]">The market maker spins up the moment its vault holds SOL. Every fill shows on its page.</p>
                   <div className="mt-5 flex gap-3">
                     <Link to={`/desk/${liveDesk.id}`} className="rounded-[3px] bg-[#8AF5D0] px-5 py-2 text-sm font-medium text-[#07111f]" data-testid="launch-open-desk">Open the maker →</Link>
                     <Link to="/explore" className="rounded-[3px] border border-white/15 px-5 py-2 text-sm text-white">Explore</Link>
@@ -326,19 +326,19 @@ export default function Launch() {
                       </div>
                     </div>
                     <ul className="mt-5 space-y-2 border-t border-white/5 pt-4 text-[12px] font-light text-[#8ca3b8] list-none">
-                      <li>1. Creates the coin on pump.fun{name && ""}.</li>
-                      <li>2. Locks the reward split: 80% maker · 20% Makers, locked for good.</li>
-                      <li>{devBuySol > 0 ? `3. Buys ${devBuySol} SOL of your coin in the same transaction.` : "3. No dev buy — the open is fair."}</li>
-                      <li>{fundSol > 0 ? `4. Funds the maker's treasury with ${fundSol} SOL.` : "4. Sends nothing to the treasury: the maker runs on the coin's creator rewards."}</li>
+                      <li>1. Mints the coin on pump.fun.</li>
+                      <li>2. Locks the fee split for good: 80% maker · 20% platform.</li>
+                      <li>{devBuySol > 0 ? `3. Buys ${devBuySol} SOL of your coin inside the same transaction.` : "3. No opening buy — everyone gets the same open."}</li>
+                      <li>{fundSol > 0 ? `4. Wires ${fundSol} SOL into the maker's vault.` : "4. Sends nothing to the vault — the maker lives off the coin's own fees."}</li>
                     </ul>
                   </Panel>
                   {err && <Panel className="border-[#ff4d4f]/30 bg-[#ff4d4f]/5 p-4 text-[13px] text-[#ff8a8a]" data-testid="launch-error">{err}</Panel>}
                   <button onClick={launch} disabled={phase !== "idle" && phase !== "failed"} data-testid="launch-sign-btn"
                     className="inline-flex h-12 items-center gap-2 rounded-[3px] bg-[#8AF5D0] px-8 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] hover:shadow-[0_0_28px_rgba(138,245,208,0.4)] disabled:opacity-50 transition-all">
                     <Rocket size={16} />
-                    {phase === "idle" || phase === "failed" ? (connected ? "Sign & launch" : "Connect wallet to launch") : phase === "signing" ? "Approve in your wallet…" : phase === "sending" ? "Sending…" : "Working…"}
+                    {phase === "idle" || phase === "failed" ? (connected ? "Approve & launch" : "Connect wallet to launch") : phase === "signing" ? "Approve in your wallet…" : phase === "sending" ? "Sending…" : "Working…"}
                   </button>
-                  <p className="text-[11px] font-light text-[#556b82]">Market making can lose money. Nothing is signed or spent until your wallet approves.</p>
+                  <p className="text-[11px] font-light text-[#556b82]">Trading can lose money. Nothing moves until your wallet approves.</p>
                 </>
               )}
             </div>
@@ -364,7 +364,7 @@ export default function Launch() {
         {/* summary rail */}
         <aside className="lg:sticky lg:top-24 self-start" data-testid="launch-summary">
           <Panel className="p-5">
-            <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#556b82]">What your wallet signs</div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#556b82]">What your wallet approves</div>
             <div className="mt-4 flex items-center gap-3">
               <CoinAvatar url={imagePreview || coin.imageUrl} name={coin.name} size={36} />
               <div>
@@ -373,16 +373,16 @@ export default function Launch() {
               </div>
             </div>
             <dl className="mt-5 space-y-2.5 border-t border-white/5 pt-4 font-mono text-[12px]">
-              <div className="flex justify-between"><dt className="text-[#556b82]">Dev buy</dt><dd className="text-white tnum">{devBuySol > 0 ? `${devBuySol} SOL` : "None"}</dd></div>
-              <div className="flex justify-between"><dt className="text-[#556b82]">Maker funding</dt><dd className="text-white tnum">{fundSol} SOL</dd></div>
-              <div className="flex justify-between"><dt className="text-[#556b82]">Transactions</dt><dd className="text-white tnum">{devBuySol > 0 ? 2 : 1}</dd></div>
-              <div className="flex justify-between"><dt className="text-[#556b82]">Reward split</dt><dd className="text-[#8AF5D0] tnum">80% maker · 20% Makers</dd></div>
-              <div className="flex justify-between"><dt className="text-[#556b82]">Strategy</dt><dd className="text-white capitalize">{preset}</dd></div>
-              <div className="flex justify-between"><dt className="text-[#556b82]">Rewards kept</dt><dd className="text-white tnum">{rewardsKeptPct}% · {100 - rewardsKeptPct}% payable to you</dd></div>
-              <div className="flex justify-between"><dt className="text-[#556b82]">Auto payout</dt><dd className="text-white tnum">On, from {payoutMinSol} SOL</dd></div>
+              <div className="flex justify-between"><dt className="text-[#556b82]">Opening buy</dt><dd className="text-white tnum">{devBuySol > 0 ? `${devBuySol} SOL` : "None"}</dd></div>
+              <div className="flex justify-between"><dt className="text-[#556b82]">Maker fuel</dt><dd className="text-white tnum">{fundSol} SOL</dd></div>
+              <div className="flex justify-between"><dt className="text-[#556b82]">Signatures</dt><dd className="text-white tnum">{devBuySol > 0 ? 2 : 1}</dd></div>
+              <div className="flex justify-between"><dt className="text-[#556b82]">Fee split</dt><dd className="text-[#8AF5D0] tnum">80% maker · 20% platform</dd></div>
+              <div className="flex justify-between"><dt className="text-[#556b82]">Temperament</dt><dd className="text-white capitalize">{preset}</dd></div>
+              <div className="flex justify-between"><dt className="text-[#556b82]">Fees kept</dt><dd className="text-white tnum">{rewardsKeptPct}% · {100 - rewardsKeptPct}% to you</dd></div>
+              <div className="flex justify-between"><dt className="text-[#556b82]">Auto payout</dt><dd className="text-white tnum">On, above {payoutMinSol} SOL</dd></div>
             </dl>
             <p className="mt-4 border-t border-white/5 pt-3 text-[10px] font-light leading-relaxed text-[#556b82]">
-              Market making can lose money. Nothing is signed or spent until your wallet approves.
+              Market making can lose money. Nothing moves until your wallet approves.
             </p>
           </Panel>
         </aside>

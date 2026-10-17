@@ -37,10 +37,10 @@ export default function Live() {
   return (
     <div className="mx-auto max-w-[1440px] px-4 md:px-8 pt-10 md:pt-14" data-testid="live-page">
       <PageHead
-        kicker="Live"
-        title="Live maker"
-        accent="activity."
-        sub="Only coins launched through this site and makers added through this site — every buy, sell, reward claim and launch, the moment it finalizes on chain."
+        kicker="The wire"
+        title="Every fill,"
+        accent="as it settles."
+        sub="Only coins born or onboarded through this site — each buy, sell, fee claim and payout, the second it lands on chain."
       />
 
       <StatRow className="mb-8" >

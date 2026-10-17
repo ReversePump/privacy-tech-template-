@@ -57,3 +57,9 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 
 ## Update 2026-10-17 (revision 8)
 - Squared all interactive shapes (rounded-full -> rounded-[3px]) across pages/components + wallet adapter buttons, matching the angular type system.
+
+## Update 2026-10-17 (revision 9)
+- Rebrand: project is MakeMarkets (logo, footer, page title/meta). "Market maker" terminology kept everywhere (it IS the product).
+- Copy paraphrased site-wide (no makers.fun sentences): hero "your coin, with a market maker built in.", money-flow cards (vault/wallets/market), temperament section, CTA, Explore ("Every maker. Every market."), Live ("Every fill, as it settles."), Docs fully rewritten (6 sections, own voice).
+- Launch wizard steps renamed: Identity / Opening buy / Maker fuel / Temperament / Your payouts / Review & launch; summary rail "What your wallet approves".
+- Header layout: primary nav (Explore, Live, Docs) + search + Onboard (outline) + Launch (white) + Connect (mint) action cluster. Mobile keeps all links.
