@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700&family=Playfair+Display:ital,wght@1,400;1,500;1,600&family=JetBrains+Mono:wght@300;400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,600&family=Space+Mono:wght@400;700&display=swap");
 
 @layer base {
     :root {
@@ -55,9 +55,9 @@
         margin: 0;
         background: var(--bg);
         color: var(--fg);
-        font-family: "Outfit", ui-sans-serif, system-ui, sans-serif;
+        font-family: "Chakra Petch", ui-sans-serif, system-ui, sans-serif;
         font-size: 14px;
-        font-weight: 300;
+        font-weight: 400;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
@@ -68,11 +68,13 @@
 }
 
 .font-mono, code, kbd {
-    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: "Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 .font-serif {
-    font-family: "Playfair Display", Georgia, serif;
+    font-family: "Archivo Black", "Chakra Petch", sans-serif;
+    font-style: normal;
+    letter-spacing: -0.01em;
 }
 
 .tnum {
@@ -80,7 +82,7 @@
 }
 
 .micro {
-    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-family: "Space Mono", ui-monospace, Menlo, monospace;
     font-size: 11px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -112,7 +114,7 @@
 
 .dtable { width: 100%; border-collapse: collapse; }
 .dtable th {
-    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-family: "Space Mono", ui-monospace, Menlo, monospace;
     font-size: 10px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -142,11 +144,11 @@ a { color: inherit; }
     border-radius: 16px !important;
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5) !important;
 }
-.wallet-adapter-modal-title { color: #fff !important; font-family: "Outfit", sans-serif !important; }
+.wallet-adapter-modal-title { color: #fff !important; font-family: "Chakra Petch", sans-serif !important; }
 .wallet-adapter-modal-content, .wallet-adapter-modal-list { color: #8ca3b8 !important; }
 .wallet-adapter-modal-list li {
     color: #fff !important;
-    font-family: "Outfit", sans-serif !important;
+    font-family: "Chakra Petch", sans-serif !important;
     border-radius: 10px !important;
 }
 .wallet-adapter-modal-list li:hover { background: rgba(255, 255, 255, 0.05) !important; }
@@ -157,13 +159,13 @@ a { color: inherit; }
     background: #8af5d0 !important;
     color: #07111f !important;
     border-radius: 999px !important;
-    font-family: "Outfit", sans-serif !important;
+    font-family: "Chakra Petch", sans-serif !important;
 }
 .wallet-adapter-button {
     background: #8af5d0 !important;
     color: #07111f !important;
     border-radius: 999px !important;
-    font-family: "Outfit", sans-serif !important;
+    font-family: "Chakra Petch", sans-serif !important;
     font-size: 13px !important;
     font-weight: 500 !important;
     height: 36px !important;

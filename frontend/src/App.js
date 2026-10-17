@@ -45,7 +45,7 @@ function App() {
             <Footer />
           </BrowserRouter>
           <Toaster theme="dark" position="bottom-right" toastOptions={{
-            style: { background: "#0d1b2a", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontFamily: "Outfit, sans-serif" },
+            style: { background: "#0d1b2a", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontFamily: "Chakra Petch, sans-serif" },
           }} />
         </AuthProvider>
       </WalletContext>

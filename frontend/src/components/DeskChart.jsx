@@ -65,7 +65,7 @@ export default function DeskChart({ deskId, height = 300 }) {
               <YAxis orientation="right" domain={["auto", "auto"]} stroke="#33465c" fontSize={10} tickLine={false} axisLine={false}
                 tickFormatter={(v) => (v >= 1 ? v.toFixed(2) : v >= 0.001 ? v.toFixed(5) : v.toExponential(1))} width={64} />
               <Tooltip
-                contentStyle={{ background: "#0d1b2a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontFamily: "JetBrains Mono", fontSize: 12 }}
+                contentStyle={{ background: "#0d1b2a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, fontFamily: "Space Mono", fontSize: 12 }}
                 labelStyle={{ color: "#8ca3b8" }}
                 labelFormatter={(t) => new Date(t).toLocaleString()}
                 formatter={(v) => [mode === "price" ? `${Number(v).toPrecision(6)} SOL` : fmtUsd(v), mode]}

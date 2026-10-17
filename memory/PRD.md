@@ -51,3 +51,6 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Ticker: filtered to our desks, hidden when none. Home hero activity: filtered, "waiting for first coin" empty state with CTA. Home stats strip: computed from our desks (running/wallets/volume/claimed/realized/paid/trades24h), labeled "Coins launched or added through this site". Home Live makers grid: ours-only with empty-state CTA.
 - Live.jsx refactored onto the shared hook.
 - Verified via screenshots: home shows zeros + empty states, no proxy-global data anywhere on landing/live.
+
+## Update 2026-10-17 (revision 7)
+- Typography switched to angular/blocky: Archivo Black (display accents), Chakra Petch (UI/body), Space Mono (mono/data). Removed Outfit/Playfair/JetBrains everywhere (incl. wallet modal reskin, toaster, chart tooltip).
