@@ -9,8 +9,6 @@ import { useAuth } from "../solana/AuthContext";
 import { short } from "../lib/format";
 import { SubPrice } from "./bits";
 
-const PLATFORM_DESK = "ee6515b5-df04-4900-9005-483e71b99286";
-
 const NAV = [
   { to: "/explore", label: "Explore" },
   { to: "/live", label: "Live" },
@@ -30,13 +28,13 @@ export default function Header() {
   const nav = useNavigate();
   const menuRef = useRef(null);
 
-  // live $MARKETS price for the header pill
+  // live $MARKETS price for the header pill (from the token's own CA)
   useEffect(() => {
     let live = true;
     const load = () =>
-      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/relay/desks/${PLATFORM_DESK}`)
+      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/markets/prices?mint=${PLATFORM_CA}&range=1h`)
         .then((r) => r.json())
-        .then((d) => live && setMarketsPrice(d?.market?.priceSol ?? null))
+        .then((d) => live && setMarketsPrice(d?.last ?? null))
         .catch(() => {});
     load();
     const t = setInterval(load, 30000);

@@ -221,3 +221,10 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - DeskChart: MCAP/PRICE mode toggle removed entirely (all coin pages) — price-only chart with a PRICE label + range buttons.
 - Header $MARKETS pill now shows the token's LIVE price (SubPrice from desk ee6515b5 market.priceSol, 30s poll) beside the CA on every page: "$MARKETS · 0.0₆4914 · 7UMd…pump".
 - Verified on the $MARKETS desk page: price pill live, no mcap toggle, chart renders, no errors.
+
+## Update 2026-10-18 (revision 35) — $MARKETS PAGE: OWN CA + OWN PRICE ACTION
+- Platform CA 7UMdnRcC9zXp1wm9MteFCEJ785bk8xpfWPgdcAghpump is the real "MakeMarkets"/MARKETS pump token (pool 3ckz3mCD…Bavz).
+- Backend: GET /api/markets/prices?mint=&range= — GeckoTerminal OHLCV proxy (30s cache; currency=token = SOL-denominated; ranges 1h/6h/24h/7d with minute/hour aggregation; auto finer-range fallback in DeskChart for young pools).
+- $MARKETS desk page (PLATFORM_MINT desk): CA copy button shows platform CA (upstream mint fully hidden); price chart = the CA's own price action; Price stat = CA price; Market/Chart/Explorer links point to the CA; mcap hidden; activity/stats remain the masked upstream engine data.
+- Header pill price switched to the CA's live price.
+- Full DOM audit green: no $MAKERS text, no makers.fun, no upstream mint in DOM or hrefs, all 4 activity tabs clean, no console errors.

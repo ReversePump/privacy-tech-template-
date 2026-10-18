@@ -217,6 +217,41 @@ def _err(code: str, status: int):
     return Response(f'{{"error":"{code}"}}', status_code=status, media_type="application/json")
 
 
+# ---------- public market data (GeckoTerminal) for the platform token chart ----------
+
+GT = "https://api.geckoterminal.com/api/v2"
+_PRICE_CACHE: dict = {}
+_RANGE_MAP = {"1h": ("minute", 1, 60), "6h": ("minute", 5, 72), "24h": ("minute", 15, 96), "7d": ("hour", 1, 168)}
+
+
+@api_router.get("/markets/prices")
+async def market_prices(mint: str, range: str = "24h"):
+    key = (mint, range)
+    now = time.time()
+    if key in _PRICE_CACHE and now - _PRICE_CACHE[key][0] < 30:
+        return _PRICE_CACHE[key][1]
+    tf, agg, limit = _RANGE_MAP.get(range, _RANGE_MAP["24h"])
+    try:
+        pr = await _client().get(f"{GT}/networks/solana/tokens/{mint}/pools", headers={"User-Agent": "Mozilla/5.0"})
+        pools = pr.json().get("data") or []
+        if not pools:
+            return _err("no_pool", 404)
+        pool = pools[0]["id"].split("_", 1)[1]
+        r = await _client().get(
+            f"{GT}/networks/solana/pools/{pool}/ohlcv/{tf}",
+            params={"aggregate": agg, "limit": limit, "currency": "token"},
+            headers={"User-Agent": "Mozilla/5.0"},
+        )
+        lst = ((r.json().get("data") or {}).get("attributes") or {}).get("ohlcv_list") or []
+        points = [{"t": int(c[0]) * 1000, "price": float(c[4])} for c in sorted(lst, key=lambda c: c[0])]
+        out = {"points": points, "last": points[-1]["price"] if points else None}
+        _PRICE_CACHE[key] = (now, out)
+        return out
+    except httpx.HTTPError as e:
+        logger.warning(f"geckoterminal error: {e}")
+        return _err("upstream_error", 502)
+
+
 @api_router.get("/vault/info")
 async def vault_info():
     return {"address": TREASURY_ADDRESS}

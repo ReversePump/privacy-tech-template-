@@ -4,25 +4,37 @@ import { makers } from "../lib/api";
 import { fmtUsd } from "../lib/format";
 import { Loading } from "./bits";
 
-export default function DeskChart({ deskId, height = 300 }) {
+export default function DeskChart({ deskId, height = 300, chartMint = null }) {
   const [range, setRange] = useState("24h");
-  const [mode, setMode] = useState("price");
+  const [mode] = useState("price");
   const [data, setData] = useState(null);
 
   useEffect(() => {
     let live = true;
     setData(null);
-    makers.chart(deskId, range)
-      .then((d) => live && setData(d))
+    const fetcher = chartMint
+      ? fetch(`${process.env.REACT_APP_BACKEND_URL}/api/markets/prices?mint=${chartMint}&range=${range}`).then((r) => r.json())
+      : makers.chart(deskId, range);
+    fetcher
+      .then((d) => {
+        if (!live) return;
+        // young pools: step down to a finer range until there is something to draw
+        const finer = { "7d": "24h", "24h": "6h", "6h": "1h" };
+        if (chartMint && (!d.points || d.points.length < 2) && finer[range]) {
+          setRange(finer[range]);
+          return;
+        }
+        setData(d);
+      })
       .catch(() => live && setData({ points: [], trades: [], claims: [] }));
     return () => { live = false; };
-  }, [deskId, range]);
+  }, [deskId, range, chartMint]);
 
   const points = (data?.points || []).map((p) => ({
-    t: Date.parse(p.at || p.t || p.time),
+    t: typeof p.t === "number" ? p.t : Date.parse(p.at || p.t || p.time),
     price: p.priceSol ?? p.price ?? p.close ?? null,
     mcap: p.mcapUsd ?? p.mcap ?? null,
-  })).filter((p) => p.t && (mode === "price" ? p.price != null : p.mcap != null));
+  })).filter((p) => p.t && p.price != null);
 
   return (
     <div data-testid="desk-chart">

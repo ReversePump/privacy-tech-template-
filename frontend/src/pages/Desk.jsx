@@ -31,6 +31,9 @@ const cleanLink = (u) => {
   }
 };
 
+// The platform token page: its own CA and its own price action
+const PLATFORM_CA = "7UMdnRcC9zXp1wm9MteFCEJ785bk8xpfWPgdcAghpump";
+
 export default function Desk() {
   const { id } = useParams();
   const [desk, setDesk] = useState(null);
@@ -45,6 +48,23 @@ export default function Desk() {
   const isMobile = isMobileDevice();
   const [vaultBal, setVaultBal] = useState(null);
   const [vaultBusy, setVaultBusy] = useState(false);
+  const [caPrice, setCaPrice] = useState(null);
+
+  // $MARKETS page: price comes from the platform CA, not the engine desk
+  const isPlatformToken = desk?.mint === PLATFORM_MINT;
+  useEffect(() => {
+    if (!isPlatformToken) return;
+    let live = true;
+    const load = () =>
+      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/markets/prices?mint=${PLATFORM_CA}&range=1h`)
+        .then((r) => r.json())
+        .then((d) => live && d.last != null && setCaPrice(d.last))
+        .catch(() => {});
+    load();
+    const t = setInterval(load, 30000);
+    return () => { live = false; clearInterval(t); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPlatformToken]);
 
   const refreshVault = (mint) => {
     if (!publicKey || !mint) return;
@@ -118,9 +138,13 @@ export default function Desk() {
             {m.venue && <span>{m.venue === "pool" ? "liquidity pool" : "bonding curve"}</span>}
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[11px] text-[#93a184]">
-            {desk.mint !== PLATFORM_MINT && (
+            {desk.mint !== PLATFORM_MINT ? (
               <button onClick={() => copy(desk.mint, "mint")} className="inline-flex items-center gap-1 hover:text-[#3F9E00]" data-testid="desk-copy-mint">
                 {copied === "mint" ? <Check size={10} /> : <Copy size={10} />} Mint {short(desk.mint, 4, 4)}
+              </button>
+            ) : (
+              <button onClick={() => copy(PLATFORM_CA, "ca")} className="inline-flex items-center gap-1 hover:text-[#3F9E00]" data-testid="desk-copy-ca">
+                {copied === "ca" ? <Check size={10} /> : <Copy size={10} />} CA {short(PLATFORM_CA, 4, 4)}
               </button>
             )}
             <button onClick={() => copy(desk.owner, "owner")} className="inline-flex items-center gap-1 hover:text-[#3F9E00]" data-testid="desk-copy-owner">
@@ -132,9 +156,11 @@ export default function Desk() {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <ExtLink href={pumpCoin(desk.mint)} className="rounded-[3px] border border-black/10 px-3.5 py-2 text-xs">Market</ExtLink>
-          <ExtLink href={dexscreener(desk.mint)} className="rounded-[3px] border border-black/10 px-3.5 py-2 text-xs">Chart</ExtLink>
-          <ExtLink href={solscanAcct(desk.mint)} className="rounded-[3px] border border-black/10 px-3.5 py-2 text-xs">Explorer</ExtLink>
+          {(() => { const linkMint = isPlatformToken ? PLATFORM_CA : desk.mint; return (<>
+            <ExtLink href={pumpCoin(linkMint)} className="rounded-[3px] border border-black/10 px-3.5 py-2 text-xs">Market</ExtLink>
+            <ExtLink href={dexscreener(linkMint)} className="rounded-[3px] border border-black/10 px-3.5 py-2 text-xs">Chart</ExtLink>
+            <ExtLink href={solscanAcct(linkMint)} className="rounded-[3px] border border-black/10 px-3.5 py-2 text-xs">Explorer</ExtLink>
+          </>); })()}
           {isOwner && (
             <Link to={`/dashboard/${desk.id}`} className="rounded-[3px] bg-[#3F9E00] px-4 py-2 text-xs font-medium text-[#131a0f] hover:bg-[#54C400]" data-testid="desk-dashboard-btn">
               Dashboard
@@ -144,7 +170,7 @@ export default function Desk() {
       </div>
 
       <Panel className="mt-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 divide-x divide-black/5 overflow-hidden" data-testid="desk-stats">
-        <Stat label="Price" value={<SubPrice value={m.priceSol} />} sub={m.priceSol ? fmtUsd(m.mcapUsd && m.priceSol ? null : null) : ""} testId="desk-price" />
+        <Stat label="Price" value={<SubPrice value={isPlatformToken && caPrice != null ? caPrice : m.priceSol} />} sub="" testId="desk-price" />
         {desk.mint !== PLATFORM_MINT && (
           <Stat label="Market cap" value={fmtUsd(m.mcapUsd)} sub={m.mcapSol ? `${fmtNum(m.mcapSol, 1)} SOL` : ""} testId="desk-mcap" />
         )}
@@ -163,7 +189,7 @@ export default function Desk() {
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 flex flex-col gap-4">
           <Panel className="overflow-hidden">
-            <DeskChart deskId={desk.id} />
+            <DeskChart deskId={desk.id} chartMint={isPlatformToken ? PLATFORM_CA : null} />
           </Panel>
 
           {(() => {
