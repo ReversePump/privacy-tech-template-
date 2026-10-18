@@ -4,7 +4,8 @@ import { Rocket, Plus } from "lucide-react";
 import { makers } from "../lib/api";
 import { fmtSol, fmtUsd, fmtNum, lamportsToSol, solscanTx, short } from "../lib/format";
 import { Panel, KindPill, CoinAvatar, Loading, ExtLink } from "../components/bits";
-import { useOurDesks, feedItemBlocked } from "../lib/useOurDesks";
+import { useOurDesks, feedItemBlocked, listBlocked, PLATFORM_MINT } from "../lib/useOurDesks";
+import { maskCoin } from "../lib/alias";
 
 function HeroActivity({ ourIds, hasOurs }) {
   const [items, setItems] = useState(null);
@@ -86,16 +87,32 @@ function HeroActivity({ ourIds, hasOurs }) {
 
 export default function Home() {
   const [config, setConfig] = useState(null);
-  const { ours, ourIds, loading } = useOurDesks();
+  const { ourIds, loading } = useOurDesks();
+  const [liveDesks, setLiveDesks] = useState(null);
 
   useEffect(() => {
     makers.config().then(setConfig).catch(() => {});
   }, []);
 
+  useEffect(() => {
+    let live = true;
+    const load = () => makers.desks({ limit: 60 }).then((d) => live && setLiveDesks(d.desks || [])).catch(() => live && setLiveDesks([]));
+    load();
+    const t = setInterval(load, 60000);
+    return () => { live = false; clearInterval(t); };
+  }, []);
+
   const presets = config?.presets ? Object.entries(config.presets) : [];
-  const desks = ours;
   const hasOurs = ourIds.size > 0;
-  const statsReady = desks !== null;
+  const statsReady = liveDesks !== null;
+  const desks = (liveDesks || [])
+    .filter((d) => !listBlocked(d))
+    .sort((a, b) =>
+      (ourIds.has(b.id) ? 1 : 0) - (ourIds.has(a.id) ? 1 : 0) ||
+      (b.status === "running" ? 1 : 0) - (a.status === "running" ? 1 : 0) ||
+      (Number(b.totals?.volumeLamports) || 0) - (Number(a.totals?.volumeLamports) || 0)
+    )
+    .slice(0, 9);
 
   return (
     <div data-testid="home-page">
@@ -164,14 +181,16 @@ export default function Home() {
         )}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {!statsReady && <Loading label="Loading makers" />}
-          {desks?.map((d) => (
-            <Link key={d.id} to={`/desk/${d.id}`} data-testid={`home-desk-${d.ticker}`}>
+          {desks?.map((d) => {
+            const mk = maskCoin(d, ourIds.has(d.id), PLATFORM_MINT);
+            return (
+            <Link key={d.id} to={`/desk/${d.id}`} data-testid={`home-desk-${mk.ticker}`}>
               <Panel className="group h-full p-5 hover:border-[#3F9E00]/30 hover:-translate-y-0.5 transition-all">
                 <div className="flex items-center gap-3">
-                  <CoinAvatar url={d.imageUrl} name={d.name} size={40} />
+                  <CoinAvatar url={mk.imageUrl} name={mk.name} size={40} />
                   <div className="min-w-0">
-                    <div className="truncate text-[#131a0f] group-hover:text-[#3F9E00] transition-colors">{d.name}</div>
-                    <div className="font-mono text-[11px] text-[#93a184]">${d.ticker}</div>
+                    <div className="truncate text-[#131a0f] group-hover:text-[#3F9E00] transition-colors">{mk.name}</div>
+                    <div className="font-mono text-[11px] text-[#93a184]">${mk.ticker}</div>
                   </div>
                   <span className={`ml-auto h-1.5 w-1.5 rounded-[3px] ${d.status === "running" ? "bg-[#38c973] pip-blink" : "bg-[#556b82]"}`} />
                 </div>
@@ -191,7 +210,8 @@ export default function Home() {
                 </div>
               </Panel>
             </Link>
-          ))}
+            );
+          })}
         </div>
       </section>
 

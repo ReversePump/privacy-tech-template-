@@ -234,3 +234,10 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Landing page audited: zero address-like strings rendered; $MARKETS pill with live CA price present.
 - External link audit across all 9 routes: only neutral infra domains (solscan/dexscreener/pump.fun/x.com/pinata); zero makers.fun/vortexdeployer anywhere.
 - Verified 3-way: masked page -> platform CA; our desk -> real mint; $MARKETS page -> platform CA. No console errors.
+
+## Update 2026-10-18 (revision 37) — EXPLORE + LANDING GO LIVE (MASKED)
+- Explore now lists all live upstream makers (limit=100; upstream caps at 100) masked via maskCoin(): ours real + pinned first + TypeBadge, platform mint rebranded $MARKETS, everything else alias name + M image. Copycat MAKER tickers excluded (listBlocked). Search matches masked identity. Filters "Launched here/Onboarded" narrow to platform coins.
+- Landing "Market makers live now" grid shows live masked desks (ours pinned first, then running, then volume), 9 cards.
+- Desk pages of masked coins now also show the masked alias name/ticker (identity fully hidden end to end).
+- alias.js exports MASK_IMG + maskCoin(); useOurDesks exports listBlocked + PLATFORM_MINT.
+- Verified: Explore 95 rows (94 masked + ours), search works, Home grid 9 masked cards, no console errors.

@@ -29,6 +29,9 @@ export const feedItemBlocked = (it) => {
   );
 };
 
+// Lists show live upstream coins (masked) — only copycat/brand coins are excluded
+export const listBlocked = (d) => isBlocked(d) && d.mint !== PLATFORM_MINT;
+
 // Desks launched or added through THIS site (recorded by the relay in Mongo).
 export function useOurDesks(pollMs = 30000) {
   const [ourDesks, setOurDesks] = useState(null); // recorded rows

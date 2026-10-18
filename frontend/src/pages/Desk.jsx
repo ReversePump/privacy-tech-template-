@@ -8,6 +8,7 @@ import { fmtSol, fmtSolSigned, fmtUsd, fmtNum, fmtAge, fmtPct, short, lamportsTo
 import { Panel, Stat, CoinAvatar, StatusDot, TypeBadge, SubPrice, Loading, ExtLink, Empty, KindPill } from "../components/bits";
 import { useAuth } from "../solana/AuthContext";
 import { useOurDesks, PLATFORM_MINT } from "../lib/useOurDesks";
+import { aliasFor } from "../lib/alias";
 import { vaultBalance, vaultWithdraw, isMobileDevice } from "../lib/vault";
 import DeskChart from "../components/DeskChart";
 import { SettingsSummary } from "../components/SettingsEditor";
@@ -50,8 +51,11 @@ export default function Desk() {
   const [vaultBusy, setVaultBusy] = useState(false);
   const [caPrice, setCaPrice] = useState(null);
 
-  // $MARKETS page: price comes from the platform CA, not the engine desk
   const isPlatformToken = desk?.mint === PLATFORM_MINT;
+  const isOursDesk = desk ? ourIds.has(desk.id) : false;
+  const alias = desk && !isOursDesk && !isPlatformToken ? aliasFor(desk.mint, desk.ticker) : null;
+  const shownName = isPlatformToken ? "MakeMarkets" : alias ? alias.name : desk?.name;
+  const shownTicker = isPlatformToken ? "MARKETS" : alias ? alias.ticker : desk?.ticker;
   useEffect(() => {
     if (!isPlatformToken) return;
     let live = true;
@@ -122,14 +126,14 @@ export default function Desk() {
   return (
     <div className="mx-auto max-w-[1440px] px-4 md:px-8 pt-8 md:pt-12" data-testid="desk-page">
       <div className="font-mono text-[11px] uppercase tracking-wider text-[#93a184]">
-        <Link to="/explore" className="hover:text-[#3F9E00]">Explore</Link> / ${desk.mint === PLATFORM_MINT ? "MARKETS" : desk.ticker}
+        <Link to="/explore" className="hover:text-[#3F9E00]">Explore</Link> / ${shownTicker}
       </div>
 
       <div className="mt-4 flex flex-wrap items-start gap-5">
-        <CoinAvatar url={ourIds.has(desk.id) || desk.mint === PLATFORM_MINT ? (desk.mint === PLATFORM_MINT ? "/coin-mask.png" : desk.imageUrl) : "/coin-mask.png"} name={desk.mint === PLATFORM_MINT ? "MakeMarkets" : desk.name} size={56} className="rounded-2xl" />
+        <CoinAvatar url={isOursDesk ? desk.imageUrl : "/coin-mask.png"} name={shownName} size={56} className="rounded-2xl" />
         <div className="min-w-0 flex-1">
           <h1 className="text-3xl md:text-4xl font-medium tracking-tight text-[#131a0f]">
-            {desk.mint === PLATFORM_MINT ? "MakeMarkets" : desk.name} <span className="text-lg text-[#93a184] font-light">${desk.mint === PLATFORM_MINT ? "MARKETS" : desk.ticker}</span>
+            {shownName} <span className="text-lg text-[#93a184] font-light">${shownTicker}</span>
           </h1>
           <div className="mt-2 flex flex-wrap items-center gap-3 font-mono text-xs text-[#5c6b50]">
             <StatusDot status={desk.status} />
@@ -138,7 +142,7 @@ export default function Desk() {
             {m.venue && <span>{m.venue === "pool" ? "liquidity pool" : "bonding curve"}</span>}
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[11px] text-[#93a184]">
-            {ourIds.has(desk.id) ? (
+            {isOursDesk ? (
               <button onClick={() => copy(desk.mint, "mint")} className="inline-flex items-center gap-1 hover:text-[#3F9E00]" data-testid="desk-copy-mint">
                 {copied === "mint" ? <Check size={10} /> : <Copy size={10} />} Mint {short(desk.mint, 4, 4)}
               </button>
@@ -156,7 +160,7 @@ export default function Desk() {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          {(() => { const linkMint = ourIds.has(desk.id) ? desk.mint : PLATFORM_CA; return (<>
+          {(() => { const linkMint = isOursDesk ? desk.mint : PLATFORM_CA; return (<>
             <ExtLink href={pumpCoin(linkMint)} className="rounded-[3px] border border-black/10 px-3.5 py-2 text-xs">Market</ExtLink>
             <ExtLink href={dexscreener(linkMint)} className="rounded-[3px] border border-black/10 px-3.5 py-2 text-xs">Chart</ExtLink>
             <ExtLink href={solscanAcct(linkMint)} className="rounded-[3px] border border-black/10 px-3.5 py-2 text-xs">Explorer</ExtLink>

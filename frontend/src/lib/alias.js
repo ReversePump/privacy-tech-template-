@@ -26,3 +26,14 @@ export const aliasFor = (mint, fallback = "?") => {
   const n = NOUN[Math.floor(h / ADJ.length) % NOUN.length];
   return { name: `${a} ${n}`, ticker: `${a.slice(0, 3)}${n.slice(0, 2)}`.toUpperCase() };
 };
+
+export const MASK_IMG = "/coin-mask.png";
+
+// Display identity for a desk: ours keep their real identity, the platform token is $MARKETS,
+// every other upstream coin is masked.
+export const maskCoin = (d, isOurs, platformMint) => {
+  if (isOurs) return { name: d.name, ticker: d.ticker, imageUrl: d.imageUrl };
+  if (d.mint === platformMint) return { name: "MakeMarkets", ticker: "MARKETS", imageUrl: MASK_IMG };
+  const a = aliasFor(d.mint, d.ticker);
+  return { name: a.name, ticker: a.ticker, imageUrl: MASK_IMG };
+};

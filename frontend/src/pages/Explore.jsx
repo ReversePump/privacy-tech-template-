@@ -3,7 +3,9 @@ import { Link, useSearchParams } from "react-router-dom";
 import { Search, ArrowUpDown, Rocket, Plus, Zap } from "lucide-react";
 import { fmtSol, fmtSolSigned, fmtUsd, fmtNum, fmtAge, lamportsToSol } from "../lib/format";
 import { PageHead, Panel, CoinCell, StatusDot, TypeBadge, Loading, Empty, CoinAvatar } from "../components/bits";
-import { useOurDesks } from "../lib/useOurDesks";
+import { useOurDesks, listBlocked, PLATFORM_MINT } from "../lib/useOurDesks";
+import { makers } from "../lib/api";
+import { maskCoin } from "../lib/alias";
 
 const FILTERS = [
   ["all", "All"],
@@ -37,11 +39,21 @@ const sortVal = (d, s) => {
 
 export default function Explore() {
   const [params] = useSearchParams();
-  const { ours } = useOurDesks();
+  const { ourIds } = useOurDesks();
+  const platformMint = PLATFORM_MINT;
+  const [allDesks, setAllDesks] = useState(null);
   const [launches, setLaunches] = useState([]);
   const [q, setQ] = useState(params.get("q") || "");
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("volume");
+
+  useEffect(() => {
+    let live = true;
+    const load = () => makers.desks({ limit: 100 }).then((d) => live && setAllDesks(d.desks || [])).catch(() => live && setAllDesks([]));
+    load();
+    const t = setInterval(load, 60000);
+    return () => { live = false; clearInterval(t); };
+  }, []);
 
   useEffect(() => {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/api/our/launches`)
@@ -50,17 +62,22 @@ export default function Explore() {
       .catch(() => {});
   }, []);
 
-  const deskMints = new Set((ours || []).map((d) => d.mint));
+  const deskMints = new Set([...(allDesks || []).filter((d) => ourIds.has(d.id)).map((d) => d.mint)]);
   const awaiting = launches.filter((l) => !deskMints.has(l.mint));
 
   const rows = useMemo(() => {
-    if (!ours) return null;
+    if (!allDesks) return null;
     const needle = q.trim().toLowerCase();
-    return ours
-      .filter((d) => matchFilter(d, filter))
-      .filter((d) => !needle || d.name?.toLowerCase().includes(needle) || d.ticker?.toLowerCase().includes(needle) || d.mint?.toLowerCase().startsWith(needle))
-      .sort((a, b) => sortVal(b, sort) - sortVal(a, sort));
-  }, [ours, q, filter, sort]);
+    return allDesks
+      .filter((d) => !listBlocked(d))
+      .filter((d) => (filter === "all" ? true : ourIds.has(d.id) && matchFilter(d, filter)))
+      .filter((d) => {
+        if (!needle) return true;
+        const mk = maskCoin(d, ourIds.has(d.id), platformMint);
+        return mk.name?.toLowerCase().includes(needle) || mk.ticker?.toLowerCase().includes(needle) || d.mint?.toLowerCase().startsWith(needle);
+      })
+      .sort((a, b) => (ourIds.has(b.id) ? 1 : 0) - (ourIds.has(a.id) ? 1 : 0) || sortVal(b, sort) - sortVal(a, sort));
+  }, [allDesks, ourIds, platformMint, q, filter, sort]);
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 md:px-8 pt-10 md:pt-14" data-testid="explore-page">
@@ -68,7 +85,7 @@ export default function Explore() {
         kicker="Explore"
         title="Every maker."
         accent="Every market."
-        sub="Only coins launched or onboarded through MakeMarkets. Open any row to inspect its wallets, fills, fee claims and the dials it runs on."
+        sub="Live markets running right now, plus every coin launched or onboarded through MakeMarkets. Open any row to inspect wallets, fills, fee claims and the dials it runs on."
       />
 
       {awaiting.length > 0 && (
@@ -125,9 +142,9 @@ export default function Explore() {
         {!rows && <Loading label="Loading makers" />}
         {rows && rows.length === 0 && (
           <Empty>
-            <p className="mb-1 font-mono text-xs uppercase tracking-[0.15em] text-[#3F9E00]">Nothing here yet</p>
+            <p className="mb-1 font-mono text-xs uppercase tracking-[0.15em] text-[#3F9E00]">Nothing matches</p>
             <p className="mx-auto mb-5 max-w-md text-[12px] font-light leading-relaxed">
-              This board only lists coins with a market maker created through MakeMarkets. Be the first — it appears here the moment it lands on chain.
+              Try another search — or launch your own coin and watch it appear here the moment it lands on chain.
             </p>
             <div className="flex justify-center gap-3">
               <Link to="/launch" className="inline-flex h-9 items-center gap-2 rounded-[3px] bg-[#3F9E00] px-4 text-xs font-medium text-[#131a0f] hover:bg-[#54C400]" data-testid="explore-empty-launch">
@@ -153,9 +170,10 @@ export default function Explore() {
               <tbody>
                 {rows.map((d) => {
                   const realized = lamportsToSol(d.totals?.realizedLamports);
+                  const mk = maskCoin(d, ourIds.has(d.id), platformMint);
                   return (
-                    <tr key={d.id} data-testid={`desk-row-${d.ticker}-${d.id.slice(0, 6)}`}>
-                      <td><CoinCell imageUrl={d.imageUrl} name={d.name} ticker={d.ticker} id={d.id} /></td>
+                    <tr key={d.id} data-testid={`desk-row-${mk.ticker}-${d.id.slice(0, 6)}`}>
+                      <td><CoinCell imageUrl={mk.imageUrl} name={mk.name} ticker={mk.ticker} id={d.id} /></td>
                       <td><StatusDot status={d.status} /></td>
                       <td><TypeBadge desk={d} /></td>
                       <td className="text-right font-mono text-[#131a0f] tnum">{fmtUsd(d.market?.mcapUsd)}</td>
