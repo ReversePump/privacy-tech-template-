@@ -1,15 +1,26 @@
 import { useEffect, useState, useMemo } from "react";
 import { makers } from "./api";
 
-// Coins that must never surface on MakeMarkets (upstream's own token etc.)
-const BLOCKED_TICKERS = new Set(["MAKERS"]);
+// Coins that must never surface on MakeMarkets (upstream's own token and brand-evoking copycats)
+const BLOCKED_TICKER_PARTS = ["MAKER"];
 const BLOCKED_ORIGINS = new Set(["native"]);
+const BLOCKED_MINTS = new Set(["3XEqNHe3jHTRWAZCTHbb1UwpSfNbJL9oU1ErsM86pump"]);
+const BLOCKED_NAMES = new Set(["makers.fun", "makers"]);
+
+const tickerBlocked = (t) => BLOCKED_TICKER_PARTS.some((p) => (t || "").toUpperCase().includes(p));
 
 const isBlocked = (d) =>
-  !d || BLOCKED_ORIGINS.has(d.origin) || BLOCKED_TICKERS.has((d.ticker || "").toUpperCase());
+  !d ||
+  BLOCKED_ORIGINS.has(d.origin) ||
+  tickerBlocked(d.ticker) ||
+  BLOCKED_MINTS.has(d.mint) ||
+  BLOCKED_NAMES.has((d.name || "").toLowerCase());
 
 export const feedItemBlocked = (it) =>
-  BLOCKED_TICKERS.has((it?.ticker || "").toUpperCase());
+  !it ||
+  tickerBlocked(it?.ticker) ||
+  BLOCKED_MINTS.has(it?.mint) ||
+  BLOCKED_NAMES.has((it?.name || "").toLowerCase());
 
 // Desks launched or added through THIS site (recorded by the relay in Mongo).
 export function useOurDesks(pollMs = 30000) {

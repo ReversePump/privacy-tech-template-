@@ -14,25 +14,29 @@ const KINDS = [
 ];
 
 export default function Live() {
-  const { ourDesks, ours, ourIds } = useOurDesks();
+  const { ourDesks } = useOurDesks();
   const [items, setItems] = useState(null);
+  const [stats, setStats] = useState(null);
   const [kind, setKind] = useState("");
 
-  const sum = (arr, fn) => arr.reduce((a, d) => a + (fn(d) || 0), 0);
+  useEffect(() => {
+    makers.stats().then(setStats).catch(() => {});
+    const t = setInterval(() => makers.stats().then(setStats).catch(() => {}), 30000);
+    return () => clearInterval(t);
+  }, []);
 
   useEffect(() => {
-    if (!ourDesks) return;
     let live = true;
     setItems(null);
     const load = () =>
       makers.feed(100, kind || undefined)
-        .then((d) => live && setItems((d.items || []).filter((it) => ourIds.has(it.deskId) && !feedItemBlocked(it))))
+        .then((d) => live && setItems((d.items || []).filter((it) => !feedItemBlocked(it))))
         .catch(() => live && setItems([]));
     load();
     const t = setInterval(load, 10000);
     return () => { live = false; clearInterval(t); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [kind, ourDesks]);
+  }, [kind]);
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 md:px-8 pt-10 md:pt-14" data-testid="live-page">
@@ -40,16 +44,16 @@ export default function Live() {
         kicker="The wire"
         title="Every fill,"
         accent="as it settles."
-        sub="Only coins born or onboarded through this site — each buy, sell, fee claim and payout, the second it lands on chain."
+        sub="Every buy, sell, fee claim and payout across the engine — the second it lands on chain."
       />
 
       <StatRow className="mb-8" >
-        <Stat testId="live-stat-makers" label="Makers running" value={ourDesks ? fmtNum((ours || []).filter((d) => d.status === "running").length) : "—"} sub="launched or added here" />
+        <Stat testId="live-stat-makers" label="Makers running" value={stats ? fmtNum(stats.liveDesks) : "—"} sub="live right now" />
+        <Stat testId="live-stat-wallets" label="Trading wallets" value={stats ? fmtNum(stats.wallets) : "—"} sub="every one public" />
+        <Stat testId="live-stat-volume" label="Volume traded" value={stats ? fmtSol(stats.volumeLamports, 1) : "—"} sub="all makers together" />
+        <Stat testId="live-stat-trades" label="Trades 24h" value={stats ? fmtNum(stats.trades24h) : "—"} sub="finalized on chain" />
         <Stat testId="live-stat-launched" label="Coins launched here" value={ourDesks ? fmtNum(ourDesks.filter((d) => d.origin === "launch").length) : "—"} sub="created through this site" />
         <Stat testId="live-stat-added" label="Makers added here" value={ourDesks ? fmtNum(ourDesks.filter((d) => d.origin === "mm").length) : "—"} sub="put on existing coins" />
-        <Stat testId="live-stat-wallets" label="Trading wallets" value={ours !== null ? fmtNum(sum(ours, (d) => d.walletCount || 0)) : "—"} sub="every one public" />
-        <Stat testId="live-stat-volume" label="Volume traded" value={ours !== null ? fmtSol(String(sum(ours, (d) => lamportsToSol(d.totals?.volumeLamports) || 0) * 1e9), 1) : "—"} />
-        <Stat testId="live-stat-trades" label="Trades 24h" value={ours !== null ? fmtNum(sum(ours, (d) => d.totals?.trades24h || 0)) : "—"} sub="finalized on chain" />
       </StatRow>
 
       <Panel className="overflow-hidden" data-testid="activity-panel">
@@ -65,7 +69,7 @@ export default function Live() {
           </div>
         </div>
         {!items && <Loading label="Listening" />}
-        {items && items.length === 0 && <Empty>Nothing yet — the first coin launched or maker added through this site will show up here the moment it lands on chain.</Empty>}
+        {items && items.length === 0 && <Empty>The wire is quiet for this filter right now — it fills the moment a matching operation lands on chain.</Empty>}
         {items && items.length > 0 && (
           <div className="overflow-x-auto">
             <table className="dtable" data-testid="activity-table">

@@ -20,6 +20,16 @@ const stratLine = (s) => {
   return parts.join(" · ");
 };
 
+// never render outbound links to the upstream brand's domains
+const BLOCKED_LINK_HOSTS = new Set(["makers.fun", "www.makers.fun", "api.makers.fun"]);
+const cleanLink = (u) => {
+  try {
+    return BLOCKED_LINK_HOSTS.has(new URL(u).hostname.toLowerCase()) ? null : u;
+  } catch {
+    return null;
+  }
+};
+
 export default function Desk() {
   const { id } = useParams();
   const [desk, setDesk] = useState(null);
@@ -113,8 +123,8 @@ export default function Desk() {
               {copied === "owner" ? <Check size={10} /> : <Copy size={10} />} Owner {short(desk.owner, 4, 4)}
             </button>
             <span>Launched {fmtAge(desk.launchedAt || desk.createdAt)} ago</span>
-            {desk.links?.website && <ExtLink href={desk.links.website}>Website</ExtLink>}
-            {desk.links?.x && <ExtLink href={desk.links.x}>X</ExtLink>}
+            {cleanLink(desk.links?.website) && <ExtLink href={cleanLink(desk.links.website)}>Website</ExtLink>}
+            {cleanLink(desk.links?.x) && <ExtLink href={cleanLink(desk.links.x)}>X</ExtLink>}
           </div>
         </div>
         <div className="flex flex-wrap gap-2">

@@ -182,3 +182,10 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
   - KEY FIX learned: solders VersionedTransaction.populate() mangles v0/ALT messages (SignatureFailure). Byte-exact splice signing (sign original message bytes, splice signatures) is the working pattern; frontend web3.js path unaffected.
   - Backend withdraw hardened: finalized blockhash + 3-attempt retry (publicnode had blockhash races).
 - Treasury balance after tests: ~0.019 SOL (holds retained 10% + remainder).
+
+## Update 2026-10-18 (revision 28) — LIVE PAGE GOES GLOBAL-FILTERED + LINK LOCKDOWN
+- Live page feed now shows the full upstream operations stream (All/Trades/Claims/Payouts/Launches tabs, 10s poll) instead of ours-only. Stats strip: global engine numbers (makers running/wallets/volume/trades 24h) + "launched/added here" counters.
+- Blocklist hardened (useOurDesks.js): any ticker CONTAINING "MAKER" (covers $MAKERS, $MAKERSINU, $MAKERDOG etc.), blocked mint 3XEqNH…pump, names makers.fun/makers, origin native — applied to feed, desks, ticker, hero.
+- Link lockdown: no href anywhere points to the original site — code sweep clean; dynamic coin links on desk pages are host-filtered (cleanLink blocks makers.fun/www/api). Verified: zero makers.fun hrefs in rendered DOM.
+- Verified: all 5 feed tabs render live rows with zero MAKER* leaks; stats live; no console errors.
+- NOTE: deployment ran before this revision — Live feed + link lockdown need a redeploy to reach makemarkets.app.
