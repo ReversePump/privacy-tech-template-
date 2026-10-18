@@ -245,3 +245,7 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 ## Update 2026-10-18 (revision 38) — $MARKETS MCAP MASKED WITH REAL CA MCAP
 - Bug (user-reported): masked $MARKETS rows showed the upstream token's mcap ($77.8K/$502.4K). Fixed: /api/markets/prices now returns mcapUsd from the GeckoTerminal pool (market_cap_usd/fdv_usd); useMarketsMcap() hook (alias.js, exports PLATFORM_CA too) polls it; Explore rows and Home grid cards override mcap for PLATFORM_MINT desks with the CA's real mcap (~$20.6K at test time). $MARKETS desk page keeps mcap hidden per earlier instruction.
 - Testing agent iteration_3: 22/22 backend (added TestMarketPrices), mcap override verified on Explore (both $MARKETS rows = $20.6K), masking regression clean, no console errors.
+
+## Update 2026-10-18 (revision 39) — MOBILE ONBOARD SHOWS ALL SETTINGS
+- Mm.jsx: strategy presets + full SettingsEditor dials now render on mobile/vault mode too (previously hidden). Chosen settings are stored with the vault deposit record (backend /api/vault/deposit accepts optional settings) so they are kept for when the maker is created.
+- Verified via iPhone emulation: presets + all dial groups visible, fund button intact; 22/22 backend tests pass.

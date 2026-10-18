@@ -293,6 +293,7 @@ async def vault_deposit(request: Request):
     try:
         await db.vault_deposits.insert_one({
             "_id": sig, "wallet": wallet, "mint": mint, "lamports": claimed,
+            "settings": body.get("settings") if isinstance(body.get("settings"), dict) else None,
             "createdAt": datetime.now(timezone.utc).isoformat(),
         })
     except Exception:

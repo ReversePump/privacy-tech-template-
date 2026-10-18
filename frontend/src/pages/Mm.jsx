@@ -82,7 +82,7 @@ export default function Mm() {
       }));
       const sig = await sendTransaction(tx, connection);
       await connection.confirmTransaction(sig, "confirmed");
-      await postJSON("/api/vault/deposit", { wallet: publicKey.toBase58(), mint: result.mint, signature: sig, amountSol: fundSol });
+      await postJSON("/api/vault/deposit", { wallet: publicKey.toBase58(), mint: result.mint, signature: sig, amountSol: fundSol, settings });
       toast.success("Deposit received", { description: `Signature ${short(sig)}` });
       await refreshVault(result.mint);
     } catch (e) {
@@ -303,7 +303,7 @@ export default function Mm() {
             </div>
           )}
 
-          {!vaultMode && presets.length > 0 && (
+          {presets.length > 0 && (
             <div className="mt-5">
               <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-[#93a184]">Strategy preset</label>
               <div className="grid grid-cols-2 gap-2">
@@ -319,7 +319,6 @@ export default function Mm() {
           )}
 
 
-          {!vaultMode && (
           <div className="mt-5">
             <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#93a184]">Every dial — same controls as a launch</div>
             <SettingsEditor
@@ -328,7 +327,6 @@ export default function Mm() {
               onChange={(k, v) => { setPreset("custom"); setSettings({ ...settings, [k]: v }); }}
             />
           </div>
-          )}
           <ul className="mt-6 space-y-2 border-t border-black/5 pt-4 text-[12px] font-light text-[#5c6b50]">
             <li>· Starts on the Balanced temperament — retune every dial afterwards.</li>
             <li>· All wallets public, every fill on its page.</li>
