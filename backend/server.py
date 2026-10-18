@@ -280,6 +280,33 @@ async def vault_balance(wallet: str, mint: str | None = None):
     return {"balanceSol": bal / 1_000_000_000}
 
 
+@api_router.get("/vault/positions/{wallet}")
+async def vault_positions(wallet: str):
+    deps = await db.vault_deposits.find({"wallet": wallet}, {"_id": 0}).to_list(1000)
+    wds = await db.vault_withdrawals.find({"wallet": wallet}, {"_id": 0}).to_list(1000)
+    by_mint: dict[str, int] = {}
+    for d in deps:
+        m = d.get("mint") or ""
+        by_mint[m] = by_mint.get(m, 0) + int(d["lamports"])
+    for w in wds:
+        m = w.get("mint") or ""
+        by_mint[m] = by_mint.get(m, 0) - int(w["grossLamports"])
+    mints = [m for m, v in by_mint.items() if v > 0 and m]
+    launches = {}
+    if mints:
+        launches = {l["mint"]: l for l in await db.our_launches.find({"mint": {"$in": mints}}, {"_id": 0}).to_list(200)}
+    return {"positions": [
+        {
+            "mint": m,
+            "balanceSol": by_mint[m] / 1_000_000_000,
+            "name": (launches.get(m) or {}).get("name"),
+            "ticker": (launches.get(m) or {}).get("ticker"),
+            "imageUrl": (launches.get(m) or {}).get("imageUrl"),
+        }
+        for m in mints
+    ]}
+
+
 @api_router.post("/vault/withdraw")
 async def vault_withdraw(request: Request):
     from solders.keypair import Keypair as _Kp

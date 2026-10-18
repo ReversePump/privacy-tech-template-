@@ -5,9 +5,77 @@ import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { toast } from "sonner";
 import { makers, errorMessage } from "../lib/api";
 import { fmtSol, fmtAge, short } from "../lib/format";
-import { PageHead, Panel, CoinCell, Loading, Empty, StatusDot } from "../components/bits";
+import { PageHead, Panel, CoinCell, Loading, Empty, StatusDot, CoinAvatar } from "../components/bits";
 import { SettingsEditor } from "../components/SettingsEditor";
 import { useAuth } from "../solana/AuthContext";
+import { vaultPositions, vaultWithdraw, isMobileDevice } from "../lib/vault";
+
+function VaultPositions() {
+  const { publicKey, connected, signMessage } = useWallet();
+  const { setVisible } = useWalletModal();
+  const [positions, setPositions] = useState(null);
+  const [busyMint, setBusyMint] = useState("");
+
+  const load = () => {
+    if (!publicKey) return;
+    vaultPositions(publicKey.toBase58()).then((d) => setPositions(d.positions || [])).catch(() => setPositions([]));
+  };
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [publicKey?.toBase58?.()]);
+
+  if (!connected) {
+    return (
+      <Empty>
+        <p className="mb-4">Connect your wallet to see your positions.</p>
+        <button onClick={() => setVisible(true)} className="rounded-[3px] bg-[#3F9E00] px-5 py-2 text-sm font-medium text-[#131a0f]" data-testid="dash-connect-btn">Connect</button>
+      </Empty>
+    );
+  }
+  if (!positions) return <Loading label="Loading your positions" />;
+  if (!positions.length) return <Empty>No vault balance on this wallet yet. <Link to="/launch" className="text-[#3F9E00]">Launch a coin →</Link></Empty>;
+
+  const withdraw = async (mint) => {
+    setBusyMint(mint);
+    try {
+      const res = await vaultWithdraw({ mint, publicKey, signMessage });
+      toast.success("Withdrawal sent", { description: res.signature ? `Signature ${short(res.signature)}` : undefined });
+      load();
+    } catch (e) {
+      toast.error(errorMessage(e));
+    } finally { setBusyMint(""); }
+  };
+
+  return (
+    <Panel className="overflow-hidden" data-testid="dash-vault-panel">
+      <table className="dtable">
+        <thead><tr><th>Coin</th><th className="text-right">Balance</th><th></th></tr></thead>
+        <tbody>
+          {positions.map((p) => (
+            <tr key={p.mint}>
+              <td>
+                <span className="flex items-center gap-2.5 min-w-0">
+                  <CoinAvatar url={p.imageUrl} name={p.name || p.mint} size={28} />
+                  <span className="min-w-0">
+                    <span className="block truncate text-[#131a0f] text-[13px]">{p.name || short(p.mint, 6, 6)}</span>
+                    {p.ticker && <span className="block font-mono text-[10px] uppercase tracking-wider text-[#93a184]">${p.ticker}</span>}
+                  </span>
+                </span>
+              </td>
+              <td className="text-right font-mono text-[#131a0f] tnum" data-testid={`vault-balance-${p.ticker || p.mint.slice(0, 4)}`}>
+                {p.balanceSol.toLocaleString("en-US", { maximumFractionDigits: 4 })} SOL
+              </td>
+              <td className="text-right">
+                <button onClick={() => withdraw(p.mint)} disabled={busyMint === p.mint} data-testid={`vault-withdraw-${p.ticker || p.mint.slice(0, 4)}`}
+                  className="h-8 rounded-[3px] border border-[#3F9E00]/40 px-4 font-mono text-[11px] uppercase text-[#3F9E00] hover:bg-[#3F9E00]/5 disabled:opacity-50">
+                  {busyMint === p.mint ? "Approve…" : "Withdraw"}
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </Panel>
+  );
+}
 
 function MyDesks() {
   const [desks, setDesks] = useState(null);
@@ -28,6 +96,7 @@ function MyDesks() {
       </Empty>
     );
   }
+  if (isMobileDevice()) return <VaultPositions />;
   if (!signedIn) {
     return (
       <Empty>
