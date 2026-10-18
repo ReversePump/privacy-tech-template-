@@ -14,22 +14,55 @@ const KINDS = [
   ["launch", "Launches"],
 ];
 
+const MASK_IMG = "/coin-mask.png";
+const API = process.env.REACT_APP_BACKEND_URL;
+
 export default function Live() {
   const [items, setItems] = useState(null);
   const [kind, setKind] = useState("");
+  const [oursRec, setOursRec] = useState({ desks: [], launches: [] });
+
+  useEffect(() => {
+    const load = () =>
+      Promise.all([
+        fetch(`${API}/api/our/desks`).then((r) => r.json()).catch(() => ({})),
+        fetch(`${API}/api/our/launches`).then((r) => r.json()).catch(() => ({})),
+      ]).then(([d, l]) => setOursRec({ desks: d.desks || [], launches: l.launches || [] }));
+    load();
+    const t = setInterval(load, 30000);
+    return () => clearInterval(t);
+  }, []);
 
   useEffect(() => {
     let live = true;
     setItems(null);
     const load = () =>
       makers.feed(100, kind || undefined)
-        .then((d) => live && setItems((d.items || []).filter((it) => !feedItemBlocked(it))))
+        .then((d) => {
+          if (!live) return;
+          const upstream = (d.items || []).filter((it) => !feedItemBlocked(it));
+          const ourDeskIds = new Set(oursRec.desks.map((dk) => dk.deskId));
+          upstream.forEach((it) => { if (it.deskId && ourDeskIds.has(it.deskId)) it.ours = true; });
+          const synth = [];
+          if (!kind || kind === "launch") {
+            oursRec.launches.forEach((l) =>
+              synth.push({ kind: "launch", mint: l.mint, ticker: l.ticker, name: l.name, imageUrl: l.imageUrl, at: l.createdAt, ours: true })
+            );
+            oursRec.desks.forEach((dk) =>
+              synth.push({ kind: "onboard", mint: dk.mint, ticker: dk.ticker, name: dk.name, imageUrl: dk.imageUrl, at: dk.createdAt, deskId: dk.deskId, ours: true })
+            );
+          }
+          const upLaunchMints = new Set(upstream.filter((i) => i.kind === "launch" && i.mint).map((i) => i.mint));
+          const merged = [...upstream, ...synth.filter((s) => !s.mint || !upLaunchMints.has(s.mint))]
+            .sort((a, b) => new Date(b.at || 0) - new Date(a.at || 0));
+          setItems(merged);
+        })
         .catch(() => live && setItems([]));
     load();
     const t = setInterval(load, 10000);
     return () => { live = false; clearInterval(t); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [kind]);
+  }, [kind, oursRec]);
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 md:px-8 pt-10 md:pt-14" data-testid="live-page">
@@ -62,14 +95,21 @@ export default function Live() {
               </thead>
               <tbody>
                 {items.map((it, i) => {
-                  const al = aliasFor(it.mint, it.ticker);
+                  const al = it.ours ? null : aliasFor(it.mint, it.ticker);
+                  const shownTicker = it.ours ? (it.ticker || aliasFor(it.mint).ticker) : al.ticker;
+                  const shownImg = it.ours ? it.imageUrl : MASK_IMG;
                   return (
-                  <tr key={it.signature || i} className="animate-[feedin_0.3s_ease]">
-                    <td><KindPill kind={it.kind} /></td>
+                  <tr key={it.signature || `${it.ours ? "ours" : "up"}-${it.mint || i}-${i}`} className="animate-[feedin_0.3s_ease]">
+                    <td>
+                      <span className="inline-flex items-center gap-1.5">
+                        <KindPill kind={it.kind} />
+                        {it.ours && <span className="rounded-[3px] bg-[#3F9E00]/10 px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-wider text-[#3F9E00]" data-testid="feed-here-chip">here</span>}
+                      </span>
+                    </td>
                     <td>
                       <Link to={it.deskId ? `/desk/${it.deskId}` : "#"} className="flex items-center gap-2 group">
-                        <CoinAvatar url={it.imageUrl} name={al.name} size={20} className="rounded" />
-                        <span className="font-mono text-xs text-[#131a0f] group-hover:text-[#3F9E00]">${al.ticker}</span>
+                        <CoinAvatar url={shownImg} name={it.ours ? it.name || shownTicker : al.name} size={20} className="rounded" />
+                        <span className="font-mono text-xs text-[#131a0f] group-hover:text-[#3F9E00]">${shownTicker}</span>
                       </Link>
                     </td>
                     <td className="text-right font-mono text-[#131a0f] tnum">

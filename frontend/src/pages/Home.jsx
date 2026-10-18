@@ -8,17 +8,41 @@ import { useOurDesks, feedItemBlocked } from "../lib/useOurDesks";
 
 function HeroActivity({ ourIds, hasOurs }) {
   const [items, setItems] = useState(null);
+  const [oursRec, setOursRec] = useState({ desks: [], launches: [] });
+
   useEffect(() => {
-    if (!hasOurs) { setItems([]); return; }
+    const load = () =>
+      Promise.all([
+        fetch(`${process.env.REACT_APP_BACKEND_URL}/api/our/desks`).then((r) => r.json()).catch(() => ({})),
+        fetch(`${process.env.REACT_APP_BACKEND_URL}/api/our/launches`).then((r) => r.json()).catch(() => ({})),
+      ]).then(([d, l]) => setOursRec({ desks: d.desks || [], launches: l.launches || [] }));
+    load();
+    const t = setInterval(load, 30000);
+    return () => clearInterval(t);
+  }, []);
+
+  useEffect(() => {
+    if (!hasOurs && !oursRec.launches.length) { setItems([]); return; }
     let live = true;
     const load = () =>
       makers.feed(100)
-        .then((d) => live && setItems((d.items || []).filter((it) => ourIds.has(it.deskId) && !feedItemBlocked(it)).slice(0, 9)))
+        .then((d) => {
+          if (!live) return;
+          const upstream = (d.items || []).filter((it) => ourIds.has(it.deskId) && !feedItemBlocked(it));
+          const synth = [
+            ...oursRec.launches.map((l) => ({ kind: "launch", mint: l.mint, ticker: l.ticker, imageUrl: l.imageUrl, at: l.createdAt, ours: true })),
+            ...oursRec.desks.map((dk) => ({ kind: "onboard", mint: dk.mint, ticker: dk.ticker, imageUrl: dk.imageUrl, at: dk.createdAt, ours: true })),
+          ];
+          const seen = new Set(upstream.filter((i) => i.kind === "launch" && i.mint).map((i) => i.mint));
+          setItems([...upstream, ...synth.filter((s) => !s.mint || !seen.has(s.mint))]
+            .sort((a, b) => new Date(b.at || 0) - new Date(a.at || 0)).slice(0, 9));
+        })
         .catch(() => live && setItems([]));
     load();
     const t = setInterval(load, 10000);
     return () => { live = false; clearInterval(t); };
-  }, [ourIds, hasOurs]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ourIds, hasOurs, oursRec]);
   return (
     <Panel className="w-full lg:w-[420px] shrink-0 overflow-hidden" data-testid="hero-activity-panel">
       <div className="flex items-center justify-between border-b border-black/5 px-4 py-3">

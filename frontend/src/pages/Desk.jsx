@@ -7,6 +7,7 @@ import { makers, errorMessage } from "../lib/api";
 import { fmtSol, fmtSolSigned, fmtUsd, fmtNum, fmtAge, fmtPct, short, lamportsToSol, solscanAcct, solscanTx, pumpCoin, dexscreener } from "../lib/format";
 import { Panel, Stat, CoinAvatar, StatusDot, TypeBadge, SubPrice, Loading, ExtLink, Empty, KindPill } from "../components/bits";
 import { useAuth } from "../solana/AuthContext";
+import { useOurDesks } from "../lib/useOurDesks";
 import { vaultBalance, vaultWithdraw, isMobileDevice } from "../lib/vault";
 import DeskChart from "../components/DeskChart";
 import { SettingsSummary } from "../components/SettingsEditor";
@@ -37,6 +38,7 @@ export default function Desk() {
   const [trades, setTrades] = useState(null);
   const [copied, setCopied] = useState(null);
   const { publicKey, signMessage } = useWallet();
+  const { ourIds } = useOurDesks();
   const { signedIn, signIn } = useAuth();
   const [acting, setActing] = useState("");
   const [tab, setTab] = useState("trades");
@@ -104,7 +106,7 @@ export default function Desk() {
       </div>
 
       <div className="mt-4 flex flex-wrap items-start gap-5">
-        <CoinAvatar url={desk.imageUrl} name={desk.name} size={56} className="rounded-2xl" />
+        <CoinAvatar url={ourIds.has(desk.id) ? desk.imageUrl : "/coin-mask.png"} name={desk.name} size={56} className="rounded-2xl" />
         <div className="min-w-0 flex-1">
           <h1 className="text-3xl md:text-4xl font-medium tracking-tight text-[#131a0f]">
             {desk.name} <span className="text-lg text-[#93a184] font-light">${desk.ticker}</span>

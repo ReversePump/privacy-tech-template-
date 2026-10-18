@@ -69,6 +69,7 @@ export const KindPill = ({ kind }) => {
     claim: ["Claim", "text-[#3F9E00]", "◆"],
     payout: ["Payout", "text-[#c8a24a]", "⭱"],
     launch: ["Launch", "text-[#131a0f]", "✦"],
+    onboard: ["Onboard", "text-[#131a0f]", "✚"],
   };
   const [label, color, icon] = map[kind] || [kind, "text-[#5c6b50]", "•"];
   return (

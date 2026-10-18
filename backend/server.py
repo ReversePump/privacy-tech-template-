@@ -364,12 +364,17 @@ async def vault_withdraw(request: Request):
     return {"ok": True, "signature": sig, "sentSol": payout / 1_000_000_000}
 
 
-async def _record_our_desk(desk_id: str, origin: str):
+async def _record_our_desk(desk_id: str, origin: str, desk: dict | None = None):
     try:
         from datetime import datetime, timezone
+        doc = {"deskId": desk_id, "origin": origin, "createdAt": datetime.now(timezone.utc).isoformat()}
+        if isinstance(desk, dict):
+            for k in ("mint", "name", "ticker", "imageUrl"):
+                if desk.get(k):
+                    doc[k] = desk[k]
         await db.our_desks.update_one(
             {"deskId": desk_id},
-            {"$set": {"deskId": desk_id, "origin": origin, "createdAt": datetime.now(timezone.utc).isoformat()}},
+            {"$set": doc},
             upsert=True,
         )
     except Exception as e:
@@ -415,14 +420,19 @@ async def proxy(path: str, request: Request):
         try:
             import re as _re, json as _json
             if _re.fullmatch(r"launches/[^/]+/submit", path):
-                await _record_our_desk(path.split("/")[1], "launch")
+                try:
+                    _data = _json.loads(r.content.decode("utf-8", "ignore"))
+                    _desk = _data.get("desk") if isinstance(_data, dict) else None
+                except Exception:
+                    _desk = None
+                await _record_our_desk(path.split("/")[1], "launch", _desk)
             elif path == "desks":
                 data = _json.loads(r.content.decode("utf-8", "ignore"))
                 desk = data.get("desk") if isinstance(data, dict) else None
                 desk = desk if isinstance(desk, dict) else data
                 did = desk.get("id") if isinstance(desk, dict) else None
                 if did:
-                    await _record_our_desk(did, "mm")
+                    await _record_our_desk(did, "mm", desk)
         except Exception as e:
             logger.warning(f"desk recording failed: {e}")
 

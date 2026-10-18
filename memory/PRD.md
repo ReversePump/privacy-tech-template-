@@ -204,3 +204,10 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 ## Update 2026-10-18 (revision 31) — CA PILL REPOSITIONED + $MARKETS
 - Header CA pill now sits immediately left of the X link on ALL breakpoints (top bar, desktop + mobile). Label: $MARKETS + short CA (7UMd…pump), click copies full CA 7UMdnRcC9zXp1wm9MteFCEJ785bk8xpfWPgdcAghpump. Removed the separate mobile-nav pill.
 - Verified desktop + 390px: pill visible at top next to X, no wrapping.
+
+## Update 2026-10-18 (revision 32) — OUR COINS IN FEEDS + IMAGE MASKING
+- User-supplied pixel-M image saved as /app/frontend/public/coin-mask.png (256px, 41KB). All upstream (non-platform) coin images are replaced with it: Live feed avatars and desk-page coin avatars. Platform's own coins keep their real images.
+- Live feed merges local records: our_launches -> kind "launch", our_desks -> kind "onboard" (new KindPill), deduped against upstream launch items by mint, marked with a green "here" chip; upstream items whose deskId is in our records render with real name + here chip instead of mask/alias.
+- Landing hero feed (HeroActivity) merges the same synthetic launch/onboard events, so the landing page reflects the site's own coins immediately.
+- Backend: _record_our_desk now stores mint/name/ticker/imageUrl from the create/submit response so our records show real identity.
+- Verified: seeded demo launch appeared in Live Launches tab with HERE chip + hero feed; real desk's claim rows get here chip + real name; desk page of foreign coin shows mask image; demo records cleaned (real desk record kept); 20/20 backend tests pass.
