@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { makers } from "../lib/api";
 import { fmtAge, lamportsToSol, short, solscanTx } from "../lib/format";
 import { PageHead, Panel, KindPill, CoinAvatar, Loading, Empty, ExtLink } from "../components/bits";
-import { feedItemBlocked } from "../lib/useOurDesks";
+import { feedItemBlocked, PLATFORM_MINT } from "../lib/useOurDesks";
 import { aliasFor } from "../lib/alias";
 
 const KINDS = [
@@ -95,9 +95,11 @@ export default function Live() {
               </thead>
               <tbody>
                 {items.map((it, i) => {
-                  const al = it.ours ? null : aliasFor(it.mint, it.ticker);
-                  const shownTicker = it.ours ? (it.ticker || aliasFor(it.mint).ticker) : al.ticker;
-                  const shownImg = it.ours ? it.imageUrl : MASK_IMG;
+                  const isPlatform = it.mint === PLATFORM_MINT;
+                  const al = it.ours || isPlatform ? null : aliasFor(it.mint, it.ticker);
+                  const shownTicker = isPlatform ? "MARKETS" : it.ours ? (it.ticker || aliasFor(it.mint).ticker) : al.ticker;
+                  const shownImg = isPlatform || !it.ours ? MASK_IMG : it.imageUrl;
+                  const shownName = isPlatform ? "MakeMarkets" : it.ours ? it.name || shownTicker : al.name;
                   return (
                   <tr key={it.signature || `${it.ours ? "ours" : "up"}-${it.mint || i}-${i}`} className="animate-[feedin_0.3s_ease]">
                     <td>
@@ -108,7 +110,7 @@ export default function Live() {
                     </td>
                     <td>
                       <Link to={it.deskId ? `/desk/${it.deskId}` : "#"} className="flex items-center gap-2 group">
-                        <CoinAvatar url={shownImg} name={it.ours ? it.name || shownTicker : al.name} size={20} className="rounded" />
+                        <CoinAvatar url={shownImg} name={shownName} size={20} className="rounded" />
                         <span className="font-mono text-xs text-[#131a0f] group-hover:text-[#3F9E00]">${shownTicker}</span>
                       </Link>
                     </td>

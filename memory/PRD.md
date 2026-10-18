@@ -211,3 +211,8 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Landing hero feed (HeroActivity) merges the same synthetic launch/onboard events, so the landing page reflects the site's own coins immediately.
 - Backend: _record_our_desk now stores mint/name/ticker/imageUrl from the create/submit response so our records show real identity.
 - Verified: seeded demo launch appeared in Live Launches tab with HERE chip + hero feed; real desk's claim rows get here chip + real name; desk page of foreign coin shows mask image; demo records cleaned (real desk record kept); 20/20 backend tests pass.
+
+## Update 2026-10-18 (revision 33) — $MARKETS REBRAND OF UPSTREAM MAKERS ACTIVITY
+- Upstream's own token (mint 3XEqNHe3jHTRWAZCTHbb1UwpSfNbJL9oU1ErsM86pump, exported as PLATFORM_MINT) is no longer filtered from the Live feed — it is REBRANDED in place: shows as $MARKETS / "MakeMarkets" with the pixel-M logo. Copycat tickers containing MAKER stay blocked.
+- That token's desk page (/desk/ee6515b5-df04-4900-9005-483e71b99286): title reads MakeMarkets $MARKETS with M logo; market-cap stat hidden; CA/mint copy button hidden; MCAP chart toggle hidden (hideMcap prop on DeskChart); no makers.fun strings. All other stats/chart/wallets/trades stay live.
+- Verified: $MARKETS rows flow in the live feed, no raw $MAKERS text anywhere, desk page checks all pass, zero console errors.

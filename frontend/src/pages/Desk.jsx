@@ -7,7 +7,7 @@ import { makers, errorMessage } from "../lib/api";
 import { fmtSol, fmtSolSigned, fmtUsd, fmtNum, fmtAge, fmtPct, short, lamportsToSol, solscanAcct, solscanTx, pumpCoin, dexscreener } from "../lib/format";
 import { Panel, Stat, CoinAvatar, StatusDot, TypeBadge, SubPrice, Loading, ExtLink, Empty, KindPill } from "../components/bits";
 import { useAuth } from "../solana/AuthContext";
-import { useOurDesks } from "../lib/useOurDesks";
+import { useOurDesks, PLATFORM_MINT } from "../lib/useOurDesks";
 import { vaultBalance, vaultWithdraw, isMobileDevice } from "../lib/vault";
 import DeskChart from "../components/DeskChart";
 import { SettingsSummary } from "../components/SettingsEditor";
@@ -102,14 +102,14 @@ export default function Desk() {
   return (
     <div className="mx-auto max-w-[1440px] px-4 md:px-8 pt-8 md:pt-12" data-testid="desk-page">
       <div className="font-mono text-[11px] uppercase tracking-wider text-[#93a184]">
-        <Link to="/explore" className="hover:text-[#3F9E00]">Explore</Link> / ${desk.ticker}
+        <Link to="/explore" className="hover:text-[#3F9E00]">Explore</Link> / ${desk.mint === PLATFORM_MINT ? "MARKETS" : desk.ticker}
       </div>
 
       <div className="mt-4 flex flex-wrap items-start gap-5">
-        <CoinAvatar url={ourIds.has(desk.id) ? desk.imageUrl : "/coin-mask.png"} name={desk.name} size={56} className="rounded-2xl" />
+        <CoinAvatar url={ourIds.has(desk.id) || desk.mint === PLATFORM_MINT ? (desk.mint === PLATFORM_MINT ? "/coin-mask.png" : desk.imageUrl) : "/coin-mask.png"} name={desk.mint === PLATFORM_MINT ? "MakeMarkets" : desk.name} size={56} className="rounded-2xl" />
         <div className="min-w-0 flex-1">
           <h1 className="text-3xl md:text-4xl font-medium tracking-tight text-[#131a0f]">
-            {desk.name} <span className="text-lg text-[#93a184] font-light">${desk.ticker}</span>
+            {desk.mint === PLATFORM_MINT ? "MakeMarkets" : desk.name} <span className="text-lg text-[#93a184] font-light">${desk.mint === PLATFORM_MINT ? "MARKETS" : desk.ticker}</span>
           </h1>
           <div className="mt-2 flex flex-wrap items-center gap-3 font-mono text-xs text-[#5c6b50]">
             <StatusDot status={desk.status} />
@@ -118,9 +118,11 @@ export default function Desk() {
             {m.venue && <span>{m.venue === "pool" ? "liquidity pool" : "bonding curve"}</span>}
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[11px] text-[#93a184]">
-            <button onClick={() => copy(desk.mint, "mint")} className="inline-flex items-center gap-1 hover:text-[#3F9E00]" data-testid="desk-copy-mint">
-              {copied === "mint" ? <Check size={10} /> : <Copy size={10} />} Mint {short(desk.mint, 4, 4)}
-            </button>
+            {desk.mint !== PLATFORM_MINT && (
+              <button onClick={() => copy(desk.mint, "mint")} className="inline-flex items-center gap-1 hover:text-[#3F9E00]" data-testid="desk-copy-mint">
+                {copied === "mint" ? <Check size={10} /> : <Copy size={10} />} Mint {short(desk.mint, 4, 4)}
+              </button>
+            )}
             <button onClick={() => copy(desk.owner, "owner")} className="inline-flex items-center gap-1 hover:text-[#3F9E00]" data-testid="desk-copy-owner">
               {copied === "owner" ? <Check size={10} /> : <Copy size={10} />} Owner {short(desk.owner, 4, 4)}
             </button>
@@ -143,7 +145,9 @@ export default function Desk() {
 
       <Panel className="mt-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 divide-x divide-black/5 overflow-hidden" data-testid="desk-stats">
         <Stat label="Price" value={<SubPrice value={m.priceSol} />} sub={m.priceSol ? fmtUsd(m.mcapUsd && m.priceSol ? null : null) : ""} testId="desk-price" />
-        <Stat label="Market cap" value={fmtUsd(m.mcapUsd)} sub={m.mcapSol ? `${fmtNum(m.mcapSol, 1)} SOL` : ""} testId="desk-mcap" />
+        {desk.mint !== PLATFORM_MINT && (
+          <Stat label="Market cap" value={fmtUsd(m.mcapUsd)} sub={m.mcapSol ? `${fmtNum(m.mcapSol, 1)} SOL` : ""} testId="desk-mcap" />
+        )}
         <Stat label="Capital" value={fmtSol(t.capitalLamports, 2)} testId="desk-capital" />
         <Stat label="Deployed" value={fmtSol(t.deployedLamports, 2)} testId="desk-deployed" />
         <Stat label="Realized P&L" value={fmtSolSigned(t.realizedLamports, 3)} testId="desk-realized" />
@@ -159,7 +163,7 @@ export default function Desk() {
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 flex flex-col gap-4">
           <Panel className="overflow-hidden">
-            <DeskChart deskId={desk.id} />
+            <DeskChart deskId={desk.id} hideMcap={desk.mint === PLATFORM_MINT} />
           </Panel>
 
           {(() => {

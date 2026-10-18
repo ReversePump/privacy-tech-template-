@@ -4,7 +4,7 @@ import { makers } from "../lib/api";
 import { fmtUsd } from "../lib/format";
 import { Loading } from "./bits";
 
-export default function DeskChart({ deskId, height = 300 }) {
+export default function DeskChart({ deskId, height = 300, hideMcap = false }) {
   const [range, setRange] = useState("24h");
   const [mode, setMode] = useState("price");
   const [data, setData] = useState(null);
@@ -28,7 +28,7 @@ export default function DeskChart({ deskId, height = 300 }) {
     <div data-testid="desk-chart">
       <div className="flex items-center justify-between px-4 pt-3">
         <div className="flex gap-1">
-          {[["price", "Price"], ["mcap", "Mcap"]].map(([k, l]) => (
+          {[["price", "Price"], ["mcap", "Mcap"]].filter(([k]) => !(hideMcap && k === "mcap")).map(([k, l]) => (
             <button key={k} data-testid={`chart-mode-${k}`} onClick={() => setMode(k)}
               className={`rounded-[3px] px-3 py-1 font-mono text-[11px] uppercase ${mode === k ? "bg-[#3F9E00] text-[#131a0f]" : "text-[#5c6b50] hover:bg-black/5"}`}>
               {l}

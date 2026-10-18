@@ -9,6 +9,9 @@ const BLOCKED_NAMES = new Set(["makers.fun", "makers"]);
 
 const tickerBlocked = (t) => BLOCKED_TICKER_PARTS.some((p) => (t || "").toUpperCase().includes(p));
 
+// The upstream's own token is rebranded as the platform's $MARKETS in feeds.
+export const PLATFORM_MINT = "3XEqNHe3jHTRWAZCTHbb1UwpSfNbJL9oU1ErsM86pump";
+
 const isBlocked = (d) =>
   !d ||
   BLOCKED_ORIGINS.has(d.origin) ||
@@ -16,11 +19,15 @@ const isBlocked = (d) =>
   BLOCKED_MINTS.has(d.mint) ||
   BLOCKED_NAMES.has((d.name || "").toLowerCase());
 
-export const feedItemBlocked = (it) =>
-  !it ||
-  tickerBlocked(it?.ticker) ||
-  BLOCKED_MINTS.has(it?.mint) ||
-  BLOCKED_NAMES.has((it?.name || "").toLowerCase());
+export const feedItemBlocked = (it) => {
+  if (!it) return true;
+  if (it.mint === PLATFORM_MINT) return false; // shown rebranded as $MARKETS
+  return (
+    tickerBlocked(it?.ticker) ||
+    BLOCKED_MINTS.has(it?.mint) ||
+    BLOCKED_NAMES.has((it?.name || "").toLowerCase())
+  );
+};
 
 // Desks launched or added through THIS site (recorded by the relay in Mongo).
 export function useOurDesks(pollMs = 30000) {
