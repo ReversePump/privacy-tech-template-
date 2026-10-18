@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { makers } from "../lib/api";
-import { fmtSol, fmtNum, fmtAge, lamportsToSol, short, solscanTx } from "../lib/format";
-import { PageHead, Panel, Stat, StatRow, KindPill, CoinAvatar, Loading, Empty, ExtLink } from "../components/bits";
-import { useOurDesks, feedItemBlocked } from "../lib/useOurDesks";
+import { fmtAge, lamportsToSol, short, solscanTx } from "../lib/format";
+import { PageHead, Panel, KindPill, CoinAvatar, Loading, Empty, ExtLink } from "../components/bits";
+import { feedItemBlocked } from "../lib/useOurDesks";
 
 const KINDS = [
   ["", "All"],
@@ -14,16 +14,8 @@ const KINDS = [
 ];
 
 export default function Live() {
-  const { ourDesks } = useOurDesks();
   const [items, setItems] = useState(null);
-  const [stats, setStats] = useState(null);
   const [kind, setKind] = useState("");
-
-  useEffect(() => {
-    makers.stats().then(setStats).catch(() => {});
-    const t = setInterval(() => makers.stats().then(setStats).catch(() => {}), 30000);
-    return () => clearInterval(t);
-  }, []);
 
   useEffect(() => {
     let live = true;
@@ -46,15 +38,6 @@ export default function Live() {
         accent="as it settles."
         sub="Every buy, sell, fee claim and payout across the engine — the second it lands on chain."
       />
-
-      <StatRow className="mb-8" >
-        <Stat testId="live-stat-makers" label="Makers running" value={stats ? fmtNum(stats.liveDesks) : "—"} sub="live right now" />
-        <Stat testId="live-stat-wallets" label="Trading wallets" value={stats ? fmtNum(stats.wallets) : "—"} sub="every one public" />
-        <Stat testId="live-stat-volume" label="Volume traded" value={stats ? fmtSol(stats.volumeLamports, 1) : "—"} sub="all makers together" />
-        <Stat testId="live-stat-trades" label="Trades 24h" value={stats ? fmtNum(stats.trades24h) : "—"} sub="finalized on chain" />
-        <Stat testId="live-stat-launched" label="Coins launched here" value={ourDesks ? fmtNum(ourDesks.filter((d) => d.origin === "launch").length) : "—"} sub="created through this site" />
-        <Stat testId="live-stat-added" label="Makers added here" value={ourDesks ? fmtNum(ourDesks.filter((d) => d.origin === "mm").length) : "—"} sub="put on existing coins" />
-      </StatRow>
 
       <Panel className="overflow-hidden" data-testid="activity-panel">
         <div className="flex items-center justify-between border-b border-black/5 px-4 py-3">

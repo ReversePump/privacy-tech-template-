@@ -189,3 +189,9 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Link lockdown: no href anywhere points to the original site — code sweep clean; dynamic coin links on desk pages are host-filtered (cleanLink blocks makers.fun/www/api). Verified: zero makers.fun hrefs in rendered DOM.
 - Verified: all 5 feed tabs render live rows with zero MAKER* leaks; stats live; no console errors.
 - NOTE: deployment ran before this revision — Live feed + link lockdown need a redeploy to reach makemarkets.app.
+
+## Update 2026-10-18 (revision 29) — STATS STRIPS REMOVED
+- Removed aggregate stats strips: Live page StatRow (global + here counters) and Home "Coins launched or added through this site" section — gone. Unused Stat/StatRow imports and helper code cleaned.
+- Per-coin market data on desk pages (price/mcap/capital/P&L) kept — that is the product itself, not platform stats.
+- Branding mask re-swept: zero makers.fun/$MAKERS strings in UI copy; only MakeMarkets branding.
+- Verified: Live + Home render clean, feed still streams, no console errors. Needs redeploy to reach makemarkets.app.

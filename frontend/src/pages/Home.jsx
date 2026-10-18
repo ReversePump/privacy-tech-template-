@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Rocket, Plus } from "lucide-react";
 import { makers } from "../lib/api";
-import { fmtSol, fmtSolSigned, fmtUsd, fmtNum, lamportsToSol, solscanTx, short } from "../lib/format";
-import { Panel, Stat, StatRow, KindPill, CoinAvatar, Loading, ExtLink } from "../components/bits";
+import { fmtSol, fmtUsd, fmtNum, lamportsToSol, solscanTx, short } from "../lib/format";
+import { Panel, KindPill, CoinAvatar, Loading, ExtLink } from "../components/bits";
 import { useOurDesks, feedItemBlocked } from "../lib/useOurDesks";
 
 function HeroActivity({ ourIds, hasOurs }) {
@@ -71,8 +71,6 @@ export default function Home() {
   const presets = config?.presets ? Object.entries(config.presets) : [];
   const desks = ours;
   const hasOurs = ourIds.size > 0;
-  const sum = (fn) => (desks || []).reduce((a, d) => a + (fn(d) || 0), 0);
-  const sumSol = (fn) => sum((d) => lamportsToSol(fn(d)) || 0);
   const statsReady = desks !== null;
 
   return (
@@ -112,20 +110,6 @@ export default function Home() {
             <HeroActivity ourIds={ourIds} hasOurs={hasOurs && !loading} />
           </div>
         </div>
-      </section>
-
-      {/* STATS — this site's coins only */}
-      <section className="mx-auto max-w-[1440px] px-4 md:px-8" data-testid="home-stats">
-        <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-[#93a184]">Coins launched or added through this site</div>
-        <StatRow>
-          <Stat testId="stat-makers" label="Makers running" value={statsReady ? fmtNum((desks || []).filter((d) => d.status === "running").length) : "—"} sub={statsReady ? `${fmtNum((desks || []).length)} launched or added` : ""} />
-          <Stat testId="stat-wallets" label="Trading wallets" value={statsReady ? fmtNum(sum((d) => d.walletCount || 0)) : "—"} sub="every one public" />
-          <Stat testId="stat-volume" label="Volume traded" value={statsReady ? fmtSol(String(sumSol((d) => d.totals?.volumeLamports) * 1e9), 1) : "—"} />
-          <Stat testId="stat-claimed" label="Rewards claimed" value={statsReady ? fmtSol(String(sumSol((d) => d.totals?.claimedLamports) * 1e9), 1) : "—"} />
-          <Stat testId="stat-realized" label="Realized P&L" value={statsReady ? fmtSolSigned(String(sumSol((d) => d.totals?.realizedLamports) * 1e9), 3) : "—"} />
-          <Stat testId="stat-paidout" label="Paid to owners" value={statsReady ? fmtSol(String(sumSol((d) => d.totals?.paidOutLamports) * 1e9), 2) : "—"} />
-          <Stat testId="stat-trades24" label="Trades 24h" value={statsReady ? fmtNum(sum((d) => d.totals?.trades24h || 0)) : "—"} sub="finalized on chain" />
-        </StatRow>
       </section>
 
       {/* LIVE MAKERS — this site's coins only */}
