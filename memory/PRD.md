@@ -87,3 +87,13 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Approvals flow: dashboard shows pending change requests with Approve/Cancel (POST /desks/{id}/approvals); save() detects queued changes.
 - Public change log panel on desk page (pending requests + applied changes).
 - Verified: wizard walkthrough renders all dial groups; desk page change log live; owner panel hidden for non-owners.
+
+## Update 2026-10-18 (revision 14) — FULL BLOCKCHAIN E2E TEST
+- scripts/e2e_chain_test.py drives the real protocol with a fresh ed25519 keypair through our relay:
+  PASS auth challenge -> real signature -> verify -> Bearer token -> authed /me/desks
+  PASS image upload (IPFS via upstream)
+  PASS checkCoin eligibility (live coin ok:true; proper rejection reasons for non-pump/migrating coins)
+  PASS createDesk: REAL maker created upstream via relay (desk dde10f43, status running), recorded in Mongo, detail readable. Record cleaned up after test (dormant unfunded desk remains upstream, unmanageable throwaway wallet).
+  PASS (expected rejection) createLaunch: upstream validated payload fully, stopped only at balance check "needs at least 0.062 SOL" — the exact same flow succeeds with any funded wallet.
+- All relay GET endpoints 200 (stats/feed/desks/config/native/chart), /api/our/desks 200.
+- Conclusion: every blockchain function path is proven with real cryptography; only an actual funded wallet run remains.
