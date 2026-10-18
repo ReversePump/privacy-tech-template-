@@ -1,16 +1,25 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
-import { VersionedTransaction, Keypair } from "@solana/web3.js";
+import { VersionedTransaction, SystemProgram, Transaction, PublicKey, Keypair } from "@solana/web3.js";
 import { Upload, Rocket, Check, ArrowLeft, ArrowRight, Zap } from "lucide-react";
 import { toast } from "sonner";
-import { errorMessage } from "../lib/api";
-import { b64ToBytes, short, solscanAcct, solscanTx } from "../lib/format";
+import { makers, errorMessage } from "../lib/api";
+import { b64ToBytes, bytesToB64, short, solscanAcct, solscanTx } from "../lib/format";
 import { PageHead, Panel, CoinAvatar, ExtLink } from "../components/bits";
+import { SettingsEditor, NON_PAYOUT_KEYS } from "../components/SettingsEditor";
+import WalletHelpPanel from "../components/WalletHelpPanel";
+import { useAuth } from "../solana/AuthContext";
 
 const API = process.env.REACT_APP_BACKEND_URL;
-const STEPS = ["Identity", "Opening buy", "Review & launch"];
+const STEPS = ["Identity", "Opening buy", "Maker fuel", "Temperament", "Your payouts", "Review & launch"];
+
+const DEFAULT_SETTINGS = {
+  buyTriggerPct: 10, sellTriggerPct: 10, buyIntensityPct: 50, sellIntensityPct: 50,
+  averageDown: true, cooldownSeconds: 180, profitTargetPct: 4, stopLossPct: 35,
+  solRatioPct: 50, trailingStopPct: null, trendFilter: false,
+};
 
 async function postJSON(path, body) {
   const r = await fetch(`${API}${path}`, {
@@ -24,64 +33,171 @@ async function postJSON(path, body) {
 }
 
 export default function Launch() {
-  const { publicKey, connected, signTransaction } = useWallet();
+  const { publicKey, connected, signTransaction, sendTransaction } = useWallet();
   const { connection } = useConnection();
   const { setVisible } = useWalletModal();
+  const { signedIn, signIn } = useAuth();
 
+  const [config, setConfig] = useState(null);
   const [step, setStep] = useState(0);
-  const [phase, setPhase] = useState("idle"); // idle|uploading|building|signing|sending|live|failed
+  const [mode, setMode] = useState("engine"); // engine = launch with maker | native = mint only, maker later
+  const [phase, setPhase] = useState("idle"); // idle|uploading|creating|building|signing|sending|live|failed
   const [err, setErr] = useState(null);
-  const [liveMint, setLiveMint] = useState(null);
-  const [liveSig, setLiveSig] = useState(null);
+  const [domainBlocked, setDomainBlocked] = useState(() => new URLSearchParams(window.location.search).has("wallethelp"));
+  const [liveDesk, setLiveDesk] = useState(null);
+  const [nativeMint, setNativeMint] = useState(null);
+  const [nativeSig, setNativeSig] = useState(null);
 
-  const [coin, setCoin] = useState({ name: "", ticker: "", description: "", imageId: null, imageUrl: null, links: { website: "", x: "", telegram: "" } });
+  const [coin, setCoin] = useState({ name: "", ticker: "", description: "", imageUrl: null, links: { website: "", x: "", telegram: "" } });
   const [imageBlob, setImageBlob] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [devBuySol, setDevBuySol] = useState(0);
+  const [fundSol, setFundSol] = useState(1);
+  const [preset, setPreset] = useState("balanced");
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const [rewardsKeptPct, setRewardsKeptPct] = useState(50);
+  const [payoutMinSol, setPayoutMinSol] = useState(0.1);
   const fileRef = useRef(null);
 
-  const onImage = (file) => {
+  useEffect(() => {
+    makers.config().then((c) => {
+      setConfig(c);
+      if (c?.defaults) setSettings((s) => ({ ...s, ...c.defaults }));
+    }).catch(() => {});
+  }, []);
+
+  const presets = config?.presets ? Object.entries(config.presets) : [];
+
+  const pickPreset = (key) => {
+    setPreset(key);
+    const p = config?.presets?.[key];
+    if (p?.values) setSettings((s) => ({ ...s, ...p.values }));
+  };
+
+  const onImage = async (file) => {
     if (!file) return;
     if (file.size > 2 * 1024 * 1024) { toast.error("Image must be under 2 MB"); return; }
     setImageBlob(file);
     setImagePreview((old) => { if (old?.startsWith("blob:")) URL.revokeObjectURL(old); return URL.createObjectURL(file); });
-    setCoin((c) => ({ ...c, imageId: null, imageUrl: null }));
+    setCoin((c) => ({ ...c, imageUrl: null }));
+    setPhase("uploading");
+    try {
+      const { imageUrl } = await makers.uploadImage(file);
+      setCoin((c) => ({ ...c, imageUrl }));
+    } catch (e) {
+      toast.warning(`Image kept locally; it uploads when you launch. (${errorMessage(e)})`);
+    } finally { setPhase("idle"); }
   };
 
   const byteLen = (s) => new TextEncoder().encode(s).length;
   const stepOk = useMemo(() => ([
-    coin.name.trim().length > 0 && byteLen(coin.name) <= 32 && coin.ticker.trim().length > 0 && byteLen(coin.ticker) <= 13 && !!imageBlob,
+    coin.name.trim().length > 0 && byteLen(coin.name) <= 32 && coin.ticker.trim().length > 0 && byteLen(coin.ticker) <= 13 && (coin.imageUrl || imageBlob),
     devBuySol >= 0,
+    fundSol >= 0,
     true,
-  ]), [coin, imageBlob, devBuySol]);
+    rewardsKeptPct >= 0 && rewardsKeptPct <= 100 && payoutMinSol >= 0,
+    true,
+  ]), [coin, imageBlob, devBuySol, fundSol, rewardsKeptPct, payoutMinSol]);
 
+  const settingsDiff = useMemo(() => {
+    const base = { ...DEFAULT_SETTINGS, ...(config?.defaults || {}) };
+    return Object.fromEntries(Object.entries(settings).filter(([k, v]) => v !== base[k] && v !== null && typeof v !== "object"));
+  }, [settings, config]);
+
+  // PRIMARY: one-signature launch WITH its market maker, through the engine
   const launch = async () => {
     if (!connected || !publicKey) { setVisible(true); return; }
     setErr(null);
+    setDomainBlocked(false);
+    setMode("engine");
+    try {
+      if (!signedIn) { try { await signIn(); } catch (e) { throw e; } }
+
+      let imageUrl = coin.imageUrl;
+      if (!imageUrl && imageBlob) {
+        setPhase("uploading");
+        imageUrl = (await makers.uploadImage(imageBlob)).imageUrl;
+        setCoin((c) => ({ ...c, imageUrl }));
+      }
+      if (!imageUrl) throw new Error("Add an image on the Identity step first.");
+
+      setPhase("creating");
+      const links = Object.fromEntries(Object.entries(coin.links).map(([k, v]) => [k, v.trim()]).filter(([, v]) => v));
+      const body = {
+        name: coin.name.trim(),
+        ticker: coin.ticker.trim(),
+        description: coin.description.trim(),
+        imageUrl,
+        links,
+        initialBuySol: devBuySol || 0,
+        fundSol,
+        settings: { ...settingsDiff, rewardsToMmPct: rewardsKeptPct, payoutMinSol },
+      };
+      const l = await makers.createLaunch(body);
+
+      setPhase("signing");
+      toast.info("Approve the launch in your wallet.");
+      const fresh = await makers.prepareLaunch(l.desk.id);
+      const unsigned = fresh.transaction || l.transaction;
+      if (!unsigned) throw new Error("The engine returned no transaction to sign.");
+      const tx = VersionedTransaction.deserialize(b64ToBytes(unsigned));
+      const signed = await signTransaction(tx);
+
+      setPhase("sending");
+      const res = await makers.submitLaunch(fresh.desk?.id || l.desk.id, bytesToB64(signed.serialize()));
+
+      // fund the treasury separately when it does not fit in the launch tx
+      const terms = fresh.terms || l.terms || {};
+      if (terms.fundInLaunch === false && BigInt(terms.fundLamports || "0") > 0n) {
+        try {
+          const transfer = new Transaction().add(SystemProgram.transfer({
+            fromPubkey: publicKey,
+            toPubkey: new PublicKey(terms.treasury),
+            lamports: Number(BigInt(terms.fundLamports)),
+          }));
+          const sig = await sendTransaction(transfer, connection);
+          toast.info(`Funding sent: ${short(sig)}`);
+        } catch (e) {
+          toast.warning(`Launch landed but the funding transfer was not sent: ${errorMessage(e)}`);
+        }
+      }
+
+      setPhase("live");
+      setLiveDesk(res?.desk || fresh.desk || l.desk);
+      toast.success("Your coin is on chain.", { description: "The maker starts as soon as its vault holds SOL." });
+    } catch (e) {
+      setPhase("failed");
+      if (e?.code === "SIWS_DOMAIN_BLOCK") setDomainBlocked(true);
+      setErr(errorMessage(e));
+      toast.error(errorMessage(e));
+    }
+  };
+
+  // FALLBACK: mint the coin without a maker when the wallet blocks engine sign-in
+  const launchNative = async () => {
+    if (!connected || !publicKey) { setVisible(true); return; }
+    if (!imageBlob && !coin.imageUrl) { setErr("Add an image on the Identity step first."); return; }
+    setErr(null);
+    setMode("native");
     try {
       // 1. host the artwork on our own infra
       setPhase("uploading");
-      let imageId = coin.imageId;
-      if (!imageId) {
-        const r = await fetch(`${API}/api/uploads/image`, {
-          method: "POST",
-          headers: { "Content-Type": imageBlob.type || "image/png" },
-          body: imageBlob,
-        });
-        const up = await r.json();
-        if (!r.ok) throw new Error(up?.error || "Image upload failed");
-        imageId = up.id;
-        setCoin((c) => ({ ...c, imageId, imageUrl: up.url }));
-      }
+      const r = await fetch(`${API}/api/uploads/image`, {
+        method: "POST",
+        headers: { "Content-Type": imageBlob?.type || "image/png" },
+        body: imageBlob,
+      });
+      const up = await r.json();
+      if (!r.ok) throw new Error(up?.error || "Image upload failed");
 
       // 2. metadata JSON, hosted by us
       setPhase("building");
       const links = Object.fromEntries(Object.entries(coin.links).map(([k, v]) => [k, v.trim()]).filter(([, v]) => v));
       const meta = await postJSON("/api/launch/metadata", {
-        name: coin.name.trim(), symbol: coin.ticker.trim(), description: coin.description.trim(), imageId, links,
+        name: coin.name.trim(), symbol: coin.ticker.trim(), description: coin.description.trim(), imageId: up.id, links,
       });
 
-      // 3. fresh mint keypair + unsigned create transaction (pump.fun, via our backend)
+      // 3. fresh mint keypair + unsigned create transaction (via our backend)
       const mintKp = Keypair.generate();
       const built = await postJSON("/api/launch/build", {
         publicKey: publicKey.toBase58(),
@@ -108,12 +224,12 @@ export default function Launch() {
       const mint = mintKp.publicKey.toBase58();
       await postJSON("/api/our/launches", {
         mint, name: coin.name.trim(), ticker: coin.ticker.trim(),
-        imageUrl: coin.imageUrl || `${API}/api/media/${imageId}`,
+        imageUrl: `${API}/api/media/${up.id}`,
         creator: publicKey.toBase58(), signature: sig,
       }).catch(() => {});
 
-      setLiveMint(mint);
-      setLiveSig(sig);
+      setNativeMint(mint);
+      setNativeSig(sig);
       setPhase("live");
       toast.success("Your coin is on chain.", { description: "Add its market maker next — one deposit, every dial yours." });
     } catch (e) {
@@ -122,6 +238,9 @@ export default function Launch() {
       toast.error(errorMessage(e));
     }
   };
+
+  const busy = phase !== "idle" && phase !== "failed";
+  const phaseLabel = phase === "signing" ? "Approve in your wallet…" : phase === "sending" ? "Minting on chain…" : phase === "uploading" ? "Uploading artwork…" : phase === "building" ? "Building transaction…" : "Working…";
 
   const field = (label, node, hint, testId) => (
     <div data-testid={testId}>
@@ -136,8 +255,8 @@ export default function Launch() {
       <PageHead
         kicker="Launch"
         title="Mint a coin."
-        accent="Right here."
-        sub="One approval mints your coin on the bonding curve — straight from this page, in any wallet. Attach its market maker in the next step. Market making can lose money."
+        accent="Wire the maker."
+        sub="One approval mints the coin, locks its fee split and funds its market maker. Every dial stays yours afterwards. Market making can lose money."
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_320px] gap-8">
@@ -166,7 +285,7 @@ export default function Launch() {
           {step === 0 && (
             <div className="space-y-6" data-testid="launch-step-coin">
               <h2 className="text-xl font-medium text-[#131a0f]">Identity</h2>
-              <p className="text-[13px] font-light text-[#5c6b50]">The face of your coin — name, ticker, artwork. Artwork and metadata are hosted by MakeMarkets and written to chain at mint.</p>
+              <p className="text-[13px] font-light text-[#5c6b50]">The face of your coin — name, ticker, artwork. It trades against SOL while its own fees power the maker.</p>
               <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-6">
                 <div>
                   <button onClick={() => fileRef.current?.click()} data-testid="launch-image-upload"
@@ -204,11 +323,22 @@ export default function Launch() {
               <p className="text-[13px] font-light text-[#5c6b50]">Grab your own coin inside the mint transaction, ahead of the crowd. Zero means everyone gets the same open.</p>
               {field("Opening buy (SOL)",
                 <input data-testid="launch-devbuy" type="number" min={0} step={0.1} value={devBuySol} onChange={(e) => setDevBuySol(Number(e.target.value) || 0)}
+                  className="h-11 w-56 rounded-[3px] border border-black/10 bg-black/5 px-3.5 font-mono text-sm text-[#131a0f] outline-none focus:border-[#3F9E00]/40" />,
+                "An opening buy leaves no room for fuel in the mint transaction, so your wallet signs twice: the mint, then a plain transfer to the maker's vault.")}
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="space-y-6" data-testid="launch-step-funding">
+              <h2 className="text-xl font-medium text-[#131a0f]">Maker fuel</h2>
+              <p className="text-[13px] font-light text-[#5c6b50]">SOL wired into the maker's vault at mint. At zero, the market maker runs purely on the coin's own creator fees.</p>
+              {field("Fuel the maker (SOL)",
+                <input data-testid="launch-fund" type="number" min={0} step={0.1} value={fundSol} onChange={(e) => setFundSol(Number(e.target.value) || 0)}
                   className="h-11 w-56 rounded-[3px] border border-black/10 bg-black/5 px-3.5 font-mono text-sm text-[#131a0f] outline-none focus:border-[#3F9E00]/40" />)}
               <div className="flex gap-2">
-                {[0, 0.1, 0.5, 1, 2].map((v) => (
-                  <button key={v} data-testid={`devbuy-preset-${v}`} onClick={() => setDevBuySol(v)}
-                    className={`rounded-[3px] px-4 py-1.5 font-mono text-xs ${devBuySol === v ? "bg-[#3F9E00] text-white" : "border border-black/10 text-[#5c6b50] hover:border-[#3F9E00]/40"}`}>
+                {[0, 0.5, 1, 2, 5].map((v) => (
+                  <button key={v} data-testid={`fund-preset-${v}`} onClick={() => setFundSol(v)}
+                    className={`rounded-[3px] px-4 py-1.5 font-mono text-xs ${fundSol === v ? "bg-[#3F9E00] text-white" : "border border-black/10 text-[#5c6b50] hover:border-[#3F9E00]/40"}`}>
                     {v} SOL
                   </button>
                 ))}
@@ -216,19 +346,79 @@ export default function Launch() {
             </div>
           )}
 
-          {step === 2 && (
+          {step === 3 && (
+            <div className="space-y-6" data-testid="launch-step-strategy">
+              <h2 className="text-xl font-medium text-[#131a0f]">Temperament</h2>
+              <p className="text-[13px] font-light text-[#5c6b50]">Choose how the market maker behaves out of the gate. Retune every dial later.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {presets.map(([key, p]) => (
+                  <button key={key} data-testid={`preset-${key}`} onClick={() => pickPreset(key)}
+                    className={`rounded-[3px] border p-4 text-left transition-colors ${preset === key ? "border-[#3F9E00]/50 bg-[#3F9E00]/5" : "border-black/10 bg-black/[0.03] hover:border-black/25"}`}>
+                    <div className="text-[#131a0f] text-sm font-medium">{p.name}</div>
+                    <p className="mt-1 text-[12px] font-light text-[#5c6b50]">{p.summary}</p>
+                  </button>
+                ))}
+              </div>
+              <div>
+                <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#93a184]">Fine-tune the maker — every dial, adjustable now and forever after</div>
+                <SettingsEditor
+                  values={settings}
+                  compactKeys={NON_PAYOUT_KEYS}
+                  onChange={(k, v) => { setPreset("custom"); setSettings({ ...settings, [k]: v }); }}
+                />
+              </div>
+            </div>
+          )}
+
+          {step === 4 && (
+            <div className="space-y-6" data-testid="launch-step-treasury">
+              <h2 className="text-xl font-medium text-[#131a0f]">Your payouts</h2>
+              <p className="text-[13px] font-light text-[#5c6b50]">How much of each fee claim stays in the maker — and when the rest lands in your wallet.</p>
+              <div>
+                <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-[#93a184]">Fees the maker keeps · {rewardsKeptPct}%</label>
+                <input type="range" min={0} max={100} value={rewardsKeptPct} data-testid="launch-rewards-range"
+                  onChange={(e) => setRewardsKeptPct(Number(e.target.value))} className="w-full accent-[#3F9E00]" />
+                <div className="mt-1 flex justify-between font-mono text-[10px] text-[#93a184]">
+                  <span>{rewardsKeptPct}% maker</span>
+                  <span>{100 - rewardsKeptPct}% flows to you</span>
+                </div>
+              </div>
+              {field("Auto payout above (SOL)",
+                <input data-testid="launch-payoutmin" type="number" min={0.01} step={0.01} value={payoutMinSol} onChange={(e) => setPayoutMinSol(Number(e.target.value) || 0)}
+                  className="h-11 w-56 rounded-[3px] border border-black/10 bg-black/5 px-3.5 font-mono text-sm text-[#131a0f] outline-none focus:border-[#3F9E00]/40" />)}
+              <div>
+                <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#93a184]">More payout dials</div>
+                <SettingsEditor
+                  values={settings}
+                  compactKeys={["reinvestPct", "autoPayout", "closeAtProfitSol"]}
+                  onChange={(k, v) => setSettings({ ...settings, [k]: v })}
+                />
+              </div>
+            </div>
+          )}
+
+          {step === 5 && (
             <div className="space-y-6" data-testid="launch-step-review">
               <h2 className="text-xl font-medium text-[#131a0f]">Review & launch</h2>
-              {phase === "live" && liveMint ? (
+              {phase === "live" && mode === "engine" && liveDesk ? (
                 <Panel className="border-[#3F9E00]/30 bg-[#3F9E00]/5 p-6" data-testid="launch-success">
+                  <div className="flex items-center gap-2 text-[#3F9E00]"><Check size={18} /><span className="font-medium">Your coin is on chain — maker wired in.</span></div>
+                  <p className="mt-2 text-[13px] font-light text-[#5c6b50]">The market maker spins up the moment its vault holds SOL. Every fill shows on its page.</p>
+                  <div className="mt-5 flex gap-3">
+                    <Link to={`/desk/${liveDesk.id}`} className="inline-flex items-center gap-2 rounded-[3px] bg-[#3F9E00] px-5 py-2 text-sm font-medium text-white hover:bg-[#54C400]" data-testid="launch-open-desk">Open the maker →</Link>
+                    <Link to="/explore" className="rounded-[3px] border border-black/15 px-5 py-2 text-sm text-[#131a0f]">Explore</Link>
+                  </div>
+                </Panel>
+              ) : phase === "live" && mode === "native" && nativeMint ? (
+                <Panel className="border-[#3F9E00]/30 bg-[#3F9E00]/5 p-6" data-testid="launch-success-native">
                   <div className="flex items-center gap-2 text-[#3F9E00]"><Check size={18} /><span className="font-medium">Your coin is on chain.</span></div>
                   <div className="mt-3 font-mono text-xs text-[#5c6b50] space-y-1.5">
-                    <div className="flex items-center gap-2">Mint <ExtLink href={solscanAcct(liveMint)}>{short(liveMint, 6, 6)}</ExtLink></div>
-                    {liveSig && <div className="flex items-center gap-2">Tx <ExtLink href={solscanTx(liveSig)}>{short(liveSig, 6, 6)}</ExtLink></div>}
+                    <div className="flex items-center gap-2">Mint <ExtLink href={solscanAcct(nativeMint)}>{short(nativeMint, 6, 6)}</ExtLink></div>
+                    {nativeSig && <div className="flex items-center gap-2">Tx <ExtLink href={solscanTx(nativeSig)}>{short(nativeSig, 6, 6)}</ExtLink></div>}
                   </div>
                   <p className="mt-3 text-[13px] font-light text-[#5c6b50]">Now give it a market maker — one deposit and it trades the dips and rips on its own.</p>
                   <div className="mt-5 flex flex-wrap gap-3">
-                    <Link to={`/mm?mint=${liveMint}`} className="inline-flex items-center gap-2 rounded-[3px] bg-[#3F9E00] px-5 py-2 text-sm font-medium text-white hover:bg-[#54C400]" data-testid="launch-add-maker">
+                    <Link to={`/mm?mint=${nativeMint}`} className="inline-flex items-center gap-2 rounded-[3px] bg-[#3F9E00] px-5 py-2 text-sm font-medium text-white hover:bg-[#54C400]" data-testid="launch-add-maker">
                       <Zap size={14} /> Add its market maker
                     </Link>
                     <Link to="/explore" className="rounded-[3px] border border-black/15 px-5 py-2 text-sm text-[#131a0f]">Explore</Link>
@@ -241,20 +431,39 @@ export default function Launch() {
                       <CoinAvatar url={imagePreview || coin.imageUrl} name={coin.name} size={48} className="rounded-[3px]" />
                       <div>
                         <div className="text-[#131a0f] font-medium">{coin.name || "Unnamed coin"} <span className="text-[#93a184] font-mono text-xs">${coin.ticker || "TICKER"}</span></div>
-                        <div className="font-mono text-[11px] text-[#93a184]">bonding curve · minted from this page</div>
+                        <div className="font-mono text-[11px] text-[#93a184]">SOL pair · its own maker</div>
                       </div>
                     </div>
                     <ul className="mt-5 space-y-2 border-t border-black/5 pt-4 text-[12px] font-light text-[#5c6b50] list-none">
                       <li>1. Mints the coin on the bonding curve.</li>
-                      <li>{devBuySol > 0 ? `2. Buys ${devBuySol} SOL of your coin inside the same transaction.` : "2. No opening buy — everyone gets the same open."}</li>
-                      <li>3. One wallet approval, that's the whole launch.</li>
+                      <li>2. Locks the fee split for good: 80% maker · 20% platform.</li>
+                      <li>{devBuySol > 0 ? `3. Buys ${devBuySol} SOL of your coin inside the same transaction.` : "3. No opening buy — everyone gets the same open."}</li>
+                      <li>{fundSol > 0 ? `4. Wires ${fundSol} SOL into the maker's vault.` : "4. Sends nothing to the vault — the maker lives off the coin's own fees."}</li>
                     </ul>
                   </Panel>
+                  {!signedIn && connected && !domainBlocked && (
+                    <Panel className="border-[#a8780f]/25 bg-[#a8780f]/5 p-4 text-[12px] font-light text-[#3a4a33]" data-testid="launch-signin-note">
+                      Your wallet will first ask you to approve a sign-in message (it proves ownership only — it can't spend or launch). It may warn that the message is issued by the market-maker engine's API — that's expected, approve it to continue.
+                    </Panel>
+                  )}
+                  {domainBlocked && (
+                    <div className="space-y-3">
+                      <WalletHelpPanel />
+                      <Panel className="p-4" data-testid="launch-native-offer">
+                        <div className="text-[13px] font-medium text-[#131a0f]">Can't sign in right now?</div>
+                        <p className="mt-1 text-[12px] font-light text-[#5c6b50]">Mint the coin without a maker — no sign-in needed, works in any wallet. Attach the maker afterwards from the Onboard page.</p>
+                        <button onClick={launchNative} disabled={busy} data-testid="launch-native-btn"
+                          className="mt-3 inline-flex h-10 items-center gap-2 rounded-[3px] border border-[#3F9E00]/40 px-5 text-sm text-[#3F9E00] hover:bg-[#3F9E00]/5 disabled:opacity-50 transition-colors">
+                          <Rocket size={14} /> {busy && mode === "native" ? phaseLabel : "Mint without a maker"}
+                        </button>
+                      </Panel>
+                    </div>
+                  )}
                   {err && <Panel className="border-[#ff4d4f]/30 bg-[#ff4d4f]/5 p-4 text-[13px] text-[#d43d3d]" data-testid="launch-error">{err}</Panel>}
-                  <button onClick={launch} disabled={phase !== "idle" && phase !== "failed"} data-testid="launch-sign-btn"
+                  <button onClick={launch} disabled={busy} data-testid="launch-sign-btn"
                     className="inline-flex h-12 items-center gap-2 rounded-[3px] bg-[#3F9E00] px-8 text-sm font-medium text-white hover:bg-[#54C400] hover:shadow-[0_0_28px_rgba(92,225,0,0.35)] disabled:opacity-50 transition-all">
                     <Rocket size={16} />
-                    {phase === "idle" || phase === "failed" ? (connected ? "Approve & launch" : "Connect wallet to launch") : phase === "signing" ? "Approve in your wallet…" : phase === "sending" ? "Minting on chain…" : "Working…"}
+                    {phase === "idle" || phase === "failed" ? (connected ? "Approve & launch" : "Connect wallet to launch") : phaseLabel}
                   </button>
                   <p className="text-[11px] font-light text-[#93a184]">Market making can lose money. Nothing moves until your wallet approves.</p>
                 </>
@@ -262,7 +471,7 @@ export default function Launch() {
             </div>
           )}
 
-          {step < 2 && (
+          {step < 5 && (
             <div className="mt-10 flex items-center gap-3">
               {step > 0 && (
                 <button onClick={() => setStep(step - 1)} data-testid="launch-back-btn"
@@ -291,9 +500,12 @@ export default function Launch() {
             </div>
             <dl className="mt-5 space-y-2.5 border-t border-black/5 pt-4 font-mono text-[12px]">
               <div className="flex justify-between"><dt className="text-[#93a184]">Opening buy</dt><dd className="text-[#131a0f] tnum">{devBuySol > 0 ? `${devBuySol} SOL` : "None"}</dd></div>
-              <div className="flex justify-between"><dt className="text-[#93a184]">Signatures</dt><dd className="text-[#131a0f] tnum">1</dd></div>
-              <div className="flex justify-between"><dt className="text-[#93a184]">Creator fees</dt><dd className="text-[#3F9E00] tnum">100% to you</dd></div>
-              <div className="flex justify-between"><dt className="text-[#93a184]">Market maker</dt><dd className="text-[#131a0f]">add right after</dd></div>
+              <div className="flex justify-between"><dt className="text-[#93a184]">Maker fuel</dt><dd className="text-[#131a0f] tnum">{fundSol} SOL</dd></div>
+              <div className="flex justify-between"><dt className="text-[#93a184]">Signatures</dt><dd className="text-[#131a0f] tnum">{devBuySol > 0 ? 2 : 1}</dd></div>
+              <div className="flex justify-between"><dt className="text-[#93a184]">Fee split</dt><dd className="text-[#3F9E00] tnum">80% maker · 20% platform</dd></div>
+              <div className="flex justify-between"><dt className="text-[#93a184]">Temperament</dt><dd className="text-[#131a0f] capitalize">{preset}</dd></div>
+              <div className="flex justify-between"><dt className="text-[#93a184]">Fees kept</dt><dd className="text-[#131a0f] tnum">{rewardsKeptPct}% · {100 - rewardsKeptPct}% to you</dd></div>
+              <div className="flex justify-between"><dt className="text-[#93a184]">Auto payout</dt><dd className="text-[#131a0f] tnum">On, above {payoutMinSol} SOL</dd></div>
             </dl>
             <p className="mt-4 border-t border-black/5 pt-3 text-[10px] font-light leading-relaxed text-[#93a184]">
               Market making can lose money. Nothing moves until your wallet approves.
