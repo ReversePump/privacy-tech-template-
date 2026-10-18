@@ -138,3 +138,12 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Explore shows a "Minted here — awaiting a market maker" strip from our_launches.
 - Engine (makers.fun relay) remains for the market maker: Onboard + desk management need engine sign-in (signMessage-first; WalletHelpPanel covers Phantom's domain block).
 - Verified server-side: upload/media/metadata/build/dual-sign/record all PASS (only broadcast needs a funded wallet, ~0.01 SOL rent). Wizard walkthrough screenshot-verified.
+
+## Update 2026-10-18 (revision 23) — ENGINE-PARITY LAUNCH RESTORED + FULL VERIFICATION
+- User directive: "make it work — no signs of the original site, but every function should work".
+- Launch.jsx rewritten: PRIMARY flow is now the exact upstream flow through the relay — 6 steps (Identity / Opening buy / Maker fuel / Temperament / Your payouts / Review & launch), SIWS sign-in (signMessage-first), POST /images -> /launches -> prepare -> wallet signs -> submit. Coin launches WITH its market maker in one signature, full presets + every engine dial.
+- FALLBACK preserved: on Phantom SIWS domain-block, WalletHelpPanel + "Mint without a maker" native path (PumpPortal via /api/uploads/image, /api/launch/metadata, /api/launch/build) mints coin-only, then routes to /mm?mint= to attach the maker.
+- Bug fix (CRITICAL, testing agent): media/metadata URLs were built from request.base_url (internal k8s host, 403 externally). Now derived from X-Forwarded-Proto/Host (_public_base) — verified upload -> public URL -> GET 200.
+- Bug fix (HIGH, testing agent): TypeBadge showed "LAUNCHED HERE"/"ONBOARDED" for any upstream desk by origin alone. Now gated on membership in /api/our/desks (useOurDesks) — foreign desks show no badge.
+- Verified: testing agent 15/17 backend + full UI sweep (then 17/17 after fixes); e2e_chain_test.py 7/8 (only stop = unfunded balance gate, by design); launch wizard 6-step walkthrough screenshot-verified; branding sweep clean (no makers.fun/$MAKERS/pump.fun/Solscan/DexScreener strings in UI).
+- Backend tests live at /app/backend/tests/backend_test.py (pytest, 17 cases).

@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Loader2 } from "lucide-react";
 import { smallPrice, subDigit } from "../lib/format";
+import { useOurDesks } from "../lib/useOurDesks";
 
 export const Panel = ({ className = "", children, ...rest }) => (
   <div className={`rounded-xl border border-black/10 bg-black/[0.04] backdrop-blur-xl ${className}`} {...rest}>
@@ -121,6 +122,8 @@ export const PageHead = ({ kicker, title, accent, sub, right }) => (
 );
 
 export const TypeBadge = ({ desk }) => {
+  const { ourIds } = useOurDesks();
+  if (!ourIds.has(desk?.id)) return null;
   const t = desk.origin === "launch" ? "LAUNCHED HERE" : "ONBOARDED";
   return (
     <span className="rounded-[3px] border border-black/10 bg-black/5 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-[#5c6b50]">

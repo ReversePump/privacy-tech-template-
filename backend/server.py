@@ -62,6 +62,15 @@ from datetime import datetime, timezone
 PUMPPORTAL = "https://pumpportal.fun/api/trade-local"
 
 
+def _public_base(request: Request) -> str:
+    """Absolute public base URL — request.base_url is the pod-internal host behind the ingress."""
+    host = request.headers.get("x-forwarded-host")
+    if host:
+        proto = request.headers.get("x-forwarded-proto", "https").split(",")[0].strip()
+        return f"{proto}://{host.split(',')[0].strip()}"
+    return str(request.base_url).rstrip("/")
+
+
 @api_router.post("/uploads/image")
 async def upload_image(request: Request):
     body = await request.body()
@@ -73,7 +82,7 @@ async def upload_image(request: Request):
         "_id": mid, "data": base64.b64encode(body).decode(), "contentType": ctype,
         "createdAt": datetime.now(timezone.utc).isoformat(),
     })
-    base = str(request.base_url).rstrip("/")
+    base = _public_base(request)
     return {"id": mid, "url": f"{base}/api/media/{mid}"}
 
 
@@ -96,7 +105,7 @@ async def launch_metadata(request: Request):
     symbol = (body.get("symbol") or "").strip()[:16]
     if not name or not symbol:
         return Response('{"error":"invalid_metadata"}', status_code=400, media_type="application/json")
-    base = str(request.base_url).rstrip("/")
+    base = _public_base(request)
     links = body.get("links") or {}
     meta = {
         "name": name,
