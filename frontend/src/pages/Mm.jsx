@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { makers, errorMessage } from "../lib/api";
 import { fmtUsd, fmtSol, short } from "../lib/format";
 import { PageHead, Panel, CoinAvatar, Loading } from "../components/bits";
+import { SettingsEditor, NON_PAYOUT_KEYS } from "../components/SettingsEditor";
 import { useAuth } from "../solana/AuthContext";
 
 export default function Mm() {
@@ -223,6 +224,15 @@ export default function Mm() {
             </div>
           )}
 
+
+          <div className="mt-5">
+            <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#93a184]">Every dial — same controls as a launch</div>
+            <SettingsEditor
+              values={settings}
+              compactKeys={NON_PAYOUT_KEYS}
+              onChange={(k, v) => { setPreset("custom"); setSettings({ ...settings, [k]: v }); }}
+            />
+          </div>
           <ul className="mt-6 space-y-2 border-t border-black/5 pt-4 text-[12px] font-light text-[#5c6b50]">
             <li>· Starts on the Balanced temperament — retune every dial afterwards.</li>
             <li>· All wallets public, every fill on its page.</li>

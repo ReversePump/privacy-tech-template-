@@ -80,3 +80,10 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Logo: user's pixel-art mark at /logo.png in header + footer; favicon.png + apple-touch-icon set in index.html.
 - Header external links: ONLY https://x.com/usemakemarkets (X icon). No other external links in header/footer.
 - Last brand string removed (PumpSwap -> liquidity pool).
+
+## Update 2026-10-18 (revision 13)
+- FULL upstream settings surface in setup: launch Temperament step now renders every engine dial (all groups minus payout), "Your payouts" step gains reinvestPct/autoPayout/closeAtProfitSol; Onboard (mm) page gets the same full dial set. SettingsEditor exports NON_PAYOUT_KEYS/PAYOUT_KEYS.
+- Full owner action set on desk page: pause/resume, withdraw profits/capital (with amount)/tokens, liquidate, close maker (confirm-guarded).
+- Approvals flow: dashboard shows pending change requests with Approve/Cancel (POST /desks/{id}/approvals); save() detects queued changes.
+- Public change log panel on desk page (pending requests + applied changes).
+- Verified: wizard walkthrough renders all dial groups; desk page change log live; owner panel hidden for non-owners.

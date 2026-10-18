@@ -84,6 +84,11 @@ const fieldByKey = (k) => {
   return null;
 };
 
+// Every adjustable key the upstream supports, minus walletOverrides (advanced JSON).
+export const PAYOUT_KEYS = SETTING_GROUPS.find((g) => g.id === "payout").fields.map((f) => f.key);
+export const NON_PAYOUT_KEYS = SETTING_GROUPS.filter((g) => g.id !== "payout").flatMap((g) => g.fields.map((f) => f.key));
+export const ALL_SETTING_KEYS = [...NON_PAYOUT_KEYS, ...PAYOUT_KEYS];
+
 const prettyLabel = (k) =>
   k.replace(/Pct$/, " %").replace(/Sol$/, " SOL").replace(/Seconds$/, " s").replace(/Bps$/, " bps")
     .replace(/([A-Z])/g, " $1").replace(/^./, (c) => c.toUpperCase()).trim();

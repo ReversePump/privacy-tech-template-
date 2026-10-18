@@ -159,27 +159,70 @@ export default function Desk() {
           {isOwner && (
             <Panel className="p-5 border-[#3F9E00]/20" data-testid="desk-owner-panel">
               <div className="font-mono text-[11px] uppercase tracking-[0.15em] text-[#3F9E00]">You own this maker</div>
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="mt-4 grid grid-cols-2 gap-2">
                 {desk.status === "running" ? (
                   <button data-testid="desk-pause-btn" disabled={!!acting} onClick={() => act("Pause", () => makers.pause(desk.id))}
-                    className="inline-flex h-9 items-center gap-1.5 rounded-[3px] border border-black/15 px-4 text-xs text-[#131a0f] hover:border-[#ff4d4f]/50 hover:text-[#ff4d4f] disabled:opacity-50">
+                    className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[3px] border border-black/15 px-3 text-xs text-[#131a0f] hover:border-[#d43d3d]/50 hover:text-[#d43d3d] disabled:opacity-50">
                     <Pause size={12} /> Pause
                   </button>
                 ) : (
                   <button data-testid="desk-resume-btn" disabled={!!acting} onClick={() => act("Resume", () => makers.resume(desk.id))}
-                    className="inline-flex h-9 items-center gap-1.5 rounded-[3px] border border-[#3F9E00]/30 px-4 text-xs text-[#3F9E00] hover:bg-[#3F9E00]/10 disabled:opacity-50">
+                    className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[3px] border border-[#3F9E00]/30 px-3 text-xs text-[#3F9E00] hover:bg-[#3F9E00]/10 disabled:opacity-50">
                     <Play size={12} /> Resume
                   </button>
                 )}
-                <button data-testid="desk-withdraw-btn" disabled={!!acting} onClick={() => act("Withdraw", () => makers.withdraw(desk.id, "profits"))}
-                  className="inline-flex h-9 items-center gap-1.5 rounded-[3px] border border-black/15 px-4 text-xs text-[#131a0f] hover:border-[#3F9E00]/40 hover:text-[#3F9E00] disabled:opacity-50">
-                  <CircleDollarSign size={12} /> Withdraw profits
+                <button data-testid="desk-withdraw-profits-btn" disabled={!!acting} onClick={() => act("Withdraw profits", () => makers.withdraw(desk.id, "profits"))}
+                  className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[3px] border border-black/15 px-3 text-xs text-[#131a0f] hover:border-[#3F9E00]/40 hover:text-[#3F9E00] disabled:opacity-50">
+                  <CircleDollarSign size={12} /> Profits out
+                </button>
+                <button data-testid="desk-withdraw-capital-btn" disabled={!!acting}
+                  onClick={() => { const sol = window.prompt("Capital to withdraw (SOL) — leave empty for all:"); act("Withdraw capital", () => makers.withdraw(desk.id, "capital", sol ? { sol: Number(sol) } : undefined)); }}
+                  className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[3px] border border-black/15 px-3 text-xs text-[#131a0f] hover:border-[#3F9E00]/40 hover:text-[#3F9E00] disabled:opacity-50">
+                  <CircleDollarSign size={12} /> Capital out
+                </button>
+                <button data-testid="desk-withdraw-tokens-btn" disabled={!!acting}
+                  onClick={() => window.confirm("Withdraw the maker's token holdings to your wallet?") && act("Withdraw tokens", () => makers.withdraw(desk.id, "tokens"))}
+                  className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[3px] border border-black/15 px-3 text-xs text-[#131a0f] hover:border-[#3F9E00]/40 hover:text-[#3F9E00] disabled:opacity-50">
+                  <CircleDollarSign size={12} /> Tokens out
+                </button>
+                <button data-testid="desk-liquidate-btn" disabled={!!acting}
+                  onClick={() => window.confirm("Sell the entire position at market? This realizes any loss.") && act("Liquidate", () => makers.liquidate(desk.id))}
+                  className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[3px] border border-black/15 px-3 text-xs text-[#131a0f] hover:border-[#d43d3d]/50 hover:text-[#d43d3d] disabled:opacity-50">
+                  Liquidate
+                </button>
+                <button data-testid="desk-close-btn" disabled={!!acting}
+                  onClick={() => window.confirm("Close this maker for good? Position is sold and remaining SOL returns to you.") && act("Close", () => makers.closeDesk(desk.id))}
+                  className="inline-flex h-9 items-center justify-center gap-1.5 rounded-[3px] border border-black/15 px-3 text-xs text-[#131a0f] hover:border-[#d43d3d]/50 hover:text-[#d43d3d] disabled:opacity-50">
+                  Close maker
                 </button>
               </div>
+              <p className="mt-3 text-[10px] font-light text-[#93a184]">Withdrawals, liquidations and closes are on-chain actions — irreversible.</p>
             </Panel>
           )}
         </div>
       </div>
+
+      {(desk.changes?.length > 0 || desk.requests?.length > 0) && (
+        <Panel className="mt-6 overflow-hidden" data-testid="desk-changes-panel">
+          <div className="border-b border-black/5 px-4 py-3 text-[#131a0f] font-medium">Change log</div>
+          <div className="max-h-[300px] overflow-y-auto">
+            {(desk.requests || []).map((r, i) => (
+              <div key={`req-${r.id || i}`} className="flex items-center gap-3 border-b border-black/5 px-4 py-2.5 last:border-0">
+                <span className="rounded-[3px] bg-[#a8780f]/10 px-2 py-0.5 font-mono text-[9px] uppercase text-[#a8780f]">pending</span>
+                <span className="font-mono text-xs text-[#3a4a33]">{r.summary || r.kind || JSON.stringify(r.change || r).slice(0, 90)}</span>
+                <span className="ml-auto font-mono text-[11px] text-[#93a184]">{fmtAge(r.at || r.createdAt)}</span>
+              </div>
+            ))}
+            {(desk.changes || []).map((c, i) => (
+              <div key={`chg-${i}`} className="flex items-center gap-3 border-b border-black/5 px-4 py-2.5 last:border-0">
+                <span className="rounded-[3px] bg-[#3F9E00]/10 px-2 py-0.5 font-mono text-[9px] uppercase text-[#3F9E00]">applied</span>
+                <span className="font-mono text-xs text-[#3a4a33]">{c.summary || c.kind || JSON.stringify(c.change || c).slice(0, 90)}</span>
+                <span className="ml-auto font-mono text-[11px] text-[#93a184]">{fmtAge(c.at || c.createdAt)}</span>
+              </div>
+            ))}
+          </div>
+        </Panel>
+      )}
 
       <Panel className="mt-6 overflow-hidden" data-testid="desk-trades-panel">
         <div className="border-b border-black/5 px-4 py-3 text-[#131a0f] font-medium">Trades</div>

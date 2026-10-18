@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { makers, errorMessage } from "../lib/api";
 import { b64ToBytes, bytesToB64, fmtSol, short } from "../lib/format";
 import { PageHead, Panel, CoinAvatar } from "../components/bits";
-import { SettingsEditor } from "../components/SettingsEditor";
+import { SettingsEditor, NON_PAYOUT_KEYS } from "../components/SettingsEditor";
 import { useAuth } from "../solana/AuthContext";
 
 const STEPS = ["Identity", "Opening buy", "Maker fuel", "Temperament", "Your payouts", "Review & launch"];
@@ -274,10 +274,10 @@ export default function Launch() {
                 ))}
               </div>
               <div>
-                <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#93a184]">Fine-tune the maker</div>
+                <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#93a184]">Fine-tune the maker — every dial from the engine, adjustable now and forever after</div>
                 <SettingsEditor
                   values={settings}
-                  compactKeys={["buyTriggerPct", "buyIntensityPct", "averageDown", "sellTriggerPct", "sellIntensityPct", "profitTargetPct", "stopLossPct", "cooldownSeconds"]}
+                  compactKeys={NON_PAYOUT_KEYS}
                   onChange={(k, v) => { setPreset("custom"); setSettings({ ...settings, [k]: v }); }}
                 />
               </div>
@@ -300,6 +300,14 @@ export default function Launch() {
               {field("Auto payout above (SOL)",
                 <input data-testid="launch-payoutmin" type="number" min={0.01} step={0.01} value={payoutMinSol} onChange={(e) => setPayoutMinSol(Number(e.target.value) || 0)}
                   className="h-11 w-56 rounded-lg border border-black/10 bg-black/5 px-3.5 font-mono text-sm text-[#131a0f] outline-none focus:border-[#3F9E00]/40" />)}
+              <div>
+                <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#93a184]">More payout dials</div>
+                <SettingsEditor
+                  values={settings}
+                  compactKeys={["reinvestPct", "autoPayout", "closeAtProfitSol"]}
+                  onChange={(k, v) => setSettings({ ...settings, [k]: v })}
+                />
+              </div>
             </div>
           )}
 

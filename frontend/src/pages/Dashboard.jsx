@@ -79,8 +79,25 @@ function DeskDashboard({ id }) {
       const orig = desk.settings || desk.strategy || {};
       const change = Object.fromEntries(Object.entries(form).filter(([k, v]) => v !== orig[k] && typeof v !== "object"));
       if (!Object.keys(change).length) { toast.info("Nothing changed"); return; }
-      await makers.updateSettings(id, change);
-      toast.success("Settings updated — takes effect within one engine pass.");
+      const res = await makers.updateSettings(id, change);
+      if (res?.request || res?.needsApproval || res?.pending) {
+        toast.info("Change queued — approve it below to apply.");
+      } else {
+        toast.success("Settings updated — takes effect within one engine pass.");
+      }
+      load();
+    } catch (e) {
+      toast.error(errorMessage(e));
+    } finally { setBusy(false); }
+  };
+
+  const decide = async (req, action) => {
+    if (!signedIn) { try { await signIn(); } catch (e) { toast.error(errorMessage(e)); return; } }
+    setBusy(true);
+    try {
+      const change = req.change ?? req;
+      await makers.approval(id, action, change);
+      toast.success(action === "approve" ? "Change approved." : "Change cancelled.");
       load();
     } catch (e) {
       toast.error(errorMessage(e));
@@ -114,6 +131,25 @@ function DeskDashboard({ id }) {
           <div className="flex justify-between"><span>Claimed</span><span className="text-[#131a0f]">{fmtSol(desk.totals?.claimedLamports, 2)}</span></div>
           <div className="flex justify-between"><span>Treasury</span><span className="text-[#131a0f]">{short(desk.treasury, 4, 4)}</span></div>
         </div>
+
+        {desk.requests?.length > 0 && (
+          <div className="mt-6 border-t border-black/5 pt-4" data-testid="dash-requests">
+            <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#a8780f]">Pending approvals</div>
+            <div className="mt-3 space-y-2.5">
+              {desk.requests.map((r, i) => (
+                <div key={r.id || i} className="rounded-[3px] border border-[#a8780f]/20 bg-[#a8780f]/5 p-3">
+                  <div className="font-mono text-[11px] text-[#3a4a33]">{r.summary || r.kind || JSON.stringify(r.change || r).slice(0, 80)}</div>
+                  <div className="mt-2 flex gap-2">
+                    <button onClick={() => decide(r, "approve")} disabled={busy} data-testid={`req-approve-${i}`}
+                      className="h-7 rounded-[3px] bg-[#3F9E00] px-3 font-mono text-[10px] uppercase text-white hover:bg-[#54C400] disabled:opacity-50">Approve</button>
+                    <button onClick={() => decide(r, "cancel")} disabled={busy} data-testid={`req-cancel-${i}`}
+                      className="h-7 rounded-[3px] border border-black/15 px-3 font-mono text-[10px] uppercase text-[#5c6b50] hover:border-[#d43d3d]/40 hover:text-[#d43d3d] disabled:opacity-50">Cancel</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </Panel>
     </div>
   );
