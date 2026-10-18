@@ -35,6 +35,18 @@ function parseSiws(message, fallbackAddress) {
 const wasRejected = (e) =>
   /reject|declin|cancel|denied/i.test(e instanceof Error ? `${e.name} ${e.message}` : String(e));
 
+// Phantom hard-blocks signing SIWS messages whose domain != the page origin.
+export const isDomainBlock = (e) =>
+  /domain in the sign-in message does not match|cannot be shown/i.test(e instanceof Error ? e.message : String(e));
+
+export class DomainBlockError extends Error {
+  constructor() {
+    super("This wallet blocks cross-domain sign-in.");
+    this.name = "DomainBlockError";
+    this.code = "SIWS_DOMAIN_BLOCK";
+  }
+}
+
 export function AuthProvider({ children }) {
   const { publicKey, signMessage, signIn: walletSignIn, connected } = useWallet();
   const [session, setSession] = useState(null); // {wallet}
@@ -56,6 +68,7 @@ export function AuthProvider({ children }) {
       try {
         signature = bs58.encode(await signMessage(new TextEncoder().encode(ch.message)));
       } catch (e) {
+        if (isDomainBlock(e)) throw new DomainBlockError();
         if (wasRejected(e)) {
           throw new Error("Sign-in was declined in your wallet. Tap approve on the prompt to continue — it only proves wallet ownership, it cannot spend or launch anything.");
         }
@@ -73,6 +86,7 @@ export function AuthProvider({ children }) {
         }
         if (out?.signature) signature = bs58.encode(Uint8Array.from(out.signature));
       } catch (e) {
+        if (isDomainBlock(e)) throw new DomainBlockError();
         if (wasRejected(e)) {
           throw new Error("Sign-in was declined in your wallet. Tap approve on the prompt to continue — it only proves wallet ownership, it cannot spend or launch anything.");
         }

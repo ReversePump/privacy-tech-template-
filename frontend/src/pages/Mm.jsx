@@ -9,6 +9,7 @@ import { makers, errorMessage } from "../lib/api";
 import { fmtUsd, fmtSol, short } from "../lib/format";
 import { PageHead, Panel, CoinAvatar, Loading } from "../components/bits";
 import { SettingsEditor, NON_PAYOUT_KEYS } from "../components/SettingsEditor";
+import WalletHelpPanel from "../components/WalletHelpPanel";
 import { useAuth } from "../solana/AuthContext";
 
 export default function Mm() {
@@ -23,6 +24,7 @@ export default function Mm() {
   const [settings, setSettings] = useState({});
   const [busy, setBusy] = useState(false);
   const [created, setCreated] = useState(null); // created desk
+  const [domainBlocked, setDomainBlocked] = useState(false);
   const [depositState, setDepositState] = useState("idle"); // idle|sending|done|failed
   const { connected, publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
@@ -110,6 +112,7 @@ export default function Mm() {
       toast.success(`Maker created for $${desk.ticker || result.ticker}`, { description: "Deposit SOL to its treasury to start trading." });
       await deposit(desk, fundSol);
     } catch (e) {
+      if (e?.code === "SIWS_DOMAIN_BLOCK") setDomainBlocked(true);
       toast.error(errorMessage(e));
     } finally { setBusy(false); }
   };
@@ -244,6 +247,7 @@ export default function Mm() {
               {connected ? (busy ? "Creating…" : "Create the maker") : "Connect to add"} <ArrowRight size={14} />
             </button>
           )}
+          {domainBlocked && <div className="mt-5"><WalletHelpPanel /></div>}
         </Panel>
       </div>
     </div>

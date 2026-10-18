@@ -3,6 +3,8 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Search, Wallet, LogOut, LayoutDashboard, KeyRound, Plus, Rocket } from "lucide-react";
+import { toast } from "sonner";
+import { errorMessage } from "../lib/api";
 import { useAuth } from "../solana/AuthContext";
 import { short } from "../lib/format";
 
@@ -130,7 +132,7 @@ export default function Header() {
                   {!signedIn && (
                     <button
                       data-testid="wallet-signin-btn"
-                      onClick={async () => { setMenu(false); try { await signIn(); } catch { /* surfaced via toast elsewhere */ } }}
+                      onClick={async () => { setMenu(false); try { await signIn(); } catch (e) { toast.error(errorMessage(e)); } }}
                       disabled={status === "signing" || status === "verifying"}
                       className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[13px] text-[#3F9E00] hover:bg-black/5"
                     >

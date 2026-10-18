@@ -116,3 +116,9 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Phantom mobile hard-blocks wallet-native signIn when the SIWS domain (makers.fun, fixed by upstream's PUBLIC_ORIGIN) != page origin. Verified: upstream challenge domain is fixed (rejects domain/origin fields per-request), verify reconstructs message server-side (tampered message = invalid_signature). So the message domain cannot change while relaying.
 - Fix: signMessage-first (Phantom shows it with a warning instead of hard-blocking), signIn only as fallback for wallets lacking signMessage. Auto sign-in attempt right after connect. Launch review step now shows a guidance note explaining the warning is expected.
 - KNOWN LIMIT: on any domain (preview or makemarkets.app), wallets see the sign-in message issued under the engine's domain. If a user's Phantom version hard-blocks signMessage too, they must use desktop or another wallet.
+
+## Update 2026-10-18 (revision 19) — CUSTOM DOMAIN LIVE + WALLET BLOCK UX
+- makemarkets.app verified live: frontend renders, /api + /api/relay 200 on-domain, CORS open.
+- Confirmed via user's deployed-build screenshot: Phantom iOS hard-blocks BOTH signIn and signMessage for the upstream's fixed-domain SIWS message. No client-side bypass exists (message bytes are verified server-side; tampering = invalid_signature).
+- Added WalletHelpPanel (Solflare in-app browser deep link, copy link, desktop guidance) shown on Launch + Onboard when the domain block fires; header menu sign-in errors now surface as toasts.
+- Needs redeploy for the help panel to reach makemarkets.app.

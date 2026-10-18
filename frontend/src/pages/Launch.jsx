@@ -9,6 +9,7 @@ import { makers, errorMessage } from "../lib/api";
 import { b64ToBytes, bytesToB64, fmtSol, short } from "../lib/format";
 import { PageHead, Panel, CoinAvatar } from "../components/bits";
 import { SettingsEditor, NON_PAYOUT_KEYS } from "../components/SettingsEditor";
+import WalletHelpPanel from "../components/WalletHelpPanel";
 import { useAuth } from "../solana/AuthContext";
 
 const STEPS = ["Identity", "Opening buy", "Maker fuel", "Temperament", "Your payouts", "Review & launch"];
@@ -31,6 +32,7 @@ export default function Launch() {
   const [step, setStep] = useState(0);
   const [phase, setPhase] = useState("idle"); // idle|uploading|creating|signing|sending|live|failed
   const [err, setErr] = useState(null);
+  const [domainBlocked, setDomainBlocked] = useState(false);
   const [liveDesk, setLiveDesk] = useState(null);
 
   const [coin, setCoin] = useState({ name: "", ticker: "", description: "", imageUrl: null, links: { website: "", x: "", telegram: "" } });
@@ -92,6 +94,7 @@ export default function Launch() {
   const launch = async () => {
     if (!connected || !publicKey) { setVisible(true); return; }
     setErr(null);
+    setDomainBlocked(false);
     try {
       if (!signedIn) { try { await signIn(); } catch (e) { throw new Error(errorMessage(e)); } }
 
@@ -149,6 +152,7 @@ export default function Launch() {
       toast.success("Your coin is on chain.", { description: "The maker starts as soon as its treasury has SOL." });
     } catch (e) {
       setPhase("failed");
+      if (e?.code === "SIWS_DOMAIN_BLOCK") setDomainBlocked(true);
       setErr(errorMessage(e));
       toast.error(errorMessage(e));
     }
@@ -345,7 +349,8 @@ export default function Launch() {
                       Your wallet will first ask you to approve a sign-in message (it proves ownership only — it can't spend or launch). It may warn that the message is issued by the market-maker engine's API — that's expected, approve it to continue.
                     </Panel>
                   )}
-                  {err && <Panel className="border-[#ff4d4f]/30 bg-[#ff4d4f]/5 p-4 text-[13px] text-[#d43d3d]" data-testid="launch-error">{err}</Panel>}
+                  {domainBlocked && <WalletHelpPanel />}
+                  {err && !domainBlocked && <Panel className="border-[#ff4d4f]/30 bg-[#ff4d4f]/5 p-4 text-[13px] text-[#d43d3d]" data-testid="launch-error">{err}</Panel>}
                   <button onClick={launch} disabled={phase !== "idle" && phase !== "failed"} data-testid="launch-sign-btn"
                     className="inline-flex h-12 items-center gap-2 rounded-[3px] bg-[#3F9E00] px-8 text-sm font-medium text-[#131a0f] hover:bg-[#54C400] hover:shadow-[0_0_28px_rgba(92,225,0,0.4)] disabled:opacity-50 transition-all">
                     <Rocket size={16} />
