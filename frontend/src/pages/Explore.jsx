@@ -5,7 +5,7 @@ import { fmtSol, fmtSolSigned, fmtUsd, fmtNum, fmtAge, lamportsToSol } from "../
 import { PageHead, Panel, CoinCell, StatusDot, TypeBadge, Loading, Empty, CoinAvatar } from "../components/bits";
 import { useOurDesks, listBlocked, PLATFORM_MINT } from "../lib/useOurDesks";
 import { makers } from "../lib/api";
-import { maskCoin } from "../lib/alias";
+import { maskCoin, useMarketsMcap } from "../lib/alias";
 
 const FILTERS = [
   ["all", "All"],
@@ -41,6 +41,7 @@ export default function Explore() {
   const [params] = useSearchParams();
   const { ourIds } = useOurDesks();
   const platformMint = PLATFORM_MINT;
+  const caMcap = useMarketsMcap();
   const [allDesks, setAllDesks] = useState(null);
   const [launches, setLaunches] = useState([]);
   const [q, setQ] = useState(params.get("q") || "");
@@ -171,12 +172,13 @@ export default function Explore() {
                 {rows.map((d) => {
                   const realized = lamportsToSol(d.totals?.realizedLamports);
                   const mk = maskCoin(d, ourIds.has(d.id), platformMint);
+                  const mcapUsd = d.mint === platformMint && caMcap != null ? caMcap : d.market?.mcapUsd;
                   return (
                     <tr key={d.id} data-testid={`desk-row-${mk.ticker}-${d.id.slice(0, 6)}`}>
                       <td><CoinCell imageUrl={mk.imageUrl} name={mk.name} ticker={mk.ticker} id={d.id} /></td>
                       <td><StatusDot status={d.status} /></td>
                       <td><TypeBadge desk={d} /></td>
-                      <td className="text-right font-mono text-[#131a0f] tnum">{fmtUsd(d.market?.mcapUsd)}</td>
+                      <td className="text-right font-mono text-[#131a0f] tnum">{fmtUsd(mcapUsd)}</td>
                       <td className="text-right font-mono text-[#5c6b50] tnum">{fmtSol(d.totals?.capitalLamports, 2)}</td>
                       <td className={`text-right font-mono tnum ${realized > 0 ? "text-[#38c973]" : realized < 0 ? "text-[#ff4d4f]" : "text-[#5c6b50]"}`}>
                         {d.totals?.realizedLamports != null ? fmtSolSigned(d.totals.realizedLamports, 3) : "—"}

@@ -1,4 +1,6 @@
 // Deterministic per-coin aliases — the same mint always maps to the same masked name.
+import { useEffect, useState } from "react";
+
 const ADJ = [
   "Fire", "Amber", "Nova", "Ember", "Solar", "Lunar", "Neon", "Astro", "Turbo", "Hyper",
   "Iron", "Golden", "Silver", "Crimson", "Azure", "Jade", "Onyx", "Ruby", "Sonic", "Rapid",
@@ -26,6 +28,25 @@ export const aliasFor = (mint, fallback = "?") => {
   const n = NOUN[Math.floor(h / ADJ.length) % NOUN.length];
   return { name: `${a} ${n}`, ticker: `${a.slice(0, 3)}${n.slice(0, 2)}`.toUpperCase() };
 };
+
+export const PLATFORM_CA = "7UMdnRcC9zXp1wm9MteFCEJ785bk8xpfWPgdcAghpump";
+
+// Live market cap of the platform token (from its own CA) — used to mask $MARKETS rows
+export function useMarketsMcap() {
+  const [mcap, setMcap] = useState(null);
+  useEffect(() => {
+    let live = true;
+    const load = () =>
+      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/markets/prices?mint=${PLATFORM_CA}&range=1h`)
+        .then((r) => r.json())
+        .then((d) => live && setMcap(d.mcapUsd ?? null))
+        .catch(() => {});
+    load();
+    const t = setInterval(load, 60000);
+    return () => { live = false; clearInterval(t); };
+  }, []);
+  return mcap;
+}
 
 export const MASK_IMG = "/coin-mask.png";
 

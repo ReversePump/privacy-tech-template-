@@ -237,6 +237,8 @@ async def market_prices(mint: str, range: str = "24h"):
         if not pools:
             return _err("no_pool", 404)
         pool = pools[0]["id"].split("_", 1)[1]
+        attrs = pools[0].get("attributes") or {}
+        mcap = attrs.get("market_cap_usd") or attrs.get("fdv_usd")
         r = await _client().get(
             f"{GT}/networks/solana/pools/{pool}/ohlcv/{tf}",
             params={"aggregate": agg, "limit": limit, "currency": "token"},
@@ -244,7 +246,7 @@ async def market_prices(mint: str, range: str = "24h"):
         )
         lst = ((r.json().get("data") or {}).get("attributes") or {}).get("ohlcv_list") or []
         points = [{"t": int(c[0]) * 1000, "price": float(c[4])} for c in sorted(lst, key=lambda c: c[0])]
-        out = {"points": points, "last": points[-1]["price"] if points else None}
+        out = {"points": points, "last": points[-1]["price"] if points else None, "mcapUsd": float(mcap) if mcap else None}
         _PRICE_CACHE[key] = (now, out)
         return out
     except httpx.HTTPError as e:

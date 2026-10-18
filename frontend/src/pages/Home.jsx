@@ -5,7 +5,7 @@ import { makers } from "../lib/api";
 import { fmtSol, fmtUsd, fmtNum, lamportsToSol, solscanTx, short } from "../lib/format";
 import { Panel, KindPill, CoinAvatar, Loading, ExtLink } from "../components/bits";
 import { useOurDesks, feedItemBlocked, listBlocked, PLATFORM_MINT } from "../lib/useOurDesks";
-import { maskCoin } from "../lib/alias";
+import { maskCoin, useMarketsMcap } from "../lib/alias";
 
 function HeroActivity({ ourIds, hasOurs }) {
   const [items, setItems] = useState(null);
@@ -88,6 +88,7 @@ function HeroActivity({ ourIds, hasOurs }) {
 export default function Home() {
   const [config, setConfig] = useState(null);
   const { ourIds, loading } = useOurDesks();
+  const caMcap = useMarketsMcap();
   const [liveDesks, setLiveDesks] = useState(null);
 
   useEffect(() => {
@@ -197,7 +198,7 @@ export default function Home() {
                 <div className="mt-4 grid grid-cols-3 gap-2 font-mono text-xs">
                   <div>
                     <div className="text-[9px] uppercase tracking-wider text-[#93a184]">Mcap</div>
-                    <div className="mt-0.5 text-[#131a0f] tnum">{fmtUsd(d.market?.mcapUsd)}</div>
+                    <div className="mt-0.5 text-[#131a0f] tnum">{fmtUsd(d.mint === PLATFORM_MINT && caMcap != null ? caMcap : d.market?.mcapUsd)}</div>
                   </div>
                   <div>
                     <div className="text-[9px] uppercase tracking-wider text-[#93a184]">Volume</div>
