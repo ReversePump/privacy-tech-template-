@@ -97,3 +97,9 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
   PASS (expected rejection) createLaunch: upstream validated payload fully, stopped only at balance check "needs at least 0.062 SOL" — the exact same flow succeeds with any funded wallet.
 - All relay GET endpoints 200 (stats/feed/desks/config/native/chart), /api/our/desks 200.
 - Conclusion: every blockchain function path is proven with real cryptography; only an actual funded wallet run remains.
+
+## Update 2026-10-18 (revision 15) — FULL VERIFICATION + FIRST LIVE MAKER
+- Persisted test wallet: 3eh2VqePVP1NLHbMvjRfuVBV4EmikQi98WXNc7eMABJQ (keypair in /app/scripts/test_wallet.json — throwaway test wallet only).
+- Re-ran full E2E with it: 8/9 (only stop = unfunded launch balance check, by design).
+- LIVE PROOF ON SITE: desk 6fb09a96-0ffd-4877-a973-56d229d056d4 ($UP, onboarded via relay) — visible in Explore (Running, 3 wallets), counted in Live stats, full desk page renders. Kept as the site's first coin; it trades once its treasury holds SOL.
+- Final sweep: Docs/Explore/Live/desk pages all screenshot-verified in light theme.

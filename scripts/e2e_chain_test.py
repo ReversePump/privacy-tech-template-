@@ -21,7 +21,11 @@ def step(name, ok, detail=""):
     results.append((name, ok, detail))
     print(f"[{'PASS' if ok else 'FAIL'}] {name} :: {detail[:180]}")
 
-kp = Keypair()
+kp = (
+    Keypair.from_bytes(bytes(json.load(open("/app/scripts/test_wallet.json"))))
+    if os.path.exists("/app/scripts/test_wallet.json")
+    else Keypair()
+)
 wallet = str(kp.pubkey())
 print("test wallet:", wallet)
 
