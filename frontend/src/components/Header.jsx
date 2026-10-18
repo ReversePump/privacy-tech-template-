@@ -7,6 +7,9 @@ import { toast } from "sonner";
 import { errorMessage } from "../lib/api";
 import { useAuth } from "../solana/AuthContext";
 import { short } from "../lib/format";
+import { SubPrice } from "./bits";
+
+const PLATFORM_DESK = "ee6515b5-df04-4900-9005-483e71b99286";
 
 const NAV = [
   { to: "/explore", label: "Explore" },
@@ -23,8 +26,22 @@ export default function Header() {
   const [q, setQ] = useState("");
   const [menu, setMenu] = useState(false);
   const [copiedCa, setCopiedCa] = useState(false);
+  const [marketsPrice, setMarketsPrice] = useState(null);
   const nav = useNavigate();
   const menuRef = useRef(null);
+
+  // live $MARKETS price for the header pill
+  useEffect(() => {
+    let live = true;
+    const load = () =>
+      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/relay/desks/${PLATFORM_DESK}`)
+        .then((r) => r.json())
+        .then((d) => live && setMarketsPrice(d?.market?.priceSol ?? null))
+        .catch(() => {});
+    load();
+    const t = setInterval(load, 30000);
+    return () => { live = false; clearInterval(t); };
+  }, []);
 
   const copyCa = () => {
     navigator.clipboard?.writeText(PLATFORM_CA);
@@ -123,6 +140,9 @@ export default function Header() {
           <button onClick={copyCa} data-testid="header-ca" title={PLATFORM_CA}
             className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-[3px] border border-black/10 bg-black/[0.03] px-2.5 md:px-3 font-mono text-[10px] md:text-[11px] text-[#5c6b50] hover:border-[#3F9E00]/40 hover:text-[#3F9E00] transition-colors">
             <span className="font-medium text-[#131a0f]">$MARKETS</span>
+            {marketsPrice != null && (
+              <span className="hidden sm:inline text-[#3F9E00] tnum" data-testid="header-ca-price"><SubPrice value={marketsPrice} /></span>
+            )}
             <span className="text-[#93a184]">{copiedCa ? "Copied" : short(PLATFORM_CA, 4, 4)}</span>
             {copiedCa ? <Check size={12} className="text-[#3F9E00]" /> : <Copy size={12} />}
           </button>

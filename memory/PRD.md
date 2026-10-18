@@ -216,3 +216,8 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Upstream's own token (mint 3XEqNHe3jHTRWAZCTHbb1UwpSfNbJL9oU1ErsM86pump, exported as PLATFORM_MINT) is no longer filtered from the Live feed — it is REBRANDED in place: shows as $MARKETS / "MakeMarkets" with the pixel-M logo. Copycat tickers containing MAKER stay blocked.
 - That token's desk page (/desk/ee6515b5-df04-4900-9005-483e71b99286): title reads MakeMarkets $MARKETS with M logo; market-cap stat hidden; CA/mint copy button hidden; MCAP chart toggle hidden (hideMcap prop on DeskChart); no makers.fun strings. All other stats/chart/wallets/trades stay live.
 - Verified: $MARKETS rows flow in the live feed, no raw $MAKERS text anywhere, desk page checks all pass, zero console errors.
+
+## Update 2026-10-18 (revision 34) — MCAP TOGGLE REMOVED + LIVE $MARKETS PRICE IN HEADER
+- DeskChart: MCAP/PRICE mode toggle removed entirely (all coin pages) — price-only chart with a PRICE label + range buttons.
+- Header $MARKETS pill now shows the token's LIVE price (SubPrice from desk ee6515b5 market.priceSol, 30s poll) beside the CA on every page: "$MARKETS · 0.0₆4914 · 7UMd…pump".
+- Verified on the $MARKETS desk page: price pill live, no mcap toggle, chart renders, no errors.

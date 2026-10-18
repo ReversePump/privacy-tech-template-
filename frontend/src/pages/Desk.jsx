@@ -163,7 +163,7 @@ export default function Desk() {
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 flex flex-col gap-4">
           <Panel className="overflow-hidden">
-            <DeskChart deskId={desk.id} hideMcap={desk.mint === PLATFORM_MINT} />
+            <DeskChart deskId={desk.id} />
           </Panel>
 
           {(() => {
