@@ -50,8 +50,21 @@ export function AuthProvider({ children }) {
     let signature = null;
     setStatus("signing");
 
-    // 1) wallet-native sign-in (best on mobile, e.g. Phantom's sign-in screen)
-    if (typeof walletSignIn === "function") {
+    // 1) raw message signing first — wallets that domain-check SIWS (Phantom)
+    //    hard-block signIn on proxied domains, but still show signMessage with a warning.
+    if (typeof signMessage === "function") {
+      try {
+        signature = bs58.encode(await signMessage(new TextEncoder().encode(ch.message)));
+      } catch (e) {
+        if (wasRejected(e)) {
+          throw new Error("Sign-in was declined in your wallet. Tap approve on the prompt to continue — it only proves wallet ownership, it cannot spend or launch anything.");
+        }
+        // fall through to wallet-native sign-in
+      }
+    }
+
+    // 2) wallet-native sign-in fallback (wallets without signMessage, e.g. some MWA wallets)
+    if (!signature && typeof walletSignIn === "function") {
       try {
         const out = await walletSignIn(parseSiws(ch.message, wallet));
         const addr = out?.account?.address;
@@ -60,21 +73,14 @@ export function AuthProvider({ children }) {
         }
         if (out?.signature) signature = bs58.encode(Uint8Array.from(out.signature));
       } catch (e) {
-        if (wasRejected(e)) throw new Error("Sign-in was cancelled in your wallet.");
-        // fall through to raw message signing
-      }
-    }
-
-    // 2) raw message signing fallback
-    if (!signature) {
-      if (typeof signMessage !== "function") throw new Error("This wallet cannot sign messages. Try Phantom or Solflare.");
-      try {
-        signature = bs58.encode(await signMessage(new TextEncoder().encode(ch.message)));
-      } catch (e) {
-        if (wasRejected(e)) throw new Error("Sign-in was cancelled in your wallet.");
+        if (wasRejected(e)) {
+          throw new Error("Sign-in was declined in your wallet. Tap approve on the prompt to continue — it only proves wallet ownership, it cannot spend or launch anything.");
+        }
         throw e;
       }
     }
+
+    if (!signature) throw new Error("This wallet cannot sign messages. Try Phantom or Solflare.");
 
     setStatus("verifying");
     const res = await makers.verify({ challengeId: ch.challengeId, signature });
@@ -94,6 +100,17 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!connected) setSession(null);
   }, [connected]);
+
+  // attempt sign-in once right after connect, so launch/onboard flows don't surprise mid-way
+  useEffect(() => {
+    if (connected && publicKey && !getToken()) {
+      const t = setTimeout(() => {
+        signIn().catch(() => { /* user can retry from the wallet menu or any action */ });
+      }, 800);
+      return () => clearTimeout(t);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connected, publicKey]);
 
   const value = {
     session,

@@ -340,6 +340,11 @@ export default function Launch() {
                       <li>{fundSol > 0 ? `4. Wires ${fundSol} SOL into the maker's vault.` : "4. Sends nothing to the vault — the maker lives off the coin's own fees."}</li>
                     </ul>
                   </Panel>
+                  {!signedIn && connected && (
+                    <Panel className="border-[#a8780f]/25 bg-[#a8780f]/5 p-4 text-[12px] font-light text-[#3a4a33]" data-testid="launch-signin-note">
+                      Your wallet will first ask you to approve a sign-in message (it proves ownership only — it can't spend or launch). It may warn that the message is issued by the market-maker engine's API — that's expected, approve it to continue.
+                    </Panel>
+                  )}
                   {err && <Panel className="border-[#ff4d4f]/30 bg-[#ff4d4f]/5 p-4 text-[13px] text-[#d43d3d]" data-testid="launch-error">{err}</Panel>}
                   <button onClick={launch} disabled={phase !== "idle" && phase !== "failed"} data-testid="launch-sign-btn"
                     className="inline-flex h-12 items-center gap-2 rounded-[3px] bg-[#3F9E00] px-8 text-sm font-medium text-[#131a0f] hover:bg-[#54C400] hover:shadow-[0_0_28px_rgba(92,225,0,0.4)] disabled:opacity-50 transition-all">

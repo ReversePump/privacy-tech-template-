@@ -111,3 +111,8 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Bug: mobile (Phantom in-app browser) "Sign-in was cancelled in your wallet" on Approve & launch.
 - Fix: AuthContext now mirrors upstream exactly — tries wallet-native SIWS signIn first (Phantom's native sign-in screen), falls back to raw signMessage; SIWS parser round-trip verified byte-for-byte against live challenge messages (incl. Expiration Time + Request ID). Accurate error mapping (only real rejections say "cancelled", other wallet errors surface raw).
 - Added mobile deep-link: connect on a wallet-less mobile browser opens the site inside Phantom's browser (upstream's inAppBrowserLinks approach).
+
+## Update 2026-10-18 (revision 18) — SIWS DOMAIN BLOCK ROOT CAUSE
+- Phantom mobile hard-blocks wallet-native signIn when the SIWS domain (makers.fun, fixed by upstream's PUBLIC_ORIGIN) != page origin. Verified: upstream challenge domain is fixed (rejects domain/origin fields per-request), verify reconstructs message server-side (tampered message = invalid_signature). So the message domain cannot change while relaying.
+- Fix: signMessage-first (Phantom shows it with a warning instead of hard-blocking), signIn only as fallback for wallets lacking signMessage. Auto sign-in attempt right after connect. Launch review step now shows a guidance note explaining the warning is expected.
+- KNOWN LIMIT: on any domain (preview or makemarkets.app), wallets see the sign-in message issued under the engine's domain. If a user's Phantom version hard-blocks signMessage too, they must use desktop or another wallet.
