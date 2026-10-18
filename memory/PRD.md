@@ -147,3 +147,10 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Bug fix (HIGH, testing agent): TypeBadge showed "LAUNCHED HERE"/"ONBOARDED" for any upstream desk by origin alone. Now gated on membership in /api/our/desks (useOurDesks) — foreign desks show no badge.
 - Verified: testing agent 15/17 backend + full UI sweep (then 17/17 after fixes); e2e_chain_test.py 7/8 (only stop = unfunded balance gate, by design); launch wizard 6-step walkthrough screenshot-verified; branding sweep clean (no makers.fun/$MAKERS/pump.fun/Solscan/DexScreener strings in UI).
 - Backend tests live at /app/backend/tests/backend_test.py (pytest, 17 cases).
+
+## Update 2026-10-18 (revision 24) — MOBILE DEFAULTS TO DIRECT MINT (SILENT)
+- On phones (mobile UA or coarse pointer), Launch skips engine sign-in entirely: wizard collapses to Identity -> Opening buy -> Review, the main button runs the native direct mint (no SIWS), and NO copy explains the difference — page sub, review bullets and summary rail simply describe the mint (no fee-split/maker-fuel/auto-payout rows, no sign-in note, no WalletHelpPanel).
+- Image picker no longer fires the authed relay upload on mobile (artwork uploads with the launch itself via /api/uploads/image).
+- Desktop flow unchanged: full 6-step engine launch with maker.
+- Verified via CDP iPhone emulation: 3-step flow, review lands directly, zero fee-split/login/maker-fuel strings on screen. Desktop 6-step flow re-verified before the change.
+- NOTE: a deployment was initiated BEFORE this revision — mobile default-mint requires a redeploy to reach makemarkets.app.

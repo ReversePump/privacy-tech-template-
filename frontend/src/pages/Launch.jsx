@@ -13,7 +13,7 @@ import WalletHelpPanel from "../components/WalletHelpPanel";
 import { useAuth } from "../solana/AuthContext";
 
 const API = process.env.REACT_APP_BACKEND_URL;
-const STEPS = ["Identity", "Opening buy", "Maker fuel", "Temperament", "Your payouts", "Review & launch"];
+const ALL_STEPS = ["Identity", "Opening buy", "Maker fuel", "Temperament", "Your payouts", "Review & launch"];
 
 const DEFAULT_SETTINGS = {
   buyTriggerPct: 10, sellTriggerPct: 10, buyIntensityPct: 50, sellIntensityPct: 50,
@@ -38,6 +38,13 @@ export default function Launch() {
   const { setVisible } = useWalletModal();
   const { signedIn, signIn } = useAuth();
 
+  // Phones go straight to the direct mint path — no sign-in round-trip, no maker-only steps.
+  const isMobile = useMemo(
+    () => /Android|webOS|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || !!window.matchMedia?.("(pointer: coarse)").matches,
+    []
+  );
+  const FLOW = useMemo(() => (isMobile ? [0, 1, 5] : [0, 1, 2, 3, 4, 5]), [isMobile]);
+
   const [config, setConfig] = useState(null);
   const [step, setStep] = useState(0);
   const [mode, setMode] = useState("engine"); // engine = launch with maker | native = mint only, maker later
@@ -58,6 +65,7 @@ export default function Launch() {
   const [rewardsKeptPct, setRewardsKeptPct] = useState(50);
   const [payoutMinSol, setPayoutMinSol] = useState(0.1);
   const fileRef = useRef(null);
+  const pos = Math.max(0, FLOW.indexOf(step));
 
   useEffect(() => {
     makers.config().then((c) => {
@@ -80,6 +88,7 @@ export default function Launch() {
     setImageBlob(file);
     setImagePreview((old) => { if (old?.startsWith("blob:")) URL.revokeObjectURL(old); return URL.createObjectURL(file); });
     setCoin((c) => ({ ...c, imageUrl: null }));
+    if (isMobile) return; // mobile mints directly — artwork uploads with the launch itself
     setPhase("uploading");
     try {
       const { imageUrl } = await makers.uploadImage(file);
@@ -255,26 +264,28 @@ export default function Launch() {
       <PageHead
         kicker="Launch"
         title="Mint a coin."
-        accent="Wire the maker."
-        sub="One approval mints the coin, locks its fee split and funds its market maker. Every dial stays yours afterwards. Market making can lose money."
+        accent={isMobile ? "Right here." : "Wire the maker."}
+        sub={isMobile
+          ? "One approval mints your coin on the bonding curve — straight from this page, in any wallet. Market making can lose money."
+          : "One approval mints the coin, locks its fee split and funds its market maker. Every dial stays yours afterwards. Market making can lose money."}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_320px] gap-8">
         <nav className="hidden lg:block" data-testid="launch-steps">
           <ol className="space-y-1 border-l border-black/10">
-            {STEPS.map((s, i) => (
-              <li key={s}>
+            {FLOW.map((i, fi) => (
+              <li key={ALL_STEPS[i]}>
                 <button
                   data-testid={`launch-step-${i}`}
-                  onClick={() => i < step && setStep(i)}
+                  onClick={() => fi < pos && setStep(i)}
                   className={`-ml-px flex w-full items-center gap-3 border-l-2 px-4 py-2.5 text-left text-[13px] transition-colors ${
-                    i === step ? "border-[#3F9E00] text-[#131a0f]" : i < step ? "border-transparent text-[#3F9E00]" : "border-transparent text-[#93a184]"
+                    i === step ? "border-[#3F9E00] text-[#131a0f]" : fi < pos ? "border-transparent text-[#3F9E00]" : "border-transparent text-[#93a184]"
                   }`}
                 >
-                  <span className={`flex h-5 w-5 items-center justify-center rounded-[3px] border font-mono text-[10px] ${i === step ? "border-[#3F9E00] text-[#3F9E00]" : i < step ? "border-[#3F9E00]/40 bg-[#3F9E00]/10 text-[#3F9E00]" : "border-black/15"}`}>
-                    {i < step ? <Check size={10} /> : i + 1}
+                  <span className={`flex h-5 w-5 items-center justify-center rounded-[3px] border font-mono text-[10px] ${i === step ? "border-[#3F9E00] text-[#3F9E00]" : fi < pos ? "border-[#3F9E00]/40 bg-[#3F9E00]/10 text-[#3F9E00]" : "border-black/15"}`}>
+                    {fi < pos ? <Check size={10} /> : fi + 1}
                   </span>
-                  {s}
+                  {ALL_STEPS[i]}
                 </button>
               </li>
             ))}
@@ -436,12 +447,13 @@ export default function Launch() {
                     </div>
                     <ul className="mt-5 space-y-2 border-t border-black/5 pt-4 text-[12px] font-light text-[#5c6b50] list-none">
                       <li>1. Mints the coin on the bonding curve.</li>
-                      <li>2. Locks the fee split for good: 80% maker · 20% platform.</li>
-                      <li>{devBuySol > 0 ? `3. Buys ${devBuySol} SOL of your coin inside the same transaction.` : "3. No opening buy — everyone gets the same open."}</li>
-                      <li>{fundSol > 0 ? `4. Wires ${fundSol} SOL into the maker's vault.` : "4. Sends nothing to the vault — the maker lives off the coin's own fees."}</li>
+                      {!isMobile && <li>2. Locks the fee split for good: 80% maker · 20% platform.</li>}
+                      <li>{isMobile ? (devBuySol > 0 ? `2. Buys ${devBuySol} SOL of your coin inside the same transaction.` : "2. No opening buy — everyone gets the same open.") : (devBuySol > 0 ? `3. Buys ${devBuySol} SOL of your coin inside the same transaction.` : "3. No opening buy — everyone gets the same open.")}</li>
+                      {!isMobile && <li>{fundSol > 0 ? `4. Wires ${fundSol} SOL into the maker's vault.` : "4. Sends nothing to the vault — the maker lives off the coin's own fees."}</li>}
+                      {isMobile && <li>3. One wallet approval, that's the whole launch.</li>}
                     </ul>
                   </Panel>
-                  {!signedIn && connected && !domainBlocked && (
+                  {!signedIn && connected && !domainBlocked && !isMobile && (
                     <Panel className="border-[#a8780f]/25 bg-[#a8780f]/5 p-4 text-[12px] font-light text-[#3a4a33]" data-testid="launch-signin-note">
                       Your wallet will first ask you to approve a sign-in message (it proves ownership only — it can't spend or launch). It may warn that the message is issued by the market-maker engine's API — that's expected, approve it to continue.
                     </Panel>
@@ -460,7 +472,7 @@ export default function Launch() {
                     </div>
                   )}
                   {err && <Panel className="border-[#ff4d4f]/30 bg-[#ff4d4f]/5 p-4 text-[13px] text-[#d43d3d]" data-testid="launch-error">{err}</Panel>}
-                  <button onClick={launch} disabled={busy} data-testid="launch-sign-btn"
+                  <button onClick={isMobile ? launchNative : launch} disabled={busy} data-testid="launch-sign-btn"
                     className="inline-flex h-12 items-center gap-2 rounded-[3px] bg-[#3F9E00] px-8 text-sm font-medium text-white hover:bg-[#54C400] hover:shadow-[0_0_28px_rgba(92,225,0,0.35)] disabled:opacity-50 transition-all">
                     <Rocket size={16} />
                     {phase === "idle" || phase === "failed" ? (connected ? "Approve & launch" : "Connect wallet to launch") : phaseLabel}
@@ -471,15 +483,15 @@ export default function Launch() {
             </div>
           )}
 
-          {step < 5 && (
+          {pos < FLOW.length - 1 && (
             <div className="mt-10 flex items-center gap-3">
-              {step > 0 && (
-                <button onClick={() => setStep(step - 1)} data-testid="launch-back-btn"
+              {pos > 0 && (
+                <button onClick={() => setStep(FLOW[pos - 1])} data-testid="launch-back-btn"
                   className="inline-flex h-10 items-center gap-1.5 rounded-[3px] border border-black/15 px-5 text-sm text-[#131a0f] hover:border-[#3F9E00]/40">
                   <ArrowLeft size={14} /> Back
                 </button>
               )}
-              <button onClick={() => setStep(step + 1)} disabled={!stepOk[step]} data-testid="launch-next-btn"
+              <button onClick={() => setStep(FLOW[pos + 1])} disabled={!stepOk[step]} data-testid="launch-next-btn"
                 className="inline-flex h-10 items-center gap-1.5 rounded-[3px] bg-[#3F9E00] px-6 text-sm font-medium text-white hover:bg-[#54C400] disabled:opacity-40">
                 Next <ArrowRight size={14} />
               </button>
@@ -500,12 +512,12 @@ export default function Launch() {
             </div>
             <dl className="mt-5 space-y-2.5 border-t border-black/5 pt-4 font-mono text-[12px]">
               <div className="flex justify-between"><dt className="text-[#93a184]">Opening buy</dt><dd className="text-[#131a0f] tnum">{devBuySol > 0 ? `${devBuySol} SOL` : "None"}</dd></div>
-              <div className="flex justify-between"><dt className="text-[#93a184]">Maker fuel</dt><dd className="text-[#131a0f] tnum">{fundSol} SOL</dd></div>
-              <div className="flex justify-between"><dt className="text-[#93a184]">Signatures</dt><dd className="text-[#131a0f] tnum">{devBuySol > 0 ? 2 : 1}</dd></div>
-              <div className="flex justify-between"><dt className="text-[#93a184]">Fee split</dt><dd className="text-[#3F9E00] tnum">80% maker · 20% platform</dd></div>
-              <div className="flex justify-between"><dt className="text-[#93a184]">Temperament</dt><dd className="text-[#131a0f] capitalize">{preset}</dd></div>
-              <div className="flex justify-between"><dt className="text-[#93a184]">Fees kept</dt><dd className="text-[#131a0f] tnum">{rewardsKeptPct}% · {100 - rewardsKeptPct}% to you</dd></div>
-              <div className="flex justify-between"><dt className="text-[#93a184]">Auto payout</dt><dd className="text-[#131a0f] tnum">On, above {payoutMinSol} SOL</dd></div>
+              {!isMobile && <div className="flex justify-between"><dt className="text-[#93a184]">Maker fuel</dt><dd className="text-[#131a0f] tnum">{fundSol} SOL</dd></div>}
+              <div className="flex justify-between"><dt className="text-[#93a184]">Signatures</dt><dd className="text-[#131a0f] tnum">{!isMobile && devBuySol > 0 ? 2 : 1}</dd></div>
+              {!isMobile && <div className="flex justify-between"><dt className="text-[#93a184]">Fee split</dt><dd className="text-[#3F9E00] tnum">80% maker · 20% platform</dd></div>}
+              {!isMobile && <div className="flex justify-between"><dt className="text-[#93a184]">Temperament</dt><dd className="text-[#131a0f] capitalize">{preset}</dd></div>}
+              {!isMobile && <div className="flex justify-between"><dt className="text-[#93a184]">Fees kept</dt><dd className="text-[#131a0f] tnum">{rewardsKeptPct}% · {100 - rewardsKeptPct}% to you</dd></div>}
+              {!isMobile && <div className="flex justify-between"><dt className="text-[#93a184]">Auto payout</dt><dd className="text-[#131a0f] tnum">On, above {payoutMinSol} SOL</dd></div>}
             </dl>
             <p className="mt-4 border-t border-black/5 pt-3 text-[10px] font-light leading-relaxed text-[#93a184]">
               Market making can lose money. Nothing moves until your wallet approves.
