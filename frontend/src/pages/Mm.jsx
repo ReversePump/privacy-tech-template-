@@ -241,6 +241,11 @@ export default function Mm() {
             <li>· All wallets public, every fill on its page.</li>
             <li>· Your wallet alone can pause, resume or withdraw.</li>
           </ul>
+          {connected && !signedIn && (
+            <div className="mt-5 rounded-[3px] border border-[#a8780f]/25 bg-[#a8780f]/5 p-4 text-[12px] font-light text-[#3a4a33]" data-testid="mm-signin-note">
+              Your wallet will first ask you to approve a sign-in message (ownership proof only — it can't spend). If your wallet blocks it, you'll get one-tap alternatives below.
+            </div>
+          )}
           {!created && (
             <button onClick={add} disabled={!result?.ok || busy} data-testid="mm-add-btn"
               className="mt-6 inline-flex h-11 items-center gap-2 rounded-[3px] bg-[#3F9E00] px-6 text-sm font-medium text-[#131a0f] hover:bg-[#54C400] disabled:opacity-40 transition-all">

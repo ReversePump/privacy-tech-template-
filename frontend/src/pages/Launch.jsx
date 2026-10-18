@@ -32,7 +32,7 @@ export default function Launch() {
   const [step, setStep] = useState(0);
   const [phase, setPhase] = useState("idle"); // idle|uploading|creating|signing|sending|live|failed
   const [err, setErr] = useState(null);
-  const [domainBlocked, setDomainBlocked] = useState(false);
+  const [domainBlocked, setDomainBlocked] = useState(() => new URLSearchParams(window.location.search).has("wallethelp"));
   const [liveDesk, setLiveDesk] = useState(null);
 
   const [coin, setCoin] = useState({ name: "", ticker: "", description: "", imageUrl: null, links: { website: "", x: "", telegram: "" } });

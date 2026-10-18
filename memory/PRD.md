@@ -122,3 +122,12 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Confirmed via user's deployed-build screenshot: Phantom iOS hard-blocks BOTH signIn and signMessage for the upstream's fixed-domain SIWS message. No client-side bypass exists (message bytes are verified server-side; tampering = invalid_signature).
 - Added WalletHelpPanel (Solflare in-app browser deep link, copy link, desktop guidance) shown on Launch + Onboard when the domain block fires; header menu sign-in errors now surface as toasts.
 - Needs redeploy for the help panel to reach makemarkets.app.
+
+## Update 2026-10-18 (revision 20)
+- Onboard (/mm) brought to full parity with Launch: sign-in guidance note when connected, WalletHelpPanel on Phantom domain-block, full dial editor + presets + live coin check — verified working on makemarkets.app (check resolves live coin data).
+- Reminder: latest panels require a redeploy to reach the custom domain.
+
+## Update 2026-10-18 (revision 21) — PHANTOM BLOCK: FINAL SOLUTION SET
+- Exhausted upstream options: challenge accepts only {wallet} (all partner/domain fields rejected), verify reconstructs message server-side (tamper=invalid), no openapi/docs partner mention. Phantom blocks SIWS sign on foreign domains — no client bypass exists or should exist.
+- Delivered best-possible UX: WalletHelpPanel (Solflare in-app browser deep link that preserves the current page, copy link, QR-to-desktop handoff) — shown on Launch & Onboard when the block fires. Previewable via /launch?wallethelp=1. Verified rendering + wizard navigation.
+- Real permanent fix = upstream adds makemarkets.app to their sign-in origin config (PUBLIC_ORIGIN/partner allowlist). User should contact makers.fun team (their X is linked on their coin page).
