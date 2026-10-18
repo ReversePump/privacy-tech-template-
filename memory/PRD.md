@@ -74,3 +74,9 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Hard blocklist added in useOurDesks (ticker MAKERS, origin native) so the upstream's own token can never appear in lists, stats, ticker, hero feed or Live — even if accidentally recorded.
 - TypeBadge simplified: LAUNCHED HERE / ONBOARDED.
 - Site-wide rule now: upstream data is fetched only to enrich coins that were created through this website; nothing else is displayed anywhere.
+
+## Update 2026-10-18 (revision 12)
+- LIGHT THEME: full conversion (off-white #fbfdf7 bg, near-black #131a0f ink, lime #3F9E00 accents matching logo, dark hairlines). Wallet modal + toasts + chart tooltips reskinned light.
+- Logo: user's pixel-art mark at /logo.png in header + footer; favicon.png + apple-touch-icon set in index.html.
+- Header external links: ONLY https://x.com/usemakemarkets (X icon). No other external links in header/footer.
+- Last brand string removed (PumpSwap -> liquidity pool).

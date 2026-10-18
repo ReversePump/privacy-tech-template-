@@ -7,7 +7,7 @@ import { useOurDesks, feedItemBlocked } from "../lib/useOurDesks";
 const KIND_MARK = {
   buy: ["▼", "#38c973", "BUY"],
   sell: ["▲", "#ff4d4f", "SELL"],
-  claim: ["◆", "#8AF5D0", "CLAIM"],
+  claim: ["◆", "#3F9E00", "CLAIM"],
   payout: ["⭱", "#c8a24a", "PAYOUT"],
   launch: ["✦", "#ffffff", "LAUNCH"],
 };
@@ -37,11 +37,11 @@ export default function Ticker() {
       <Link
         key={`${it.signature || i}-${i}`}
         to={it.deskId ? `/desk/${it.deskId}` : "/live"}
-        className="mx-4 flex items-center gap-2 font-mono text-[11px] text-[#8ca3b8] hover:text-white transition-colors whitespace-nowrap"
+        className="mx-4 flex items-center gap-2 font-mono text-[11px] text-[#5c6b50] hover:text-[#131a0f] transition-colors whitespace-nowrap"
       >
         <span style={{ color }}>{icon}</span>
         <span style={{ color }}>{label}</span>
-        <span className="text-white">${it.ticker}</span>
+        <span className="text-[#131a0f]">${it.ticker}</span>
         {it.lamports != null && (
           <span>{lamportsToSol(it.lamports)?.toLocaleString("en-US", { maximumFractionDigits: 3 })} SOL</span>
         )}
@@ -50,13 +50,13 @@ export default function Ticker() {
   };
 
   return (
-    <div className="relative overflow-hidden border-b border-white/5 bg-[#0a1626]/60 py-2" data-testid="live-ticker">
+    <div className="relative overflow-hidden border-b border-black/5 bg-[#eef5e3]/90 py-2" data-testid="live-ticker">
       <div className="ticker-track">
         <div className="flex">{items.map(row)}</div>
         <div className="flex" aria-hidden>{items.map((it, i) => row(it, i + items.length))}</div>
       </div>
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#07111f] to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#07111f] to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#fbfdf7] to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#fbfdf7] to-transparent" />
     </div>
   );
 }

@@ -61,30 +61,30 @@ export default function Explore() {
       />
 
       <Panel className="overflow-hidden" data-testid="explore-table-panel">
-        <div className="flex flex-wrap items-center gap-3 border-b border-white/5 px-4 py-3">
+        <div className="flex flex-wrap items-center gap-3 border-b border-black/5 px-4 py-3">
           <div className="relative">
-            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#556b82]" />
+            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#93a184]" />
             <input
               data-testid="explore-search"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Name, ticker or mint"
-              className="h-9 w-64 rounded-[3px] border border-white/10 bg-white/5 pl-9 pr-3 text-[13px] text-white placeholder-[#556b82] outline-none focus:border-[#8AF5D0]/40"
+              className="h-9 w-64 rounded-[3px] border border-black/10 bg-black/5 pl-9 pr-3 text-[13px] text-[#131a0f] placeholder-[#93a184] outline-none focus:border-[#3F9E00]/40"
             />
           </div>
           <div className="flex flex-wrap gap-1" data-testid="explore-filters">
             {FILTERS.map(([k, l]) => (
               <button key={k} data-testid={`filter-${k}`} onClick={() => setFilter(k)}
-                className={`rounded-[3px] px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide transition-colors ${filter === k ? "bg-[#8AF5D0] text-[#07111f]" : "text-[#8ca3b8] hover:bg-white/5"}`}>
+                className={`rounded-[3px] px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide transition-colors ${filter === k ? "bg-[#3F9E00] text-[#131a0f]" : "text-[#5c6b50] hover:bg-black/5"}`}>
                 {l}
               </button>
             ))}
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <ArrowUpDown size={12} className="text-[#556b82]" />
+            <ArrowUpDown size={12} className="text-[#93a184]" />
             <select data-testid="explore-sort" value={sort} onChange={(e) => setSort(e.target.value)}
-              className="h-9 rounded-[3px] border border-white/10 bg-white/5 px-3 font-mono text-[11px] uppercase text-[#8ca3b8] outline-none">
-              {SORTS.map(([k, l]) => <option key={k} value={k} className="bg-[#0d1b2a]">{l}</option>)}
+              className="h-9 rounded-[3px] border border-black/10 bg-black/5 px-3 font-mono text-[11px] uppercase text-[#5c6b50] outline-none">
+              {SORTS.map(([k, l]) => <option key={k} value={k} className="bg-white">{l}</option>)}
             </select>
           </div>
         </div>
@@ -92,15 +92,15 @@ export default function Explore() {
         {!rows && <Loading label="Loading makers" />}
         {rows && rows.length === 0 && (
           <Empty>
-            <p className="mb-1 font-mono text-xs uppercase tracking-[0.15em] text-[#8AF5D0]">Nothing here yet</p>
+            <p className="mb-1 font-mono text-xs uppercase tracking-[0.15em] text-[#3F9E00]">Nothing here yet</p>
             <p className="mx-auto mb-5 max-w-md text-[12px] font-light leading-relaxed">
               This board only lists coins with a market maker created through MakeMarkets. Be the first — it appears here the moment it lands on chain.
             </p>
             <div className="flex justify-center gap-3">
-              <Link to="/launch" className="inline-flex h-9 items-center gap-2 rounded-[3px] bg-[#8AF5D0] px-4 text-xs font-medium text-[#07111f] hover:bg-[#7CFFC8]" data-testid="explore-empty-launch">
+              <Link to="/launch" className="inline-flex h-9 items-center gap-2 rounded-[3px] bg-[#3F9E00] px-4 text-xs font-medium text-[#131a0f] hover:bg-[#54C400]" data-testid="explore-empty-launch">
                 <Rocket size={13} /> Launch a coin
               </Link>
-              <Link to="/mm" className="inline-flex h-9 items-center gap-2 rounded-[3px] border border-white/15 px-4 text-xs text-white hover:border-[#8AF5D0]/40 hover:text-[#8AF5D0]" data-testid="explore-empty-mm">
+              <Link to="/mm" className="inline-flex h-9 items-center gap-2 rounded-[3px] border border-black/15 px-4 text-xs text-[#131a0f] hover:border-[#3F9E00]/40 hover:text-[#3F9E00]" data-testid="explore-empty-mm">
                 <Plus size={13} /> Onboard a coin
               </Link>
             </div>
@@ -125,16 +125,16 @@ export default function Explore() {
                       <td><CoinCell imageUrl={d.imageUrl} name={d.name} ticker={d.ticker} id={d.id} /></td>
                       <td><StatusDot status={d.status} /></td>
                       <td><TypeBadge desk={d} /></td>
-                      <td className="text-right font-mono text-white tnum">{fmtUsd(d.market?.mcapUsd)}</td>
-                      <td className="text-right font-mono text-[#8ca3b8] tnum">{fmtSol(d.totals?.capitalLamports, 2)}</td>
-                      <td className={`text-right font-mono tnum ${realized > 0 ? "text-[#38c973]" : realized < 0 ? "text-[#ff4d4f]" : "text-[#8ca3b8]"}`}>
+                      <td className="text-right font-mono text-[#131a0f] tnum">{fmtUsd(d.market?.mcapUsd)}</td>
+                      <td className="text-right font-mono text-[#5c6b50] tnum">{fmtSol(d.totals?.capitalLamports, 2)}</td>
+                      <td className={`text-right font-mono tnum ${realized > 0 ? "text-[#38c973]" : realized < 0 ? "text-[#ff4d4f]" : "text-[#5c6b50]"}`}>
                         {d.totals?.realizedLamports != null ? fmtSolSigned(d.totals.realizedLamports, 3) : "—"}
                       </td>
-                      <td className="text-right font-mono text-[#8ca3b8] tnum">{d.origin === "mm" || d.origin === "external" ? "no fees" : fmtSol(d.totals?.claimedLamports, 2)}</td>
-                      <td className="text-right font-mono text-white tnum">{fmtSol(d.totals?.volumeLamports, 1)}</td>
-                      <td className="text-right font-mono text-[#8ca3b8] tnum">{fmtNum(d.totals?.trades24h)}</td>
-                      <td className="text-right font-mono text-[#8ca3b8] tnum">{d.walletCount ?? "—"}</td>
-                      <td className="text-right font-mono text-[#8ca3b8] tnum">{fmtAge(d.launchedAt || d.createdAt)}</td>
+                      <td className="text-right font-mono text-[#5c6b50] tnum">{d.origin === "mm" || d.origin === "external" ? "no fees" : fmtSol(d.totals?.claimedLamports, 2)}</td>
+                      <td className="text-right font-mono text-[#131a0f] tnum">{fmtSol(d.totals?.volumeLamports, 1)}</td>
+                      <td className="text-right font-mono text-[#5c6b50] tnum">{fmtNum(d.totals?.trades24h)}</td>
+                      <td className="text-right font-mono text-[#5c6b50] tnum">{d.walletCount ?? "—"}</td>
+                      <td className="text-right font-mono text-[#5c6b50] tnum">{fmtAge(d.launchedAt || d.createdAt)}</td>
                     </tr>
                   );
                 })}

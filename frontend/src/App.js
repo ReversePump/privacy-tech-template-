@@ -18,7 +18,7 @@ import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
-    <div className="App min-h-screen bg-[#07111f] text-white">
+    <div className="App min-h-screen bg-[#fbfdf7] text-[#131a0f]">
       <WalletContext>
         <AuthProvider>
           <BrowserRouter>
@@ -45,7 +45,7 @@ function App() {
             <Footer />
           </BrowserRouter>
           <Toaster theme="dark" position="bottom-right" toastOptions={{
-            style: { background: "#0d1b2a", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontFamily: "Chakra Petch, sans-serif" },
+            style: { background: "#ffffff", border: "1px solid rgba(19,26,15,0.12)", color: "#131a0f", fontFamily: "Chakra Petch, sans-serif" },
           }} />
         </AuthProvider>
       </WalletContext>

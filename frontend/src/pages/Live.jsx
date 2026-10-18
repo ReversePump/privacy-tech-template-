@@ -53,12 +53,12 @@ export default function Live() {
       </StatRow>
 
       <Panel className="overflow-hidden" data-testid="activity-panel">
-        <div className="flex items-center justify-between border-b border-white/5 px-4 py-3">
-          <span className="text-white font-medium">Activity</span>
+        <div className="flex items-center justify-between border-b border-black/5 px-4 py-3">
+          <span className="text-[#131a0f] font-medium">Activity</span>
           <div className="flex gap-1" data-testid="activity-filters">
             {KINDS.map(([k, l]) => (
               <button key={k || "all"} data-testid={`activity-filter-${k || "all"}`} onClick={() => setKind(k)}
-                className={`rounded-[3px] px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide transition-colors ${kind === k ? "bg-[#8AF5D0] text-[#07111f]" : "text-[#8ca3b8] hover:bg-white/5"}`}>
+                className={`rounded-[3px] px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide transition-colors ${kind === k ? "bg-[#3F9E00] text-[#131a0f]" : "text-[#5c6b50] hover:bg-black/5"}`}>
                 {l}
               </button>
             ))}
@@ -79,16 +79,16 @@ export default function Live() {
                     <td>
                       <Link to={it.deskId ? `/desk/${it.deskId}` : "#"} className="flex items-center gap-2 group">
                         <CoinAvatar url={it.imageUrl} name={it.ticker} size={20} className="rounded" />
-                        <span className="font-mono text-xs text-white group-hover:text-[#8AF5D0]">${it.ticker}</span>
+                        <span className="font-mono text-xs text-[#131a0f] group-hover:text-[#3F9E00]">${it.ticker}</span>
                       </Link>
                     </td>
-                    <td className="text-right font-mono text-white tnum">
+                    <td className="text-right font-mono text-[#131a0f] tnum">
                       {it.lamports != null ? lamportsToSol(it.lamports)?.toLocaleString("en-US", { maximumFractionDigits: 4 }) : "—"}
                     </td>
                     <td className="text-right">
                       {it.signature ? <ExtLink href={solscanTx(it.signature)} className="font-mono text-[11px]">{short(it.signature, 4, 4)}</ExtLink> : "—"}
                     </td>
-                    <td className="text-right font-mono text-[11px] text-[#556b82]">{fmtAge(it.at)}</td>
+                    <td className="text-right font-mono text-[11px] text-[#93a184]">{fmtAge(it.at)}</td>
                   </tr>
                 ))}
               </tbody>

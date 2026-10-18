@@ -97,7 +97,7 @@ const Toggle = ({ checked, onChange, testId }) => (
     aria-checked={!!checked}
     data-testid={testId}
     onClick={() => onChange(!checked)}
-    className={`relative h-6 w-11 rounded-[3px] transition-colors ${checked ? "bg-[#8AF5D0]" : "bg-white/10 border border-white/15"}`}
+    className={`relative h-6 w-11 rounded-[3px] transition-colors ${checked ? "bg-[#3F9E00]" : "bg-black/10 border border-black/15"}`}
   >
     <span className={`absolute top-0.5 h-5 w-5 rounded-[3px] bg-white shadow transition-all ${checked ? "left-[22px]" : "left-0.5"}`} />
   </button>
@@ -112,14 +112,14 @@ const PctSlider = ({ value, onChange, min = 0, max = 100, nullable, testId }) =>
         value={off ? min : value}
         onChange={(e) => onChange(Number(e.target.value))}
         data-testid={testId}
-        className="flex-1 accent-[#8AF5D0] disabled:opacity-30"
+        className="flex-1 accent-[#3F9E00] disabled:opacity-30"
       />
-      <span className={`w-16 text-right font-mono text-xs tnum ${off ? "text-[#556b82]" : "text-white"}`}>
+      <span className={`w-16 text-right font-mono text-xs tnum ${off ? "text-[#93a184]" : "text-[#131a0f]"}`}>
         {off ? "off" : `${value}%`}
       </span>
       {nullable && (
         <button type="button" onClick={() => onChange(off ? min : null)} data-testid={`${testId}-toggle`}
-          className={`rounded-[3px] border px-2 py-0.5 font-mono text-[10px] uppercase ${off ? "border-white/15 text-[#8ca3b8]" : "border-[#8AF5D0]/40 text-[#8AF5D0]"}`}>
+          className={`rounded-[3px] border px-2 py-0.5 font-mono text-[10px] uppercase ${off ? "border-black/15 text-[#5c6b50]" : "border-[#3F9E00]/40 text-[#3F9E00]"}`}>
           {off ? "set" : "off"}
         </button>
       )}
@@ -138,13 +138,13 @@ const NumInput = ({ value, onChange, unit, step = 1, min, nullable, testId }) =>
           onChange={(e) => onChange(e.target.value === "" ? (nullable ? null : 0) : Number(e.target.value))}
           data-testid={testId}
           placeholder={off ? "off" : ""}
-          className="h-9 w-full rounded-lg border border-white/10 bg-white/5 px-3 pr-12 font-mono text-sm text-white outline-none focus:border-[#8AF5D0]/40 disabled:opacity-40"
+          className="h-9 w-full rounded-lg border border-black/10 bg-black/5 px-3 pr-12 font-mono text-sm text-[#131a0f] outline-none focus:border-[#3F9E00]/40 disabled:opacity-40"
         />
-        {unit && <span className="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[10px] uppercase text-[#556b82]">{unit}</span>}
+        {unit && <span className="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[10px] uppercase text-[#93a184]">{unit}</span>}
       </div>
       {nullable && (
         <button type="button" onClick={() => onChange(off ? 0 : null)} data-testid={`${testId}-toggle`}
-          className={`rounded-[3px] border px-2 py-1 font-mono text-[10px] uppercase ${off ? "border-white/15 text-[#8ca3b8]" : "border-[#8AF5D0]/40 text-[#8AF5D0]"}`}>
+          className={`rounded-[3px] border px-2 py-1 font-mono text-[10px] uppercase ${off ? "border-black/15 text-[#5c6b50]" : "border-[#3F9E00]/40 text-[#3F9E00]"}`}>
           {off ? "set" : "off"}
         </button>
       )}
@@ -158,14 +158,14 @@ const FieldControl = ({ field, value, onChange }) => {
     case "bool":
       return (
         <div className="flex items-center justify-between gap-3">
-          <span className="font-mono text-xs text-[#8ca3b8]">{value ? "on" : "off"}</span>
+          <span className="font-mono text-xs text-[#5c6b50]">{value ? "on" : "off"}</span>
           <Toggle checked={!!value} onChange={onChange} testId={t} />
         </div>
       );
     case "bool-null":
       return (
         <div className="flex items-center justify-between gap-3">
-          <span className="font-mono text-xs text-[#8ca3b8]">{value === null || value === undefined ? "off" : value ? "on" : "off"}</span>
+          <span className="font-mono text-xs text-[#5c6b50]">{value === null || value === undefined ? "off" : value ? "on" : "off"}</span>
           <Toggle checked={!!value} onChange={onChange} testId={t} />
         </div>
       );
@@ -196,23 +196,23 @@ export function SettingsEditor({ values, onChange, compactKeys }) {
         const isOpen = open[g.id];
         const activeCount = fields.filter((f) => values[f.key] !== null && values[f.key] !== undefined && values[f.key] !== false).length;
         return (
-          <div key={g.id} className="rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden" data-testid={`group-${g.id}`}>
+          <div key={g.id} className="rounded-xl border border-black/10 bg-black/[0.03] overflow-hidden" data-testid={`group-${g.id}`}>
             <button type="button" onClick={() => setOpen({ ...open, [g.id]: !isOpen })} data-testid={`group-toggle-${g.id}`}
-              className="flex w-full items-center gap-3 px-5 py-4 text-left hover:bg-white/[0.02] transition-colors">
-              <span className={`font-mono text-[10px] uppercase tracking-[0.18em] ${isOpen ? "text-[#8AF5D0]" : "text-[#556b82]"}`}>{g.title}</span>
-              <span className="text-[11px] font-light text-[#556b82] hidden sm:inline">{g.blurb}</span>
-              <span className="ml-auto rounded-[3px] border border-white/10 px-2 py-0.5 font-mono text-[10px] text-[#8ca3b8]">{activeCount} set</span>
-              <span className={`text-[#556b82] transition-transform ${isOpen ? "rotate-180" : ""}`}>▾</span>
+              className="flex w-full items-center gap-3 px-5 py-4 text-left hover:bg-black/[0.03] transition-colors">
+              <span className={`font-mono text-[10px] uppercase tracking-[0.18em] ${isOpen ? "text-[#3F9E00]" : "text-[#93a184]"}`}>{g.title}</span>
+              <span className="text-[11px] font-light text-[#93a184] hidden sm:inline">{g.blurb}</span>
+              <span className="ml-auto rounded-[3px] border border-black/10 px-2 py-0.5 font-mono text-[10px] text-[#5c6b50]">{activeCount} set</span>
+              <span className={`text-[#93a184] transition-transform ${isOpen ? "rotate-180" : ""}`}>▾</span>
             </button>
             {isOpen && (
-              <div className="border-t border-white/5 px-5 py-4 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
+              <div className="border-t border-black/5 px-5 py-4 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
                 {fields.map((f) => (
                   <div key={f.key}>
                     <div className="mb-1.5 flex items-baseline justify-between">
-                      <label className="font-mono text-[11px] text-[#c4d2df]">{f.label}{f.unit && f.kind !== "pct" && f.kind !== "pct-null" ? "" : ""}</label>
+                      <label className="font-mono text-[11px] text-[#3a4a33]">{f.label}{f.unit && f.kind !== "pct" && f.kind !== "pct-null" ? "" : ""}</label>
                     </div>
                     <FieldControl field={f} value={values[f.key]} onChange={(v) => onChange(f.key, v)} />
-                    {f.help && <p className="mt-1 text-[10px] font-light text-[#556b82]">{f.help}</p>}
+                    {f.help && <p className="mt-1 text-[10px] font-light text-[#93a184]">{f.help}</p>}
                   </div>
                 ))}
               </div>
@@ -246,11 +246,11 @@ export function SettingsSummary({ settings }) {
         if (!items.length) return null;
         return (
           <div key={g.id}>
-            <div className="mb-2 font-mono text-[9px] uppercase tracking-[0.18em] text-[#556b82]">{g.title}</div>
+            <div className="mb-2 font-mono text-[9px] uppercase tracking-[0.18em] text-[#93a184]">{g.title}</div>
             <div className="flex flex-wrap gap-1.5">
               {items.map(([label, val]) => (
-                <span key={label} className={`rounded-[3px] border px-2.5 py-1 font-mono text-[10px] ${val === "off" ? "border-white/5 text-[#3d4f63]" : "border-white/10 text-[#8ca3b8]"}`}>
-                  {label} <span className={val === "off" ? "" : "text-white"}>{val}</span>
+                <span key={label} className={`rounded-[3px] border px-2.5 py-1 font-mono text-[10px] ${val === "off" ? "border-black/5 text-[#b7c4a9]" : "border-black/10 text-[#5c6b50]"}`}>
+                  {label} <span className={val === "off" ? "" : "text-[#131a0f]"}>{val}</span>
                 </span>
               ))}
             </div>

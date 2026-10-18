@@ -6,47 +6,47 @@
 
 @layer base {
     :root {
-        --bg: #07111f;
-        --surface: #0d1b2a;
-        --glass: rgba(255, 255, 255, 0.03);
-        --line: rgba(255, 255, 255, 0.08);
-        --line-strong: rgba(255, 255, 255, 0.16);
-        --fg: #ffffff;
-        --fg-2: #8ca3b8;
-        --fg-3: #556b82;
-        --signal: #8af5d0;
-        --signal-hover: #7cffc8;
-        --signal-ink: #07111f;
-        --up: #38c973;
-        --down: #ff4d4f;
-        --warn: #d9a441;
+        --bg: #fbfdf7;
+        --surface: #ffffff;
+        --glass: rgba(19, 26, 15, 0.03);
+        --line: rgba(19, 26, 15, 0.09);
+        --line-strong: rgba(19, 26, 15, 0.18);
+        --fg: #131a0f;
+        --fg-2: #3a4a33;
+        --fg-3: #93a184;
+        --signal: #3f9e00;
+        --signal-hover: #54c400;
+        --signal-ink: #ffffff;
+        --up: #1e8a4c;
+        --down: #d43d3d;
+        --warn: #a8780f;
 
-        --background: 213 63% 7%;
-        --foreground: 0 0% 100%;
-        --card: 210 53% 11%;
-        --card-foreground: 0 0% 100%;
-        --popover: 210 53% 11%;
-        --popover-foreground: 0 0% 100%;
-        --primary: 158 84% 75%;
-        --primary-foreground: 213 63% 7%;
-        --secondary: 210 40% 16%;
-        --secondary-foreground: 0 0% 100%;
-        --muted: 210 40% 16%;
-        --muted-foreground: 208 24% 64%;
-        --accent: 210 40% 16%;
-        --accent-foreground: 0 0% 100%;
-        --destructive: 359 100% 65%;
+        --background: 90 33% 98%;
+        --foreground: 96 28% 8%;
+        --card: 0 0% 100%;
+        --card-foreground: 96 28% 8%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 96 28% 8%;
+        --primary: 93 100% 31%;
+        --primary-foreground: 0 0% 100%;
+        --secondary: 90 20% 94%;
+        --secondary-foreground: 96 28% 8%;
+        --muted: 90 20% 94%;
+        --muted-foreground: 84 12% 55%;
+        --accent: 90 20% 94%;
+        --accent-foreground: 96 28% 8%;
+        --destructive: 0 65% 54%;
         --destructive-foreground: 0 0% 100%;
-        --border: 0 0% 100% / 0.08;
-        --input: 0 0% 100% / 0.1;
-        --ring: 158 84% 75%;
-        --radius: 12px;
+        --border: 96 28% 8% / 0.09;
+        --input: 96 28% 8% / 0.12;
+        --ring: 93 100% 31%;
+        --radius: 3px;
     }
 }
 
 @layer base {
     * {
-        border-color: rgba(255, 255, 255, 0.08);
+        border-color: rgba(19, 26, 15, 0.09);
     }
     html {
         scroll-behavior: smooth;
@@ -122,48 +122,48 @@
     font-weight: 500;
     text-align: left;
     padding: 10px 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid rgba(19, 26, 15, 0.09);
     white-space: nowrap;
 }
 .dtable td {
     padding: 11px 14px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(19, 26, 15, 0.06);
     font-size: 13px;
     vertical-align: middle;
     white-space: nowrap;
 }
 .dtable tbody tr { transition: background-color 0.12s ease; }
-.dtable tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+.dtable tbody tr:hover { background: rgba(63, 158, 0, 0.05); }
 
 a { color: inherit; }
 
-/* wallet adapter modal — dark empire reskin */
+/* wallet adapter modal — light reskin */
 .wallet-adapter-modal-wrapper {
-    background: #0d1b2a !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 16px !important;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5) !important;
-}
-.wallet-adapter-modal-title { color: #fff !important; font-family: "Chakra Petch", sans-serif !important; }
-.wallet-adapter-modal-content, .wallet-adapter-modal-list { color: #8ca3b8 !important; }
-.wallet-adapter-modal-list li {
-    color: #fff !important;
-    font-family: "Chakra Petch", sans-serif !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(19, 26, 15, 0.14) !important;
     border-radius: 10px !important;
+    box-shadow: 0 24px 60px rgba(19, 26, 15, 0.18) !important;
 }
-.wallet-adapter-modal-list li:hover { background: rgba(255, 255, 255, 0.05) !important; }
-.wallet-adapter-modal-button-close { background: rgba(255, 255, 255, 0.06) !important; }
-.wallet-adapter-modal-button-close svg { fill: #fff !important; }
-.wallet-adapter-modal-middle { background: rgba(255, 255, 255, 0.04) !important; }
+.wallet-adapter-modal-title { color: #131a0f !important; font-family: "Chakra Petch", sans-serif !important; }
+.wallet-adapter-modal-content, .wallet-adapter-modal-list { color: #3a4a33 !important; }
+.wallet-adapter-modal-list li {
+    color: #131a0f !important;
+    font-family: "Chakra Petch", sans-serif !important;
+    border-radius: 6px !important;
+}
+.wallet-adapter-modal-list li:hover { background: rgba(63, 158, 0, 0.08) !important; }
+.wallet-adapter-modal-button-close { background: rgba(19, 26, 15, 0.06) !important; }
+.wallet-adapter-modal-button-close svg { fill: #131a0f !important; }
+.wallet-adapter-modal-middle { background: rgba(19, 26, 15, 0.05) !important; }
 .wallet-adapter-modal-middle-button {
-    background: #8af5d0 !important;
-    color: #07111f !important;
+    background: #3f9e00 !important;
+    color: #ffffff !important;
     border-radius: 3px !important;
     font-family: "Chakra Petch", sans-serif !important;
 }
 .wallet-adapter-button {
-    background: #8af5d0 !important;
-    color: #07111f !important;
+    background: #3f9e00 !important;
+    color: #ffffff !important;
     border-radius: 3px !important;
     font-family: "Chakra Petch", sans-serif !important;
     font-size: 13px !important;
@@ -171,14 +171,14 @@ a { color: inherit; }
     height: 36px !important;
     padding: 0 18px !important;
 }
-.wallet-adapter-modal-overlay { background: rgba(4, 10, 18, 0.7) !important; backdrop-filter: blur(4px); }
+.wallet-adapter-modal-overlay { background: rgba(251, 253, 247, 0.75) !important; backdrop-filter: blur(4px); }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 5px; border: 2px solid var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(19, 26, 15, 0.18); border-radius: 5px; border: 2px solid var(--bg); }
 ::-webkit-scrollbar-track { background: transparent; }
 
-input[type="range"] { accent-color: #8af5d0; }
-input[type="checkbox"] { accent-color: #8af5d0; }
+input[type="range"] { accent-color: #3f9e00; }
+input[type="checkbox"] { accent-color: #3f9e00; }
 
 @layer base {
     [data-debug-wrapper="true"] { display: contents !important; }

@@ -156,9 +156,9 @@ export default function Launch() {
 
   const field = (label, node, hint, testId) => (
     <div data-testid={testId}>
-      <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-[#556b82]">{label}</label>
+      <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-[#93a184]">{label}</label>
       {node}
-      {hint && <p className="mt-1.5 text-[11px] font-light text-[#556b82]">{hint}</p>}
+      {hint && <p className="mt-1.5 text-[11px] font-light text-[#93a184]">{hint}</p>}
     </div>
   );
 
@@ -174,17 +174,17 @@ export default function Launch() {
       <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_320px] gap-8">
         {/* steps rail */}
         <nav className="hidden lg:block" data-testid="launch-steps">
-          <ol className="space-y-1 border-l border-white/10">
+          <ol className="space-y-1 border-l border-black/10">
             {STEPS.map((s, i) => (
               <li key={s}>
                 <button
                   data-testid={`launch-step-${i}`}
                   onClick={() => i < step && setStep(i)}
                   className={`-ml-px flex w-full items-center gap-3 border-l-2 px-4 py-2.5 text-left text-[13px] transition-colors ${
-                    i === step ? "border-[#8AF5D0] text-white" : i < step ? "border-transparent text-[#8AF5D0]" : "border-transparent text-[#556b82]"
+                    i === step ? "border-[#3F9E00] text-[#131a0f]" : i < step ? "border-transparent text-[#3F9E00]" : "border-transparent text-[#93a184]"
                   }`}
                 >
-                  <span className={`flex h-5 w-5 items-center justify-center rounded-[3px] border font-mono text-[10px] ${i === step ? "border-[#8AF5D0] text-[#8AF5D0]" : i < step ? "border-[#8AF5D0]/40 bg-[#8AF5D0]/10 text-[#8AF5D0]" : "border-white/15"}`}>
+                  <span className={`flex h-5 w-5 items-center justify-center rounded-[3px] border font-mono text-[10px] ${i === step ? "border-[#3F9E00] text-[#3F9E00]" : i < step ? "border-[#3F9E00]/40 bg-[#3F9E00]/10 text-[#3F9E00]" : "border-black/15"}`}>
                     {i < step ? <Check size={10} /> : i + 1}
                   </span>
                   {s}
@@ -198,61 +198,61 @@ export default function Launch() {
         <div className="min-w-0">
           {step === 0 && (
             <div className="space-y-6" data-testid="launch-step-coin">
-              <h2 className="text-xl font-medium text-white">Identity</h2>
-              <p className="text-[13px] font-light text-[#8ca3b8]">The face of your coin — name, ticker, artwork. It trades against SOL while its own fees power the maker.</p>
+              <h2 className="text-xl font-medium text-[#131a0f]">Identity</h2>
+              <p className="text-[13px] font-light text-[#5c6b50]">The face of your coin — name, ticker, artwork. It trades against SOL while its own fees power the maker.</p>
               <div className="grid grid-cols-1 md:grid-cols-[180px_1fr] gap-6">
                 <div>
                   <button onClick={() => fileRef.current?.click()} data-testid="launch-image-upload"
-                    className="flex h-[180px] w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 bg-white/[0.02] text-[#8ca3b8] hover:border-[#8AF5D0]/40 hover:text-[#8AF5D0] transition-colors overflow-hidden">
-                    {imagePreview ? <img src={imagePreview} alt="coin" className="h-full w-full object-cover" /> : (<><Upload size={20} /><span className="text-xs">Upload image</span><span className="text-[10px] text-[#556b82]">or drop it here</span></>)}
+                    className="flex h-[180px] w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-black/15 bg-black/[0.03] text-[#5c6b50] hover:border-[#3F9E00]/40 hover:text-[#3F9E00] transition-colors overflow-hidden">
+                    {imagePreview ? <img src={imagePreview} alt="coin" className="h-full w-full object-cover" /> : (<><Upload size={20} /><span className="text-xs">Upload image</span><span className="text-[10px] text-[#93a184]">or drop it here</span></>)}
                   </button>
                   <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp,image/gif" className="hidden"
                     onChange={(e) => onImage(e.target.files?.[0])} data-testid="launch-image-input" />
-                  <p className="mt-2 text-[10px] font-light text-[#556b82]">PNG, JPEG, WEBP or GIF, up to 1 MB. Square works best.</p>
+                  <p className="mt-2 text-[10px] font-light text-[#93a184]">PNG, JPEG, WEBP or GIF, up to 1 MB. Square works best.</p>
                 </div>
                 <div className="space-y-5">
                   {field(`Name · ${byteLen(coin.name)} / 32 bytes`,
-                    <input data-testid="launch-name" className="h-11 w-full rounded-lg border border-white/10 bg-white/5 px-3.5 text-sm text-white outline-none focus:border-[#8AF5D0]/40" placeholder="Coin name" value={coin.name} onChange={(e) => setCoin({ ...coin, name: e.target.value })} />)}
+                    <input data-testid="launch-name" className="h-11 w-full rounded-lg border border-black/10 bg-black/5 px-3.5 text-sm text-[#131a0f] outline-none focus:border-[#3F9E00]/40" placeholder="Coin name" value={coin.name} onChange={(e) => setCoin({ ...coin, name: e.target.value })} />)}
                   {field(`Ticker · ${byteLen(coin.ticker)} / 13 bytes`,
-                    <input data-testid="launch-ticker" className="h-11 w-full rounded-lg border border-white/10 bg-white/5 px-3.5 font-mono text-sm text-white outline-none focus:border-[#8AF5D0]/40" placeholder="$ TICKER" value={coin.ticker} onChange={(e) => setCoin({ ...coin, ticker: e.target.value.toUpperCase().replace(/\s/g, "") })} />)}
+                    <input data-testid="launch-ticker" className="h-11 w-full rounded-lg border border-black/10 bg-black/5 px-3.5 font-mono text-sm text-[#131a0f] outline-none focus:border-[#3F9E00]/40" placeholder="$ TICKER" value={coin.ticker} onChange={(e) => setCoin({ ...coin, ticker: e.target.value.toUpperCase().replace(/\s/g, "") })} />)}
                 </div>
               </div>
-              <Panel className="border-[#8AF5D0]/20 bg-[#8AF5D0]/5 p-4">
-                <span className="font-mono text-[10px] uppercase tracking-wider text-[#8AF5D0]">Set in stone</span>
-                <p className="mt-1 text-[12px] font-light text-[#8ca3b8]">Name, ticker and artwork are written into the coin itself at mint. No one edits them later — not even you.</p>
+              <Panel className="border-[#3F9E00]/20 bg-[#3F9E00]/5 p-4">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-[#3F9E00]">Set in stone</span>
+                <p className="mt-1 text-[12px] font-light text-[#5c6b50]">Name, ticker and artwork are written into the coin itself at mint. No one edits them later — not even you.</p>
               </Panel>
               {field(`Description · optional · ${byteLen(coin.description)} / 1000`,
-                <textarea data-testid="launch-description" rows={3} className="w-full rounded-lg border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white outline-none focus:border-[#8AF5D0]/40" placeholder="What the coin is about, in a sentence or two." value={coin.description} onChange={(e) => setCoin({ ...coin, description: e.target.value })} />)}
+                <textarea data-testid="launch-description" rows={3} className="w-full rounded-lg border border-black/10 bg-black/5 px-3.5 py-2.5 text-sm text-[#131a0f] outline-none focus:border-[#3F9E00]/40" placeholder="What the coin is about, in a sentence or two." value={coin.description} onChange={(e) => setCoin({ ...coin, description: e.target.value })} />)}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {field("Website · optional", <input data-testid="launch-website" className="h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white outline-none focus:border-[#8AF5D0]/40" placeholder="https://" value={coin.links.website} onChange={(e) => setCoin({ ...coin, links: { ...coin.links, website: e.target.value } })} />)}
-                {field("X · optional", <input data-testid="launch-x" className="h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white outline-none focus:border-[#8AF5D0]/40" placeholder="https://x.com/…" value={coin.links.x} onChange={(e) => setCoin({ ...coin, links: { ...coin.links, x: e.target.value } })} />)}
-                {field("Telegram · optional", <input data-testid="launch-telegram" className="h-10 w-full rounded-lg border border-white/10 bg-white/5 px-3 text-sm text-white outline-none focus:border-[#8AF5D0]/40" placeholder="https://t.me/…" value={coin.links.telegram} onChange={(e) => setCoin({ ...coin, links: { ...coin.links, telegram: e.target.value } })} />)}
+                {field("Website · optional", <input data-testid="launch-website" className="h-10 w-full rounded-lg border border-black/10 bg-black/5 px-3 text-sm text-[#131a0f] outline-none focus:border-[#3F9E00]/40" placeholder="https://" value={coin.links.website} onChange={(e) => setCoin({ ...coin, links: { ...coin.links, website: e.target.value } })} />)}
+                {field("X · optional", <input data-testid="launch-x" className="h-10 w-full rounded-lg border border-black/10 bg-black/5 px-3 text-sm text-[#131a0f] outline-none focus:border-[#3F9E00]/40" placeholder="https://x.com/…" value={coin.links.x} onChange={(e) => setCoin({ ...coin, links: { ...coin.links, x: e.target.value } })} />)}
+                {field("Telegram · optional", <input data-testid="launch-telegram" className="h-10 w-full rounded-lg border border-black/10 bg-black/5 px-3 text-sm text-[#131a0f] outline-none focus:border-[#3F9E00]/40" placeholder="https://t.me/…" value={coin.links.telegram} onChange={(e) => setCoin({ ...coin, links: { ...coin.links, telegram: e.target.value } })} />)}
               </div>
             </div>
           )}
 
           {step === 1 && (
             <div className="space-y-6" data-testid="launch-step-devbuy">
-              <h2 className="text-xl font-medium text-white">Opening buy</h2>
-              <p className="text-[13px] font-light text-[#8ca3b8]">Grab your own coin inside the mint transaction, ahead of the crowd. Zero means everyone gets the same open.</p>
+              <h2 className="text-xl font-medium text-[#131a0f]">Opening buy</h2>
+              <p className="text-[13px] font-light text-[#5c6b50]">Grab your own coin inside the mint transaction, ahead of the crowd. Zero means everyone gets the same open.</p>
               {field("Opening buy (SOL)",
                 <input data-testid="launch-devbuy" type="number" min={0} step={0.1} value={devBuySol} onChange={(e) => setDevBuySol(Number(e.target.value) || 0)}
-                  className="h-11 w-56 rounded-lg border border-white/10 bg-white/5 px-3.5 font-mono text-sm text-white outline-none focus:border-[#8AF5D0]/40" />,
+                  className="h-11 w-56 rounded-lg border border-black/10 bg-black/5 px-3.5 font-mono text-sm text-[#131a0f] outline-none focus:border-[#3F9E00]/40" />,
                 "An opening buy leaves no room for fuel in the mint transaction, so your wallet signs twice: the mint, then a plain transfer to the maker's vault.")}
             </div>
           )}
 
           {step === 2 && (
             <div className="space-y-6" data-testid="launch-step-funding">
-              <h2 className="text-xl font-medium text-white">Maker fuel</h2>
-              <p className="text-[13px] font-light text-[#8ca3b8]">SOL wired into the maker's vault at mint. At zero, the market maker runs purely on the coin's own creator fees.</p>
+              <h2 className="text-xl font-medium text-[#131a0f]">Maker fuel</h2>
+              <p className="text-[13px] font-light text-[#5c6b50]">SOL wired into the maker's vault at mint. At zero, the market maker runs purely on the coin's own creator fees.</p>
               {field("Fuel the maker (SOL)",
                 <input data-testid="launch-fund" type="number" min={0} step={0.1} value={fundSol} onChange={(e) => setFundSol(Number(e.target.value) || 0)}
-                  className="h-11 w-56 rounded-lg border border-white/10 bg-white/5 px-3.5 font-mono text-sm text-white outline-none focus:border-[#8AF5D0]/40" />)}
+                  className="h-11 w-56 rounded-lg border border-black/10 bg-black/5 px-3.5 font-mono text-sm text-[#131a0f] outline-none focus:border-[#3F9E00]/40" />)}
               <div className="flex gap-2">
                 {[0, 0.5, 1, 2, 5].map((v) => (
                   <button key={v} data-testid={`fund-preset-${v}`} onClick={() => setFundSol(v)}
-                    className={`rounded-[3px] px-4 py-1.5 font-mono text-xs ${fundSol === v ? "bg-[#8AF5D0] text-[#07111f]" : "border border-white/10 text-[#8ca3b8] hover:border-[#8AF5D0]/40"}`}>
+                    className={`rounded-[3px] px-4 py-1.5 font-mono text-xs ${fundSol === v ? "bg-[#3F9E00] text-[#131a0f]" : "border border-black/10 text-[#5c6b50] hover:border-[#3F9E00]/40"}`}>
                     {v} SOL
                   </button>
                 ))}
@@ -262,19 +262,19 @@ export default function Launch() {
 
           {step === 3 && (
             <div className="space-y-6" data-testid="launch-step-strategy">
-              <h2 className="text-xl font-medium text-white">Temperament</h2>
-              <p className="text-[13px] font-light text-[#8ca3b8]">Choose how the market maker behaves out of the gate. Retune every dial later.</p>
+              <h2 className="text-xl font-medium text-[#131a0f]">Temperament</h2>
+              <p className="text-[13px] font-light text-[#5c6b50]">Choose how the market maker behaves out of the gate. Retune every dial later.</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {presets.map(([key, p]) => (
                   <button key={key} data-testid={`preset-${key}`} onClick={() => pickPreset(key)}
-                    className={`rounded-xl border p-4 text-left transition-colors ${preset === key ? "border-[#8AF5D0]/50 bg-[#8AF5D0]/5" : "border-white/10 bg-white/[0.02] hover:border-white/25"}`}>
-                    <div className="text-white text-sm font-medium">{p.name}</div>
-                    <p className="mt-1 text-[12px] font-light text-[#8ca3b8]">{p.summary}</p>
+                    className={`rounded-xl border p-4 text-left transition-colors ${preset === key ? "border-[#3F9E00]/50 bg-[#3F9E00]/5" : "border-black/10 bg-black/[0.03] hover:border-black/25"}`}>
+                    <div className="text-[#131a0f] text-sm font-medium">{p.name}</div>
+                    <p className="mt-1 text-[12px] font-light text-[#5c6b50]">{p.summary}</p>
                   </button>
                 ))}
               </div>
               <div>
-                <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#556b82]">Fine-tune the maker</div>
+                <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#93a184]">Fine-tune the maker</div>
                 <SettingsEditor
                   values={settings}
                   compactKeys={["buyTriggerPct", "buyIntensityPct", "averageDown", "sellTriggerPct", "sellIntensityPct", "profitTargetPct", "stopLossPct", "cooldownSeconds"]}
@@ -286,33 +286,33 @@ export default function Launch() {
 
           {step === 4 && (
             <div className="space-y-6" data-testid="launch-step-treasury">
-              <h2 className="text-xl font-medium text-white">Your payouts</h2>
-              <p className="text-[13px] font-light text-[#8ca3b8]">How much of each fee claim stays in the maker — and when the rest lands in your wallet.</p>
+              <h2 className="text-xl font-medium text-[#131a0f]">Your payouts</h2>
+              <p className="text-[13px] font-light text-[#5c6b50]">How much of each fee claim stays in the maker — and when the rest lands in your wallet.</p>
               <div>
-                <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-[#556b82]">Fees the maker keeps · {rewardsKeptPct}%</label>
+                <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-[#93a184]">Fees the maker keeps · {rewardsKeptPct}%</label>
                 <input type="range" min={0} max={100} value={rewardsKeptPct} data-testid="launch-rewards-range"
-                  onChange={(e) => setRewardsKeptPct(Number(e.target.value))} className="w-full accent-[#8AF5D0]" />
-                <div className="mt-1 flex justify-between font-mono text-[10px] text-[#556b82]">
+                  onChange={(e) => setRewardsKeptPct(Number(e.target.value))} className="w-full accent-[#3F9E00]" />
+                <div className="mt-1 flex justify-between font-mono text-[10px] text-[#93a184]">
                   <span>{rewardsKeptPct}% maker</span>
                   <span>{100 - rewardsKeptPct}% flows to you</span>
                 </div>
               </div>
               {field("Auto payout above (SOL)",
                 <input data-testid="launch-payoutmin" type="number" min={0.01} step={0.01} value={payoutMinSol} onChange={(e) => setPayoutMinSol(Number(e.target.value) || 0)}
-                  className="h-11 w-56 rounded-lg border border-white/10 bg-white/5 px-3.5 font-mono text-sm text-white outline-none focus:border-[#8AF5D0]/40" />)}
+                  className="h-11 w-56 rounded-lg border border-black/10 bg-black/5 px-3.5 font-mono text-sm text-[#131a0f] outline-none focus:border-[#3F9E00]/40" />)}
             </div>
           )}
 
           {step === 5 && (
             <div className="space-y-6" data-testid="launch-step-review">
-              <h2 className="text-xl font-medium text-white">Review & launch</h2>
+              <h2 className="text-xl font-medium text-[#131a0f]">Review & launch</h2>
               {phase === "live" && liveDesk ? (
-                <Panel className="border-[#8AF5D0]/30 bg-[#8AF5D0]/5 p-6" data-testid="launch-success">
-                  <div className="flex items-center gap-2 text-[#8AF5D0]"><Check size={18} /><span className="font-medium">Your coin is on chain.</span></div>
-                  <p className="mt-2 text-[13px] font-light text-[#8ca3b8]">The market maker spins up the moment its vault holds SOL. Every fill shows on its page.</p>
+                <Panel className="border-[#3F9E00]/30 bg-[#3F9E00]/5 p-6" data-testid="launch-success">
+                  <div className="flex items-center gap-2 text-[#3F9E00]"><Check size={18} /><span className="font-medium">Your coin is on chain.</span></div>
+                  <p className="mt-2 text-[13px] font-light text-[#5c6b50]">The market maker spins up the moment its vault holds SOL. Every fill shows on its page.</p>
                   <div className="mt-5 flex gap-3">
-                    <Link to={`/desk/${liveDesk.id}`} className="rounded-[3px] bg-[#8AF5D0] px-5 py-2 text-sm font-medium text-[#07111f]" data-testid="launch-open-desk">Open the maker →</Link>
-                    <Link to="/explore" className="rounded-[3px] border border-white/15 px-5 py-2 text-sm text-white">Explore</Link>
+                    <Link to={`/desk/${liveDesk.id}`} className="rounded-[3px] bg-[#3F9E00] px-5 py-2 text-sm font-medium text-[#131a0f]" data-testid="launch-open-desk">Open the maker →</Link>
+                    <Link to="/explore" className="rounded-[3px] border border-black/15 px-5 py-2 text-sm text-[#131a0f]">Explore</Link>
                   </div>
                 </Panel>
               ) : (
@@ -321,24 +321,24 @@ export default function Launch() {
                     <div className="flex items-center gap-4">
                       <CoinAvatar url={imagePreview || coin.imageUrl} name={coin.name} size={48} className="rounded-xl" />
                       <div>
-                        <div className="text-white font-medium">{coin.name || "Unnamed coin"} <span className="text-[#556b82] font-mono text-xs">${coin.ticker || "TICKER"}</span></div>
-                        <div className="font-mono text-[11px] text-[#556b82]">SOL pair · its own maker</div>
+                        <div className="text-[#131a0f] font-medium">{coin.name || "Unnamed coin"} <span className="text-[#93a184] font-mono text-xs">${coin.ticker || "TICKER"}</span></div>
+                        <div className="font-mono text-[11px] text-[#93a184]">SOL pair · its own maker</div>
                       </div>
                     </div>
-                    <ul className="mt-5 space-y-2 border-t border-white/5 pt-4 text-[12px] font-light text-[#8ca3b8] list-none">
+                    <ul className="mt-5 space-y-2 border-t border-black/5 pt-4 text-[12px] font-light text-[#5c6b50] list-none">
                       <li>1. Mints the coin on the bonding curve.</li>
                       <li>2. Locks the fee split for good: 80% maker · 20% platform.</li>
                       <li>{devBuySol > 0 ? `3. Buys ${devBuySol} SOL of your coin inside the same transaction.` : "3. No opening buy — everyone gets the same open."}</li>
                       <li>{fundSol > 0 ? `4. Wires ${fundSol} SOL into the maker's vault.` : "4. Sends nothing to the vault — the maker lives off the coin's own fees."}</li>
                     </ul>
                   </Panel>
-                  {err && <Panel className="border-[#ff4d4f]/30 bg-[#ff4d4f]/5 p-4 text-[13px] text-[#ff8a8a]" data-testid="launch-error">{err}</Panel>}
+                  {err && <Panel className="border-[#ff4d4f]/30 bg-[#ff4d4f]/5 p-4 text-[13px] text-[#d43d3d]" data-testid="launch-error">{err}</Panel>}
                   <button onClick={launch} disabled={phase !== "idle" && phase !== "failed"} data-testid="launch-sign-btn"
-                    className="inline-flex h-12 items-center gap-2 rounded-[3px] bg-[#8AF5D0] px-8 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] hover:shadow-[0_0_28px_rgba(138,245,208,0.4)] disabled:opacity-50 transition-all">
+                    className="inline-flex h-12 items-center gap-2 rounded-[3px] bg-[#3F9E00] px-8 text-sm font-medium text-[#131a0f] hover:bg-[#54C400] hover:shadow-[0_0_28px_rgba(92,225,0,0.4)] disabled:opacity-50 transition-all">
                     <Rocket size={16} />
                     {phase === "idle" || phase === "failed" ? (connected ? "Approve & launch" : "Connect wallet to launch") : phase === "signing" ? "Approve in your wallet…" : phase === "sending" ? "Sending…" : "Working…"}
                   </button>
-                  <p className="text-[11px] font-light text-[#556b82]">Trading can lose money. Nothing moves until your wallet approves.</p>
+                  <p className="text-[11px] font-light text-[#93a184]">Trading can lose money. Nothing moves until your wallet approves.</p>
                 </>
               )}
             </div>
@@ -348,15 +348,15 @@ export default function Launch() {
             <div className="mt-10 flex items-center gap-3">
               {step > 0 && (
                 <button onClick={() => setStep(step - 1)} data-testid="launch-back-btn"
-                  className="inline-flex h-10 items-center gap-1.5 rounded-[3px] border border-white/15 px-5 text-sm text-white hover:border-[#8AF5D0]/40">
+                  className="inline-flex h-10 items-center gap-1.5 rounded-[3px] border border-black/15 px-5 text-sm text-[#131a0f] hover:border-[#3F9E00]/40">
                   <ArrowLeft size={14} /> Back
                 </button>
               )}
               <button onClick={() => setStep(step + 1)} disabled={!stepOk[step]} data-testid="launch-next-btn"
-                className="inline-flex h-10 items-center gap-1.5 rounded-[3px] bg-[#8AF5D0] px-6 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] disabled:opacity-40">
+                className="inline-flex h-10 items-center gap-1.5 rounded-[3px] bg-[#3F9E00] px-6 text-sm font-medium text-[#131a0f] hover:bg-[#54C400] disabled:opacity-40">
                 Next <ArrowRight size={14} />
               </button>
-              {!stepOk[step] && step === 0 && <span className="font-mono text-[11px] text-[#556b82]">name, ticker and image required</span>}
+              {!stepOk[step] && step === 0 && <span className="font-mono text-[11px] text-[#93a184]">name, ticker and image required</span>}
             </div>
           )}
         </div>
@@ -364,24 +364,24 @@ export default function Launch() {
         {/* summary rail */}
         <aside className="lg:sticky lg:top-24 self-start" data-testid="launch-summary">
           <Panel className="p-5">
-            <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#556b82]">What your wallet approves</div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#93a184]">What your wallet approves</div>
             <div className="mt-4 flex items-center gap-3">
               <CoinAvatar url={imagePreview || coin.imageUrl} name={coin.name} size={36} />
               <div>
-                <div className="text-white text-sm">{coin.name || "Unnamed coin"}</div>
-                <div className="font-mono text-[11px] text-[#556b82]">${coin.ticker || "TICKER"}</div>
+                <div className="text-[#131a0f] text-sm">{coin.name || "Unnamed coin"}</div>
+                <div className="font-mono text-[11px] text-[#93a184]">${coin.ticker || "TICKER"}</div>
               </div>
             </div>
-            <dl className="mt-5 space-y-2.5 border-t border-white/5 pt-4 font-mono text-[12px]">
-              <div className="flex justify-between"><dt className="text-[#556b82]">Opening buy</dt><dd className="text-white tnum">{devBuySol > 0 ? `${devBuySol} SOL` : "None"}</dd></div>
-              <div className="flex justify-between"><dt className="text-[#556b82]">Maker fuel</dt><dd className="text-white tnum">{fundSol} SOL</dd></div>
-              <div className="flex justify-between"><dt className="text-[#556b82]">Signatures</dt><dd className="text-white tnum">{devBuySol > 0 ? 2 : 1}</dd></div>
-              <div className="flex justify-between"><dt className="text-[#556b82]">Fee split</dt><dd className="text-[#8AF5D0] tnum">80% maker · 20% platform</dd></div>
-              <div className="flex justify-between"><dt className="text-[#556b82]">Temperament</dt><dd className="text-white capitalize">{preset}</dd></div>
-              <div className="flex justify-between"><dt className="text-[#556b82]">Fees kept</dt><dd className="text-white tnum">{rewardsKeptPct}% · {100 - rewardsKeptPct}% to you</dd></div>
-              <div className="flex justify-between"><dt className="text-[#556b82]">Auto payout</dt><dd className="text-white tnum">On, above {payoutMinSol} SOL</dd></div>
+            <dl className="mt-5 space-y-2.5 border-t border-black/5 pt-4 font-mono text-[12px]">
+              <div className="flex justify-between"><dt className="text-[#93a184]">Opening buy</dt><dd className="text-[#131a0f] tnum">{devBuySol > 0 ? `${devBuySol} SOL` : "None"}</dd></div>
+              <div className="flex justify-between"><dt className="text-[#93a184]">Maker fuel</dt><dd className="text-[#131a0f] tnum">{fundSol} SOL</dd></div>
+              <div className="flex justify-between"><dt className="text-[#93a184]">Signatures</dt><dd className="text-[#131a0f] tnum">{devBuySol > 0 ? 2 : 1}</dd></div>
+              <div className="flex justify-between"><dt className="text-[#93a184]">Fee split</dt><dd className="text-[#3F9E00] tnum">80% maker · 20% platform</dd></div>
+              <div className="flex justify-between"><dt className="text-[#93a184]">Temperament</dt><dd className="text-[#131a0f] capitalize">{preset}</dd></div>
+              <div className="flex justify-between"><dt className="text-[#93a184]">Fees kept</dt><dd className="text-[#131a0f] tnum">{rewardsKeptPct}% · {100 - rewardsKeptPct}% to you</dd></div>
+              <div className="flex justify-between"><dt className="text-[#93a184]">Auto payout</dt><dd className="text-[#131a0f] tnum">On, above {payoutMinSol} SOL</dd></div>
             </dl>
-            <p className="mt-4 border-t border-white/5 pt-3 text-[10px] font-light leading-relaxed text-[#556b82]">
+            <p className="mt-4 border-t border-black/5 pt-3 text-[10px] font-light leading-relaxed text-[#93a184]">
               Market making can lose money. Nothing moves until your wallet approves.
             </p>
           </Panel>

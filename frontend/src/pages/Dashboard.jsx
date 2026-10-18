@@ -24,7 +24,7 @@ function MyDesks() {
     return (
       <Empty>
         <p className="mb-4">Connect your wallet to see your makers.</p>
-        <button onClick={() => setVisible(true)} className="rounded-[3px] bg-[#8AF5D0] px-5 py-2 text-sm font-medium text-[#07111f]" data-testid="dash-connect-btn">Connect</button>
+        <button onClick={() => setVisible(true)} className="rounded-[3px] bg-[#3F9E00] px-5 py-2 text-sm font-medium text-[#131a0f]" data-testid="dash-connect-btn">Connect</button>
       </Empty>
     );
   }
@@ -32,12 +32,12 @@ function MyDesks() {
     return (
       <Empty>
         <p className="mb-4">Sign in with your wallet to prove ownership.</p>
-        <button onClick={async () => { try { await signIn(); } catch (e) { toast.error(errorMessage(e)); } }} className="rounded-[3px] bg-[#8AF5D0] px-5 py-2 text-sm font-medium text-[#07111f]" data-testid="dash-signin-btn">Sign in</button>
+        <button onClick={async () => { try { await signIn(); } catch (e) { toast.error(errorMessage(e)); } }} className="rounded-[3px] bg-[#3F9E00] px-5 py-2 text-sm font-medium text-[#131a0f]" data-testid="dash-signin-btn">Sign in</button>
       </Empty>
     );
   }
   if (!desks) return <Loading label="Loading your makers" />;
-  if (!desks.length) return <Empty>No makers on this wallet yet. <Link to="/launch" className="text-[#8AF5D0]">Launch one →</Link></Empty>;
+  if (!desks.length) return <Empty>No makers on this wallet yet. <Link to="/launch" className="text-[#3F9E00]">Launch one →</Link></Empty>;
   return (
     <Panel className="overflow-hidden" data-testid="mydesks-panel">
       <table className="dtable">
@@ -47,11 +47,11 @@ function MyDesks() {
             <tr key={d.id}>
               <td><CoinCell imageUrl={d.imageUrl} name={d.name} ticker={d.ticker} id={d.id} /></td>
               <td><StatusDot status={d.status} /></td>
-              <td className="text-right font-mono text-white tnum">{fmtSol(d.totals?.capitalLamports, 2)}</td>
-              <td className="text-right font-mono text-[#8ca3b8] tnum">{fmtSol(d.totals?.claimedLamports, 2)}</td>
-              <td className="text-right font-mono text-[#8ca3b8] tnum">{fmtAge(d.launchedAt || d.createdAt)}</td>
+              <td className="text-right font-mono text-[#131a0f] tnum">{fmtSol(d.totals?.capitalLamports, 2)}</td>
+              <td className="text-right font-mono text-[#5c6b50] tnum">{fmtSol(d.totals?.claimedLamports, 2)}</td>
+              <td className="text-right font-mono text-[#5c6b50] tnum">{fmtAge(d.launchedAt || d.createdAt)}</td>
               <td className="text-right">
-                <Link to={`/dashboard/${d.id}`} className="font-mono text-[11px] uppercase text-[#8AF5D0] hover:underline" data-testid={`manage-${d.ticker}`}>Manage →</Link>
+                <Link to={`/dashboard/${d.id}`} className="font-mono text-[11px] uppercase text-[#3F9E00] hover:underline" data-testid={`manage-${d.ticker}`}>Manage →</Link>
               </td>
             </tr>
           ))}
@@ -91,28 +91,28 @@ function DeskDashboard({ id }) {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <Panel className="lg:col-span-2 p-6" data-testid="dash-settings-panel">
         <div className="flex items-baseline justify-between">
-          <span className="text-white font-medium">Maker controls</span>
-          <span className="font-mono text-[10px] text-[#556b82]">version {desk.settingsVersion ?? 1}</span>
+          <span className="text-[#131a0f] font-medium">Maker controls</span>
+          <span className="font-mono text-[10px] text-[#93a184]">version {desk.settingsVersion ?? 1}</span>
         </div>
-        <p className="mt-1 text-[12px] font-light text-[#556b82]">Every dial is yours, every change is public, applied within one engine pass.</p>
+        <p className="mt-1 text-[12px] font-light text-[#93a184]">Every dial is yours, every change is public, applied within one engine pass.</p>
         <div className="mt-5">
           <SettingsEditor values={form} onChange={(k, v) => setForm({ ...form, [k]: v })} />
         </div>
         <button onClick={save} disabled={busy} data-testid="dash-save-btn"
-          className="mt-6 h-10 rounded-[3px] bg-[#8AF5D0] px-6 text-sm font-medium text-[#07111f] hover:bg-[#7CFFC8] disabled:opacity-50">
+          className="mt-6 h-10 rounded-[3px] bg-[#3F9E00] px-6 text-sm font-medium text-[#131a0f] hover:bg-[#54C400] disabled:opacity-50">
           {busy ? "Saving…" : "Save changes"}
         </button>
-        <p className="mt-3 text-[11px] font-light text-[#556b82]">Changes may require a wallet approval before they apply.</p>
+        <p className="mt-3 text-[11px] font-light text-[#93a184]">Changes may require a wallet approval before they apply.</p>
       </Panel>
 
       <Panel className="p-6" data-testid="dash-info-panel">
-        <span className="text-white font-medium">This maker</span>
-        <div className="mt-4 space-y-2.5 font-mono text-xs text-[#8ca3b8]">
-          <div className="flex justify-between"><span>Coin</span><Link to={`/desk/${desk.id}`} className="text-[#8AF5D0]">${desk.ticker}</Link></div>
+        <span className="text-[#131a0f] font-medium">This maker</span>
+        <div className="mt-4 space-y-2.5 font-mono text-xs text-[#5c6b50]">
+          <div className="flex justify-between"><span>Coin</span><Link to={`/desk/${desk.id}`} className="text-[#3F9E00]">${desk.ticker}</Link></div>
           <div className="flex justify-between"><span>Status</span><StatusDot status={desk.status} /></div>
-          <div className="flex justify-between"><span>Capital</span><span className="text-white">{fmtSol(desk.totals?.capitalLamports, 2)}</span></div>
-          <div className="flex justify-between"><span>Claimed</span><span className="text-white">{fmtSol(desk.totals?.claimedLamports, 2)}</span></div>
-          <div className="flex justify-between"><span>Treasury</span><span className="text-white">{short(desk.treasury, 4, 4)}</span></div>
+          <div className="flex justify-between"><span>Capital</span><span className="text-[#131a0f]">{fmtSol(desk.totals?.capitalLamports, 2)}</span></div>
+          <div className="flex justify-between"><span>Claimed</span><span className="text-[#131a0f]">{fmtSol(desk.totals?.claimedLamports, 2)}</span></div>
+          <div className="flex justify-between"><span>Treasury</span><span className="text-[#131a0f]">{short(desk.treasury, 4, 4)}</span></div>
         </div>
       </Panel>
     </div>
