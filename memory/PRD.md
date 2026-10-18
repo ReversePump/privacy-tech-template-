@@ -200,3 +200,7 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Header (all pages, desktop + mobile nav): CA pill 7UMdnRcC9zXp1wm9MteFCEJ785bk8xpfWPgdcAghpump — click copies to clipboard with toast + check feedback (data-testid header-ca / header-ca-mobile).
 - Live page feed masks real coin identities: deterministic per-mint alias (lib/alias.js — adjective+noun wordlists, djb2 hash) replaces name/ticker in the feed; same coin always shows the same alias; amounts/times/tx links/desk links stay live and real. Real upstream tickers verified gone, stable across reloads.
 - Verified: 5 repeated rows of one coin share one alias (correct), zero page errors.
+
+## Update 2026-10-18 (revision 31) — CA PILL REPOSITIONED + $MARKETS
+- Header CA pill now sits immediately left of the X link on ALL breakpoints (top bar, desktop + mobile). Label: $MARKETS + short CA (7UMd…pump), click copies full CA 7UMdnRcC9zXp1wm9MteFCEJ785bk8xpfWPgdcAghpump. Removed the separate mobile-nav pill.
+- Verified desktop + 390px: pill visible at top next to X, no wrapping.

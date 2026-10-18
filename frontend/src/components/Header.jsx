@@ -111,13 +111,6 @@ export default function Header() {
             </div>
           </form>
 
-          <button onClick={copyCa} data-testid="header-ca" title={PLATFORM_CA}
-            className="hidden md:inline-flex h-9 items-center gap-1.5 rounded-[3px] border border-black/10 bg-black/[0.03] px-3 font-mono text-[11px] text-[#5c6b50] hover:border-[#3F9E00]/40 hover:text-[#3F9E00] transition-colors">
-            <span className="uppercase tracking-wider text-[#93a184]">CA</span>
-            {copiedCa ? "Copied" : short(PLATFORM_CA, 4, 4)}
-            {copiedCa ? <Check size={12} className="text-[#3F9E00]" /> : <Copy size={12} />}
-          </button>
-
           <Link to="/mm" data-testid="header-onboard-btn"
             className="hidden md:inline-flex h-9 items-center gap-1.5 rounded-[3px] border border-black/15 px-4 text-[13px] text-[#3a4a33] hover:border-[#3F9E00]/40 hover:text-[#3F9E00] transition-colors">
             <Plus size={14} /> Onboard
@@ -126,6 +119,13 @@ export default function Header() {
             className="hidden md:inline-flex h-9 items-center gap-1.5 rounded-[3px] bg-[#131a0f] px-4 text-[13px] font-medium text-white hover:bg-[#3F9E00] transition-colors">
             <Rocket size={14} /> Launch
           </Link>
+
+          <button onClick={copyCa} data-testid="header-ca" title={PLATFORM_CA}
+            className="inline-flex h-9 items-center gap-1.5 whitespace-nowrap rounded-[3px] border border-black/10 bg-black/[0.03] px-2.5 md:px-3 font-mono text-[10px] md:text-[11px] text-[#5c6b50] hover:border-[#3F9E00]/40 hover:text-[#3F9E00] transition-colors">
+            <span className="font-medium text-[#131a0f]">$MARKETS</span>
+            <span className="text-[#93a184]">{copiedCa ? "Copied" : short(PLATFORM_CA, 4, 4)}</span>
+            {copiedCa ? <Check size={12} className="text-[#3F9E00]" /> : <Copy size={12} />}
+          </button>
 
           <a href="https://x.com/usemakemarkets" target="_blank" rel="noopener noreferrer" data-testid="header-x-link"
             aria-label="MakeMarkets on X"
@@ -194,10 +194,6 @@ export default function Header() {
             {n.label}
           </NavLink>
         ))}
-        <button onClick={copyCa} data-testid="header-ca-mobile"
-          className="whitespace-nowrap rounded-[3px] border border-black/10 px-3 py-1 font-mono text-[10px] text-[#5c6b50] hover:border-[#3F9E00]/40 hover:text-[#3F9E00] transition-colors">
-          {copiedCa ? "Copied ✓" : `CA ${short(PLATFORM_CA, 4, 4)}`}
-        </button>
       </nav>
     </header>
   );
