@@ -103,3 +103,6 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Re-ran full E2E with it: 8/9 (only stop = unfunded launch balance check, by design).
 - LIVE PROOF ON SITE: desk 6fb09a96-0ffd-4877-a973-56d229d056d4 ($UP, onboarded via relay) — visible in Explore (Running, 3 wallets), counted in Live stats, full desk page renders. Kept as the site's first coin; it trades once its treasury holds SOL.
 - Final sweep: Docs/Explore/Live/desk pages all screenshot-verified in light theme.
+
+## Update 2026-10-18 (revision 16)
+- Purged all recorded desks: NO coin/CA/token appears anywhere until a real user launches or onboards one through MakeMarkets. Verified: Explore zero rows, Live zeroed, ticker hidden.
