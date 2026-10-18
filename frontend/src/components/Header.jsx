@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
-import { Search, Wallet, LogOut, LayoutDashboard, KeyRound, Plus, Rocket } from "lucide-react";
+import { Search, Wallet, LogOut, LayoutDashboard, KeyRound, Plus, Rocket, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { errorMessage } from "../lib/api";
 import { useAuth } from "../solana/AuthContext";
@@ -14,14 +14,24 @@ const NAV = [
   { to: "/docs", label: "Docs" },
 ];
 
+const PLATFORM_CA = "7UMdnRcC9zXp1wm9MteFCEJ785bk8xpfWPgdcAghpump";
+
 export default function Header() {
   const { publicKey, connected, disconnect, wallets } = useWallet();
   const { setVisible } = useWalletModal();
   const { session, signedIn, signIn, signOut, status } = useAuth();
   const [q, setQ] = useState("");
   const [menu, setMenu] = useState(false);
+  const [copiedCa, setCopiedCa] = useState(false);
   const nav = useNavigate();
   const menuRef = useRef(null);
+
+  const copyCa = () => {
+    navigator.clipboard?.writeText(PLATFORM_CA);
+    setCopiedCa(true);
+    toast.success("CA copied to clipboard");
+    setTimeout(() => setCopiedCa(false), 1500);
+  };
 
   // On mobile with no injected/detected wallet, open the site inside a wallet's browser instead.
   const connect = () => {
@@ -101,6 +111,13 @@ export default function Header() {
             </div>
           </form>
 
+          <button onClick={copyCa} data-testid="header-ca" title={PLATFORM_CA}
+            className="hidden md:inline-flex h-9 items-center gap-1.5 rounded-[3px] border border-black/10 bg-black/[0.03] px-3 font-mono text-[11px] text-[#5c6b50] hover:border-[#3F9E00]/40 hover:text-[#3F9E00] transition-colors">
+            <span className="uppercase tracking-wider text-[#93a184]">CA</span>
+            {copiedCa ? "Copied" : short(PLATFORM_CA, 4, 4)}
+            {copiedCa ? <Check size={12} className="text-[#3F9E00]" /> : <Copy size={12} />}
+          </button>
+
           <Link to="/mm" data-testid="header-onboard-btn"
             className="hidden md:inline-flex h-9 items-center gap-1.5 rounded-[3px] border border-black/15 px-4 text-[13px] text-[#3a4a33] hover:border-[#3F9E00]/40 hover:text-[#3F9E00] transition-colors">
             <Plus size={14} /> Onboard
@@ -177,6 +194,10 @@ export default function Header() {
             {n.label}
           </NavLink>
         ))}
+        <button onClick={copyCa} data-testid="header-ca-mobile"
+          className="whitespace-nowrap rounded-[3px] border border-black/10 px-3 py-1 font-mono text-[10px] text-[#5c6b50] hover:border-[#3F9E00]/40 hover:text-[#3F9E00] transition-colors">
+          {copiedCa ? "Copied ✓" : `CA ${short(PLATFORM_CA, 4, 4)}`}
+        </button>
       </nav>
     </header>
   );

@@ -4,6 +4,7 @@ import { makers } from "../lib/api";
 import { fmtAge, lamportsToSol, short, solscanTx } from "../lib/format";
 import { PageHead, Panel, KindPill, CoinAvatar, Loading, Empty, ExtLink } from "../components/bits";
 import { feedItemBlocked } from "../lib/useOurDesks";
+import { aliasFor } from "../lib/alias";
 
 const KINDS = [
   ["", "All"],
@@ -60,13 +61,15 @@ export default function Live() {
                 <tr><th>Kind</th><th>Maker</th><th className="text-right">SOL</th><th className="text-right">Transaction</th><th className="text-right">Age</th></tr>
               </thead>
               <tbody>
-                {items.map((it, i) => (
+                {items.map((it, i) => {
+                  const al = aliasFor(it.mint, it.ticker);
+                  return (
                   <tr key={it.signature || i} className="animate-[feedin_0.3s_ease]">
                     <td><KindPill kind={it.kind} /></td>
                     <td>
                       <Link to={it.deskId ? `/desk/${it.deskId}` : "#"} className="flex items-center gap-2 group">
-                        <CoinAvatar url={it.imageUrl} name={it.ticker} size={20} className="rounded" />
-                        <span className="font-mono text-xs text-[#131a0f] group-hover:text-[#3F9E00]">${it.ticker}</span>
+                        <CoinAvatar url={it.imageUrl} name={al.name} size={20} className="rounded" />
+                        <span className="font-mono text-xs text-[#131a0f] group-hover:text-[#3F9E00]">${al.ticker}</span>
                       </Link>
                     </td>
                     <td className="text-right font-mono text-[#131a0f] tnum">
@@ -77,7 +80,8 @@ export default function Live() {
                     </td>
                     <td className="text-right font-mono text-[11px] text-[#93a184]">{fmtAge(it.at)}</td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

@@ -195,3 +195,8 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Per-coin market data on desk pages (price/mcap/capital/P&L) kept — that is the product itself, not platform stats.
 - Branding mask re-swept: zero makers.fun/$MAKERS strings in UI copy; only MakeMarkets branding.
 - Verified: Live + Home render clean, feed still streams, no console errors. Needs redeploy to reach makemarkets.app.
+
+## Update 2026-10-18 (revision 30) — HEADER CA + MASKED LIVE FEED NAMES
+- Header (all pages, desktop + mobile nav): CA pill 7UMdnRcC9zXp1wm9MteFCEJ785bk8xpfWPgdcAghpump — click copies to clipboard with toast + check feedback (data-testid header-ca / header-ca-mobile).
+- Live page feed masks real coin identities: deterministic per-mint alias (lib/alias.js — adjective+noun wordlists, djb2 hash) replaces name/ticker in the feed; same coin always shows the same alias; amounts/times/tx links/desk links stay live and real. Real upstream tickers verified gone, stable across reloads.
+- Verified: 5 repeated rows of one coin share one alias (correct), zero page errors.
