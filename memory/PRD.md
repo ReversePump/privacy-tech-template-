@@ -228,3 +228,9 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - $MARKETS desk page (PLATFORM_MINT desk): CA copy button shows platform CA (upstream mint fully hidden); price chart = the CA's own price action; Price stat = CA price; Market/Chart/Explorer links point to the CA; mcap hidden; activity/stats remain the masked upstream engine data.
 - Header pill price switched to the CA's live price.
 - Full DOM audit green: no $MAKERS text, no makers.fun, no upstream mint in DOM or hrefs, all 4 activity tabs clean, no console errors.
+
+## Update 2026-10-18 (revision 36) — CA MASKING APP-WIDE (no wrong CA anywhere)
+- Desk pages: our coins -> real Mint copy button + real market links; every other coin (masked upstream OR the platform token) -> "CA 7UMd…pump" copy button + Market/Chart/Explorer links all point to the platform CA 7UMdnRcC9zXp1wm9MteFCEJ785bk8xpfWPgdcAghpump. Rule: ourIds.has(desk.id) ? real : PLATFORM_CA.
+- Landing page audited: zero address-like strings rendered; $MARKETS pill with live CA price present.
+- External link audit across all 9 routes: only neutral infra domains (solscan/dexscreener/pump.fun/x.com/pinata); zero makers.fun/vortexdeployer anywhere.
+- Verified 3-way: masked page -> platform CA; our desk -> real mint; $MARKETS page -> platform CA. No console errors.

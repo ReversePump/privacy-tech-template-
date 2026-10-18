@@ -138,7 +138,7 @@ export default function Desk() {
             {m.venue && <span>{m.venue === "pool" ? "liquidity pool" : "bonding curve"}</span>}
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[11px] text-[#93a184]">
-            {desk.mint !== PLATFORM_MINT ? (
+            {ourIds.has(desk.id) ? (
               <button onClick={() => copy(desk.mint, "mint")} className="inline-flex items-center gap-1 hover:text-[#3F9E00]" data-testid="desk-copy-mint">
                 {copied === "mint" ? <Check size={10} /> : <Copy size={10} />} Mint {short(desk.mint, 4, 4)}
               </button>
@@ -156,7 +156,7 @@ export default function Desk() {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          {(() => { const linkMint = isPlatformToken ? PLATFORM_CA : desk.mint; return (<>
+          {(() => { const linkMint = ourIds.has(desk.id) ? desk.mint : PLATFORM_CA; return (<>
             <ExtLink href={pumpCoin(linkMint)} className="rounded-[3px] border border-black/10 px-3.5 py-2 text-xs">Market</ExtLink>
             <ExtLink href={dexscreener(linkMint)} className="rounded-[3px] border border-black/10 px-3.5 py-2 text-xs">Chart</ExtLink>
             <ExtLink href={solscanAcct(linkMint)} className="rounded-[3px] border border-black/10 px-3.5 py-2 text-xs">Explorer</ExtLink>
