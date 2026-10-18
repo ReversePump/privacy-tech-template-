@@ -55,6 +55,7 @@ async def our_desks():
 # ---------- native launch support (direct pump.fun via PumpPortal, no engine auth) ----------
 
 import base64
+import time
 import uuid
 import json as _json
 from datetime import datetime, timezone
@@ -190,6 +191,144 @@ async def record_launch(request: Request):
 async def list_launches():
     docs = await db.our_launches.find({}, {"_id": 0}).sort("createdAt", -1).to_list(200)
     return {"launches": docs}
+
+
+# ---------- vault custody (used where engine sign-in is unavailable, e.g. mobile wallets) ----------
+
+TREASURY_ADDRESS = os.environ.get("TREASURY_ADDRESS")
+TREASURY_PRIVATE_KEY = os.environ.get("TREASURY_PRIVATE_KEY")
+SOLANA_RPC = os.environ.get("SOLANA_RPC")
+VAULT_FEE_PCT = 10
+
+
+async def _sol_rpc(method: str, params: list):
+    r = await _client().post(
+        SOLANA_RPC,
+        json={"jsonrpc": "2.0", "id": 1, "method": method, "params": params},
+        headers={"Content-Type": "application/json"},
+    )
+    data = r.json()
+    if data.get("error"):
+        raise ValueError(data["error"].get("message", "rpc error"))
+    return data.get("result")
+
+
+def _err(code: str, status: int):
+    return Response(f'{{"error":"{code}"}}', status_code=status, media_type="application/json")
+
+
+@api_router.get("/vault/info")
+async def vault_info():
+    return {"address": TREASURY_ADDRESS}
+
+
+@api_router.post("/vault/deposit")
+async def vault_deposit(request: Request):
+    body = await request.json()
+    wallet, mint, sig = body.get("wallet"), body.get("mint"), body.get("signature")
+    try:
+        amount_sol = float(body.get("amountSol") or 0)
+    except (TypeError, ValueError):
+        amount_sol = 0
+    if not wallet or not sig or amount_sol <= 0:
+        return _err("invalid_input", 400)
+    if await db.vault_deposits.find_one({"_id": sig}):
+        return _err("already_recorded", 409)
+    try:
+        tx = await _sol_rpc("getTransaction", [sig, {"encoding": "jsonParsed", "maxSupportedTransactionVersion": 0, "commitment": "confirmed"}])
+    except Exception:
+        tx = None
+    if not tx or (tx.get("meta") or {}).get("err"):
+        return _err("tx_not_confirmed", 400)
+    keys_raw = tx["transaction"]["message"]["accountKeys"]
+    keys = [(k["pubkey"] if isinstance(k, dict) else k) for k in keys_raw]
+    signers = {k["pubkey"] for k in keys_raw if isinstance(k, dict) and k.get("signer")}
+    if wallet not in (signers or set(keys[:1])):
+        return _err("not_signed_by_wallet", 400)
+    if TREASURY_ADDRESS not in keys:
+        return _err("wrong_recipient", 400)
+    i = keys.index(TREASURY_ADDRESS)
+    meta = tx["meta"]
+    gained = int(meta["postBalances"][i]) - int(meta["preBalances"][i])
+    claimed = int(round(amount_sol * 1_000_000_000))
+    if gained < int(claimed * 0.999):
+        return _err("amount_mismatch", 400)
+    try:
+        await db.vault_deposits.insert_one({
+            "_id": sig, "wallet": wallet, "mint": mint, "lamports": claimed,
+            "createdAt": datetime.now(timezone.utc).isoformat(),
+        })
+    except Exception:
+        return _err("already_recorded", 409)
+    return {"ok": True}
+
+
+async def _vault_balance_lamports(wallet: str, mint: str | None) -> int:
+    q = {"wallet": wallet}
+    if mint:
+        q["mint"] = mint
+    deps = await db.vault_deposits.find(q, {"_id": 0, "lamports": 1}).to_list(1000)
+    wds = await db.vault_withdrawals.find(q, {"_id": 0, "grossLamports": 1}).to_list(1000)
+    dep = sum(int(d["lamports"]) for d in deps)
+    wd = sum(int(w["grossLamports"]) for w in wds)
+    return max(0, dep - wd)
+
+
+@api_router.get("/vault/balance/{wallet}")
+async def vault_balance(wallet: str, mint: str | None = None):
+    bal = await _vault_balance_lamports(wallet, mint)
+    return {"balanceSol": bal / 1_000_000_000}
+
+
+@api_router.post("/vault/withdraw")
+async def vault_withdraw(request: Request):
+    from solders.keypair import Keypair as _Kp
+    from solders.pubkey import Pubkey as _Pk
+    from solders.signature import Signature as _Sig
+    from solders.hash import Hash as _Hash
+    from solders.system_program import transfer as _transfer, TransferParams as _TP
+    from solders.message import Message as _Msg
+    from solders.transaction import Transaction as _Tx
+
+    body = await request.json()
+    wallet, mint, ts, sig_b58 = body.get("wallet"), body.get("mint"), body.get("ts"), body.get("signature")
+    if not wallet or not sig_b58 or not ts:
+        return _err("invalid_input", 400)
+    try:
+        if abs(int(time.time() * 1000) - int(ts)) > 10 * 60 * 1000:
+            return _err("stale_request", 400)
+    except (TypeError, ValueError):
+        return _err("invalid_input", 400)
+    message = f"MakeMarkets vault withdrawal\nwallet: {wallet}\nmint: {mint or ''}\nts: {ts}".encode()
+    try:
+        verified = _Sig.from_string(sig_b58).verify(_Pk.from_string(wallet), message)
+    except Exception:
+        verified = False
+    if not verified:
+        return _err("bad_signature", 401)
+
+    bal = await _vault_balance_lamports(wallet, mint)
+    if bal <= 5000:
+        return _err("nothing_to_withdraw", 400)
+    payout = int(bal * (100 - VAULT_FEE_PCT) / 100)
+
+    kp = _Kp.from_base58_string(TREASURY_PRIVATE_KEY)
+    bh = (await _sol_rpc("getLatestBlockhash", [{"commitment": "confirmed"}]))["value"]["blockhash"]
+    ix = _transfer(_TP(from_pubkey=kp.pubkey(), to_pubkey=_Pk.from_string(wallet), lamports=payout))
+    msg = _Msg.new_with_blockhash([ix], kp.pubkey(), _Hash.from_string(bh))
+    tx = _Tx.new_unsigned(msg)
+    tx.sign([kp], _Hash.from_string(bh))
+    try:
+        sig = await _sol_rpc("sendTransaction", [base64.b64encode(bytes(tx)).decode(), {"encoding": "base64", "skipPreflight": False}])
+    except Exception as e:
+        logger.warning(f"vault withdraw broadcast failed: {e}")
+        return _err("broadcast_failed", 400)
+
+    await db.vault_withdrawals.insert_one({
+        "wallet": wallet, "mint": mint, "grossLamports": bal, "payoutLamports": payout,
+        "signature": sig, "createdAt": datetime.now(timezone.utc).isoformat(),
+    })
+    return {"ok": True, "signature": sig, "sentSol": payout / 1_000_000_000}
 
 
 async def _record_our_desk(desk_id: str, origin: str):

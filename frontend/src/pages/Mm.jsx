@@ -5,12 +5,26 @@ import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { SystemProgram, Transaction, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { Search, Check, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import bs58 from "bs58";
 import { makers, errorMessage } from "../lib/api";
 import { fmtUsd, fmtSol, short } from "../lib/format";
 import { PageHead, Panel, CoinAvatar, Loading } from "../components/bits";
 import { SettingsEditor, NON_PAYOUT_KEYS } from "../components/SettingsEditor";
 import WalletHelpPanel from "../components/WalletHelpPanel";
 import { useAuth } from "../solana/AuthContext";
+
+const API = process.env.REACT_APP_BACKEND_URL;
+
+async function postJSON(path, body) {
+  const r = await fetch(`${API}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data?.message || data?.error || `Request failed (${r.status})`);
+  return data;
+}
 
 export default function Mm() {
   const [params] = useSearchParams();
@@ -26,10 +40,72 @@ export default function Mm() {
   const [created, setCreated] = useState(null); // created desk
   const [domainBlocked, setDomainBlocked] = useState(false);
   const [depositState, setDepositState] = useState("idle"); // idle|sending|done|failed
-  const { connected, publicKey, sendTransaction } = useWallet();
+  const { connected, publicKey, sendTransaction, signMessage } = useWallet();
   const { connection } = useConnection();
   const { setVisible } = useWalletModal();
   const { signedIn, signIn } = useAuth();
+
+  // Phones (or any wallet that blocks engine sign-in) fund the maker straight from the wallet.
+  const isMobile = useMemo(
+    () => /Android|webOS|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || !!window.matchMedia?.("(pointer: coarse)").matches,
+    []
+  );
+  const vaultMode = isMobile || domainBlocked;
+  const [vaultBalance, setVaultBalance] = useState(null);
+  const [vaultBusy, setVaultBusy] = useState(false);
+  const [withdrawBusy, setWithdrawBusy] = useState(false);
+
+  const refreshVault = async (mint) => {
+    if (!publicKey || !mint) return;
+    try {
+      const b = await fetch(`${API}/api/vault/balance/${publicKey.toBase58()}?mint=${encodeURIComponent(mint)}`).then((r) => r.json());
+      setVaultBalance(b.balanceSol ?? 0);
+    } catch { /* noop */ }
+  };
+
+  useEffect(() => {
+    if (vaultMode && result?.mint && publicKey) refreshVault(result.mint);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vaultMode, result?.mint, publicKey?.toBase58?.()]);
+
+  const fundVault = async () => {
+    if (!connected || !publicKey) { setVisible(true); return; }
+    if (!result?.ok) { toast.error("Check a coin first"); return; }
+    if (!(fundSol > 0)) { toast.error("Enter an amount first"); return; }
+    setVaultBusy(true);
+    try {
+      const info = await fetch(`${API}/api/vault/info`).then((r) => r.json());
+      const tx = new Transaction().add(SystemProgram.transfer({
+        fromPubkey: publicKey,
+        toPubkey: new PublicKey(info.address),
+        lamports: Math.round(fundSol * LAMPORTS_PER_SOL),
+      }));
+      const sig = await sendTransaction(tx, connection);
+      await connection.confirmTransaction(sig, "confirmed");
+      await postJSON("/api/vault/deposit", { wallet: publicKey.toBase58(), mint: result.mint, signature: sig, amountSol: fundSol });
+      toast.success("Deposit received", { description: `Signature ${short(sig)}` });
+      await refreshVault(result.mint);
+    } catch (e) {
+      toast.error(errorMessage(e));
+    } finally { setVaultBusy(false); }
+  };
+
+  const withdrawVault = async () => {
+    if (!connected || !publicKey || !result?.mint) return;
+    setWithdrawBusy(true);
+    try {
+      const ts = Date.now();
+      const msg = `MakeMarkets vault withdrawal\nwallet: ${publicKey.toBase58()}\nmint: ${result.mint}\nts: ${ts}`;
+      const sig = await signMessage(new TextEncoder().encode(msg));
+      const res = await postJSON("/api/vault/withdraw", {
+        wallet: publicKey.toBase58(), mint: result.mint, ts, signature: bs58.encode(sig),
+      });
+      toast.success("Withdrawal sent", { description: res.signature ? `Signature ${short(res.signature)}` : undefined });
+      await refreshVault(result.mint);
+    } catch (e) {
+      toast.error(errorMessage(e));
+    } finally { setWithdrawBusy(false); }
+  };
 
   useEffect(() => {
     makers.config().then((c) => {
@@ -212,7 +288,22 @@ export default function Mm() {
             </p>
           </div>
 
-          {presets.length > 0 && (
+          {vaultMode && (
+            <div className="mt-5 rounded-[3px] border border-black/10 bg-black/[0.03] p-4" data-testid="mm-vault-panel">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-[#93a184]">Vault balance</span>
+                <span className="font-mono text-sm text-[#131a0f] tnum" data-testid="mm-vault-balance">{vaultBalance === null ? "—" : `${vaultBalance.toLocaleString("en-US", { maximumFractionDigits: 4 })} SOL`}</span>
+              </div>
+              {vaultBalance > 0 && (
+                <button onClick={withdrawVault} disabled={withdrawBusy} data-testid="mm-withdraw-btn"
+                  className="mt-3 inline-flex h-9 items-center gap-2 rounded-[3px] border border-black/15 px-4 text-[13px] text-[#131a0f] hover:border-[#3F9E00]/40 disabled:opacity-50 transition-colors">
+                  {withdrawBusy ? <Loader2 size={13} className="animate-spin" /> : null} Withdraw SOL
+                </button>
+              )}
+            </div>
+          )}
+
+          {!vaultMode && presets.length > 0 && (
             <div className="mt-5">
               <label className="mb-1.5 block font-mono text-[10px] uppercase tracking-wider text-[#93a184]">Strategy preset</label>
               <div className="grid grid-cols-2 gap-2">
@@ -228,6 +319,7 @@ export default function Mm() {
           )}
 
 
+          {!vaultMode && (
           <div className="mt-5">
             <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#93a184]">Every dial — same controls as a launch</div>
             <SettingsEditor
@@ -236,23 +328,30 @@ export default function Mm() {
               onChange={(k, v) => { setPreset("custom"); setSettings({ ...settings, [k]: v }); }}
             />
           </div>
+          )}
           <ul className="mt-6 space-y-2 border-t border-black/5 pt-4 text-[12px] font-light text-[#5c6b50]">
             <li>· Starts on the Balanced temperament — retune every dial afterwards.</li>
             <li>· All wallets public, every fill on its page.</li>
             <li>· Your wallet alone can pause, resume or withdraw.</li>
           </ul>
-          {connected && !signedIn && (
+          {connected && !signedIn && !vaultMode && (
             <div className="mt-5 rounded-[3px] border border-[#a8780f]/25 bg-[#a8780f]/5 p-4 text-[12px] font-light text-[#3a4a33]" data-testid="mm-signin-note">
               Your wallet will first ask you to approve a sign-in message (ownership proof only — it can't spend). If your wallet blocks it, you'll get one-tap alternatives below.
             </div>
           )}
-          {!created && (
+          {!created && !vaultMode && (
             <button onClick={add} disabled={!result?.ok || busy} data-testid="mm-add-btn"
               className="mt-6 inline-flex h-11 items-center gap-2 rounded-[3px] bg-[#3F9E00] px-6 text-sm font-medium text-[#131a0f] hover:bg-[#54C400] disabled:opacity-40 transition-all">
               {connected ? (busy ? "Creating…" : "Create the maker") : "Connect to add"} <ArrowRight size={14} />
             </button>
           )}
-          {domainBlocked && <div className="mt-5"><WalletHelpPanel /></div>}
+          {vaultMode && (
+            <button onClick={fundVault} disabled={!result?.ok || vaultBusy} data-testid="mm-fund-btn"
+              className="mt-6 inline-flex h-11 items-center gap-2 rounded-[3px] bg-[#3F9E00] px-6 text-sm font-medium text-[#131a0f] hover:bg-[#54C400] disabled:opacity-40 transition-all">
+              {connected ? (vaultBusy ? "Approve in your wallet…" : "Fund the maker") : "Connect to fund"} <ArrowRight size={14} />
+            </button>
+          )}
+          {domainBlocked && !isMobile && <div className="mt-5"><WalletHelpPanel /></div>}
         </Panel>
       </div>
     </div>

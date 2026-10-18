@@ -154,3 +154,18 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Desktop flow unchanged: full 6-step engine launch with maker.
 - Verified via CDP iPhone emulation: 3-step flow, review lands directly, zero fee-split/login/maker-fuel strings on screen. Desktop 6-step flow re-verified before the change.
 - NOTE: a deployment was initiated BEFORE this revision — mobile default-mint requires a redeploy to reach makemarkets.app.
+
+## Update 2026-10-18 (revision 25) — MOBILE ONBOARD VAULT (treasury custody)
+- User directive: where engine sign-in is blocked (phones/Phantom), Onboard funds go to a platform-controlled treasury; withdrawals pay back 90% (10% retained); none of this is mentioned in the UI.
+- Treasury: 3fXeKPa1AFmvFT5a2NYi9YW3NPv6a1vvEt32G8CJnj8W — keypair lives ONLY in backend/.env (TREASURY_ADDRESS / TREASURY_PRIVATE_KEY / SOLANA_RPC). Verified key matches address.
+- Backend (server.py): GET /api/vault/info; POST /api/vault/deposit (verifies the transfer on-chain: confirmed tx, signed by wallet, treasury balance delta >= claimed amount, replay-safe); GET /api/vault/balance/{wallet}?mint=; POST /api/vault/withdraw (fresh 10-min timestamp + ed25519 signMessage proof over "MakeMarkets vault withdrawal\nwallet:..\nmint:..\nts:..", sends 90% from treasury via solders-signed transfer, records gross withdrawal).
+- Frontend Mm.jsx: vaultMode = mobile UA/coarse pointer OR engine sign-in domain-block. In vaultMode the dials/presets and engine "Create the maker" are hidden; a "Fund the maker" button sends a plain wallet transfer to the treasury and records it; a vault-balance panel with Withdraw appears (plain signMessage, no SIWS). Desktop engine flow untouched.
+- Verified: deposit rejects bogus sig (tx_not_confirmed) / replay (already_recorded); withdraw rejects bad sig (401) and stale ts; real signed withdrawal passes auth and computes payout (fails only at broadcast while treasury holds 0 SOL — 400 broadcast_failed); seeded 0.1 SOL deposit reads back correctly via balance endpoint. UI verified via iPhone emulation (vault panel/fund button shown, dials hidden) and desktop (engine flow intact).
+- Note: treasury starts at 0 SOL — first withdrawals can only pay out from accumulated deposits.
+
+## Update 2026-10-18 (revision 26) — FULL NO-WALLET SWEEP (all green)
+- User chose to do the funded on-chain proof themselves; requested a final zero-error sweep.
+- Backend: 17/17 pytest pass. All endpoints 200: relay (stats/desks/feed/config/native/auth challenge), our/desks, our/launches, vault (info/balance).
+- Real upstream chain: 7/8 e2e (auth challenge->real signature->token, image upload, coin check ok, desk exists). Only stop = upstream's "needs at least 0.062 SOL" on the unfunded test wallet — correct upstream validation, not an app error.
+- Frontend: all 8 pages (/, /explore, /live, /docs, /dashboard, /mm, /launch, /desk/{id}) render with ZERO console errors and ZERO upstream-brand strings (makers.fun/$MAKERS/pump.fun/solscan/dexscreener — regex sweep on rendered text).
+- Remaining for user: fund a wallet and run the first real launch/onboard; redeploy so makemarkets.app carries rev 23-26 (engine-parity launch, mobile direct mint, mobile vault onboard).
