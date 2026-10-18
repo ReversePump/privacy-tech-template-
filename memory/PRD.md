@@ -253,3 +253,7 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 ## Update 2026-10-18 (revision 40) — SOLSCAN ACCOUNT LINKS DISABLED ON $MARKETS PAGE ONLY
 - On the $MARKETS (masked platform-mint) desk page: Explorer button removed and wallet addresses render as plain text (no solscan account links). Transaction links (trades/claims/transfers) stay.
 - All other coin pages keep full solscan links. Verified: $MARKETS page 0 account links / 50 tx links; masked coin page keeps 5 account links.
+
+## Update 2026-10-18 (revision 41) — $MARKETS LINK DISABLE RULE IS DATA-DRIVEN (holds for live updates)
+- The no-solscan rule for the platform token is keyed on desk.mint === PLATFORM_MINT, so any wallets/rows that stream in via the 20s live refetch render link-free automatically.
+- Verified across two live refresh cycles: 0 account links persistently, wallet addresses are inert plain text (click does nothing), 50 tx links intact. All other coins keep full links.
