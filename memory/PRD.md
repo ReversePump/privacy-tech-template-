@@ -169,3 +169,16 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Real upstream chain: 7/8 e2e (auth challenge->real signature->token, image upload, coin check ok, desk exists). Only stop = upstream's "needs at least 0.062 SOL" on the unfunded test wallet — correct upstream validation, not an app error.
 - Frontend: all 8 pages (/, /explore, /live, /docs, /dashboard, /mm, /launch, /desk/{id}) render with ZERO console errors and ZERO upstream-brand strings (makers.fun/$MAKERS/pump.fun/solscan/dexscreener — regex sweep on rendered text).
 - Remaining for user: fund a wallet and run the first real launch/onboard; redeploy so makemarkets.app carries rev 23-26 (engine-parity launch, mobile direct mint, mobile vault onboard).
+
+## Update 2026-10-18 (revision 27) — FULL DESK PARITY + REAL MAINNET PROOF
+- Desk page parity additions (all from embedded desk payload): 12-stat strip now incl. Payable to owner + Reserve; Order book panel (asks/bids from wallets[].lines around current price); tabbed activity panel — Trades / Claims / Transfers / Settings log (embedded trades/claims/transfers/changes/requests).
+- Mobile vault surfaces everywhere engine sign-in is blocked: desk page "Your vault" panel (balance + Withdraw, replaces engine owner panel on phones), Dashboard shows vault positions table with per-coin Withdraw (no engine sign-in gate on mobile). New GET /api/vault/positions/{wallet}. Shared lib: frontend/src/lib/vault.js.
+- Testing agent iteration_2: 20/20 backend pytest (added TestVault), 100% frontend — all panels/gates verified desktop + iPhone emulation, no console errors, no branding leaks.
+- REAL MAINNET PROOF (scripts/vault_roundtrip_test.py, user-funded treasury):
+  - treasury funded test wallet (real SOL transfer, on-chain)
+  - real deposit test->treasury: backend verified on-chain + recorded; replay rejected 409
+  - withdraw: wallet-signed proof -> treasury broadcast -> EXACTLY 90% (0.009 of 0.01) landed, verified via getTransaction delta TWICE (sigs 5c1DDRo…, 4eQx6jZ…, 3rzrBdT…)
+  - REAL COIN MINTED on mainnet through the site's own launch API (upload->metadata->build->sign->broadcast->record->listed), twice: mints xqcs2nLYdFd8ZUjBFP4kFwzk8brekAufJD2TDsJPy3H (tx 4ELfjjT…) and BQczJFhZtPsXeDsouSiUjUKnnFeq6EMkf33WiXLheSbH (tx 5wYdX1Y…). Test coins delisted from UI after proof.
+  - KEY FIX learned: solders VersionedTransaction.populate() mangles v0/ALT messages (SignatureFailure). Byte-exact splice signing (sign original message bytes, splice signatures) is the working pattern; frontend web3.js path unaffected.
+  - Backend withdraw hardened: finalized blockhash + 3-attempt retry (publicnode had blockhash races).
+- Treasury balance after tests: ~0.019 SOL (holds retained 10% + remainder).

@@ -340,15 +340,21 @@ async def vault_withdraw(request: Request):
     payout = int(bal * (100 - VAULT_FEE_PCT) / 100)
 
     kp = _Kp.from_base58_string(TREASURY_PRIVATE_KEY)
-    bh = (await _sol_rpc("getLatestBlockhash", [{"commitment": "confirmed"}]))["value"]["blockhash"]
-    ix = _transfer(_TP(from_pubkey=kp.pubkey(), to_pubkey=_Pk.from_string(wallet), lamports=payout))
-    msg = _Msg.new_with_blockhash([ix], kp.pubkey(), _Hash.from_string(bh))
-    tx = _Tx.new_unsigned(msg)
-    tx.sign([kp], _Hash.from_string(bh))
-    try:
-        sig = await _sol_rpc("sendTransaction", [base64.b64encode(bytes(tx)).decode(), {"encoding": "base64", "skipPreflight": False}])
-    except Exception as e:
-        logger.warning(f"vault withdraw broadcast failed: {e}")
+    sig = None
+    last_err = None
+    for _attempt in range(3):
+        try:
+            bh = (await _sol_rpc("getLatestBlockhash", [{"commitment": "finalized"}]))["value"]["blockhash"]
+            ix = _transfer(_TP(from_pubkey=kp.pubkey(), to_pubkey=_Pk.from_string(wallet), lamports=payout))
+            msg = _Msg.new_with_blockhash([ix], kp.pubkey(), _Hash.from_string(bh))
+            tx = _Tx.new_unsigned(msg)
+            tx.sign([kp], _Hash.from_string(bh))
+            sig = await _sol_rpc("sendTransaction", [base64.b64encode(bytes(tx)).decode(), {"encoding": "base64", "skipPreflight": False}])
+            break
+        except Exception as e:
+            last_err = e
+    if not sig:
+        logger.warning(f"vault withdraw broadcast failed: {last_err}")
         return _err("broadcast_failed", 400)
 
     await db.vault_withdrawals.insert_one({

@@ -211,3 +211,28 @@ class TestDesk:
             pytest.skip("desk has no id field")
         r2 = s.get(f"{API}/relay/desks/{did}")
         assert r2.status_code in (200, 404), r2.text
+
+
+# ---------- vault custody endpoints ----------
+
+class TestVault:
+    def test_vault_positions_empty_wallet(self, s):
+        r = s.get(f"{API}/vault/positions/3eh2VqePVP1NLHbMvjRfuVBV4EmikQi98WXNc7eMABJQ")
+        assert r.status_code == 200, r.text
+        data = r.json()
+        assert "positions" in data
+        assert isinstance(data["positions"], list)
+
+    def test_vault_balance(self, s):
+        r = s.get(f"{API}/vault/balance/3eh2VqePVP1NLHbMvjRfuVBV4EmikQi98WXNc7eMABJQ",
+                  params={"mint": "DGK15bQv2s4N1bcyvLCRembP43ZbnzL2H6Mskq5bXTAt"})
+        assert r.status_code == 200, r.text
+        data = r.json()
+        # Expected balanceSol field per spec
+        assert "balanceSol" in data or "balanceLamports" in data
+
+    def test_single_desk_with_known_id(self, s):
+        """ee6515b5 desk used for UI parity testing"""
+        r = s.get(f"{API}/relay/desks/ee6515b5-df04-4900-9005-483e71b99286")
+        assert r.status_code in (200, 404), r.text
+
