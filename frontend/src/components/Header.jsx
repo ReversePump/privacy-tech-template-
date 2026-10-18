@@ -13,13 +13,26 @@ const NAV = [
 ];
 
 export default function Header() {
-  const { publicKey, connected, disconnect } = useWallet();
+  const { publicKey, connected, disconnect, wallets } = useWallet();
   const { setVisible } = useWalletModal();
   const { session, signedIn, signIn, signOut, status } = useAuth();
   const [q, setQ] = useState("");
   const [menu, setMenu] = useState(false);
   const nav = useNavigate();
   const menuRef = useRef(null);
+
+  // On mobile with no injected/detected wallet, open the site inside a wallet's browser instead.
+  const connect = () => {
+    const isMobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+    const detected = (wallets || []).some((w) => w.readyState === "Installed" || w.readyState === "Loadable");
+    if (isMobile && !window.solana && !detected) {
+      const url = encodeURIComponent(window.location.href);
+      const ref = encodeURIComponent(window.location.origin);
+      window.location.href = `https://phantom.app/ul/browse/${url}?ref=${ref}`;
+      return;
+    }
+    setVisible(true);
+  };
 
   useEffect(() => {
     const onKey = (e) => {
@@ -144,7 +157,7 @@ export default function Header() {
           ) : (
             <button
               data-testid="connect-wallet-btn"
-              onClick={() => setVisible(true)}
+              onClick={connect}
               className="flex h-9 items-center gap-2 rounded-[3px] bg-[#3F9E00] px-4 text-[13px] font-medium text-[#131a0f] hover:bg-[#54C400] hover:shadow-[0_0_20px_rgba(92,225,0,0.35)] transition-all"
             >
               <Wallet size={14} /> Connect

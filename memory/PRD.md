@@ -106,3 +106,8 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 
 ## Update 2026-10-18 (revision 16)
 - Purged all recorded desks: NO coin/CA/token appears anywhere until a real user launches or onboards one through MakeMarkets. Verified: Explore zero rows, Live zeroed, ticker hidden.
+
+## Update 2026-10-18 (revision 17) — MOBILE SIGN-IN FIX
+- Bug: mobile (Phantom in-app browser) "Sign-in was cancelled in your wallet" on Approve & launch.
+- Fix: AuthContext now mirrors upstream exactly — tries wallet-native SIWS signIn first (Phantom's native sign-in screen), falls back to raw signMessage; SIWS parser round-trip verified byte-for-byte against live challenge messages (incl. Expiration Time + Request ID). Accurate error mapping (only real rejections say "cancelled", other wallet errors surface raw).
+- Added mobile deep-link: connect on a wallet-less mobile browser opens the site inside Phantom's browser (upstream's inAppBrowserLinks approach).
