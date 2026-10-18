@@ -236,3 +236,26 @@ class TestVault:
         r = s.get(f"{API}/relay/desks/ee6515b5-df04-4900-9005-483e71b99286")
         assert r.status_code in (200, 404), r.text
 
+
+# ---------- market prices + mcapUsd for platform CA ----------
+PLATFORM_CA = "7UMdnRcC9zXp1wm9MteFCEJ785bk8xpfWPgdcAghpump"
+
+
+class TestMarketPrices:
+    def test_prices_has_points_last_and_mcap(self, s):
+        r = s.get(f"{API}/markets/prices", params={"mint": PLATFORM_CA, "range": "24h"})
+        assert r.status_code == 200, r.text
+        data = r.json()
+        assert "points" in data and isinstance(data["points"], list)
+        assert "last" in data
+        assert "mcapUsd" in data
+        assert isinstance(data["mcapUsd"], (int, float))
+        # The CA mcap moves — just sanity bounds (should be a few thousand to a few hundred k)
+        assert 1_000 < data["mcapUsd"] < 10_000_000, f"unexpected mcap: {data['mcapUsd']}"
+
+    def test_prices_1h_range(self, s):
+        r = s.get(f"{API}/markets/prices", params={"mint": PLATFORM_CA, "range": "1h"})
+        assert r.status_code == 200, r.text
+        data = r.json()
+        assert "mcapUsd" in data
+
