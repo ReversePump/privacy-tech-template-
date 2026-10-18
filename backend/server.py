@@ -52,6 +52,137 @@ async def our_desks():
     return {"desks": docs}
 
 
+# ---------- native launch support (direct pump.fun via PumpPortal, no engine auth) ----------
+
+import base64
+import uuid
+import json as _json
+from datetime import datetime, timezone
+
+PUMPPORTAL = "https://pumpportal.fun/api/trade-local"
+
+
+@api_router.post("/uploads/image")
+async def upload_image(request: Request):
+    body = await request.body()
+    if not body or len(body) > 2 * 1024 * 1024:
+        return Response('{"error":"invalid_image"}', status_code=400, media_type="application/json")
+    ctype = request.headers.get("content-type", "image/png")
+    mid = uuid.uuid4().hex
+    await db.media.insert_one({
+        "_id": mid, "data": base64.b64encode(body).decode(), "contentType": ctype,
+        "createdAt": datetime.now(timezone.utc).isoformat(),
+    })
+    base = str(request.base_url).rstrip("/")
+    return {"id": mid, "url": f"{base}/api/media/{mid}"}
+
+
+@api_router.get("/media/{mid}")
+async def get_media(mid: str):
+    doc = await db.media.find_one({"_id": mid})
+    if not doc:
+        return Response(status_code=404)
+    return Response(
+        content=base64.b64decode(doc["data"]),
+        media_type=doc["contentType"],
+        headers={"Cache-Control": "public, max-age=31536000, immutable", "Access-Control-Allow-Origin": "*"},
+    )
+
+
+@api_router.post("/launch/metadata")
+async def launch_metadata(request: Request):
+    body = await request.json()
+    name = (body.get("name") or "").strip()[:64]
+    symbol = (body.get("symbol") or "").strip()[:16]
+    if not name or not symbol:
+        return Response('{"error":"invalid_metadata"}', status_code=400, media_type="application/json")
+    base = str(request.base_url).rstrip("/")
+    links = body.get("links") or {}
+    meta = {
+        "name": name,
+        "symbol": symbol,
+        "description": (body.get("description") or "")[:1000],
+        "image": f"{base}/api/media/{body.get('imageId')}",
+        "showName": True,
+        "createdOn": base,
+    }
+    if links.get("website"):
+        meta["website"] = links["website"]
+    if links.get("x"):
+        meta["twitter"] = links["x"]
+    if links.get("telegram"):
+        meta["telegram"] = links["telegram"]
+    mid = uuid.uuid4().hex
+    await db.meta.insert_one({"_id": mid, "json": meta})
+    return {"uri": f"{base}/api/meta/{mid}.json", "id": mid}
+
+
+@api_router.get("/meta/{mid}.json")
+async def get_meta(mid: str):
+    doc = await db.meta.find_one({"_id": mid})
+    if not doc:
+        return Response(status_code=404)
+    return Response(
+        content=_json.dumps(doc["json"]),
+        media_type="application/json",
+        headers={"Cache-Control": "public, max-age=31536000, immutable", "Access-Control-Allow-Origin": "*"},
+    )
+
+
+@api_router.post("/launch/build")
+async def launch_build(request: Request):
+    """Build the unsigned pump.fun create transaction via PumpPortal (keyless)."""
+    body = await request.json()
+    payload = {
+        "publicKey": body.get("publicKey"),
+        "action": "create",
+        "tokenMetadata": {
+            "name": (body.get("name") or "").strip()[:64],
+            "symbol": (body.get("symbol") or "").strip()[:16],
+            "uri": body.get("uri"),
+        },
+        "mint": body.get("mint"),
+        "denominatedInSol": "true",
+        "amount": float(body.get("amountSol") or 0),
+        "slippage": 10,
+        "priorityFee": 0.0005,
+        "pool": "pump",
+    }
+    if not payload["publicKey"] or not payload["mint"] or not payload["tokenMetadata"]["uri"]:
+        return Response('{"error":"invalid_input"}', status_code=400, media_type="application/json")
+    try:
+        r = await _client().post(PUMPPORTAL, json=payload, headers={"Content-Type": "application/json"})
+    except httpx.HTTPError as e:
+        return Response(f'{{"error":"upstream_error","message":"{type(e).__name__}"}}', status_code=502, media_type="application/json")
+    if r.status_code != 200:
+        return Response(r.content, status_code=r.status_code, media_type="application/json")
+    return {"transaction": base64.b64encode(r.content).decode()}
+
+
+@api_router.post("/our/launches")
+async def record_launch(request: Request):
+    body = await request.json()
+    if not body.get("mint"):
+        return Response('{"error":"invalid_input"}', status_code=400, media_type="application/json")
+    await db.our_launches.update_one(
+        {"mint": body["mint"]},
+        {"$set": {
+            "mint": body["mint"], "name": body.get("name"), "ticker": body.get("ticker"),
+            "imageUrl": body.get("imageUrl"), "creator": body.get("creator"),
+            "signature": body.get("signature"),
+            "createdAt": datetime.now(timezone.utc).isoformat(),
+        }},
+        upsert=True,
+    )
+    return {"ok": True}
+
+
+@api_router.get("/our/launches")
+async def list_launches():
+    docs = await db.our_launches.find({}, {"_id": 0}).sort("createdAt", -1).to_list(200)
+    return {"launches": docs}
+
+
 async def _record_our_desk(desk_id: str, origin: str):
     try:
         from datetime import datetime, timezone

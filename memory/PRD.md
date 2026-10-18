@@ -131,3 +131,10 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 - Exhausted upstream options: challenge accepts only {wallet} (all partner/domain fields rejected), verify reconstructs message server-side (tamper=invalid), no openapi/docs partner mention. Phantom blocks SIWS sign on foreign domains — no client bypass exists or should exist.
 - Delivered best-possible UX: WalletHelpPanel (Solflare in-app browser deep link that preserves the current page, copy link, QR-to-desktop handoff) — shown on Launch & Onboard when the block fires. Previewable via /launch?wallethelp=1. Verified rendering + wizard navigation.
 - Real permanent fix = upstream adds makemarkets.app to their sign-in origin config (PUBLIC_ORIGIN/partner allowlist). User should contact makers.fun team (their X is linked on their coin page).
+
+## Update 2026-10-18 (revision 22) — NATIVE LAUNCH (no engine auth)
+- Launch is now fully native: artwork hosted by our backend (/api/uploads/image + /api/media/{id}), metadata JSON hosted by us (/api/launch/metadata + /api/meta/{id}.json), unsigned pump.fun create tx built via PumpPortal trade-local through /api/launch/build (keyless), signed client-side (fresh mint keypair + wallet via adapter — transactions are NOT domain-blocked), broadcast via our RPC, recorded in db.our_launches.
+- Wizard simplified to 3 steps: Identity / Opening buy / Review & launch. Success panel links mint + tx on explorer and routes to /mm?mint= to attach the engine maker.
+- Explore shows a "Minted here — awaiting a market maker" strip from our_launches.
+- Engine (makers.fun relay) remains for the market maker: Onboard + desk management need engine sign-in (signMessage-first; WalletHelpPanel covers Phantom's domain block).
+- Verified server-side: upload/media/metadata/build/dual-sign/record all PASS (only broadcast needs a funded wallet, ~0.01 SOL rent). Wizard walkthrough screenshot-verified.

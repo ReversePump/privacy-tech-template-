@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Search, ArrowUpDown, Rocket, Plus } from "lucide-react";
+import { Search, ArrowUpDown, Rocket, Plus, Zap } from "lucide-react";
 import { fmtSol, fmtSolSigned, fmtUsd, fmtNum, fmtAge, lamportsToSol } from "../lib/format";
-import { PageHead, Panel, CoinCell, StatusDot, TypeBadge, Loading, Empty } from "../components/bits";
+import { PageHead, Panel, CoinCell, StatusDot, TypeBadge, Loading, Empty, CoinAvatar } from "../components/bits";
 import { useOurDesks } from "../lib/useOurDesks";
 
 const FILTERS = [
@@ -38,9 +38,20 @@ const sortVal = (d, s) => {
 export default function Explore() {
   const [params] = useSearchParams();
   const { ours } = useOurDesks();
+  const [launches, setLaunches] = useState([]);
   const [q, setQ] = useState(params.get("q") || "");
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("volume");
+
+  useEffect(() => {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/api/our/launches`)
+      .then((r) => r.json())
+      .then((d) => setLaunches(d.launches || []))
+      .catch(() => {});
+  }, []);
+
+  const deskMints = new Set((ours || []).map((d) => d.mint));
+  const awaiting = launches.filter((l) => !deskMints.has(l.mint));
 
   const rows = useMemo(() => {
     if (!ours) return null;
@@ -59,6 +70,28 @@ export default function Explore() {
         accent="Every market."
         sub="Only coins launched or onboarded through MakeMarkets. Open any row to inspect its wallets, fills, fee claims and the dials it runs on."
       />
+
+      {awaiting.length > 0 && (
+        <Panel className="mb-6 overflow-hidden" data-testid="awaiting-panel">
+          <div className="border-b border-black/5 px-4 py-3 flex items-center gap-2">
+            <Zap size={14} className="text-[#3F9E00]" />
+            <span className="text-[#131a0f] font-medium text-sm">Minted here — awaiting a market maker</span>
+          </div>
+          {awaiting.map((l) => (
+            <div key={l.mint} className="flex items-center gap-3 border-b border-black/5 px-4 py-3 last:border-0" data-testid={`awaiting-${l.ticker}`}>
+              <CoinAvatar url={l.imageUrl} name={l.name} size={30} />
+              <div className="min-w-0">
+                <div className="truncate text-[13px] text-[#131a0f]">{l.name}</div>
+                <div className="font-mono text-[10px] text-[#93a184]">${l.ticker} · {fmtAge(l.createdAt)} ago</div>
+              </div>
+              <Link to={`/mm?mint=${l.mint}`} data-testid={`awaiting-add-${l.ticker}`}
+                className="ml-auto inline-flex h-8 items-center gap-1.5 rounded-[3px] bg-[#3F9E00] px-3.5 text-xs font-medium text-white hover:bg-[#54C400]">
+                <Zap size={12} /> Add the maker
+              </Link>
+            </div>
+          ))}
+        </Panel>
+      )}
 
       <Panel className="overflow-hidden" data-testid="explore-table-panel">
         <div className="flex flex-wrap items-center gap-3 border-b border-black/5 px-4 py-3">

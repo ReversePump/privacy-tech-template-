@@ -7,18 +7,18 @@ const SECTIONS = [
     id: "what",
     title: "What MakeMarkets does",
     body: [
-      "MakeMarkets gives every coin its own market maker on Solana. Launch a fresh coin here, or onboard one that already trades on a bonding curve — either way it gets a dedicated set of public trading wallets that accumulate on dips and distribute into strength.",
-      "The maker feeds itself: the coin's own creator fees keep it running, topped up by whatever SOL you wire in at launch. It never reaches back into your wallet — SOL only flows out to your payout address, plus a fixed 20% profit cut that is destroyed forever.",
+      "MakeMarkets gives every coin its own market maker on Solana. Mint a fresh coin right here — one approval, straight onto the bonding curve — or onboard one that already trades. Either way it can run a dedicated set of public trading wallets that accumulate on dips and distribute into strength.",
+      "The maker feeds itself from its vault: whatever SOL you deposit, plus the coin's creator fees once it holds them. It never reaches back into your wallet — SOL only flows out to its owner's payout address, plus a fixed 20% profit cut that is destroyed forever.",
     ],
   },
   {
     id: "money",
     title: "Where the SOL goes",
     body: [
-      "A single approval at launch mints the coin, locks its fee split and funds the maker's vault. After that the vault claims fees, tops up the trading wallets and settles with you — no further signatures needed.",
-      "Fee split: every trade on a coin born here pays creator fees. A split locked at mint routes 80% to the vault and 20% to the platform. It can never be edited.",
-      "Your cut: you decide how much of each claim the maker keeps and how much profit gets reinvested. The remainder is payable to you whenever you like — or automatically above a threshold.",
-      "Losses: a losing trade stays with the maker's capital. It is never recovered from your pending payouts, and nothing silently tops the maker up.",
+      "Launching mints your coin directly on the bonding curve from this page — one signature, artwork and metadata included. Attaching the market maker is the next step: pick a coin, fund its vault, and the engine runs it from there.",
+      "Fee split: every trade on a coin pays creator fees. When a maker runs the coin from birth, a locked split routes 80% to the vault and 20% to the platform — it can never be edited. Onboarded coins keep their standard fee setup.",
+      "Your cut: you decide how much of each claim the maker keeps and how much profit gets reinvested. The remainder is payable to the owner whenever you like — or automatically above a threshold.",
+      "Losses: a losing trade stays with the maker's capital. It is never recovered from pending payouts, and nothing silently tops the maker up.",
     ],
   },
   {
