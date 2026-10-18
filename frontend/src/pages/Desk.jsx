@@ -163,7 +163,7 @@ export default function Desk() {
           {(() => { const linkMint = isOursDesk ? desk.mint : PLATFORM_CA; return (<>
             <ExtLink href={pumpCoin(linkMint)} className="rounded-[3px] border border-black/10 px-3.5 py-2 text-xs">Market</ExtLink>
             <ExtLink href={dexscreener(linkMint)} className="rounded-[3px] border border-black/10 px-3.5 py-2 text-xs">Chart</ExtLink>
-            <ExtLink href={solscanAcct(linkMint)} className="rounded-[3px] border border-black/10 px-3.5 py-2 text-xs">Explorer</ExtLink>
+            {!isPlatformToken && <ExtLink href={solscanAcct(linkMint)} className="rounded-[3px] border border-black/10 px-3.5 py-2 text-xs">Explorer</ExtLink>}
           </>); })()}
           {isOwner && (
             <Link to={`/dashboard/${desk.id}`} className="rounded-[3px] bg-[#3F9E00] px-4 py-2 text-xs font-medium text-[#131a0f] hover:bg-[#54C400]" data-testid="desk-dashboard-btn">
@@ -247,7 +247,9 @@ export default function Desk() {
                     <span className="font-mono text-[10px] uppercase tracking-wider text-[#3F9E00]">
                       {w.role === "treasury" ? "Treasury" : `W${w.index}`}
                     </span>
-                    <ExtLink href={solscanAcct(w.address)} className="font-mono text-[11px]">{short(w.address, 4, 4)}</ExtLink>
+                    {isPlatformToken
+                      ? <span className="font-mono text-[11px] text-[#5c6b50]">{short(w.address, 4, 4)}</span>
+                      : <ExtLink href={solscanAcct(w.address)} className="font-mono text-[11px]">{short(w.address, 4, 4)}</ExtLink>}
                     <span className="ml-auto font-mono text-xs text-[#131a0f] tnum">{fmtSol(w.solLamports, 3)}</span>
                   </div>
                   {w.role !== "treasury" && (

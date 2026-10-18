@@ -249,3 +249,7 @@ Clone https://makers.fun/ 1:1 with full backend via proxy of their API (api.make
 ## Update 2026-10-18 (revision 39) — MOBILE ONBOARD SHOWS ALL SETTINGS
 - Mm.jsx: strategy presets + full SettingsEditor dials now render on mobile/vault mode too (previously hidden). Chosen settings are stored with the vault deposit record (backend /api/vault/deposit accepts optional settings) so they are kept for when the maker is created.
 - Verified via iPhone emulation: presets + all dial groups visible, fund button intact; 22/22 backend tests pass.
+
+## Update 2026-10-18 (revision 40) — SOLSCAN ACCOUNT LINKS DISABLED ON $MARKETS PAGE ONLY
+- On the $MARKETS (masked platform-mint) desk page: Explorer button removed and wallet addresses render as plain text (no solscan account links). Transaction links (trades/claims/transfers) stay.
+- All other coin pages keep full solscan links. Verified: $MARKETS page 0 account links / 50 tx links; masked coin page keeps 5 account links.
