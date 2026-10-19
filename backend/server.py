@@ -191,7 +191,7 @@ from solders.pubkey import Pubkey
 from solders.hash import Hash
 from solders.system_program import transfer as _sys_transfer, TransferParams
 from solders.message import Message
-from solders.transaction import Transaction, VersionedTransaction
+from solders.transaction import Transaction
 
 SOLANA_RPC = os.environ.get("SOLANA_RPC", "https://api.mainnet-beta.solana.com")
 JUP = "https://api.jup.ag/swap/v1"
@@ -298,36 +298,39 @@ async def wallet_trade(request: Request):
         return _err("invalid_input", 400)
 
     kp = _custodial_keypair(user)
-    # quote
-    q = await _client().get(f"{JUP}/quote", params={
-        "inputMint": input_mint, "outputMint": output_mint, "amount": amount, "slippageBps": 100,
-    })
-    if q.status_code != 200:
-        return _err("no_route", 400)
-    quote = q.json()
-    # swap tx
-    sw = await _client().post(f"{JUP}/swap", json={"quoteResponse": quote, "userPublicKey": str(kp.pubkey()),
-                                                   "wrapAndUnwrapSol": True, "dynamicComputeUnitLimit": True})
-    if sw.status_code != 200:
-        return _err("swap_build_failed", 400)
-    tx_b64 = sw.json().get("swapTransaction")
-    vtx = VersionedTransaction.from_bytes(base64.b64decode(tx_b64))
-    # byte-exact splice sign (populate() mangles v0/ALT messages)
-    raw = base64.b64decode(tx_b64)
-    def _u16(b, off):
-        val = 0; shift = 0
-        while True:
-            x = b[off]; off += 1
-            val |= (x & 0x7F) << shift
-            if not (x & 0x80):
-                break
-            shift += 7
-        return val, off
-    n_sigs, off = _u16(raw, 0)
-    msg_bytes = raw[off + 64 * n_sigs:]
-    sig = kp.sign_message(msg_bytes)
-    signed = raw[:off] + bytes(sig) + raw[off + 64:]
-    sig_out = await _sol_rpc("sendTransaction", [base64.b64encode(signed).decode(), {"encoding": "base64", "skipPreflight": False, "maxRetries": 3}])
+    try:
+        # quote
+        q = await _client().get(f"{JUP}/quote", params={
+            "inputMint": input_mint, "outputMint": output_mint, "amount": amount, "slippageBps": 100,
+        })
+        if q.status_code != 200:
+            return _err("no_route", 400)
+        quote = q.json()
+        # swap tx
+        sw = await _client().post(f"{JUP}/swap", json={"quoteResponse": quote, "userPublicKey": str(kp.pubkey()),
+                                                       "wrapAndUnwrapSol": True, "dynamicComputeUnitLimit": True})
+        if sw.status_code != 200:
+            return _err("swap_build_failed", 400)
+        tx_b64 = sw.json().get("swapTransaction")
+        # byte-exact splice sign (populate() mangles v0/ALT messages)
+        raw = base64.b64decode(tx_b64)
+        def _u16(b, off):
+            val = 0; shift = 0
+            while True:
+                x = b[off]; off += 1
+                val |= (x & 0x7F) << shift
+                if not (x & 0x80):
+                    break
+                shift += 7
+            return val, off
+        n_sigs, off = _u16(raw, 0)
+        msg_bytes = raw[off + 64 * n_sigs:]
+        sig = kp.sign_message(msg_bytes)
+        signed = raw[:off] + bytes(sig) + raw[off + 64:]
+        sig_out = await _sol_rpc("sendTransaction", [base64.b64encode(signed).decode(), {"encoding": "base64", "skipPreflight": False, "maxRetries": 3}])
+    except Exception as e:
+        logger.warning(f"custodial trade failed: {e}")
+        return Response(_json.dumps({"error": f"trade failed: {str(e)[:180]}"}), status_code=400, media_type="application/json")
     await db.trades.insert_one({
         "wallet": s["wallet"], "email": s.get("email"), "inputMint": input_mint, "outputMint": output_mint,
         "inAmount": quote.get("inAmount"), "outAmount": quote.get("outAmount"), "signature": sig_out,
@@ -524,7 +527,7 @@ async def hl_withdraw(request: Request):
         return _err("invalid_input", 400)
     ex = _hl_exchange(user)
     try:
-        res = ex.usd_send(amount, dest)
+        res = ex.usd_transfer(amount, dest)
     except Exception as e:
         logger.warning(f"hl withdraw error: {e}")
         return Response(_json.dumps({"error": str(e)[:200]}), status_code=400, media_type="application/json")
