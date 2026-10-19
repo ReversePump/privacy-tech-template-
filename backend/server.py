@@ -619,7 +619,7 @@ async def control_deployment(dep_id: str, request: Request):
     r = await db.deployments.update_one({"id": dep_id, "ownerKey": owner_key}, {"$set": {"status": new}})
     if not r.matched_count:
         return _err("not_found", 404)
-    await engine._event(dep_id, f"deployment {action}d by user", "info")
+    await engine._event(dep_id, f"deployment {new} by user", "info")
     return {"ok": True, "status": new}
 
 

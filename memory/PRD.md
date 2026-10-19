@@ -33,14 +33,29 @@ auto-generated wallets and REAL trading.
 
 ## Implemented (verified)
 - Email register/login with dual custodial wallet generation (Solana + EVM/Hyperliquid).
-- Account dashboard: SOL balance, HL equity, generated addresses (copyable), live HL markets.
-- Solana swap panel (SOL → $WEFT/USDC/any mint) wired to real Jupiter execution path.
-- Hyperliquid perps panel: market select w/ live prices, long/short, leverage, open + close.
-- Withdrawals: SOL to any address; USDC via HL `usd_transfer` to any HL account.
+  Wallets are REAL on-chain keypairs (mainnet RPC + Hyperliquid both recognize them),
+  Fernet-encrypted at rest; keys never leave the backend.
+- **24/7 engine (`/app/backend/engine.py`, 25s tick)**: evaluates strategy triggers against live
+  Hyperliquid prices/funding, Fear & Greed, calendar events; full expression tree
+  (and/or/not/gt/gte/lt/lte/eq/between/crosses_above/crosses_below), forMinutes + cooldownMinutes
+  (clamped ≥1 min) + reentry semantics. Unsupported signal kinds (X-social, sports, odds, weather,
+  onchain) evaluate to null by design.
+- **Three deployment modes**: paper ($10k practice account, real prices), live (real perp orders
+  from the user's generated HL account), alerts (in-app alerts feed). Pause/resume/stop controls.
+- **Position manager**: stop-loss / take-profit / trailing-stop enforced every tick, paper PnL
+  settles into the practice balance, live closes via market_close.
+- **Copy-trading automation**: mirror any Hyperliquid trader's new fills (paper/live/alerts),
+  from the Traders page Auto-copy modal.
+- **AI refine chat**: /new drafts can be tuned conversationally via upstream /ai/refine/stream.
+- Account dashboard: SOL balance, HL equity, generated addresses, deployments w/ live event log,
+  practice account (equity/positions/history), alerts feed, Solana swap panel, HL perps panel,
+  withdrawals, saved strategies w/ backtest.
 - Session persistence across reload; sign-out; wrong-password/duplicate-email handling.
 - No key material in any API response or localStorage (security-verified by test agent).
 - Wallet-signature sign-in path retained for users with their own Phantom/Solflare.
-- Tests: `/app/backend/tests/test_email_auth_wallets.py` (17) + `test_weft_relay.py` (16) — 33 pass.
+- Tests: 44 backend tests pass (17 email-auth + 16 relay + 11 engine). Test agent iteration_7:
+  100% frontend surfaces, zero critical issues.
+- Branding: Swift Fi / SwiftFi / $SWIFT everywhere visible (zero upstream brand leaks).
 
 ## NOT yet verified with real funds
 - Actual Jupiter swap execution and HL perp order placement require a funded generated wallet

@@ -1,0 +1,42 @@
+{
+  "summary": "Iteration 7: validated the newly-activated engine stack (deployments, paper, alerts, copy) end-to-end + full UI regression + Swift Fi rebranding check. 44/44 backend pytest pass (11 engine + 17 email-auth-wallets + 16 relay). All engine phases exercised live: create paper deployment with always-true trigger (ETH>1) -> within ~35s engine opened a paper ETH long at the REAL mainnet price ($2,421.45, 2x) and the fill event (\"paper long ETH $50 @ 2421.45 (2x)\") was visible in deployment-{id} card AND paper-positions section. Pause/Resume/Stop controls on the UI all fire the correct engine state transition (verified by refreshed event log + status badge: active -> paused -> active -> stopped). Alerts-mode happy path verified by test_engine.py::test_alerts_mode_creates_alert (90s wait path passes). Copy modal happy path exercised live: autocopy-trader-* opens copy-modal; copy-mode-paper + copy-start-btn created a copy deployment and modal closed cleanly. Live-mode-on-unfunded path: covered by test_live_mode_requires_email_account_note which polls the deployment event log for a non-500 error event (passes, no engine loop crash). Branding: zero visible Weft/WEFT in frontend chrome (title, header, buttons, labels); the only remaining 'Weft' sightings are (1) internal identifiers (api module name `weft`, localStorage key `weft:session`, data-testid tokens) — none user-visible — and (2) one upstream-seeded strategy card titled 'Buy WEFT at $1.6m' which is user-provided data from the Railway relay, not frontend branding. All 7 pages render (Home, New, Strategies, Traders, Leaderboard, Revenue, Account); header shows SwiftFi. logo + Strategies/Traders/Leaderboard/Revenue + Account/Start trading. Found one tiny grammar bug and the previously-noted dev-only hydration warning.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/deployments/{id}/control", "issue": "Event log and UI toast say 'deployment stopd by user' / toast 'Deployment stopd' when action=stop. The format string in server.py:622 (`f\"deployment {action}d by user\"`) and Account.jsx:224 (`\\`Deployment ${action}d\\``) assume English past tense is action+'d', which produces 'paused' ✓, 'resumed' ✓, but 'stopd' ✗. Map action -> past-tense verb explicitly (pause->paused, resume->resumed, stop->stopped)."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Account.jsx <select data-testid=hl-lev / hl-symbol / sol-trade-out>", "issues": ["Repeat of prior-iteration dev-only React hydration warning '<span> cannot be a child of <option>'. Caused by the x-component dev-overlay wrapping option text; harmless in production build. Noisy in dev console only. No functional impact."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_engine.py",
+    "/app/backend/tests/test_email_auth_wallets.py",
+    "/app/backend/tests/test_weft_relay.py",
+    "/app/test_reports/pytest/iter7_results.xml"
+  ],
+  "action_items": [
+    "Low priority: fix 'stopd' typo in /app/backend/server.py line 622 and /app/frontend/src/pages/Account.jsx line 224 — switch the ad-hoc `${action}d` string to an explicit map {pause:'paused', resume:'resumed', stop:'stopped'}."
+  ],
+  "critical_code_review_comments": [
+    "server.py line 622 and Account.jsx line 224 — ad-hoc `${action}+d` past-tense generation. Works for 2/3 verbs by coincidence. Use an explicit mapping to avoid future verbs breaking it.",
+    "engine.py tick interval is a hard-coded 25s (ENGINE_TICK = 25). Fine for MVP but no backoff on upstream (Hyperliquid price fetch) failure — if the API is slow, ticks pile up. Consider aiohttp timeouts (already present) + per-deployment skip-this-tick on error (already present via try/except in _tick_deployment). OK as-is.",
+    "Copy-mode deployments created with sizeUsd default of $100 are fine, but there's no validation on the server side that sizeUsd is positive — a client sending sizeUsd=-100 or 0 would still create a deployment that then produces errors on open. Add Pydantic/manual guard (sizeUsd > 0).",
+    "Account.jsx DeploymentsPanel polls GET /api/deployments every 10s unconditionally. Fine today but with many deployments this grows the response payload (events capped? engine._event trims to last 50 — good). No action needed.",
+    "The engine stores paper positions in-memory inside PaperAccount (Mongo-backed) — verified persists across engine restarts because paper account is read back via get_paper_account on each request. Good.",
+    "Alerts-mode cooldown relies on trigger.cooldownMinutes to avoid alert spam — if a user sets cooldownMinutes=0, every tick (25s) would create a new alert row. Clamp to a minimum (e.g. max(cooldown, 1 minute)) to be safe.",
+    "Live-mode with an unfunded custodial wallet correctly logs a non-500 error event (verified by passing test_live_mode_requires_email_account_note). Engine loop proven to not crash on this path."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (44/44 pytest)", "frontend": "100% of reachable surfaces exercised (register, account 4 sections, deployment create+pause+resume+stop, paper position render, alerts empty-state, traders copy modal + copy-start, all 7 page routes render, header + branding)"},
+  "test_credentials": "Fresh testagent_<unix_ts>@weft.test / agentpass123 generated per run (idempotent).",
+  "seed_data_creation": "Each run: 1 db.users row, >=1 db.sessions row, 1-2 db.deployments rows (paper + copy — all stopped by cleanup at end), 1 db.paper_accounts row (equity preserved at $10,000 since no close happened in-window).",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Engine stack is live and all critical paths green. Backend suite: /app/backend/tests/test_engine.py (11 tests, uses ~90s tick-waits — don't duplicate), /app/backend/tests/test_email_auth_wallets.py (17), /app/backend/tests/test_weft_relay.py (16). Fresh email per run; no cleanup needed. Frontend testids for engine: deployments-section, deployment-{id}, dep-pause-{id}/dep-resume-{id}/dep-stop-{id}, dep-events-{id}, paper-section, paper-equity, paper-pnl, paper-positions, paper-history, alerts-section, alerts-mark-read, alert-{i}. New page: start-practice-btn, start-alerts-btn, start-live-btn, refine-input, refine-btn (require a successfully-drafted strategy to be enabled). Traders: autocopy-trader-{short}, copy-modal, copy-mode-paper/alerts/live, copy-size, copy-start-btn, copy-modal-close. Anonymous AI daily cap (5/day/IP) may still be exhausted on preview — the draft-error banner is the expected observable state. Only outstanding non-blocking issue is the 'stopd' typo (server.py:622 + Account.jsx:224).",
+  "rca_of_the_issue": "N/A — no critical issue this iteration. Minor 'stopd' typo RCA: server.py:622 builds the event message as `f\"deployment {action}d by user\"` where action is directly the user-provided control verb ('pause'|'resume'|'stop'). Past-tense is coincidentally correct for 'pause' (paused) and 'resume' (resumed) because they both end in -e, but 'stop' + 'd' = 'stopd' (not 'stopped'). Same bug duplicated in Account.jsx line 224 toast. Fix: `const PAST = {pause:'paused', resume:'resumed', stop:'stopped'}; const past = PAST[action] || action; ...f\"deployment {past} by user\"`."
+}

@@ -221,7 +221,7 @@ function DeploymentsPanel({ token, deployments, onDone }) {
     setBusy(id + action);
     try {
       await authed(token, `/deployments/${id}/control`, { action });
-      toast.success(`Deployment ${action}d`);
+      toast.success(`Deployment ${{ pause: "paused", resume: "resumed", stop: "stopped" }[action] || action}`);
       onDone();
     } catch (e) { toast.error(errorMessage(e)); } finally { setBusy(""); }
   };

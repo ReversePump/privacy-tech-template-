@@ -357,7 +357,8 @@ async def _tick_deployment(dep):
             if not trig:
                 continue
             tstate = state.get("triggers", {}).get(trig_id, {})
-            if tstate.get("lastFiredAt") and now - tstate["lastFiredAt"] < (trig.get("cooldownMinutes") or 0) * 60:
+            cooldown = max(trig.get("cooldownMinutes") or 0, 1) * 60  # min 1 min — no alert/fill spam
+            if tstate.get("lastFiredAt") and now - tstate["lastFiredAt"] < cooldown:
                 continue
             cond = _eval(trig.get("when"), refval, cross_state)
             for_min = (trig.get("forMinutes") or 0) * 60
