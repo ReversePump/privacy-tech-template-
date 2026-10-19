@@ -2,6 +2,7 @@ import os
 import logging
 import uuid
 import json as _json
+import time
 import httpx
 from datetime import datetime, timezone
 from fastapi import FastAPI, APIRouter, Request
@@ -222,7 +223,16 @@ async def _session_user(request: Request):
     token = auth[7:] if auth.startswith("Bearer ") else None
     if not token:
         return None
-    return await db.sessions.find_one({"token": token})
+    s = await db.sessions.find_one({"token": token})
+    if s and s.get("createdAt"):
+        try:
+            age = time.time() - datetime.fromisoformat(s["createdAt"]).timestamp()
+            if age > 30 * 86400:  # sessions expire after 30 days
+                await db.sessions.delete_one({"token": token})
+                return None
+        except Exception:
+            pass
+    return s
 
 
 @auth_router.post("/auth/email/register")
@@ -439,6 +449,15 @@ async def hl_account(request: Request):
     except Exception as e:
         logger.warning(f"hl info error: {e}")
         state = None
+    equity_hist = []
+    try:
+        r = await _client().post("https://api.hyperliquid.xyz/info",
+                                 json={"type": "portfolio", "user": user["evmAddress"]})
+        for period, data in r.json():
+            if period == "week":
+                equity_hist = [{"t": int(t / 1000), "v": float(v)} for t, v in data.get("accountValueHistory", [])]
+    except Exception:
+        pass
     ms = (state or {}).get("marginSummary", {})
     positions = []
     for p in (state or {}).get("assetPositions", []):
@@ -452,6 +471,7 @@ async def hl_account(request: Request):
         "equityUsd": float(ms.get("accountValue", 0) or 0),
         "withdrawableUsd": float((state or {}).get("withdrawable", 0) or 0),
         "positions": positions,
+        "equityHistory": equity_hist,
     }
 
 
@@ -755,6 +775,154 @@ async def mark_alerts_read(request: Request):
     owner_key = s.get("email") or s["wallet"]
     await db.alerts.update_many({"ownerKey": owner_key}, {"$set": {"read": True}})
     return {"ok": True}
+
+
+# ---------- password reset (email code) ----------
+
+import random
+import emails
+
+
+@auth_router.post("/auth/email/reset_request")
+async def reset_request(request: Request):
+    body = await request.json()
+    email = (body.get("email") or "").strip().lower()
+    user = await db.users.find_one({"email": email})
+    if user:  # never leak whether the email exists
+        code = f"{random.randint(0, 999999):06d}"
+        await db.reset_codes.update_one(
+            {"email": email},
+            {"$set": {"email": email, "codeHash": bcrypt.hashpw(code.encode(), bcrypt.gensalt()).decode(),
+                      "expiresAt": time.time() + 600, "attempts": 0}},
+            upsert=True)
+        await emails.send_reset_code(email, code)
+    return {"ok": True}
+
+
+@auth_router.post("/auth/email/reset_confirm")
+async def reset_confirm(request: Request):
+    body = await request.json()
+    email = (body.get("email") or "").strip().lower()
+    code = (body.get("code") or "").strip()
+    new_pw = body.get("newPassword") or ""
+    if len(new_pw) < 8:
+        return _err("password_too_short", 400)
+    rec = await db.reset_codes.find_one({"email": email})
+    if not rec or rec["expiresAt"] < time.time() or rec.get("attempts", 0) >= 5:
+        return _err("invalid_code", 400)
+    if not bcrypt.checkpw(code.encode(), rec["codeHash"].encode()):
+        await db.reset_codes.update_one({"email": email}, {"$inc": {"attempts": 1}})
+        return _err("invalid_code", 400)
+    await db.users.update_one({"email": email},
+                              {"$set": {"passHash": bcrypt.hashpw(new_pw.encode(), bcrypt.gensalt()).decode()}})
+    await db.reset_codes.delete_one({"email": email})
+    await db.sessions.delete_many({"email": email})  # old sessions die on password change
+    return {"ok": True}
+
+
+# ---------- practice account reset ----------
+
+@auth_router.post("/paper/reset")
+async def paper_reset(request: Request):
+    s = await _session_user(request)
+    if not s:
+        return _err("sign_in_required", 401)
+    owner_key = s.get("email") or s["wallet"]
+    await db.positions.update_many({"ownerKey": owner_key, "mode": "paper", "status": "open"},
+                                   {"$set": {"status": "closed", "closeReason": "reset",
+                                             "closedAt": datetime.now(timezone.utc).isoformat()}})
+    await db.paper_accounts.update_one({"ownerKey": owner_key},
+                                       {"$set": {"balanceUsd": engine.PAPER_START_USD}}, upsert=True)
+    return {"ok": True, "balanceUsd": engine.PAPER_START_USD}
+
+
+# ---------- Solana token holdings ----------
+
+@auth_router.get("/wallet/holdings")
+async def wallet_holdings(request: Request):
+    s = await _session_user(request)
+    if not s:
+        return _err("sign_in_required", 401)
+    try:
+        res = await _sol_rpc("getTokenAccountsByOwner", [
+            s["wallet"], {"programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"},
+            {"encoding": "jsonParsed"}])
+    except Exception as e:
+        logger.warning(f"holdings rpc: {e}")
+        return {"holdings": []}
+    out = []
+    for acc in (res or {}).get("value", []):
+        info = acc.get("account", {}).get("data", {}).get("parsed", {}).get("info", {})
+        ta = info.get("tokenAmount", {})
+        amt = float(ta.get("uiAmount") or 0)
+        if amt > 0:
+            out.append({"mint": info.get("mint"), "amount": amt, "symbol": None, "priceUsd": None, "valueUsd": None})
+    if out:
+        try:
+            mints = ",".join(h["mint"] for h in out[:30])
+            r = await _client().get(f"https://api.dexscreener.com/tokens/v1/solana/{mints}")
+            if r.status_code == 200:
+                bymint = {}
+                for p in r.json():
+                    a = p.get("baseToken", {}).get("address")
+                    if a and a not in bymint:
+                        bymint[a] = p
+                for h in out:
+                    p = bymint.get(h["mint"])
+                    if p:
+                        h["symbol"] = p.get("baseToken", {}).get("symbol")
+                        h["priceUsd"] = float(p.get("priceUsd") or 0)
+                        h["valueUsd"] = h["amount"] * h["priceUsd"]
+        except Exception as e:
+            logger.warning(f"holdings pricing: {e}")
+    return {"holdings": out}
+
+
+# ---------- limit orders (engine-watched) ----------
+
+@auth_router.post("/hl/limit_order")
+async def hl_limit_order(request: Request):
+    s = await _session_user(request)
+    if not s:
+        return _err("sign_in_required", 401)
+    body = await request.json()
+    symbol = (body.get("symbol") or "").upper()
+    side = body.get("side")
+    direction = body.get("direction")  # above | below
+    try:
+        size_usd = float(body.get("sizeUsd") or 0)
+        target = float(body.get("targetPrice") or 0)
+        leverage = int(body.get("leverage") or 1)
+    except (TypeError, ValueError):
+        return _err("invalid_input", 400)
+    if not symbol or side not in ("long", "short") or direction not in ("above", "below") or size_usd < 10 or target <= 0:
+        return _err("invalid_input", 400)
+    if body.get("mode", "live") == "live" and s.get("authType") != "email":
+        return _err("live_needs_email_account", 400)
+    owner_key = s.get("email") or s["wallet"]
+    strategy = {
+        "schemaVersion": 1, "id": f"limit-{uuid.uuid4().hex[:8]}",
+        "name": f"Limit: {side} {symbol} when {'≥' if direction == 'above' else '≤'} {target:g}",
+        "thesis": f"Limit {side} {symbol} at {target:g}",
+        "signals": [{"id": "px", "kind": "price", "params": {"instrument": {"symbol": symbol}}}],
+        "triggers": [{"id": "hit", "label": f"{symbol} {direction} {target:g}",
+                      "when": {"op": "gte" if direction == "above" else "lte",
+                               "left": {"ref": "px.price"}, "right": {"value": target}}}],
+        "actions": [{"id": "open", "on": ["hit"], "type": "open",
+                     "instrument": {"kind": "perp", "venue": "hyperliquid", "symbol": symbol},
+                     "side": side, "size": {"unit": "usd", "value": size_usd}, "leverage": leverage,
+                     "order": {"type": "market"}, "reentry": "never"}],
+    }
+    dep = {
+        "id": uuid.uuid4().hex[:12], "ownerKey": owner_key, "authType": s.get("authType", "wallet"),
+        "mode": body.get("mode", "live"), "status": "active", "state": {}, "events": [],
+        "createdAt": datetime.now(timezone.utc).isoformat(),
+        "kind": "strategy", "strategy": strategy, "strategyName": strategy["name"], "once": True,
+    }
+    await db.deployments.insert_one(dep)
+    await engine._event(dep["id"], f"limit order set — fires when {symbol} is {direction} {target:g}", "info")
+    dep.pop("_id", None)
+    return {"ok": True, "deployment": dep}
 
 
 app.include_router(auth_router)

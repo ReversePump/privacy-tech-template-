@@ -39,6 +39,7 @@ export default function Account() {
   const [paper, setPaper] = useState(null);
   const [alerts, setAlerts] = useState(null);
   const [history, setHistory] = useState(null);
+  const [holdings, setHoldings] = useState([]);
   const [copied, setCopied] = useState("");
 
   const isEmail = user?.authType === "email";
@@ -57,6 +58,7 @@ export default function Account() {
     authed(token, "/paper/account").then(setPaper).catch(() => {});
     authed(token, "/alerts/me").then(setAlerts).catch(() => {});
     authed(token, "/history").then((d) => setHistory(d.items || [])).catch(() => {});
+    authed(token, "/wallet/holdings").then((d) => setHoldings(d.holdings || [])).catch(() => {});
   };
 
   useEffect(() => {
@@ -119,6 +121,11 @@ export default function Account() {
           <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#75777d]">Hyperliquid equity</div>
           <div className="mt-1 text-xl font-medium tnum" data-testid="acct-hl-eq">{hlInfo ? fmtUsd(hlInfo.equityUsd) : isEmail ? "—" : "n/a"}</div>
           <div className="mt-0.5 text-[11px] text-[#75777d]">{hlInfo ? `${hlInfo.positions.length} open` : ""}</div>
+          {hlInfo?.equityHistory?.length > 1 && (
+            <div className="mt-2 -mx-1" data-testid="hl-equity-chart">
+              <Sparkline points={hlInfo.equityHistory} height={34} />
+            </div>
+          )}
         </div>
         <div className="px-5 py-4">
           <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#75777d]">Saved strategies</div>
@@ -149,6 +156,8 @@ export default function Account() {
             />
           </div>
 
+          <HoldingsPanel holdings={holdings} solInfo={solInfo} />
+
           <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
             <SolTradePanel token={token} onDone={refresh} />
             <HlTradePanel token={token} markets={markets} hlInfo={hlInfo} onDone={refresh} />
@@ -159,7 +168,7 @@ export default function Account() {
       )}
 
       <DeploymentsPanel token={token} deployments={deployments} onDone={refresh} />
-      <PaperPanel paper={paper} />
+      <PaperPanel paper={paper} token={token} onDone={refresh} />
       <AlertsPanel token={token} alerts={alerts} onDone={refresh} />
       <HistoryPanel history={history} />
 
@@ -212,6 +221,32 @@ export default function Account() {
         })}
       </div>
     </div>
+  );
+}
+
+function HoldingsPanel({ holdings, solInfo }) {
+  if (!holdings) return null;
+  return (
+    <Panel className="mt-4 p-5" data-testid="holdings-panel">
+      <div className="mono text-[10px] uppercase tracking-wider text-[#75777d]">Token holdings · Solana wallet</div>
+      {holdings.length === 0 ? (
+        <p className="mt-2 text-[12.5px] text-[#75777d]" data-testid="holdings-empty">
+          No tokens yet{solInfo && solInfo.sol === 0 ? " — deposit SOL and swap into any token above" : ""}.
+        </p>
+      ) : (
+        <div className="mt-3 space-y-2">
+          {holdings.map((h) => (
+            <div key={h.mint} className="flex flex-wrap items-center gap-3 text-[12.5px]" data-testid={`holding-${(h.symbol || h.mint).slice(0, 8)}`}>
+              <span className="font-medium">{h.symbol || short(h.mint, 4, 4)}</span>
+              <span className="mono tnum text-[#75777d]">{h.amount.toLocaleString("en-US", { maximumFractionDigits: 4 })}</span>
+              {h.valueUsd != null && <span className="mono tnum">{fmtUsd(h.valueUsd)}</span>}
+              <a href={`https://solscan.io/token/${h.mint}`} target="_blank" rel="noopener noreferrer"
+                className="ml-auto mono text-[10px] text-[#2b59ff] hover:underline">view ↗</a>
+            </div>
+          ))}
+        </div>
+      )}
+    </Panel>
   );
 }
 
@@ -330,12 +365,27 @@ function DeploymentsPanel({ token, deployments, onDone }) {
   );
 }
 
-function PaperPanel({ paper }) {
+function PaperPanel({ paper, token, onDone }) {
+  const [resetBusy, setResetBusy] = useState(false);
   if (!paper) return null;
   const pnl = paper.equityUsd - paper.startUsd;
+  const reset = async () => {
+    setResetBusy(true);
+    try {
+      await authed(token, "/paper/reset", {});
+      toast.success("Practice account reset to $10,000");
+      onDone();
+    } catch (e) { toast.error(errorMessage(e)); } finally { setResetBusy(false); }
+  };
   return (
     <div className="mt-10" data-testid="paper-section">
-      <h2 className="serif text-2xl font-light">Practice account</h2>
+      <div className="flex items-center gap-3">
+        <h2 className="serif text-2xl font-light">Practice account</h2>
+        <button onClick={reset} disabled={resetBusy} data-testid="paper-reset-btn"
+          className="rounded-full border border-[#12121414] px-3 py-1 text-[11px] text-[#75777d] hover:text-[#121214] disabled:opacity-40 transition-colors">
+          {resetBusy ? "Resetting…" : "Reset to $10,000"}
+        </button>
+      </div>
       <Panel className="mt-4 p-5">
         <div className="flex flex-wrap gap-x-10 gap-y-3">
           <div>
@@ -456,9 +506,21 @@ function HlTradePanel({ token, markets, hlInfo, onDone }) {
   const [sizeUsd, setSizeUsd] = useState(25);
   const [lev, setLev] = useState(5);
   const [busy, setBusy] = useState(false);
+  const [targetPx, setTargetPx] = useState("");
+  const [direction, setDirection] = useState("below");
   const isSpot = mktType === "spot";
+  const isLimit = mktType === "limit";
   const list = markets.filter((m) => !!m.spot === isSpot);
   const sel = list.find((m) => m.symbol === symbol) || list[0];
+  const placeLimit = async () => {
+    setBusy(true);
+    try {
+      await authed(token, "/hl/limit_order", { symbol: sel?.symbol || symbol, side, sizeUsd, leverage: lev, targetPrice: Number(targetPx), direction, mode: "live" });
+      toast.success("Limit order set — the engine watches the price 24/7", {
+        description: `${side === "long" ? "Long" : "Short"} ${sel?.symbol} when price ${direction === "above" ? "≥" : "≤"} $${Number(targetPx).toLocaleString()}` });
+      onDone();
+    } catch (e) { toast.error(errorMessage(e)); } finally { setBusy(false); }
+  };
   const trade = async () => {
     setBusy(true);
     try {
@@ -484,7 +546,7 @@ function HlTradePanel({ token, markets, hlInfo, onDone }) {
       <div className="flex items-center gap-2">
         <div className="mono text-[10px] uppercase tracking-wider text-[#75777d] flex items-center gap-2"><ArrowUpRight size={12} /> Hyperliquid · real</div>
         <div className="ml-auto flex gap-1 rounded-full border border-[#12121414] p-0.5">
-          {[["perp", "Perps"], ["spot", "Spot"]].map(([k, l]) => (
+          {[["perp", "Perps"], ["spot", "Spot"], ["limit", "Limit"]].map(([k, l]) => (
             <button key={k} onClick={() => { setMktType(k); setSide("long"); }} data-testid={`hl-mkt-${k}`}
               className={`h-7 rounded-full px-3 text-[11px] transition-colors ${mktType === k ? "bg-[#121214] text-white" : "text-[#75777d]"}`}>
               {l}
@@ -516,11 +578,30 @@ function HlTradePanel({ token, markets, hlInfo, onDone }) {
           </select>
         )}
       </div>
+      {isLimit && (
+        <div className="mt-2 grid grid-cols-2 gap-2" data-testid="hl-limit-row">
+          <select value={direction} onChange={(e) => setDirection(e.target.value)} data-testid="hl-limit-dir"
+            className="h-11 rounded-lg border border-[#12121414] bg-white px-3 mono text-[12px] outline-none">
+            <option value="below">When price drops to</option>
+            <option value="above">When price rises to</option>
+          </select>
+          <input type="number" min={0} value={targetPx} onChange={(e) => setTargetPx(e.target.value)} placeholder={`now ${sel ? "$" + sel.price.toLocaleString() : ""}`}
+            className="h-11 rounded-lg border border-[#12121414] bg-[#faf9f7] px-3 mono text-[13px] outline-none" data-testid="hl-limit-price" />
+        </div>
+      )}
+      {isLimit ? (
+        <button onClick={placeLimit} disabled={busy || sizeUsd < 10 || !sel || !targetPx} data-testid="hl-trade-btn"
+          className="mt-3 h-11 w-full rounded-full bg-[#121214] text-[13px] font-medium text-white hover:bg-[#2b59ff] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
+          {busy && <Loader2 size={14} className="animate-spin" />}
+          Set limit order · {side} ${sizeUsd} {direction === "above" ? "≥" : "≤"} ${targetPx || "…"}
+        </button>
+      ) : (
       <button onClick={trade} disabled={busy || sizeUsd < 10 || !sel} data-testid="hl-trade-btn"
         className="mt-3 h-11 w-full rounded-full bg-[#121214] text-[13px] font-medium text-white hover:bg-[#2b59ff] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
         {busy && <Loader2 size={14} className="animate-spin" />}
         {isSpot ? `${side === "long" ? "Buy" : "Sell"} ${sel?.symbol || ""} · $${sizeUsd}` : `Open ${side} · $${sizeUsd} · ${lev}×`}
       </button>
+      )}
       {hlInfo?.positions?.length > 0 && (
         <div className="mt-4 border-t border-[#12121414] pt-3 space-y-2" data-testid="hl-positions">
           {hlInfo.positions.map((p) => (

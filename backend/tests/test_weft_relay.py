@@ -67,9 +67,8 @@ def test_relay_backtest_eth_long():
 
 # ---------- auth: challenge / verify / sessions ----------
 def _test_keypair() -> Keypair:
-    with open("/app/scripts/test_wallet.json") as f:
-        secret = bytes(json.load(f))
-    return Keypair.from_bytes(secret)
+    # fresh keypair per test — a fixed wallet races when xdist runs tests in parallel
+    return Keypair()
 
 
 def test_auth_challenge_shape():

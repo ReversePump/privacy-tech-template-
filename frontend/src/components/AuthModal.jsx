@@ -7,14 +7,45 @@ import { errorMessage } from "../lib/api";
 
 export default function AuthModal({ open, onClose }) {
   const [tab, setTab] = useState("email");
-  const [mode, setMode] = useState("register");
+  const [mode, setMode] = useState("register"); // register | login | forgot | reset
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const { emailAuth, signIn } = useAuth();
   const { setVisible } = useWalletModal();
 
   if (!open) return null;
+
+  const forgot = async () => {
+    setBusy(true);
+    try {
+      await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auth/email/reset_request`, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }),
+      });
+      setMode("reset");
+      toast.success("If that email is registered, a 6-digit code is on its way");
+    } catch { toast.error("Could not send the code right now"); } finally { setBusy(false); }
+  };
+
+  const resetPw = async () => {
+    setBusy(true);
+    try {
+      const r = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auth/email/reset_confirm`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code, newPassword: password }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || "failed");
+      toast.success("Password updated — log in with the new one");
+      setMode("login");
+      setPassword("");
+      setCode("");
+    } catch (e) {
+      const m = errorMessage(e);
+      toast.error(m === "invalid_code" ? "Wrong or expired code" : m === "password_too_short" ? "Password needs at least 8 characters" : m);
+    } finally { setBusy(false); }
+  };
 
   const submit = async () => {
     setBusy(true);
@@ -61,6 +92,33 @@ export default function AuthModal({ open, onClose }) {
         </div>
 
         {tab === "email" ? (
+          mode === "forgot" ? (
+            <div className="mt-5 space-y-3">
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com"
+                className="h-11 w-full rounded-lg border border-[#12121414] bg-[#faf9f7] px-4 text-[13.5px] outline-none focus:border-[#2b59ff55]"
+                data-testid="forgot-email" />
+              <button onClick={forgot} disabled={busy || !email} data-testid="forgot-submit"
+                className="h-11 w-full rounded-full bg-[#121214] text-[13px] font-medium text-white hover:bg-[#2b59ff] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
+                {busy && <Loader2 size={14} className="animate-spin" />} Email me a reset code
+              </button>
+              <button onClick={() => setMode("login")} className="w-full text-center text-[12px] text-[#75777d] hover:text-[#2b59ff]" data-testid="forgot-back">
+                Back to log in
+              </button>
+            </div>
+          ) : mode === "reset" ? (
+            <div className="mt-5 space-y-3">
+              <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="6-digit code from your email"
+                className="h-11 w-full rounded-lg border border-[#12121414] bg-[#faf9f7] px-4 mono text-[15px] tracking-[0.3em] outline-none focus:border-[#2b59ff55]"
+                data-testid="reset-code" />
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="New password (8+ characters)"
+                className="h-11 w-full rounded-lg border border-[#12121414] bg-[#faf9f7] px-4 text-[13.5px] outline-none focus:border-[#2b59ff55]"
+                data-testid="reset-password" />
+              <button onClick={resetPw} disabled={busy || code.length !== 6 || password.length < 8} data-testid="reset-submit"
+                className="h-11 w-full rounded-full bg-[#121214] text-[13px] font-medium text-white hover:bg-[#2b59ff] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
+                {busy && <Loader2 size={14} className="animate-spin" />} Set new password
+              </button>
+            </div>
+          ) : (
           <div className="mt-5 space-y-3">
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com"
               className="h-11 w-full rounded-lg border border-[#12121414] bg-[#faf9f7] px-4 text-[13.5px] outline-none focus:border-[#2b59ff55]"
@@ -74,10 +132,18 @@ export default function AuthModal({ open, onClose }) {
               {busy && <Loader2 size={14} className="animate-spin" />}
               {mode === "register" ? "Create account + wallet" : "Log in"}
             </button>
-            <button onClick={() => setMode(mode === "register" ? "login" : "register")} className="w-full text-center text-[12px] text-[#75777d] hover:text-[#2b59ff]" data-testid="auth-switch-mode">
-              {mode === "register" ? "Already have an account? Log in" : "New here? Create an account"}
-            </button>
+            <div className="flex justify-between text-[12px]">
+              <button onClick={() => setMode(mode === "register" ? "login" : "register")} className="text-[#75777d] hover:text-[#2b59ff]" data-testid="auth-switch-mode">
+                {mode === "register" ? "Already have an account? Log in" : "New here? Create an account"}
+              </button>
+              {mode === "login" && (
+                <button onClick={() => setMode("forgot")} className="text-[#75777d] hover:text-[#2b59ff]" data-testid="auth-forgot">
+                  Forgot password?
+                </button>
+              )}
+            </div>
           </div>
+          )
         ) : (
           <div className="mt-5">
             <button onClick={walletSignIn} data-testid="auth-wallet-btn"
