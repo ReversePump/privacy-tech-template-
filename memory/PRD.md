@@ -46,7 +46,14 @@ auto-generated wallets and REAL trading.
   settles into the practice balance, live closes via market_close.
 - **Copy-trading automation**: mirror any Hyperliquid trader's new fills (paper/live/alerts),
   from the Traders page Auto-copy modal.
+- **Trade history**: /api/history unified feed (swaps, perp/spot orders, engine fills, withdrawals)
+  with a History panel on the account page.
 - **AI refine chat**: /new drafts can be tuned conversationally via upstream /ai/refine/stream.
+- **Hyperliquid spot**: /api/hl/markets includes 270+ spot pairs (friendly labels, API names for
+  execution); the trade panel has a Perps/Spot toggle (spot = buy/sell, no leverage).
+- **Arbitrum bridge withdrawal**: /api/hl/withdraw_bridge (HL `withdraw_from_bridge` to the user's
+  own generated address on Arbitrum; ~1 USDC HL fee) alongside instant account-to-account USDC sends.
+- **Deposit helper**: QR-code deposit cards for both generated wallets (qrcode lib, client-side).
 - Account dashboard: SOL balance, HL equity, generated addresses, deployments w/ live event log,
   practice account (equity/positions/history), alerts feed, Solana swap panel, HL perps panel,
   withdrawals, saved strategies w/ backtest.

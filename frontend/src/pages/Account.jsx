@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Wallet, LogOut, Play, Loader2, Copy, Check, ArrowDownUp, ArrowUpRight, CircleX } from "lucide-react";
+import { Wallet, LogOut, Play, Loader2, Copy, Check, ArrowDownUp, ArrowUpRight, CircleX, QrCode } from "lucide-react";
+import QRCode from "qrcode";
 import { toast } from "sonner";
 import { weft, errorMessage } from "../lib/api";
 import { fmtUsd, fmtPctSigned, fmtAge, short } from "../lib/format";
@@ -37,6 +38,7 @@ export default function Account() {
   const [deployments, setDeployments] = useState(null);
   const [paper, setPaper] = useState(null);
   const [alerts, setAlerts] = useState(null);
+  const [history, setHistory] = useState(null);
   const [copied, setCopied] = useState("");
 
   const isEmail = user?.authType === "email";
@@ -54,6 +56,7 @@ export default function Account() {
     authed(token, "/deployments").then((d) => setDeployments(d.deployments || [])).catch(() => {});
     authed(token, "/paper/account").then(setPaper).catch(() => {});
     authed(token, "/alerts/me").then(setAlerts).catch(() => {});
+    authed(token, "/history").then((d) => setHistory(d.items || [])).catch(() => {});
   };
 
   useEffect(() => {
@@ -130,24 +133,20 @@ export default function Account() {
 
       {isEmail && (
         <>
-          {/* WALLETS */}
+          {/* WALLETS / DEPOSITS */}
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4" data-testid="wallets-panel">
-            <Panel className="p-5">
-              <div className="mono text-[10px] uppercase tracking-wider text-[#75777d]">Solana wallet · generated for you</div>
-              <button onClick={() => copy(solInfo?.address || wallet, "sol")} className="mt-2 flex items-center gap-2 mono text-[12px] text-[#121214] hover:text-[#2b59ff]" data-testid="sol-address">
-                {copied === "sol" ? <Check size={12} className="text-[#0b9466]" /> : <Copy size={12} />}
-                {short(solInfo?.address || wallet, 10, 10)}
-              </button>
-              <p className="mt-2 text-[11.5px] text-[#75777d]">Deposit SOL or USDC here — then swap any Solana token below, for real.</p>
-            </Panel>
-            <Panel className="p-5">
-              <div className="mono text-[10px] uppercase tracking-wider text-[#75777d]">Hyperliquid account · generated for you</div>
-              <button onClick={() => copy(hlInfo?.address || "", "hl")} className="mt-2 flex items-center gap-2 mono text-[12px] text-[#121214] hover:text-[#2b59ff]" data-testid="hl-address">
-                {copied === "hl" ? <Check size={12} className="text-[#0b9466]" /> : <Copy size={12} />}
-                {short(hlInfo?.address || "", 10, 10)}
-              </button>
-              <p className="mt-2 text-[11.5px] text-[#75777d]">Fund it with USDC on Arbitrum to this address, or USDC from any Hyperliquid account — then trade perps below, for real.</p>
-            </Panel>
+            <DepositCard
+              title="Solana wallet · generated for you"
+              address={solInfo?.address || wallet}
+              hint="Deposit SOL or USDC (Solana network) — then swap any Solana token below, for real."
+              copyKey="sol" copied={copied} copy={copy} testid="sol-address"
+            />
+            <DepositCard
+              title="Hyperliquid account · generated for you"
+              address={hlInfo?.address || ""}
+              hint="Fund with USDC on Arbitrum to this address, or USDC from any Hyperliquid account — then trade perps and spot below, for real."
+              copyKey="hl" copied={copied} copy={copy} testid="hl-address"
+            />
           </div>
 
           <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -162,6 +161,7 @@ export default function Account() {
       <DeploymentsPanel token={token} deployments={deployments} onDone={refresh} />
       <PaperPanel paper={paper} />
       <AlertsPanel token={token} alerts={alerts} onDone={refresh} />
+      <HistoryPanel history={history} />
 
       <h2 className="mt-10 serif text-2xl font-light">My strategies</h2>
       <div className="mt-4 space-y-4" data-testid="account-strategies">
@@ -210,6 +210,62 @@ export default function Account() {
             </Panel>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+function DepositCard({ title, address, hint, copyKey, copied, copy, testid }) {
+  const [qr, setQr] = useState(null);
+  const [showQr, setShowQr] = useState(false);
+  useEffect(() => {
+    if (address) QRCode.toDataURL(address, { margin: 1, width: 220, color: { dark: "#121214", light: "#ffffff" } }).then(setQr).catch(() => {});
+  }, [address]);
+  return (
+    <Panel className="p-5">
+      <div className="mono text-[10px] uppercase tracking-wider text-[#75777d]">{title}</div>
+      <div className="mt-2 flex items-center gap-2">
+        <button onClick={() => copy(address, copyKey)} className="flex items-center gap-2 mono text-[12px] text-[#121214] hover:text-[#2b59ff]" data-testid={testid}>
+          {copied === copyKey ? <Check size={12} className="text-[#0b9466]" /> : <Copy size={12} />}
+          {short(address, 10, 10)}
+        </button>
+        <button onClick={() => setShowQr(!showQr)} data-testid={`${testid}-qr-toggle`}
+          className="inline-flex items-center gap-1 rounded-full border border-[#12121414] px-2.5 py-1 text-[10.5px] text-[#75777d] hover:text-[#121214] transition-colors">
+          <QrCode size={11} /> {showQr ? "Hide" : "QR"}
+        </button>
+      </div>
+      {showQr && qr && (
+        <div className="mt-3 flex justify-center rounded-lg border border-[#12121414] bg-white p-3 fadeup" data-testid={`${testid}-qr`}>
+          <img src={qr} alt="deposit address QR" className="h-36 w-36" />
+        </div>
+      )}
+      <p className="mt-2 text-[11.5px] text-[#75777d]">{hint}</p>
+    </Panel>
+  );
+}
+
+function HistoryPanel({ history }) {
+  if (!history) return null;
+  const tone = { swap: "accent", perp: "long", spot: "long", engine: "amber", withdraw: "neutral" };
+  return (
+    <div className="mt-10" data-testid="history-section">
+      <h2 className="serif text-2xl font-light">History</h2>
+      <div className="mt-4 space-y-2">
+        {history.length === 0 && <Empty>Nothing yet — swaps, perp and spot orders, engine fills and withdrawals all land here.</Empty>}
+        {history.map((h, i) => (
+          <Panel key={i} className="p-4" data-testid={`history-${i}`}>
+            <div className="flex flex-wrap items-center gap-3 text-[12.5px]">
+              <Tag tone={tone[h.type] || "neutral"}>{h.type}</Tag>
+              <span className="font-medium">{h.title}</span>
+              <span className="text-[#75777d]">{h.detail}</span>
+              {h.tx && (
+                <a href={`https://solscan.io/tx/${h.tx}`} target="_blank" rel="noopener noreferrer"
+                  className="mono text-[10px] text-[#2b59ff] hover:underline">tx ↗</a>
+              )}
+              <span className="ml-auto mono text-[10px] text-[#75777d]">{fmtAge(h.at)}</span>
+            </div>
+          </Panel>
+        ))}
       </div>
     </div>
   );
@@ -394,16 +450,23 @@ function SolTradePanel({ token, onDone }) {
 }
 
 function HlTradePanel({ token, markets, hlInfo, onDone }) {
+  const [mktType, setMktType] = useState("perp");
   const [symbol, setSymbol] = useState("ETH");
   const [side, setSide] = useState("long");
   const [sizeUsd, setSizeUsd] = useState(25);
   const [lev, setLev] = useState(5);
   const [busy, setBusy] = useState(false);
+  const isSpot = mktType === "spot";
+  const list = markets.filter((m) => !!m.spot === isSpot);
+  const sel = list.find((m) => m.symbol === symbol) || list[0];
   const trade = async () => {
     setBusy(true);
     try {
-      const d = await authed(token, "/hl/trade", { symbol, side, sizeUsd, leverage: lev });
-      toast.success(`${side === "long" ? "Long" : "Short"} opened on Hyperliquid`, { description: `${symbol} · $${sizeUsd} · ${lev}×` });
+      const d = await authed(token, "/hl/trade", { symbol: sel?.symbol || symbol, side, sizeUsd, leverage: lev, spot: isSpot });
+      toast.success(
+        isSpot ? `${side === "long" ? "Bought" : "Sold"} ${d.symbol} on Hyperliquid spot`
+               : `${side === "long" ? "Long" : "Short"} opened on Hyperliquid`,
+        { description: `${d.symbol} · $${sizeUsd}${isSpot ? "" : ` · ${lev}×`}` });
       onDone();
     } catch (e) {
       toast.error(errorMessage(e));
@@ -418,14 +481,24 @@ function HlTradePanel({ token, markets, hlInfo, onDone }) {
   };
   return (
     <Panel className="p-5" data-testid="hl-trade-panel">
-      <div className="flex items-center gap-2 mono text-[10px] uppercase tracking-wider text-[#75777d]"><ArrowUpRight size={12} /> Perps on Hyperliquid · real</div>
+      <div className="flex items-center gap-2">
+        <div className="mono text-[10px] uppercase tracking-wider text-[#75777d] flex items-center gap-2"><ArrowUpRight size={12} /> Hyperliquid · real</div>
+        <div className="ml-auto flex gap-1 rounded-full border border-[#12121414] p-0.5">
+          {[["perp", "Perps"], ["spot", "Spot"]].map(([k, l]) => (
+            <button key={k} onClick={() => { setMktType(k); setSide("long"); }} data-testid={`hl-mkt-${k}`}
+              className={`h-7 rounded-full px-3 text-[11px] transition-colors ${mktType === k ? "bg-[#121214] text-white" : "text-[#75777d]"}`}>
+              {l}
+            </button>
+          ))}
+        </div>
+      </div>
       <div className="mt-4 grid grid-cols-2 gap-2">
-        <select value={symbol} onChange={(e) => setSymbol(e.target.value)} data-testid="hl-symbol"
+        <select value={sel?.symbol || ""} onChange={(e) => setSymbol(e.target.value)} data-testid="hl-symbol"
           className="h-11 rounded-lg border border-[#12121414] bg-white px-3 mono text-[12px] outline-none">
-          {markets.slice(0, 30).map((m) => <option key={m.symbol} value={m.symbol}>{m.symbol} · ${m.price < 1 ? m.price.toPrecision(3) : m.price.toLocaleString()}</option>)}
+          {list.slice(0, 40).map((m) => <option key={m.symbol} value={m.symbol}>{m.label || m.symbol} · ${m.price < 1 ? Number(m.price).toPrecision(3) : m.price.toLocaleString()}</option>)}
         </select>
         <div className="flex gap-1 rounded-lg border border-[#12121414] p-1">
-          {[["long", "Long"], ["short", "Short"]].map(([k, l]) => (
+          {(isSpot ? [["long", "Buy"], ["short", "Sell"]] : [["long", "Long"], ["short", "Short"]]).map(([k, l]) => (
             <button key={k} onClick={() => setSide(k)} data-testid={`hl-side-${k}`}
               className={`flex-1 rounded-md text-[12px] font-medium transition-colors ${side === k ? (k === "long" ? "bg-[#0b9466] text-white" : "bg-[#c23434] text-white") : "text-[#75777d]"}`}>
               {l}
@@ -434,14 +507,19 @@ function HlTradePanel({ token, markets, hlInfo, onDone }) {
         </div>
         <input type="number" min={10} value={sizeUsd} onChange={(e) => setSizeUsd(Number(e.target.value) || 0)}
           className="h-11 rounded-lg border border-[#12121414] bg-[#faf9f7] px-3 mono text-[13px] outline-none" data-testid="hl-size" />
-        <select value={lev} onChange={(e) => setLev(Number(e.target.value))} data-testid="hl-lev"
-          className="h-11 rounded-lg border border-[#12121414] bg-white px-3 mono text-[12px] outline-none">
-          {[1, 2, 3, 5, 10, 20, 25, 40].map((l) => <option key={l} value={l}>{l}× leverage</option>)}
-        </select>
+        {isSpot ? (
+          <div className="h-11 flex items-center px-3 mono text-[11px] text-[#75777d] rounded-lg border border-[#12121410]">USDC size · no leverage</div>
+        ) : (
+          <select value={lev} onChange={(e) => setLev(Number(e.target.value))} data-testid="hl-lev"
+            className="h-11 rounded-lg border border-[#12121414] bg-white px-3 mono text-[12px] outline-none">
+            {[1, 2, 3, 5, 10, 20, 25, 40].map((l) => <option key={l} value={l}>{l}× leverage</option>)}
+          </select>
+        )}
       </div>
-      <button onClick={trade} disabled={busy || sizeUsd < 10} data-testid="hl-trade-btn"
+      <button onClick={trade} disabled={busy || sizeUsd < 10 || !sel} data-testid="hl-trade-btn"
         className="mt-3 h-11 w-full rounded-full bg-[#121214] text-[13px] font-medium text-white hover:bg-[#2b59ff] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
-        {busy && <Loader2 size={14} className="animate-spin" />} Open {side} · ${sizeUsd} · {lev}×
+        {busy && <Loader2 size={14} className="animate-spin" />}
+        {isSpot ? `${side === "long" ? "Buy" : "Sell"} ${sel?.symbol || ""} · $${sizeUsd}` : `Open ${side} · $${sizeUsd} · ${lev}×`}
       </button>
       {hlInfo?.positions?.length > 0 && (
         <div className="mt-4 border-t border-[#12121414] pt-3 space-y-2" data-testid="hl-positions">
@@ -466,6 +544,7 @@ function WithdrawPanel({ token, hlInfo, onDone }) {
   const [amount, setAmount] = useState("");
   const [hlTo, setHlTo] = useState("");
   const [hlAmount, setHlAmount] = useState("");
+  const [hlDest, setHlDest] = useState("hl"); // hl = account-to-account | arb = bridge to Arbitrum
   const [busy, setBusy] = useState("");
   const solWithdraw = async () => {
     setBusy("sol");
@@ -478,8 +557,13 @@ function WithdrawPanel({ token, hlInfo, onDone }) {
   const hlWithdraw = async () => {
     setBusy("hl");
     try {
-      await authed(token, "/hl/withdraw", { destination: hlTo, amountUsd: Number(hlAmount) });
-      toast.success("USDC sent on Hyperliquid");
+      if (hlDest === "arb") {
+        await authed(token, "/hl/withdraw_bridge", { amountUsd: Number(hlAmount) });
+        toast.success("USDC sent to your address on Arbitrum", { description: "Allow a few minutes for the bridge" });
+      } else {
+        await authed(token, "/hl/withdraw", { destination: hlTo, amountUsd: Number(hlAmount) });
+        toast.success("USDC sent on Hyperliquid");
+      }
       onDone();
     } catch (e) { toast.error(errorMessage(e)); } finally { setBusy(""); }
   };
@@ -503,12 +587,26 @@ function WithdrawPanel({ token, hlInfo, onDone }) {
       <Panel className="p-5">
         <div className="mono text-[10px] uppercase tracking-wider text-[#75777d]">Withdraw from Hyperliquid</div>
         <div className="mt-3 space-y-2">
-          <input value={hlTo} onChange={(e) => setHlTo(e.target.value)} placeholder="Any Hyperliquid account address (0x…)"
-            className="h-10 w-full rounded-lg border border-[#12121414] bg-[#faf9f7] px-3 mono text-[11px] outline-none" data-testid="hl-withdraw-to" />
+          <div className="flex gap-1 rounded-full border border-[#12121414] p-0.5 w-fit">
+            {[["hl", "To a Hyperliquid account"], ["arb", "To Arbitrum chain"]].map(([k, l]) => (
+              <button key={k} onClick={() => setHlDest(k)} data-testid={`hl-dest-${k}`}
+                className={`h-7 rounded-full px-3 text-[11px] transition-colors ${hlDest === k ? "bg-[#121214] text-white" : "text-[#75777d]"}`}>
+                {l}
+              </button>
+            ))}
+          </div>
+          {hlDest === "hl" ? (
+            <input value={hlTo} onChange={(e) => setHlTo(e.target.value)} placeholder="Any Hyperliquid account address (0x…)"
+              className="h-10 w-full rounded-lg border border-[#12121414] bg-[#faf9f7] px-3 mono text-[11px] outline-none" data-testid="hl-withdraw-to" />
+          ) : (
+            <p className="rounded-lg border border-[#12121410] bg-[#faf9f7] px-3 py-2 text-[11px] text-[#75777d]" data-testid="hl-bridge-note">
+              Goes to your generated address on the Arbitrum network. Hyperliquid charges ~1 USDC.
+            </p>
+          )}
           <div className="flex gap-2">
             <input type="number" min={1} value={hlAmount} onChange={(e) => setHlAmount(e.target.value)} placeholder={`Amount (USDC) · up to ${hlInfo ? hlInfo.withdrawableUsd.toFixed(2) : "0"}`}
               className="h-10 w-44 rounded-lg border border-[#12121414] bg-[#faf9f7] px-3 mono text-[12px] outline-none" data-testid="hl-withdraw-amount" />
-            <button onClick={hlWithdraw} disabled={busy === "hl" || !hlTo || !hlAmount} data-testid="hl-withdraw-btn"
+            <button onClick={hlWithdraw} disabled={busy === "hl" || (hlDest === "hl" && !hlTo) || !hlAmount} data-testid="hl-withdraw-btn"
               className="h-10 flex-1 rounded-full border border-[#12121414] text-[12.5px] hover:border-[#2b59ff] hover:text-[#2b59ff] disabled:opacity-40 transition-colors">
               {busy === "hl" ? "Sending…" : "Send USDC"}
             </button>

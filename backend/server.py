@@ -462,8 +462,11 @@ async def hl_trade(request: Request):
         return _err("sign_in_required", 401)
     ex = _hl_exchange(user)
     body = await request.json()
-    symbol = (body.get("symbol") or "").upper().replace("-PERP", "")
-    side = body.get("side")  # long | short
+    symbol = (body.get("symbol") or "").strip().replace("-PERP", "")
+    is_spot = bool(body.get("spot"))
+    if not is_spot:
+        symbol = symbol.upper()
+    side = body.get("side")  # long | short (perp) — buy | sell map onto long | short for spot
     try:
         size_usd = float(body.get("sizeUsd") or 0)
         leverage = int(body.get("leverage") or 1)
@@ -471,12 +474,25 @@ async def hl_trade(request: Request):
         return _err("invalid_input", 400)
     if not symbol or side not in ("long", "short") or size_usd < 10:
         return _err("min_order_10_usd", 400)
-    try:
-        ex.update_leverage(leverage, symbol, is_cross=True)
-    except Exception as e:
-        logger.warning(f"hl leverage: {e}")
-    mids = _hl().all_mids()
-    px = float(mids.get(symbol) or 0)
+    if not is_spot:
+        try:
+            ex.update_leverage(leverage, symbol, is_cross=True)
+        except Exception as e:
+            logger.warning(f"hl leverage: {e}")
+        mids = _hl().all_mids()
+        px = float(mids.get(symbol) or 0)
+    else:
+        leverage = 1
+        px = None
+        try:
+            spot_meta, spot_ctxs = _hl().spot_meta_and_asset_ctxs()
+            universe = spot_meta.get("universe", [])
+            for i, t in enumerate(universe):
+                if t["name"] == symbol and i < len(spot_ctxs) and spot_ctxs[i].get("midPx"):
+                    px = float(spot_ctxs[i]["midPx"])
+                    break
+        except Exception as e:
+            logger.warning(f"spot px: {e}")
     if not px:
         return _err("unknown_market", 400)
     sz = round(size_usd / px, 6)
@@ -487,11 +503,11 @@ async def hl_trade(request: Request):
         return Response(_json.dumps({"error": str(e)[:200]}), status_code=400, media_type="application/json")
     ok = res.get("status") == "ok"
     await db.hl_trades.insert_one({"email": user["email"], "symbol": symbol, "side": side, "sizeUsd": size_usd,
-                                   "leverage": leverage, "sz": sz, "response": res,
+                                   "leverage": leverage, "sz": sz, "spot": is_spot, "response": res,
                                    "createdAt": datetime.now(timezone.utc).isoformat()})
     if not ok:
         return Response(_json.dumps({"error": str(res)[:200]}), status_code=400, media_type="application/json")
-    return {"ok": True, "symbol": symbol, "side": side, "size": sz, "leverage": leverage, "response": res}
+    return {"ok": True, "symbol": symbol, "side": side, "size": sz, "leverage": leverage, "spot": is_spot, "response": res}
 
 
 @auth_router.post("/hl/close")
@@ -539,6 +555,68 @@ async def hl_withdraw(request: Request):
     return Response(_json.dumps({"error": str(res)[:200]}), status_code=400, media_type="application/json")
 
 
+@auth_router.post("/hl/withdraw_bridge")
+async def hl_withdraw_bridge(request: Request):
+    """Withdraw USDC from Hyperliquid to the user's own address on the Arbitrum chain (~1 USDC HL fee)."""
+    s, user = await _hl_user(request)
+    if not user:
+        return _err("sign_in_required", 401)
+    body = await request.json()
+    try:
+        amount = float(body.get("amountUsd") or 0)
+    except (TypeError, ValueError):
+        return _err("invalid_input", 400)
+    if amount < 2:
+        return _err("min_withdraw_2_usd", 400)
+    ex = _hl_exchange(user)
+    try:
+        res = ex.withdraw_from_bridge(amount, user["evmAddress"])
+    except Exception as e:
+        logger.warning(f"hl bridge withdraw error: {e}")
+        return Response(_json.dumps({"error": str(e)[:200]}), status_code=400, media_type="application/json")
+    ok = res.get("status") == "ok"
+    if ok:
+        await db.hl_withdrawals.insert_one({"email": user["email"], "kind": "bridge", "destination": user["evmAddress"],
+                                            "amountUsd": amount, "createdAt": datetime.now(timezone.utc).isoformat()})
+        return {"ok": True, "destination": user["evmAddress"]}
+    return Response(_json.dumps({"error": str(res)[:200]}), status_code=400, media_type="application/json")
+
+
+@auth_router.get("/history")
+async def account_history(request: Request):
+    """Unified activity feed: swaps, perp/spot orders, engine fills, withdrawals."""
+    s = await _session_user(request)
+    if not s:
+        return _err("sign_in_required", 401)
+    owner_key = s.get("email") or s["wallet"]
+    items = []
+    for t in await db.trades.find({"wallet": s["wallet"]}, {"_id": 0}).to_list(50):
+        items.append({"type": "swap", "title": "Solana swap",
+                      "detail": f"{t.get('inputMint', '')[:4]}… → {t.get('outputMint', '')[:4]}…",
+                      "tx": t.get("signature"), "at": t.get("createdAt")})
+    for t in await db.hl_trades.find({"email": s.get("email")}, {"_id": 0}).to_list(50):
+        kind = "spot" if t.get("spot") else "perp"
+        items.append({"type": kind, "title": f"{'Buy' if t.get('side') == 'long' else 'Sell'} {t.get('symbol')}",
+                      "detail": f"${t.get('sizeUsd')} · {t.get('leverage', 1)}× · Hyperliquid {kind}",
+                      "at": t.get("createdAt")})
+    for p in await db.positions.find({"ownerKey": owner_key}, {"_id": 0}).to_list(100):
+        items.append({"type": "engine", "title": f"{p.get('side')} {p.get('symbol')} ({p.get('mode')})",
+                      "detail": (f"open ${p.get('sizeUsd')} @ {p.get('entryPx'):g}" if p.get("entryPx") else "open") +
+                                (f" → closed @ {p.get('closePx'):g} · {p.get('closeReason')} · pnl ${p.get('pnlUsd'):+g}" if p.get("status") == "closed" and p.get("closePx") else " · open"),
+                      "at": p.get("closedAt") or p.get("openedAt")})
+    for w in await db.withdrawals.find({"wallet": s["wallet"]}, {"_id": 0}).to_list(50):
+        items.append({"type": "withdraw", "title": "SOL withdrawal",
+                      "detail": f"{w.get('lamports', 0) / 1e9:g} SOL → {w.get('to', '')[:6]}…",
+                      "tx": w.get("signature"), "at": w.get("createdAt")})
+    for w in await db.hl_withdrawals.find({"email": s.get("email")}, {"_id": 0}).to_list(50):
+        items.append({"type": "withdraw", "title": "USDC withdrawal",
+                      "detail": (f"${w.get('amountUsd')} → Arbitrum {w.get('destination', '')[:8]}…" if w.get("kind") == "bridge"
+                                 else f"${w.get('amountUsd')} → HL {w.get('destination', '')[:8]}…"),
+                      "at": w.get("createdAt")})
+    items.sort(key=lambda x: x.get("at") or "", reverse=True)
+    return {"items": items[:80]}
+
+
 @auth_router.get("/hl/markets")
 async def hl_markets():
     meta = _hl().meta()
@@ -547,7 +625,26 @@ async def hl_markets():
     for m in meta.get("universe", [])[:60]:
         name = m.get("name")
         if name in mids:
-            out.append({"symbol": name, "price": float(mids[name]), "maxLeverage": m.get("maxLeverage")})
+            out.append({"symbol": name, "price": float(mids[name]), "maxLeverage": m.get("maxLeverage"), "spot": False})
+    try:
+        spot_meta, spot_ctxs = _hl().spot_meta_and_asset_ctxs()
+        universe = spot_meta.get("universe", [])
+        tokens = spot_meta.get("tokens", [])
+        def _label(t):
+            if not t["name"].startswith("@"):
+                return t["name"]
+            try:
+                base, quote = t.get("tokens", [None, None])
+                return f"{tokens[base]['name']}/{tokens[quote]['name']}"
+            except Exception:
+                return t["name"]
+        for i, t in enumerate(universe):
+            if i < len(spot_ctxs):
+                px = spot_ctxs[i].get("midPx")
+                if px:
+                    out.append({"symbol": t["name"], "label": _label(t), "price": float(px), "maxLeverage": 1, "spot": True})
+    except Exception as e:
+        logger.warning(f"spot meta: {e}")
     return {"markets": out}
 
 
