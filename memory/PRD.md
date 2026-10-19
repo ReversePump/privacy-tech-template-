@@ -64,7 +64,8 @@ link https://x.com/loomfiai, geometric Outfit display type, LoomWeave canvas her
 - Tests: 44 backend tests pass (17 email-auth + 16 relay + 11 engine). Test agent iteration_7:
   100% frontend surfaces, zero critical issues.
 - Branding: **Loom / $LOOM** everywhere visible; favicon + header/footer logo from user-supplied
-  knot asset; hero banner art; dark purple theme across all pages (verified desktop/tablet/mobile);
+  knot asset (IMG_1040 828f00ac); dark purple theme across all pages (verified desktop/tablet/mobile);
+  hero carries the LoomSignals convergence animation;
   sign-in message "Loom sign-in"; emails sent as "Loom"; zero old-brand strings.
 
 ## NOT yet verified with real funds

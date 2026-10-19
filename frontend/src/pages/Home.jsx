@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, ShieldCheck, Wallet, BellRing, CircleStop, Eye } from "lucide-react";
 import { weft } from "../lib/api";
-import LoomWeave from "../components/LoomWeave";
+import LoomSignals from "../components/LoomSignals";
 import { fmtUsd0, fmtUsd, fmtNum } from "../lib/format";
 import { Panel, Stat, Tag, CoinIcon, Loading } from "../components/bits";
 import StrategyCard from "../components/StrategyCard";
@@ -69,35 +69,31 @@ export default function Home() {
     <div data-testid="home-page">
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-[#a855f724]">
-        <LoomWeave className="absolute inset-0 z-0 pointer-events-none opacity-70" />
         <div className="absolute inset-0 z-0 pointer-events-none"
-          style={{ background: "radial-gradient(ellipse 70% 60% at 62% 42%, rgba(168,85,247,0.14), transparent 65%)" }} />
-        <div className="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6 pt-16 md:pt-24 pb-14">
-          <div className="max-w-3xl">
-            <div className="mono text-[10px] uppercase tracking-[0.34em] text-[#c084fc] fadeup" data-testid="hero-eyebrow">Analyze · Monitor · Trade</div>
-            <h1 className="serif mt-4 text-5xl md:text-7xl font-light tracking-tight leading-[1.02]" data-testid="hero-title">
-              Your strategy.<br />
-              <span className="italic bg-gradient-to-r from-[#a855f7] via-[#c084fc] to-[#e879f9] bg-clip-text text-transparent">Automatically executed.</span>
-            </h1>
-            <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-[#a89ec4]">
-              From “buy $50 of ETH” to “if funding stays low and price holds, go long.”
-              Loom turns your words into rules you can read and trades them from your own wallet — day and night.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/new" data-testid="hero-start-btn" className="inline-flex h-11 items-center gap-2 rounded-full bg-gradient-to-r from-[#9333ea] to-[#a855f7] px-6 text-sm font-medium text-white shadow-[0_0_24px_rgba(168,85,247,0.45)] hover:from-[#a855f7] hover:to-[#c084fc] hover:-translate-y-0.5 transition-all">
-                Start trading <ArrowRight size={15} />
-              </Link>
-              <a href="#demo" data-testid="hero-demo-btn" className="inline-flex h-11 items-center rounded-full border border-[#a855f73d] bg-[#17142866] px-6 text-sm text-[#f3f0fd] hover:border-[#a855f766] backdrop-blur-sm transition-colors">
-                See it work
-              </a>
+          style={{ background: "radial-gradient(ellipse 70% 60% at 62% 42%, rgba(168,85,247,0.12), transparent 65%)" }} />
+        <div className="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6 pt-16 md:pt-20 pb-14">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-12 items-center">
+            <div>
+              <div className="mono text-[10px] uppercase tracking-[0.34em] text-[#c084fc] fadeup" data-testid="hero-eyebrow">Analyze · Monitor · Trade</div>
+              <h1 className="serif mt-4 text-5xl md:text-6xl font-light tracking-tight leading-[1.04]" data-testid="hero-title">
+                Your strategy.<br />
+                <span className="italic bg-gradient-to-r from-[#a855f7] via-[#c084fc] to-[#e879f9] bg-clip-text text-transparent">Automatically executed.</span>
+              </h1>
+              <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-[#a89ec4]">
+                From “buy $50 of ETH” to “if funding stays low and price holds, go long.”
+                Loom turns your words into rules you can read and trades them from your own wallet — day and night.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link to="/new" data-testid="hero-start-btn" className="inline-flex h-11 items-center gap-2 rounded-full bg-gradient-to-r from-[#9333ea] to-[#a855f7] px-6 text-sm font-medium text-white shadow-[0_0_24px_rgba(168,85,247,0.45)] hover:from-[#a855f7] hover:to-[#c084fc] hover:-translate-y-0.5 transition-all">
+                  Start trading <ArrowRight size={15} />
+                </Link>
+                <a href="#demo" data-testid="hero-demo-btn" className="inline-flex h-11 items-center rounded-full border border-[#a855f73d] bg-[#17142866] px-6 text-sm text-[#f3f0fd] hover:border-[#a855f766] backdrop-blur-sm transition-colors">
+                  See it work
+                </a>
+              </div>
+              <p className="mt-4 mono text-[11px] text-[#a89ec4]">No wallet or Hyperliquid account needed: sign in with email and Loom makes them for you.</p>
             </div>
-            <p className="mt-4 mono text-[11px] text-[#a89ec4]">No wallet or Hyperliquid account needed: sign in with email and Loom makes them for you.</p>
-          </div>
-
-          {/* banner strip */}
-          <div className="relative mt-12 overflow-hidden rounded-2xl border border-[#a855f73d] shadow-[0_0_50px_-8px_rgba(168,85,247,0.35)] fadeup" data-testid="hero-banner">
-            <img src="/banner.png" alt="Loom — AI trading agent" className="w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#07060d88] via-transparent to-transparent" />
+            <LoomSignals className="fadeup" />
           </div>
 
           {/* live stat strip */}
