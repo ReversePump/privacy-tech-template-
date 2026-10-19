@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="mx-auto max-w-[1200px] px-4 md:px-6 py-12">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-8">
           <div>
-            <div className="serif text-2xl font-medium">Weft<span className="text-[#2b59ff]">.</span></div>
+            <div className="serif text-2xl font-medium">SwiftFi<span className="text-[#2b59ff]">.</span></div>
             <p className="mt-2 max-w-xs text-[13px] text-[#75777d]">
               Trade the thesis. Write a market view in plain English; it becomes rules you can read, traded from your own account.
             </p>
@@ -18,7 +18,7 @@ export default function Footer() {
             <Link to="/traders" className="text-[#75777d] hover:text-[#121214]">Traders</Link>
             <Link to="/leaderboard" className="text-[#75777d] hover:text-[#121214]">Leaderboard</Link>
             <Link to="/revenue" className="text-[#75777d] hover:text-[#121214]">Revenue</Link>
-            <a href="https://x.com/weftfinance" target="_blank" rel="noopener noreferrer" className="text-[#75777d] hover:text-[#121214]">@weftfinance</a>
+            <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="text-[#75777d] hover:text-[#121214]">X</a>
           </div>
         </div>
         <div className="mt-10 border-t border-[#12121414] pt-6 text-[11px] text-[#75777d] leading-relaxed">

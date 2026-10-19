@@ -111,7 +111,7 @@ export default function Account() {
         <div className="px-5 py-4">
           <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#75777d]">Rewards</div>
           <div className="mt-1 text-xl font-medium tnum">{rewards ? (rewards.enabled ? (rewards.paused ? "Paused" : "Live") : "Off") : "—"}</div>
-          <div className="mt-0.5 text-[11px] text-[#75777d]">$WEFT share of fees</div>
+          <div className="mt-0.5 text-[11px] text-[#75777d]">$SWIFT share of fees</div>
         </div>
       </Panel>
 
@@ -222,7 +222,7 @@ function SolTradePanel({ token, onDone }) {
           <span className="self-center mono text-[12px] text-[#75777d]">SOL →</span>
           <select value={out} onChange={(e) => setOut(e.target.value)} data-testid="sol-trade-out"
             className="h-11 flex-1 rounded-lg border border-[#12121414] bg-white px-3 mono text-[12px] outline-none">
-            <option value={WEFT}>$WEFT</option>
+            <option value={WEFT}>$SWIFT</option>
             <option value={USDC}>USDC</option>
           </select>
         </div>

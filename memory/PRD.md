@@ -1,9 +1,11 @@
-# Weft — Trade the thesis. (Project PRD)
+# Swift Fi — Trade the thesis. (Project PRD)
 
 ## Product
-Weft-style thesis-trading platform. Users write a market view in plain English; it becomes a
-readable strategy that can be backtested and traded. The platform relays public market data from
-the upstream Weft API and adds its own native accounts with auto-generated wallets and REAL trading.
+Swift Fi is a Weft-style thesis-trading platform (upstream data relayed from the public Weft API;
+all visible branding is Swift Fi / SwiftFi / $SWIFT — no Weft marks anywhere). Users write a market
+view in plain English; it becomes a readable strategy that can be backtested and traded. The platform
+relays public market data from the upstream Weft API and adds its own native accounts with
+auto-generated wallets and REAL trading.
 
 ## Architecture
 - **Frontend**: React (CRA) at :3000, Weft-inspired design system in `/app/frontend/src/index.css`.

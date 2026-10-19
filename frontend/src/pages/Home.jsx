@@ -32,18 +32,18 @@ const TRADES = [
 ];
 
 const FAQ = [
-  ["Do I need to know how to trade?", "You need an opinion, not a trading background. Weft turns it into concrete rules and shows you each one in plain English before anything runs. Practice it with pretend money first if you like, then start it with whatever amount you like."],
-  ["Do I need a wallet or a Hyperliquid account?", "No. Sign in with email and Weft creates both for you. You can connect your own wallet instead if you prefer."],
-  ["Is the wallet Weft makes safe?", "It is a non-custodial embedded wallet. Only you hold the keys; Weft gets a trading-only agent key."],
-  ["Does Weft hold my money?", "No. Funds stay in your own Hyperliquid account or your Solana wallet. Weft can place orders and nothing else — withdrawals are blocked at the key level."],
+  ["Do I need to know how to trade?", "You need an opinion, not a trading background. Swift Fi turns it into concrete rules and shows you each one in plain English before anything runs. Practice it with pretend money first if you like, then start it with whatever amount you like."],
+  ["Do I need a wallet or a Hyperliquid account?", "No. Sign in with email and Swift Fi creates both for you. You can connect your own wallet instead if you prefer."],
+  ["Is the wallet Swift Fi makes safe?", "It is a non-custodial embedded wallet. Only you hold the keys; Swift Fi gets a trading-only agent key."],
+  ["Does Swift Fi hold my money?", "No. Funds stay in your own Hyperliquid account or your Solana wallet. Swift Fi can place orders and nothing else — withdrawals are blocked at the key level."],
   ["What can it watch?", "Prices, funding, posts and buzz on X, wallets, Hyperliquid traders, prediction markets, news, Fear & Greed, macro rates, weather and sports results — mixed in one sentence if you like."],
   ["Can I copy other traders?", "Yes. Pick a wallet or a Hyperliquid trader and mirror their entries with your own size and stop."],
   ["What does it cost?", "Writing strategies is free. A small fee applies only when a strategy trades: 0.10% on perps, 1% on Solana swaps."],
-  ["What is $WEFT for?", "Half of every fee buys $WEFT on the open market; holders get fee discounts and a share of daily rewards. The rest is burned, so supply only shrinks."],
+  ["What is $SWIFT for?", "Half of every fee buys $SWIFT on the open market; holders get fee discounts and a share of daily rewards. The rest is burned, so supply only shrinks."],
   ["Can I try it without real money?", "Yes — every strategy can run on a $10,000 paper account at real prices, or as alerts only."],
   ["Can it just alert me instead?", "Yes. Any strategy can run in alert-only mode and ping you instead of trading."],
-  ["What if Weft goes down?", "Your money never leaves your account. Open positions keep their on-exchange stops; you can always manage them directly."],
-  ["Is this financial advice?", "No. Weft executes the rules you write. You are responsible for your own trades."],
+  ["What if Swift Fi goes down?", "Your money never leaves your account. Open positions keep their on-exchange stops; you can always manage them directly."],
+  ["Is this financial advice?", "No. Swift Fi executes the rules you write. You are responsible for your own trades."],
 ];
 
 export default function Home() {
@@ -67,7 +67,7 @@ export default function Home() {
             </h1>
             <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-[#75777d]">
               From “buy $50 of ETH” to “if this account posts, this wallet buys and funding is low, go long.”
-              Weft turns your words into rules you can read and trades them from your own wallet.
+              Swift Fi turns your words into rules you can read and trades them from your own wallet.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/new" data-testid="hero-start-btn" className="inline-flex h-11 items-center gap-2 rounded-full bg-[#121214] px-6 text-sm font-medium text-white hover:bg-[#2b59ff] transition-colors">
@@ -77,7 +77,7 @@ export default function Home() {
                 See it work
               </a>
             </div>
-            <p className="mt-4 mono text-[11px] text-[#75777d]">No wallet or Hyperliquid account needed: sign in with email and Weft makes them for you.</p>
+            <p className="mt-4 mono text-[11px] text-[#75777d]">No wallet or Hyperliquid account needed: sign in with email and Swift Fi makes them for you.</p>
           </div>
 
           {/* live stat strip */}
@@ -94,10 +94,10 @@ export default function Home() {
       <section id="demo" className="mx-auto max-w-[1200px] px-4 md:px-6 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
           <div>
-            <h2 className="serif text-3xl md:text-4xl font-light tracking-tight">Say it once. <span className="italic">Weft watches the market for you.</span></h2>
+            <h2 className="serif text-3xl md:text-4xl font-light tracking-tight">Say it once. <span className="italic">Swift Fi watches the market for you.</span></h2>
             <p className="mt-4 text-[14px] leading-relaxed text-[#75777d]">
               Type the trade the way you'd say it, with one condition or five: a price, a post on X, a wallet, the mood of the market.
-              Each part becomes a rule. Weft checks them every 15 to 30 seconds, day and night, and places the order once all of them hold.
+              Each part becomes a rule. Swift Fi checks them every 15 to 30 seconds, day and night, and places the order once all of them hold.
             </p>
             <Link to="/new" className="mt-6 inline-flex items-center gap-1.5 text-[13px] font-medium text-[#2b59ff] hover:underline">
               Write your own <ArrowRight size={13} />
@@ -122,7 +122,7 @@ export default function Home() {
       <section className="border-t border-[#12121414] bg-white">
         <div className="mx-auto max-w-[1200px] px-4 md:px-6 py-20">
           <h2 className="serif text-3xl md:text-4xl font-light tracking-tight">What it can trade</h2>
-          <p className="mt-3 text-[14px] text-[#75777d]">You name the market. Weft knows where it trades and sends the order there.</p>
+          <p className="mt-3 text-[14px] text-[#75777d]">You name the market. Swift Fi knows where it trades and sends the order there.</p>
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="trades-grid">
             {TRADES.map((t) => (
               <Panel key={t.title} className="p-5">
@@ -169,7 +169,7 @@ export default function Home() {
           <div>
             <h2 className="serif text-3xl md:text-4xl font-light tracking-tight">It can trade. <span className="italic">It can't withdraw.</span></h2>
             <p className="mt-4 text-[14px] leading-relaxed text-[#75777d]">
-              Your money stays in your own account, on Hyperliquid and on Solana. Weft gets a key that can trade for you, and nothing else.
+              Your money stays in your own account, on Hyperliquid and on Solana. Swift Fi gets a key that can trade for you, and nothing else.
             </p>
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -236,7 +236,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <p className="mt-6 text-[13px] text-[#75777d]">Anything else? Ask us on <a href="https://x.com/weftfinance" target="_blank" rel="noopener noreferrer" className="text-[#2b59ff] hover:underline">X</a>.</p>
+          <p className="mt-6 text-[13px] text-[#75777d]">Anything else? Ask us on <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="text-[#2b59ff] hover:underline">X</a>.</p>
         </div>
       </section>
 
@@ -275,16 +275,16 @@ function TokenSection() {
   return (
     <section className="border-t border-[#12121414] bg-white" id="token">
       <div className="mx-auto max-w-[1200px] px-4 md:px-6 py-20">
-        <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#75777d]">The $WEFT token</div>
+        <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#75777d]">The $SWIFT token</div>
         <h2 className="mt-3 serif text-3xl md:text-4xl font-light tracking-tight max-w-2xl">
-          You trade a small fee. <span className="italic text-[#2b59ff]">$WEFT gets bought back.</span>
+          You trade a small fee. <span className="italic text-[#2b59ff]">$SWIFT gets bought back.</span>
         </h2>
         <p className="mt-4 max-w-2xl text-[14px] leading-relaxed text-[#75777d]">
-          Weft buys $WEFT on the open market in small amounts about every ten minutes, around the clock: with half of every fee it earns, and 0.4% of every $WEFT trade. Then it goes back to the people who use Weft — traders, strategy creators — and the rest is burned.
+          Swift Fi buys $SWIFT on the open market in small amounts about every ten minutes, around the clock: with half of every fee it earns, and 0.4% of every $SWIFT trade. Then it goes back to the people who use Swift Fi — traders, strategy creators — and the rest is burned.
         </p>
 
         <Panel className="mt-8 p-5 flex flex-wrap items-center gap-3" data-testid="weft-ca">
-          <span className="mono text-[10px] uppercase tracking-wider text-[#75777d]">$WEFT contract address · the only official one</span>
+          <span className="mono text-[10px] uppercase tracking-wider text-[#75777d]">$SWIFT contract address · the only official one</span>
           <button onClick={copy} className="mono text-[12px] text-[#121214] hover:text-[#2b59ff] transition-colors" data-testid="weft-ca-copy">
             {copied ? "Copied" : CA}
           </button>
@@ -315,11 +315,11 @@ function TokenSection() {
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
           <Panel className="p-5">
-            <div className="text-[14px] font-medium">Holder · from 100,000 $WEFT</div>
+            <div className="text-[14px] font-medium">Holder · from 100,000 $SWIFT</div>
             <p className="mt-1.5 text-[13px] text-[#75777d]">25% off every trade, plus 1.5× rewards and 100 AI drafts a day.</p>
           </Panel>
           <Panel className="p-5">
-            <div className="text-[14px] font-medium">Whale · from 1,000,000 $WEFT</div>
+            <div className="text-[14px] font-medium">Whale · from 1,000,000 $SWIFT</div>
             <p className="mt-1.5 text-[13px] text-[#75777d]">50% off every trade, plus 2× rewards and 100 AI drafts a day.</p>
           </Panel>
         </div>
@@ -327,10 +327,10 @@ function TokenSection() {
         <div className="mt-8 flex flex-wrap gap-x-8 gap-y-2 mono text-[11px] text-[#75777d]">
           <span>Fee on Hyperliquid: 0.10% perps · 1% spot sales</span>
           <span>Fee on Solana swaps: 1%</span>
-          <span>Trading $WEFT: 3% (2% Weft · 0.4% buyback · 0.6% Meteora)</span>
+          <span>Trading $SWIFT: 3% (2% Swift Fi · 0.4% buyback · 0.6% Meteora)</span>
         </div>
         <p className="mt-4 text-[12px] text-[#75777d]">
-          Every fee, buyback, burn and reward is on the <Link to="/revenue" className="text-[#2b59ff] hover:underline">Revenue page</Link>. Any other token calling itself $WEFT is fake.
+          Every fee, buyback, burn and reward is on the <Link to="/revenue" className="text-[#2b59ff] hover:underline">Revenue page</Link>. Any other token calling itself $SWIFT is fake.
           {rewards?.paused ? <span className="ml-2 mono text-[10px] uppercase tracking-wider text-[#a36507]">rewards paused</span> : null}
         </p>
       </div>

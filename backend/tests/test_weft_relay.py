@@ -78,7 +78,7 @@ def test_auth_challenge_shape():
     r = requests.post(f"{API}/auth/challenge", json={"wallet": wallet}, timeout=15)
     assert r.status_code == 200, r.text
     msg = r.json().get("message", "")
-    assert msg.startswith("Weft sign-in\n"), msg
+    assert msg.startswith("Swift Fi sign-in\n"), msg
     assert f"wallet: {wallet}" in msg
     assert "nonce: " in msg
 

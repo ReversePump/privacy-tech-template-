@@ -107,7 +107,7 @@ export default function New() {
   return (
     <div className="mx-auto max-w-[860px] px-4 md:px-6 pt-14 md:pt-20" data-testid="new-page">
       <h1 className="serif text-4xl md:text-5xl font-light tracking-tight">New strategy</h1>
-      <p className="mt-3 text-[14px] text-[#75777d]">Describe a trade in your own words. Weft turns it into rules you can read before anything runs.</p>
+      <p className="mt-3 text-[14px] text-[#75777d]">Describe a trade in your own words. Swift Fi turns it into rules you can read before anything runs.</p>
 
       <Panel className="mt-8 p-5" data-testid="thesis-panel">
         <label className="mono text-[10px] uppercase tracking-[0.16em] text-[#75777d]">Your idea</label>
@@ -226,7 +226,7 @@ export default function New() {
           <Panel className="p-6" data-testid="start-panel">
             <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#75777d]">Start it</div>
             <p className="mt-2 text-[13px] text-[#75777d]">
-              Run it with $10,000 of pretend money at real prices, as alerts only, or live from your own account. Sign in with email — Weft creates the wallet and Hyperliquid account for you.
+              Run it with $10,000 of pretend money at real prices, as alerts only, or live from your own account. Sign in with email — Swift Fi creates the wallet and Hyperliquid account for you.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <button onClick={() => toast.info("Sign-in opens here — practice, alerts or live.", { description: "Email sign-in creates your wallet automatically." })} data-testid="start-practice-btn"

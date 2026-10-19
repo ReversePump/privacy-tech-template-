@@ -24,13 +24,13 @@ export default function Revenue() {
     <div className="mx-auto max-w-[1200px] px-4 md:px-6 pt-14" data-testid="revenue-page">
       <h1 className="serif text-4xl md:text-5xl font-light tracking-tight">Revenue</h1>
       <p className="mt-3 max-w-xl text-[14px] text-[#75777d]">
-        Every fee, buyback, burn and reward — public and on chain. Half of every fee buys $WEFT; that goes to traders, creators and the burn.
+        Every fee, buyback, burn and reward — public and on chain. Half of every fee buys $SWIFT; that goes to traders, creators and the burn.
       </p>
 
       <Panel className="mt-8 grid grid-cols-2 md:grid-cols-4 divide-x divide-[#12121414] overflow-hidden" data-testid="revenue-stats">
         {[
           ["Total earned", total != null ? fmtUsd(total) : "—", "all sources"],
-          ["Buybacks ($WEFT)", rev ? fmtUsd(rev.buybackUsd ?? rev.token?.buybackUsd) : "—", "bought on the open market"],
+          ["Buybacks ($SWIFT)", rev ? fmtUsd(rev.buybackUsd ?? rev.token?.buybackUsd) : "—", "bought on the open market"],
           ["Token claims", rev ? fmtNum0(rev.token?.claims) : "—", rev ? `${fmtAge(rev.token?.lastClaimAt)} last` : ""],
           ["Volume traded", stats ? fmtUsd0(stats.volumeUsd) : "—", stats ? `${fmtNum0(stats.fills)} fills` : ""],
         ].map(([l, v, s]) => (
@@ -54,7 +54,7 @@ export default function Revenue() {
           <p className="mt-1 text-[11px] text-[#75777d]">swap fees, SOL + USDC</p>
         </Panel>
         <Panel className="p-5">
-          <div className="mono text-[10px] uppercase tracking-wider text-[#75777d]">$WEFT token fees</div>
+          <div className="mono text-[10px] uppercase tracking-wider text-[#75777d]">$SWIFT token fees</div>
           <div className="mt-2 text-lg font-medium tnum">{rev ? fmtUsd(rev.token?.claimedUsd) : "—"}</div>
           <p className="mt-1 text-[11px] text-[#75777d]">claimed from the token's fee split</p>
         </Panel>
@@ -74,7 +74,7 @@ export default function Revenue() {
               <tbody>
                 {buybacks.map((b, i) => (
                   <tr key={b.signature || i}>
-                    <td className="mono tnum">{b.amount ? `${Number(b.amount).toLocaleString("en-US", { maximumFractionDigits: 0 })} $WEFT` : "—"}</td>
+                    <td className="mono tnum">{b.amount ? `${Number(b.amount).toLocaleString("en-US", { maximumFractionDigits: 0 })} $SWIFT` : "—"}</td>
                     <td className="text-right mono tnum">{b.sol != null ? `${Number(b.sol).toFixed(3)}` : "—"}</td>
                     <td className="text-right mono tnum">{b.usd != null ? fmtUsd(b.usd) : "—"}</td>
                     <td className="text-right">{b.burned ? <Tag tone="amber">burned</Tag> : <Tag>held</Tag>}</td>
