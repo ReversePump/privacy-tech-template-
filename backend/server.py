@@ -551,7 +551,124 @@ async def hl_markets():
     return {"markets": out}
 
 
+# ---------- deployments: the 24/7 engine (paper / live / alerts) ----------
+
+import asyncio
+import engine
+
+
+@auth_router.post("/deployments")
+async def create_deployment(request: Request):
+    s = await _session_user(request)
+    if not s:
+        return _err("sign_in_required", 401)
+    body = await request.json()
+    mode = body.get("mode")
+    if mode not in ("paper", "live", "alerts"):
+        return _err("invalid_mode", 400)
+    if mode == "live" and s.get("authType") != "email":
+        return _err("live_needs_email_account", 400)
+    owner_key = s.get("email") or s["wallet"]
+    if await db.deployments.count_documents({"ownerKey": owner_key, "status": "active"}) >= 5:
+        return _err("max_active_deployments", 400)
+    dep = {
+        "id": uuid.uuid4().hex[:12], "ownerKey": owner_key, "authType": s.get("authType", "wallet"),
+        "mode": mode, "status": "active", "state": {}, "events": [],
+        "createdAt": datetime.now(timezone.utc).isoformat(),
+    }
+    if body.get("kind") == "copy":
+        target = (body.get("targetAddress") or "").strip()
+        if not target.startswith("0x"):
+            return _err("invalid_target", 400)
+        dep.update({"kind": "copy", "targetAddress": target,
+                    "sizeUsd": min(max(float(body.get("sizeUsd") or 100), 10), 10000),
+                    "leverage": min(max(int(body.get("leverage") or 3), 1), 10),
+                    "strategyName": f"Copy {target[:8]}…"})
+    else:
+        strategy = body.get("strategy")
+        if not isinstance(strategy, dict) or not strategy.get("actions"):
+            return _err("strategy_required", 400)
+        dep.update({"kind": "strategy", "strategy": strategy, "strategyName": strategy.get("name") or "Strategy"})
+    await db.deployments.insert_one(dep)
+    await engine._event(dep["id"], f"deployed in {mode} mode — engine is watching", "info")
+    dep.pop("_id", None)
+    return {"ok": True, "deployment": dep}
+
+
+@auth_router.get("/deployments")
+async def list_deployments(request: Request):
+    s = await _session_user(request)
+    if not s:
+        return _err("sign_in_required", 401)
+    owner_key = s.get("email") or s["wallet"]
+    deps = await db.deployments.find({"ownerKey": owner_key}, {"_id": 0, "strategy": 0}).sort("createdAt", -1).to_list(50)
+    return {"deployments": deps}
+
+
+@auth_router.post("/deployments/{dep_id}/control")
+async def control_deployment(dep_id: str, request: Request):
+    s = await _session_user(request)
+    if not s:
+        return _err("sign_in_required", 401)
+    owner_key = s.get("email") or s["wallet"]
+    body = await request.json()
+    action = body.get("action")
+    new = {"pause": "paused", "resume": "active", "stop": "stopped"}.get(action)
+    if not new:
+        return _err("invalid_action", 400)
+    r = await db.deployments.update_one({"id": dep_id, "ownerKey": owner_key}, {"$set": {"status": new}})
+    if not r.matched_count:
+        return _err("not_found", 404)
+    await engine._event(dep_id, f"deployment {action}d by user", "info")
+    return {"ok": True, "status": new}
+
+
+@auth_router.get("/paper/account")
+async def paper_account(request: Request):
+    s = await _session_user(request)
+    if not s:
+        return _err("sign_in_required", 401)
+    owner_key = s.get("email") or s["wallet"]
+    acct = await engine._paper_account(owner_key)
+    equity = await engine._paper_equity(owner_key)
+    positions = await db.positions.find({"ownerKey": owner_key, "mode": "paper", "status": "open"},
+                                        {"_id": 0}).to_list(50)
+    history = await db.positions.find({"ownerKey": owner_key, "mode": "paper", "status": "closed"},
+                                      {"_id": 0}).sort("closedAt", -1).to_list(50)
+    return {"balanceUsd": acct["balanceUsd"], "equityUsd": equity,
+            "startUsd": engine.PAPER_START_USD, "positions": positions, "history": history}
+
+
+@auth_router.get("/alerts/me")
+async def my_alerts(request: Request):
+    s = await _session_user(request)
+    if not s:
+        return _err("sign_in_required", 401)
+    owner_key = s.get("email") or s["wallet"]
+    alerts = await db.alerts.find({"ownerKey": owner_key}, {"_id": 0}).sort("createdAt", -1).to_list(50)
+    unread = sum(1 for a in alerts if not a.get("read"))
+    return {"alerts": alerts, "unread": unread}
+
+
+@auth_router.post("/alerts/read")
+async def mark_alerts_read(request: Request):
+    s = await _session_user(request)
+    if not s:
+        return _err("sign_in_required", 401)
+    owner_key = s.get("email") or s["wallet"]
+    await db.alerts.update_many({"ownerKey": owner_key}, {"$set": {"read": True}})
+    return {"ok": True}
+
+
 app.include_router(auth_router)
+
+engine.init(db, _hl, _hl_exchange)
+
+
+@app.on_event("startup")
+async def _start_engine():
+    asyncio.create_task(engine.engine_loop())
+
 
 app.add_middleware(
     CORSMiddleware,

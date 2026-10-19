@@ -34,6 +34,9 @@ export default function Account() {
   const [solInfo, setSolInfo] = useState(null);
   const [hlInfo, setHlInfo] = useState(null);
   const [markets, setMarkets] = useState([]);
+  const [deployments, setDeployments] = useState(null);
+  const [paper, setPaper] = useState(null);
+  const [alerts, setAlerts] = useState(null);
   const [copied, setCopied] = useState("");
 
   const isEmail = user?.authType === "email";
@@ -48,7 +51,17 @@ export default function Account() {
     if (!signedIn) return;
     authed(token, "/wallet").then(setSolInfo).catch(() => {});
     if (isEmail) authed(token, "/hl/account").then(setHlInfo).catch(() => setHlInfo(null));
+    authed(token, "/deployments").then((d) => setDeployments(d.deployments || [])).catch(() => {});
+    authed(token, "/paper/account").then(setPaper).catch(() => {});
+    authed(token, "/alerts/me").then(setAlerts).catch(() => {});
   };
+
+  useEffect(() => {
+    if (!signedIn) return;
+    const iv = setInterval(refresh, 30000);
+    return () => clearInterval(iv);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signedIn, token, isEmail]);
 
   useEffect(() => {
     weft.rewards().then(setRewards).catch(() => {});
@@ -146,6 +159,10 @@ export default function Account() {
         </>
       )}
 
+      <DeploymentsPanel token={token} deployments={deployments} onDone={refresh} />
+      <PaperPanel paper={paper} />
+      <AlertsPanel token={token} alerts={alerts} onDone={refresh} />
+
       <h2 className="mt-10 serif text-2xl font-light">My strategies</h2>
       <div className="mt-4 space-y-4" data-testid="account-strategies">
         {!saved && <Loading label="Loading your strategies" />}
@@ -193,6 +210,145 @@ export default function Account() {
             </Panel>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+function DeploymentsPanel({ token, deployments, onDone }) {
+  const [busy, setBusy] = useState("");
+  const control = async (id, action) => {
+    setBusy(id + action);
+    try {
+      await authed(token, `/deployments/${id}/control`, { action });
+      toast.success(`Deployment ${action}d`);
+      onDone();
+    } catch (e) { toast.error(errorMessage(e)); } finally { setBusy(""); }
+  };
+  return (
+    <div className="mt-10" data-testid="deployments-section">
+      <h2 className="serif text-2xl font-light">Deployments <span className="text-[13px] text-[#75777d]">— the engine checks every ~25s</span></h2>
+      <div className="mt-4 space-y-3">
+        {!deployments && <Loading label="Loading deployments" />}
+        {deployments?.length === 0 && (
+          <Empty>Nothing running. <Link to="/new" className="text-[#2b59ff]">Draft a strategy</Link> and start it as practice, alerts or live.</Empty>
+        )}
+        {deployments?.map((d) => (
+          <Panel key={d.id} className="p-5" data-testid={`deployment-${d.id}`}>
+            <div className="flex flex-wrap items-center gap-3">
+              <Tag tone={d.mode === "live" ? "long" : d.mode === "paper" ? "accent" : "amber"}>{d.mode}</Tag>
+              <div className="min-w-0">
+                <div className="text-[14px] font-medium truncate">{d.strategyName || d.kind}</div>
+                <div className="mono text-[10px] text-[#75777d]">{d.kind}{d.targetAddress ? ` · ${short(d.targetAddress, 6, 4)}` : ""} · {d.status}</div>
+              </div>
+              <div className="ml-auto flex gap-2">
+                {d.status === "active" && (
+                  <button onClick={() => control(d.id, "pause")} disabled={!!busy} data-testid={`dep-pause-${d.id}`}
+                    className="h-8 rounded-full border border-[#12121414] px-3.5 text-[11.5px] text-[#75777d] hover:text-[#121214]">Pause</button>
+                )}
+                {d.status === "paused" && (
+                  <button onClick={() => control(d.id, "resume")} disabled={!!busy} data-testid={`dep-resume-${d.id}`}
+                    className="h-8 rounded-full border border-[#12121414] px-3.5 text-[11.5px] text-[#0b9466] hover:border-[#0b9466]">Resume</button>
+                )}
+                {(d.status === "active" || d.status === "paused") && (
+                  <button onClick={() => control(d.id, "stop")} disabled={!!busy} data-testid={`dep-stop-${d.id}`}
+                    className="h-8 rounded-full border border-[#12121414] px-3.5 text-[11.5px] text-[#c23434] hover:border-[#c23434]">Stop</button>
+                )}
+              </div>
+            </div>
+            {d.events?.length > 0 && (
+              <div className="mt-3 border-t border-[#12121414] pt-3 space-y-1" data-testid={`dep-events-${d.id}`}>
+                {[...d.events].slice(-3).reverse().map((e, i) => (
+                  <div key={i} className="flex gap-2 text-[11.5px]">
+                    <span className={`mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full ${e.kind === "fill" ? "bg-[#0b9466]" : e.kind === "error" ? "bg-[#c23434]" : e.kind === "alert" ? "bg-[#2b59ff]" : "bg-[#c4c6cb]"}`} />
+                    <span className="text-[#121214]">{e.msg}</span>
+                    <span className="ml-auto mono text-[10px] text-[#75777d]">{fmtAge(e.at)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Panel>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PaperPanel({ paper }) {
+  if (!paper) return null;
+  const pnl = paper.equityUsd - paper.startUsd;
+  return (
+    <div className="mt-10" data-testid="paper-section">
+      <h2 className="serif text-2xl font-light">Practice account</h2>
+      <Panel className="mt-4 p-5">
+        <div className="flex flex-wrap gap-x-10 gap-y-3">
+          <div>
+            <div className="mono text-[10px] uppercase tracking-wider text-[#75777d]">Equity (pretend)</div>
+            <div className="mt-1 text-2xl font-medium tnum" data-testid="paper-equity">{fmtUsd(paper.equityUsd)}</div>
+          </div>
+          <div>
+            <div className="mono text-[10px] uppercase tracking-wider text-[#75777d]">All-time PnL</div>
+            <div className={`mt-1 text-2xl font-medium tnum ${pnl < 0 ? "text-[#c23434]" : "text-[#0b9466]"}`} data-testid="paper-pnl">{fmtUsd(pnl)}</div>
+          </div>
+          <div>
+            <div className="mono text-[10px] uppercase tracking-wider text-[#75777d]">Cash</div>
+            <div className="mt-1 text-2xl font-medium tnum">{fmtUsd(paper.balanceUsd)}</div>
+          </div>
+        </div>
+        {paper.positions?.length > 0 && (
+          <div className="mt-4 border-t border-[#12121414] pt-3 space-y-2" data-testid="paper-positions">
+            {paper.positions.map((p) => (
+              <div key={p.id} className="flex flex-wrap items-center gap-3 text-[12px]">
+                <Tag tone={p.side === "short" ? "short" : "long"}>{p.symbol}</Tag>
+                <span className="text-[#75777d]">{p.side} ${p.sizeUsd} · {p.leverage}×</span>
+                <span className="mono tnum">entry {Number(p.entryPx).toLocaleString()}</span>
+                <span className="mono text-[10px] text-[#75777d]">{fmtAge(p.openedAt)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        {paper.history?.length > 0 && (
+          <div className="mt-4 border-t border-[#12121414] pt-3 space-y-2" data-testid="paper-history">
+            <div className="mono text-[10px] uppercase tracking-wider text-[#75777d]">Closed</div>
+            {paper.history.slice(0, 8).map((p) => (
+              <div key={p.id} className="flex flex-wrap items-center gap-3 text-[12px]">
+                <Tag tone={p.side === "short" ? "short" : "long"}>{p.symbol}</Tag>
+                <span className="text-[#75777d]">{p.closeReason}</span>
+                <span className={`mono tnum ${p.pnlUsd < 0 ? "text-[#c23434]" : "text-[#0b9466]"}`}>{fmtUsd(p.pnlUsd)}</span>
+                <span className="mono text-[10px] text-[#75777d]">{fmtAge(p.closedAt)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </Panel>
+    </div>
+  );
+}
+
+function AlertsPanel({ token, alerts, onDone }) {
+  if (!alerts) return null;
+  return (
+    <div className="mt-10" data-testid="alerts-section">
+      <div className="flex items-center gap-3">
+        <h2 className="serif text-2xl font-light">Alerts</h2>
+        {alerts.unread > 0 && (
+          <button onClick={async () => { await authed(token, "/alerts/read", {}); onDone(); }} data-testid="alerts-mark-read"
+            className="rounded-full border border-[#12121414] px-3 py-1 text-[11px] text-[#75777d] hover:text-[#121214]">
+            Mark all read ({alerts.unread})
+          </button>
+        )}
+      </div>
+      <div className="mt-4 space-y-2">
+        {alerts.alerts?.length === 0 && <Empty>No alerts yet. Deploy a strategy in alerts-only mode and it pings here.</Empty>}
+        {alerts.alerts?.slice(0, 10).map((a, i) => (
+          <Panel key={i} className={`p-4 text-[13px] ${a.read ? "opacity-60" : ""}`} data-testid={`alert-${i}`}>
+            <div className="flex items-center gap-2">
+              <span className={`h-1.5 w-1.5 rounded-full ${a.read ? "bg-[#c4c6cb]" : "bg-[#2b59ff]"}`} />
+              <span>{a.message}</span>
+              <span className="ml-auto mono text-[10px] text-[#75777d]">{fmtAge(a.createdAt)}</span>
+            </div>
+          </Panel>
+        ))}
       </div>
     </div>
   );

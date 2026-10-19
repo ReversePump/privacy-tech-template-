@@ -1,12 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { Sparkles, Play, RotateCcw, Loader2, Check, X } from "lucide-react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { Sparkles, Play, RotateCcw, Loader2, Check, X, MessageSquare, Send } from "lucide-react";
 import { toast } from "sonner";
 import { weft, sseStream, errorMessage } from "../lib/api";
 import { fmtUsd, fmtPct, fmtPctSigned, fmtNum } from "../lib/format";
 import { Panel, Tag, Sparkline } from "../components/bits";
 import RulesView from "../components/RulesView";
 import { useAuth } from "../solana/AuthContext";
+import AuthModal from "../components/AuthModal";
+
+const API = process.env.REACT_APP_BACKEND_URL;
 
 const SUGGESTIONS = [
   "Buy $50 of ETH now",
@@ -27,7 +30,63 @@ export default function New() {
   const [saved, setSaved] = useState(false);
   const [bt, setBt] = useState(null);
   const [btBusy, setBtBusy] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [deployBusy, setDeployBusy] = useState("");
+  const [refineText, setRefineText] = useState("");
+  const [refineBusy, setRefineBusy] = useState(false);
   const started = useRef(false);
+  const nav = useNavigate();
+
+  const deploy = async (mode) => {
+    if (!strategy) return;
+    if (!signedIn) { setAuthOpen(true); return; }
+    setDeployBusy(mode);
+    try {
+      const r = await fetch(`${API}/api/deployments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ mode, strategy }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error === "live_needs_email_account" ? "Live mode needs an email account — sign in with email so a wallet can be generated for you" : d.error || `failed (${r.status})`);
+      toast.success(
+        mode === "paper" ? "Deployed — running with $10,000 practice money at real prices"
+        : mode === "alerts" ? "Deployed — you'll get alerts here instead of trades"
+        : "Deployed live — trades execute from your generated wallet",
+        { action: { label: "View", onClick: () => nav("/account") } },
+      );
+    } catch (e) {
+      toast.error(errorMessage(e));
+    } finally {
+      setDeployBusy("");
+    }
+  };
+
+  const refine = async () => {
+    const t = refineText.trim();
+    if (!t || !strategy || refineBusy) return;
+    setRefineBusy(true);
+    try {
+      let got = null;
+      for await (const ev of sseStream("/ai/refine/stream", { strategy, instruction: t })) {
+        if ((ev.event === "result" || ev.event === "strategy") && ev.data?.strategy) got = ev.data.strategy;
+        else if (ev.event === "error") throw new Error(ev.data?.error || ev.data?.message || "Refine failed");
+      }
+      if (got) {
+        setStrategy(got);
+        setBt(null);
+        setSaved(false);
+        setRefineText("");
+        toast.success("Draft updated");
+      } else {
+        throw new Error("No updated draft returned");
+      }
+    } catch (e) {
+      toast.error(errorMessage(e));
+    } finally {
+      setRefineBusy(false);
+    }
+  };
 
   const draft = async (text) => {
     const t = (text ?? thesis).trim();
@@ -184,6 +243,27 @@ export default function New() {
             <div className="mt-5">
               <RulesView strategy={strategy} />
             </div>
+
+            {/* AI refine — conversationally tune the draft */}
+            <div className="mt-5 border-t border-[#12121414] pt-4" data-testid="refine-panel">
+              <div className="flex items-center gap-2 mono text-[10px] uppercase tracking-[0.16em] text-[#75777d]">
+                <MessageSquare size={11} /> Refine it
+              </div>
+              <div className="mt-2 flex gap-2">
+                <input
+                  value={refineText}
+                  onChange={(e) => setRefineText(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && refine()}
+                  placeholder='Try: "make the stop tighter" or "use 3x instead"'
+                  className="h-10 flex-1 rounded-lg border border-[#12121414] bg-[#faf9f7] px-3.5 text-[13px] outline-none focus:border-[#2b59ff55]"
+                  data-testid="refine-input"
+                />
+                <button onClick={refine} disabled={refineBusy || !refineText.trim()} data-testid="refine-btn"
+                  className="inline-flex h-10 items-center gap-1.5 rounded-full bg-[#121214] px-4 text-[12.5px] font-medium text-white hover:bg-[#2b59ff] disabled:opacity-40 transition-colors">
+                  {refineBusy ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />} Refine
+                </button>
+              </div>
+            </div>
           </Panel>
 
           <Panel className="p-6" data-testid="backtest-panel">
@@ -229,22 +309,24 @@ export default function New() {
               Run it with $10,000 of pretend money at real prices, as alerts only, or live from your own account. Sign in with email — Swift Fi creates the wallet and Hyperliquid account for you.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
-              <button onClick={() => toast.info("Sign-in opens here — practice, alerts or live.", { description: "Email sign-in creates your wallet automatically." })} data-testid="start-practice-btn"
-                className="inline-flex h-10 items-center gap-2 rounded-full bg-[#121214] px-5 text-[13px] font-medium text-white hover:bg-[#2b59ff] transition-colors">
-                <Play size={13} /> Practice with $10,000
+              <button onClick={() => deploy("paper")} disabled={!!deployBusy} data-testid="start-practice-btn"
+                className="inline-flex h-10 items-center gap-2 rounded-full bg-[#121214] px-5 text-[13px] font-medium text-white hover:bg-[#2b59ff] disabled:opacity-40 transition-colors">
+                {deployBusy === "paper" ? <Loader2 size={13} className="animate-spin" /> : <Play size={13} />} Practice with $10,000
               </button>
-              <button onClick={() => toast.info("Alert-only mode — sign in to get pinged instead of trading.")} data-testid="start-alerts-btn"
-                className="inline-flex h-10 items-center gap-2 rounded-full border border-[#12121414] px-5 text-[13px] hover:border-[#12121433] transition-colors">
-                Alerts only
+              <button onClick={() => deploy("alerts")} disabled={!!deployBusy} data-testid="start-alerts-btn"
+                className="inline-flex h-10 items-center gap-2 rounded-full border border-[#12121414] px-5 text-[13px] hover:border-[#12121433] disabled:opacity-40 transition-colors">
+                {deployBusy === "alerts" && <Loader2 size={13} className="animate-spin" />} Alerts only
               </button>
-              <button onClick={() => toast.info("Go live from your own account — sign in to continue.")} data-testid="start-live-btn"
-                className="inline-flex h-10 items-center gap-2 rounded-full border border-[#12121414] px-5 text-[13px] hover:border-[#12121433] transition-colors">
-                Go live
+              <button onClick={() => deploy("live")} disabled={!!deployBusy} data-testid="start-live-btn"
+                className="inline-flex h-10 items-center gap-2 rounded-full border border-[#12121414] px-5 text-[13px] hover:border-[#12121433] disabled:opacity-40 transition-colors">
+                {deployBusy === "live" && <Loader2 size={13} className="animate-spin" />} Go live
               </button>
             </div>
+            <p className="mt-3 text-[11px] text-[#75777d]">The engine checks your rules every ~25 seconds, around the clock. Manage deployments from your account.</p>
           </Panel>
         </div>
       )}
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
     </div>
   );
 }
