@@ -122,3 +122,10 @@ link https://x.com/loomfiai, geometric Outfit display type, LoomWeave canvas her
 - Fixed: hardcoded X-dependent example chips (Home/New) replaced with crypto-only examples.
 - Known constraint: upstream anonymous AI drafting = 5/day per server IP (site-wide). Resets daily.
   Quota error surfaces cleanly via draft-error banner. AI path itself verified working in earlier runs.
+
+## Blockchain parity pass (iteration_10, 2026-07-19)
+- Wallet-connected users get real self-signed swaps: /api/wallet/build_swap (unsigned Jupiter tx) +
+  /api/wallet/send_signed (broadcast) — Loom never touches their keys. Email users keep custodial path.
+- Old-project TREASURY_* keys removed from backend/.env (0 code refs; boot clean).
+- Branding audit: zero old-brand prefixes in key/session/token handling; localStorage = loom:session.
+- 58 backend tests pass (16 new wallet-signed). Self-sign UI branch code-verified (needs real wallet ext to click).

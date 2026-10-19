@@ -1,0 +1,36 @@
+{
+  "summary": "Iter10 verifies: (1) new POST /api/wallet/build_swap + /api/wallet/send_signed endpoints wired to Jupiter + Solana RPC with proper auth/validation; (2) TREASURY_* removed from backend/.env (0 refs in code, confirmed boot clean — 'engine started' in supervisor log); (3) all unfunded money paths return clean 400s at chain-execution stage (never 500); (4) chain-liveness endpoints (/api/wallet, /api/hl/account, /api/signals/hero) return live mainnet state; (5) branding-in-key-material audit — zero occurrences of weft/makers/makemarkets as prefix/suffix on key|secret|session|token|privkey|private identifiers in server.py (only legitimate sanitizer scrub patterns at lines 50,59); (6) frontend localStorage key is 'loom:session' (AuthContext.jsx:8). Backend pytest: 42 passed + 1 skipped (relay backtest upstream 429, expected) on test_relay+test_email_auth_wallets+test_gaps suites; new test_wallet_signed.py adds 16 passed. Frontend verified by signing in as trader1@weft.test (token-only localStorage) and navigating to /account — custodial 'Swap for real' button present, self-sign 'Build — sign in your wallet' panel correctly ABSENT for email users (wallet-trade-row element = null, which matches Account.jsx:168 gating), all 4 core testids (holdings-panel, paper-reset-btn, hl-equity-chart, hl-mkt-limit) render, live ETH price $2,391.85, Hyperliquid 0.00 / 0 open, Solana 0.0000. Only console error is pre-existing dev-overlay hydration warning (<span> child of <option>) also flagged in iter9. Self-sign branch verified by code inspection: Account.jsx:169 passes selfSign+signTransaction to SolTradePanel; SolTradePanel at 474-517 branches on selfSign — builds via /wallet/build_swap, calls wallet.signTransaction, broadcasts via /wallet/send_signed; panel label 'Swap on Solana · real · signed by your wallet' and button 'Build — sign in your wallet' (line 517).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Account.jsx <option> dropdowns (sol-trade-out / hl-symbol / hl-lev)", "issues": ["Pre-existing dev-only hydration warning '<span> cannot be a child of <option>' from x-component dev overlay — harmless in production build; same as iter7/iter8/iter9."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_wallet_signed.py",
+    "/app/backend/tests/test_relay.py",
+    "/app/backend/tests/test_email_auth_wallets.py",
+    "/app/backend/tests/test_gaps.py",
+    "/app/test_reports/pytest/iter10_results.xml",
+    "/app/test_reports/pytest/iter10_signed_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py:385-411 build_swap correctly validates auth (401), coerces/validates amount+mints (400), calls Jupiter /quote then /swap with userPublicKey=session.wallet, returns unsigned swapTransaction. No private key material touched on this path — safe for Phantom-connected users.",
+    "server.py:414-431 send_signed accepts signed base64 tx, forwards to Solana sendTransaction, catches exceptions as 400 with clipped error (NO 500 leak). Persists trade with selfSigned:true flag — good audit trail.",
+    "server.py has 0 old-brand identifiers in key/secret/session/token namespace (verified via regex both prefix and suffix). Only remaining 'weft' references are legitimate sanitizer scrub patterns (lines 50, 59) that filter upstream API blobs — these are correct and should stay.",
+    "backend/.env has TREASURY_ADDRESS/TREASURY_PRIVATE_KEY removed; boot clean with 'engine started' in supervisor log; all existing endpoints still functional.",
+    "AuthContext.jsx:8 uses 'loom:session' as localStorage key (confirmed via live login test — token-string persisted, /api/me/local 200 on reload). No weft/* storage keys remain in frontend.",
+    "Account.jsx self-sign branch (line 168-170 wallet-trade-row) is gated so email users never see the self-sign panel and non-email users (phantom/solflare connected) see only the self-sign panel — correct dual-path separation."
+  ],
+  "updated_files": ["/app/backend/tests/test_wallet_signed.py"],
+  "success_rate": {"backend": "100% (16/16 new tests + 42/42 regression + 1 pre-existing skip on upstream 429)", "frontend": "100% of money-path surfaces (custodial swap panel present, self-sign code path verified by inspection + confirmed absent for email users; wallet-only path requires a real browser wallet extension which this harness does not have — code inspection confirms the branch is wired correctly)"},
+  "test_credentials": "trader1@weft.test / testpass123 (email-session with Bearer token; localStorage key loom:session stores raw token string)",
+  "seed_data_creation": "None — reused trader1 account",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "iter10 fully green across (a) new wallet/build_swap + wallet/send_signed endpoints, (b) TREASURY removal doesn't break boot, (c) all money-paths clean-400 on unfunded wallets, (d) branding audit shows no old-brand key material. Only backlog item is the harmless dev-overlay hydration warning in Account.jsx <option> dropdowns (iter9-era; prod build suppresses it). Self-sign wallet-connect UI path cannot be exercised without a browser wallet extension — code inspection confirms Account.jsx:169 + SolTradePanel.selfSign branch calls build_swap→signTransaction→send_signed correctly; backend endpoints are tested with 200/400/401 coverage. Launch-ready.",
+  "rca_of_the_issue": "N/A — no bugs found this iteration."
+}
