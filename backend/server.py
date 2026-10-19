@@ -58,8 +58,10 @@ def _sanitize_upstream(obj):
             blob = _json.dumps(it).lower()
             if UPSTREAM_TOKEN_CA.lower() in blob or "weft" in blob:
                 continue  # drop entries referencing the upstream token or brand
-            if '"kind": "social"' in blob:
+            if '"kind": "social"' in blob or '"kind": "post_match"' in blob:
                 continue  # X/Twitter-dependent signals are removed by design
+            if any(t in blob for t in ("@elonmusk", "posts about", "posts on x", "x.com", "twitter.com", "buzz on x")):
+                continue  # text-level X references
             out.append(_sanitize_upstream(it))
         return out
     if isinstance(obj, dict):

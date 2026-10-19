@@ -110,3 +110,9 @@ link https://x.com/loomfiai, geometric Outfit display type, LoomWeave canvas her
 - Per-route titles/descriptions via react-helmet-async (Seo.jsx on all 7 pages).
 - Relay sanitizer also drops entries with social (X) signal kind — X-dependent examples/strategies never surface.
 - Deploy handoff: redeploy + enable Search Engine Crawling toggle + verify on live domain with Googlebot/OAI-SearchBot UAs.
+
+## Cleanup log (2026-07-19)
+- MakeMarkets era erased: /app/recon, /app/scripts, old test reports 1-5, coin-mask.png deleted;
+  zero makemarkets/makers/$MAKERS/$MARKETS references remain in the codebase.
+- Relay sanitizer extended: also drops entries with post_match kind and text-level X references
+  (@elonmusk, x.com, twitter.com, 'posts about/on X', 'buzz on X'). 23 fully clean strategies served.
