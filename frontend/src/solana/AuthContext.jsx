@@ -13,13 +13,18 @@ export function AuthProvider({ children }) {
   const { publicKey, signMessage, connected } = useWallet();
   const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY));
   const [wallet, setWallet] = useState(null);
+  const [user, setUser] = useState(null); // {email, wallet, authType}
   const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => {
     if (!token) { setSignedIn(false); return; }
     fetch(`${API}/api/me/local`, { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((d) => { setWallet(d.wallet); setSignedIn(true); })
+      .then((d) => {
+        setWallet(d.wallet);
+        setUser({ email: d.email || null, wallet: d.wallet, authType: d.authType || "wallet" });
+        setSignedIn(true);
+      })
       .catch(() => { localStorage.removeItem(TOKEN_KEY); setToken(null); setSignedIn(false); });
   }, [token]);
 
@@ -60,10 +65,27 @@ export function AuthProvider({ children }) {
     setToken(null);
     setWallet(null);
     setSignedIn(false);
+    setUser(null);
+  }, []);
+
+  const emailAuth = useCallback(async (mode, email, password) => {
+    const r = await fetch(`${API}/api/auth/email/${mode}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data?.error || "failed");
+    localStorage.setItem(TOKEN_KEY, data.token);
+    setToken(data.token);
+    setWallet(data.wallet);
+    setUser({ email: data.email, wallet: data.wallet, authType: "email" });
+    setSignedIn(true);
+    return data;
   }, []);
 
   return (
-    <AuthCtx.Provider value={{ token, wallet, signedIn, signIn, signOut }}>
+    <AuthCtx.Provider value={{ token, wallet, user, signedIn, signIn, signOut, emailAuth }}>
       {children}
     </AuthCtx.Provider>
   );

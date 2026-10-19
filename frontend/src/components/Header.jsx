@@ -1,11 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { LayoutDashboard, Wallet } from "lucide-react";
-import { toast } from "sonner";
 import { useAuth } from "../solana/AuthContext";
-import { errorMessage } from "../lib/api";
+import AuthModal from "./AuthModal";
 
 const NAV = [
   { to: "/strategies", label: "Strategies" },
@@ -17,16 +15,12 @@ const NAV = [
 export default function Header() {
   const nav = useNavigate();
   const { connected } = useWallet();
-  const { setVisible } = useWalletModal();
-  const { signedIn, signIn } = useAuth();
+  const { signedIn } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
 
-  const onAccount = async () => {
-    if (!connected) { setVisible(true); return; }
-    if (!signedIn) {
-      try { await signIn(); nav("/account"); } catch (e) { toast.error(errorMessage(e)); }
-      return;
-    }
-    nav("/account");
+  const onAccount = () => {
+    if (signedIn) { nav("/account"); return; }
+    setAuthOpen(true);
   };
 
   return (
@@ -69,6 +63,7 @@ export default function Header() {
           <Link key={n.to} to={n.to} className="whitespace-nowrap text-[12px] text-[#75777d]">{n.label}</Link>
         ))}
       </nav>
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
     </header>
   );
 }
