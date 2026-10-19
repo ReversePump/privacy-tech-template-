@@ -8,28 +8,28 @@ export const Panel = ({ className = "", children, ...rest }) => (
 
 export const ExtLink = ({ href, className = "", children }) => (
   <a href={href} target="_blank" rel="noopener noreferrer"
-    className={`inline-flex items-center gap-1 text-[#a855f7] hover:underline ${className}`}>
+    className={`inline-flex items-center gap-1 text-[#f1f5f9] hover:underline ${className}`}>
     {children} <ArrowUpRight size={12} />
   </a>
 );
 
 export const Loading = ({ label = "Loading" }) => (
-  <div className="flex items-center justify-center gap-2 py-16 text-[#a89ec4]">
+  <div className="flex items-center justify-center gap-2 py-16 text-[#9aa0ae]">
     <Loader2 className="animate-spin" size={16} />
     <span className="mono text-xs uppercase tracking-wider">{label}</span>
   </div>
 );
 
 export const Empty = ({ children }) => (
-  <div className="py-14 text-center text-sm text-[#a89ec4]">{children}</div>
+  <div className="py-14 text-center text-sm text-[#9aa0ae]">{children}</div>
 );
 
 export const Tag = ({ children, tone = "neutral" }) => {
   const tones = {
-    neutral: "bg-[#a855f714] text-[#f3f0fd] border-[#a855f724]",
+    neutral: "bg-[#ffffff16] text-[#f4f4f5] border-[#ffffff26]",
     long: "bg-[#10b98124] text-[#10b981] border-[#10b98138]",
     short: "bg-[#f43f5e1f] text-[#f43f5e] border-[#f43f5e38]",
-    accent: "bg-[#a855f71a] text-[#a855f7] border-[#a855f738]",
+    accent: "bg-[#ffffff1c] text-[#f1f5f9] border-[#ffffff3d]",
     amber: "bg-[#f59e0b1f] text-[#fbbf24] border-[#f59e0b38]",
   };
   return (
@@ -43,7 +43,7 @@ export const CoinIcon = ({ symbol, size = 20 }) => {
   const [err, setErr] = React.useState(false);
   if (!symbol || err) {
     return (
-      <span className="inline-flex items-center justify-center rounded-full bg-[#a855f714] mono text-[9px] text-[#a89ec4]"
+      <span className="inline-flex items-center justify-center rounded-full bg-[#ffffff16] mono text-[9px] text-[#9aa0ae]"
         style={{ width: size, height: size }}>
         {(symbol || "?").slice(0, 2)}
       </span>
@@ -56,9 +56,9 @@ export const CoinIcon = ({ symbol, size = 20 }) => {
 
 export const Stat = ({ label, value, sub, testId }) => (
   <div className="px-5 py-4" data-testid={testId}>
-    <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#a89ec4]">{label}</div>
-    <div className="mt-1 text-xl font-medium text-[#f3f0fd] tnum">{value}</div>
-    {sub && <div className="mt-0.5 text-[11px] text-[#a89ec4]">{sub}</div>}
+    <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#9aa0ae]">{label}</div>
+    <div className="mt-1 text-xl font-medium text-[#f4f4f5] tnum">{value}</div>
+    {sub && <div className="mt-0.5 text-[11px] text-[#9aa0ae]">{sub}</div>}
   </div>
 );
 

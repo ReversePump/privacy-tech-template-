@@ -68,36 +68,36 @@ export default function Home() {
   return (
     <div data-testid="home-page">
       {/* HERO */}
-      <section className="relative overflow-hidden border-b border-[#a855f724]">
+      <section className="relative overflow-hidden border-b border-[#ffffff26]">
         <div className="absolute inset-0 z-0 pointer-events-none"
-          style={{ background: "radial-gradient(ellipse 70% 60% at 62% 42%, rgba(168,85,247,0.12), transparent 65%)" }} />
+          style={{ background: "radial-gradient(ellipse 70% 60% at 62% 42%, rgba(226,232,255,0.12), transparent 65%)" }} />
         <div className="relative z-10 mx-auto max-w-[1200px] px-4 md:px-6 pt-16 md:pt-20 pb-14">
           <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-12 items-center">
             <div>
-              <div className="mono text-[10px] uppercase tracking-[0.34em] text-[#c084fc] fadeup" data-testid="hero-eyebrow">Analyze · Monitor · Trade</div>
+              <div className="mono text-[10px] uppercase tracking-[0.34em] text-[#cbd5e1] fadeup" data-testid="hero-eyebrow">Analyze · Monitor · Trade</div>
               <h1 className="serif mt-4 text-5xl md:text-6xl font-light tracking-tight leading-[1.04]" data-testid="hero-title">
                 Your strategy.<br />
-                <span className="italic bg-gradient-to-r from-[#a855f7] via-[#c084fc] to-[#e879f9] bg-clip-text text-transparent">Automatically executed.</span>
+                <span className="italic bg-gradient-to-r from-[#f1f5f9] via-[#cbd5e1] to-[#e2e8f0] bg-clip-text text-transparent">Automatically executed.</span>
               </h1>
-              <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-[#a89ec4]">
+              <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-[#9aa0ae]">
                 From “buy $50 of ETH” to “if funding stays low and price holds, go long.”
                 Loom turns your words into rules you can read and trades them from your own wallet — day and night.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link to="/new" data-testid="hero-start-btn" className="inline-flex h-11 items-center gap-2 rounded-full bg-gradient-to-r from-[#9333ea] to-[#a855f7] px-6 text-sm font-medium text-white shadow-[0_0_24px_rgba(168,85,247,0.45)] hover:from-[#a855f7] hover:to-[#c084fc] hover:-translate-y-0.5 transition-all">
+                <Link to="/new" data-testid="hero-start-btn" className="inline-flex h-11 items-center gap-2 rounded-full bg-gradient-to-r from-[#f8fafc] to-[#cbd5e1] px-6 text-sm font-medium text-black shadow-[0_0_24px_rgba(226,232,255,0.45)] hover:from-white hover:to-[#e5e7eb] hover:-translate-y-0.5 transition-all">
                   Start trading <ArrowRight size={15} />
                 </Link>
-                <a href="#demo" data-testid="hero-demo-btn" className="inline-flex h-11 items-center rounded-full border border-[#a855f73d] bg-[#17142866] px-6 text-sm text-[#f3f0fd] hover:border-[#a855f766] backdrop-blur-sm transition-colors">
+                <a href="#demo" data-testid="hero-demo-btn" className="inline-flex h-11 items-center rounded-full border border-[#ffffff40] bg-[#17171b99] px-6 text-sm text-[#f4f4f5] hover:border-[#ffffff66] backdrop-blur-sm transition-colors">
                   See it work
                 </a>
               </div>
-              <p className="mt-4 mono text-[11px] text-[#a89ec4]">No wallet or Hyperliquid account needed: sign in with email and Loom makes them for you.</p>
+              <p className="mt-4 mono text-[11px] text-[#9aa0ae]">No wallet or Hyperliquid account needed: sign in with email and Loom makes them for you.</p>
             </div>
             <LoomSignals className="fadeup" />
           </div>
 
           {/* live stat strip */}
-          <Panel className="mt-8 grid grid-cols-2 md:grid-cols-4 divide-x divide-[#a855f724] overflow-hidden" data-testid="home-stats">
+          <Panel className="mt-8 grid grid-cols-2 md:grid-cols-4 divide-x divide-[#ffffff26] overflow-hidden" data-testid="home-stats">
             <Stat label="Strategies" value={stats ? fmtNum(stats.strategies) : "—"} testId="stat-strategies" />
             <Stat label="Deployments" value={stats ? fmtNum(stats.deployments) : "—"} sub={stats ? `${fmtNum(stats.running)} running now` : ""} testId="stat-deployments" />
             <Stat label="Volume traded" value={stats ? fmtUsd0(stats.volumeUsd) : "—"} testId="stat-volume" />
@@ -111,23 +111,23 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
           <div>
             <h2 className="serif text-3xl md:text-4xl font-light tracking-tight">Say it once. <span className="italic">Loom watches the market for you.</span></h2>
-            <p className="mt-4 text-[14px] leading-relaxed text-[#a89ec4]">
+            <p className="mt-4 text-[14px] leading-relaxed text-[#9aa0ae]">
               Type the trade the way you'd say it, with one condition or five: a price, a post on X, a wallet, the mood of the market.
               Each part becomes a rule. Loom checks them every 15 to 30 seconds, day and night, and places the order once all of them hold.
             </p>
-            <Link to="/new" className="mt-6 inline-flex items-center gap-1.5 text-[13px] font-medium text-[#a855f7] hover:underline">
+            <Link to="/new" className="mt-6 inline-flex items-center gap-1.5 text-[13px] font-medium text-[#f1f5f9] hover:underline">
               Write your own <ArrowRight size={13} />
             </Link>
           </div>
           <Panel className="p-6 fadeup" data-testid="demo-card">
-            <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#a89ec4]">New strategy · your idea</div>
+            <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#9aa0ae]">New strategy · your idea</div>
             <p className="mt-3 serif text-lg italic">“Long ETH at 20× with $50 — when price is above $2,600 and funding is under 0.01% an hour.”</p>
             <div className="mt-5 space-y-2 text-[13px]">
               <div className="flex items-center gap-2"><Tag tone="accent">when</Tag> ETH price above $2,600</div>
               <div className="flex items-center gap-2"><Tag tone="accent">when</Tag> funding under 0.01% / h</div>
               <div className="flex items-center gap-2"><Tag tone="long">do</Tag> Long ETH 20× · $50 · stop −20%</div>
             </div>
-            <div className="mt-5 border-t border-[#a855f724] pt-4 flex items-center gap-2 mono text-[10px] text-[#a89ec4]">
+            <div className="mt-5 border-t border-[#ffffff26] pt-4 flex items-center gap-2 mono text-[10px] text-[#9aa0ae]">
               <span className="h-1.5 w-1.5 rounded-full bg-[#10b981] pulse-dot" /> checks every 15 s · Hyperliquid
             </div>
           </Panel>
@@ -135,17 +135,17 @@ export default function Home() {
       </section>
 
       {/* WHAT IT TRADES */}
-      <section className="border-t border-[#a855f724] bg-[#171428]">
+      <section className="border-t border-[#ffffff26] bg-[#17171b]">
         <div className="mx-auto max-w-[1200px] px-4 md:px-6 py-20">
           <h2 className="serif text-3xl md:text-4xl font-light tracking-tight">What it can trade</h2>
-          <p className="mt-3 text-[14px] text-[#a89ec4]">You name the market. Loom knows where it trades and sends the order there.</p>
+          <p className="mt-3 text-[14px] text-[#9aa0ae]">You name the market. Loom knows where it trades and sends the order there.</p>
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="trades-grid">
             {TRADES.map((t) => (
               <Panel key={t.title} className="p-5">
                 <div className="flex items-center gap-1.5">{t.icons.map((i) => <CoinIcon key={i} symbol={i} size={24} />)}</div>
                 <h3 className="mt-3 text-[15px] font-medium">{t.title}</h3>
-                <div className="mono text-[10px] uppercase tracking-wider text-[#a855f7]">{t.where}</div>
-                <p className="mt-2 text-[12.5px] leading-relaxed text-[#a89ec4]">{t.text}</p>
+                <div className="mono text-[10px] uppercase tracking-wider text-[#f1f5f9]">{t.where}</div>
+                <p className="mt-2 text-[12.5px] leading-relaxed text-[#9aa0ae]">{t.text}</p>
               </Panel>
             ))}
           </div>
@@ -155,23 +155,23 @@ export default function Home() {
       {/* WHAT IT WATCHES */}
       <section className="mx-auto max-w-[1200px] px-4 md:px-6 py-20">
         <h2 className="serif text-3xl md:text-4xl font-light tracking-tight">What it watches</h2>
-        <p className="mt-3 text-[14px] text-[#a89ec4]">Any of these can be a condition, and one sentence can mix as many as you like. Pick one to try it.</p>
+        <p className="mt-3 text-[14px] text-[#9aa0ae]">Any of these can be a condition, and one sentence can mix as many as you like. Pick one to try it.</p>
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="watches-grid">
           {WATCHES.map(([title, example, thesis]) => (
             thesis ? (
               <Link key={title} to={`/new?thesis=${encodeURIComponent(thesis)}`}>
-                <Panel className="group h-full p-5 hover:border-[#a855f73d] transition-colors">
+                <Panel className="group h-full p-5 hover:border-[#ffffff40] transition-colors">
                   <div className="text-[14px] font-medium">{title}</div>
-                  <p className="mt-1.5 text-[12.5px] text-[#a89ec4]">“{example}”</p>
-                  <span className="mt-3 inline-flex items-center gap-1 text-[12px] text-[#a855f7] group-hover:underline">Try it <ArrowRight size={12} /></span>
+                  <p className="mt-1.5 text-[12.5px] text-[#9aa0ae]">“{example}”</p>
+                  <span className="mt-3 inline-flex items-center gap-1 text-[12px] text-[#f1f5f9] group-hover:underline">Try it <ArrowRight size={12} /></span>
                 </Panel>
               </Link>
             ) : (
               <Link key={title} to="/new">
-                <Panel className="group h-full p-5 hover:border-[#a855f73d] transition-colors">
+                <Panel className="group h-full p-5 hover:border-[#ffffff40] transition-colors">
                   <div className="text-[14px] font-medium">{title}</div>
-                  <p className="mt-1.5 text-[12.5px] text-[#a89ec4]">“{example}”</p>
-                  <span className="mt-3 inline-flex items-center gap-1 text-[12px] text-[#a855f7] group-hover:underline">Try it <ArrowRight size={12} /></span>
+                  <p className="mt-1.5 text-[12.5px] text-[#9aa0ae]">“{example}”</p>
+                  <span className="mt-3 inline-flex items-center gap-1 text-[12px] text-[#f1f5f9] group-hover:underline">Try it <ArrowRight size={12} /></span>
                 </Panel>
               </Link>
             )
@@ -180,11 +180,11 @@ export default function Home() {
       </section>
 
       {/* SECURITY */}
-      <section className="border-t border-[#a855f724] bg-[#171428]">
+      <section className="border-t border-[#ffffff26] bg-[#17171b]">
         <div className="mx-auto max-w-[1200px] px-4 md:px-6 py-20 grid grid-cols-1 lg:grid-cols-2 gap-10">
           <div>
             <h2 className="serif text-3xl md:text-4xl font-light tracking-tight">It can trade. <span className="italic">It can't withdraw.</span></h2>
-            <p className="mt-4 text-[14px] leading-relaxed text-[#a89ec4]">
+            <p className="mt-4 text-[14px] leading-relaxed text-[#9aa0ae]">
               Your money stays in your own account, on Hyperliquid and on Solana. Loom gets a key that can trade for you, and nothing else.
             </p>
           </div>
@@ -192,7 +192,7 @@ export default function Home() {
             <Panel className="p-5">
               <ShieldCheck size={18} className="text-[#10b981]" />
               <div className="mt-2 text-[13px] font-medium">The agent can</div>
-              <ul className="mt-2 space-y-1 text-[12.5px] text-[#a89ec4]">
+              <ul className="mt-2 space-y-1 text-[12.5px] text-[#9aa0ae]">
                 <li>Place and cancel orders</li>
                 <li>Set stops and targets</li>
                 <li>Swap tokens inside your own wallet</li>
@@ -201,16 +201,16 @@ export default function Home() {
             <Panel className="p-5">
               <Wallet size={18} className="text-[#f43f5e]" />
               <div className="mt-2 text-[13px] font-medium">The agent can't</div>
-              <ul className="mt-2 space-y-1 text-[12.5px] text-[#a89ec4]">
+              <ul className="mt-2 space-y-1 text-[12.5px] text-[#9aa0ae]">
                 <li>Withdraw your money</li>
                 <li>Send it to another address</li>
                 <li>Trade a strategy you haven't started</li>
               </ul>
             </Panel>
             <Panel className="p-5 sm:col-span-2 flex items-start gap-3">
-              <Eye size={18} className="text-[#a855f7] mt-0.5" />
-              <div className="text-[12.5px] leading-relaxed text-[#a89ec4]">
-                <span className="text-[#f3f0fd] font-medium">Practice first.</span> Run any strategy with $10,000 of pretend money at real prices, or as alerts only. No money moves until you start it for real. Your amount, your stop. Hold the stop button and everything closes right away.
+              <Eye size={18} className="text-[#f1f5f9] mt-0.5" />
+              <div className="text-[12.5px] leading-relaxed text-[#9aa0ae]">
+                <span className="text-[#f4f4f5] font-medium">Practice first.</span> Run any strategy with $10,000 of pretend money at real prices, or as alerts only. No money moves until you start it for real. Your amount, your stop. Hold the stop button and everything closes right away.
               </div>
             </Panel>
           </div>
@@ -222,9 +222,9 @@ export default function Home() {
         <div className="flex items-end justify-between">
           <div>
             <h2 className="serif text-3xl md:text-4xl font-light tracking-tight">Start from someone else's strategy</h2>
-            <p className="mt-3 max-w-lg text-[14px] text-[#a89ec4]">Saved strategies are public, with no names attached. Open one, read exactly what it does and change what you like.</p>
+            <p className="mt-3 max-w-lg text-[14px] text-[#9aa0ae]">Saved strategies are public, with no names attached. Open one, read exactly what it does and change what you like.</p>
           </div>
-          <Link to="/strategies" className="hidden sm:inline-flex items-center gap-1.5 text-[13px] font-medium text-[#a855f7] hover:underline" data-testid="home-browse-strategies">
+          <Link to="/strategies" className="hidden sm:inline-flex items-center gap-1.5 text-[13px] font-medium text-[#f1f5f9] hover:underline" data-testid="home-browse-strategies">
             Browse all strategies <ArrowRight size={13} />
           </Link>
         </div>
@@ -238,36 +238,36 @@ export default function Home() {
       <TokenSection />
 
       {/* FAQ */}
-      <section className="border-t border-[#a855f724]">
+      <section className="border-t border-[#ffffff26]">
         <div className="mx-auto max-w-[760px] px-4 md:px-6 py-20">
           <h2 className="serif text-3xl md:text-4xl font-light tracking-tight">Questions</h2>
-          <div className="mt-8 divide-y divide-[#a855f724]" data-testid="faq">
+          <div className="mt-8 divide-y divide-[#ffffff26]" data-testid="faq">
             {FAQ.map(([q, a], i) => (
               <div key={q}>
                 <button onClick={() => setOpen(open === i ? -1 : i)} className="flex w-full items-center justify-between py-4 text-left" data-testid={`faq-${i}`}>
                   <span className="text-[14px] font-medium">{q}</span>
-                  <span className="mono text-[#a89ec4]">{open === i ? "−" : "+"}</span>
+                  <span className="mono text-[#9aa0ae]">{open === i ? "−" : "+"}</span>
                 </button>
-                {open === i && <p className="pb-5 text-[13px] leading-relaxed text-[#a89ec4]">{a}</p>}
+                {open === i && <p className="pb-5 text-[13px] leading-relaxed text-[#9aa0ae]">{a}</p>}
               </div>
             ))}
           </div>
-          <p className="mt-6 text-[13px] text-[#a89ec4]">Anything else? Ask us on <a href="https://x.com/loomfiai" target="_blank" rel="noopener noreferrer" className="text-[#a855f7] hover:underline">X</a>.</p>
+          <p className="mt-6 text-[13px] text-[#9aa0ae]">Anything else? Ask us on <a href="https://x.com/loomfiai" target="_blank" rel="noopener noreferrer" className="text-[#f1f5f9] hover:underline">X</a>.</p>
         </div>
       </section>
 
       {/* BOTTOM CTA */}
-      <section className="border-t border-[#a855f724] bg-[#171428]">
+      <section className="border-t border-[#ffffff26] bg-[#17171b]">
         <div className="mx-auto max-w-[1200px] px-4 md:px-6 py-20 text-center">
-          <h2 className="serif text-4xl md:text-5xl font-light tracking-tight">What's your <span className="italic text-[#a855f7]">thesis?</span></h2>
+          <h2 className="serif text-4xl md:text-5xl font-light tracking-tight">What's your <span className="italic text-[#f1f5f9]">thesis?</span></h2>
           <div className="mt-6 flex flex-wrap justify-center gap-2">
             {["Buy $50 of ETH now", "If @elonmusk posts about Dogecoin, long DOGE 5x with $100", "Long BTC and ETH 20x with $100 each if Fear & Greed drops to 20"].map((t) => (
-              <Link key={t} to={`/new?thesis=${encodeURIComponent(t)}`} className="rounded-full border border-[#a855f724] bg-[#171428] px-4 py-2 text-[12.5px] hover:border-[#a855f7] hover:text-[#c084fc] transition-colors">
+              <Link key={t} to={`/new?thesis=${encodeURIComponent(t)}`} className="rounded-full border border-[#ffffff26] bg-[#17171b] px-4 py-2 text-[12.5px] hover:border-[#f1f5f9] hover:text-[#cbd5e1] transition-colors">
                 {t}
               </Link>
             ))}
           </div>
-          <p className="mt-6 mono text-[11px] text-[#a89ec4]">Free to write. A small fee only when it trades.</p>
+          <p className="mt-6 mono text-[11px] text-[#9aa0ae]">Free to write. A small fee only when it trades.</p>
         </div>
       </section>
     </div>
@@ -289,42 +289,42 @@ function TokenSection() {
     setTimeout(() => setCopied(false), 1500);
   };
   return (
-    <section className="border-t border-[#a855f724] bg-[#171428]" id="token">
+    <section className="border-t border-[#ffffff26] bg-[#17171b]" id="token">
       <div className="mx-auto max-w-[1200px] px-4 md:px-6 py-20">
-        <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#a89ec4]">The $LOOM token</div>
+        <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#9aa0ae]">The $LOOM token</div>
         <h2 className="mt-3 serif text-3xl md:text-4xl font-light tracking-tight max-w-2xl">
-          You trade a small fee. <span className="italic text-[#a855f7]">$LOOM gets bought back.</span>
+          You trade a small fee. <span className="italic text-[#f1f5f9]">$LOOM gets bought back.</span>
         </h2>
-        <p className="mt-4 max-w-2xl text-[14px] leading-relaxed text-[#a89ec4]">
+        <p className="mt-4 max-w-2xl text-[14px] leading-relaxed text-[#9aa0ae]">
           Loom buys $LOOM on the open market in small amounts about every ten minutes, around the clock: with half of every fee it earns, and 0.4% of every $LOOM trade. Then it goes back to the people who use Loom — traders, strategy creators — and the rest is burned.
         </p>
 
         <Panel className="mt-8 p-5 flex flex-wrap items-center gap-3" data-testid="weft-ca">
-          <span className="mono text-[10px] uppercase tracking-wider text-[#a89ec4]">$LOOM contract address · the only official one</span>
-          <button onClick={copy} className="mono text-[12px] text-[#f3f0fd] hover:text-[#c084fc] transition-colors" data-testid="weft-ca-copy">
+          <span className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae]">$LOOM contract address · the only official one</span>
+          <button onClick={copy} className="mono text-[12px] text-[#f4f4f5] hover:text-[#cbd5e1] transition-colors" data-testid="weft-ca-copy">
             {copied ? "Copied" : CA}
           </button>
           <span className="flex gap-3 ml-auto text-[12px]">
-            <a className="text-[#a855f7] hover:underline" href={`https://solscan.io/token/${CA}`} target="_blank" rel="noopener noreferrer">Solscan ↗</a>
-            <a className="text-[#a855f7] hover:underline" href={`https://dexscreener.com/solana/${CA}`} target="_blank" rel="noopener noreferrer">DexScreener ↗</a>
-            <a className="text-[#a855f7] hover:underline" href={`https://jup.ag/tokens/${CA}`} target="_blank" rel="noopener noreferrer">Jupiter ↗</a>
+            <a className="text-[#f1f5f9] hover:underline" href={`https://solscan.io/token/${CA}`} target="_blank" rel="noopener noreferrer">Solscan ↗</a>
+            <a className="text-[#f1f5f9] hover:underline" href={`https://dexscreener.com/solana/${CA}`} target="_blank" rel="noopener noreferrer">DexScreener ↗</a>
+            <a className="text-[#f1f5f9] hover:underline" href={`https://jup.ag/tokens/${CA}`} target="_blank" rel="noopener noreferrer">Jupiter ↗</a>
           </span>
         </Panel>
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
           <Panel className="p-5">
-            <div className="mono text-[10px] uppercase tracking-wider text-[#a89ec4]">50% · back to traders</div>
-            <p className="mt-2 text-[12.5px] text-[#a89ec4]">Shared out every day. Your share is the fees you paid that day.</p>
+            <div className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae]">50% · back to traders</div>
+            <p className="mt-2 text-[12.5px] text-[#9aa0ae]">Shared out every day. Your share is the fees you paid that day.</p>
             <div className="mt-3 text-lg font-medium tnum" data-testid="weft-trader-share">{rev ? fmtUsd(rev.buybackUsd * 0.5) : "—"}</div>
           </Panel>
           <Panel className="p-5">
-            <div className="mono text-[10px] uppercase tracking-wider text-[#a89ec4]">20% · to creators</div>
-            <p className="mt-2 text-[12.5px] text-[#a89ec4]">Publish a strategy. When other people run it, you earn from the fees their runs pay.</p>
+            <div className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae]">20% · to creators</div>
+            <p className="mt-2 text-[12.5px] text-[#9aa0ae]">Publish a strategy. When other people run it, you earn from the fees their runs pay.</p>
             <div className="mt-3 text-lg font-medium tnum">{rev ? fmtUsd(rev.buybackUsd * 0.2) : "—"}</div>
           </Panel>
           <Panel className="p-5">
-            <div className="mono text-[10px] uppercase tracking-wider text-[#a89ec4]">30% · burned</div>
-            <p className="mt-2 text-[12.5px] text-[#a89ec4]">Burned the moment it's bought. No team allocation, nothing new is ever minted — supply only shrinks.</p>
+            <div className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae]">30% · burned</div>
+            <p className="mt-2 text-[12.5px] text-[#9aa0ae]">Burned the moment it's bought. No team allocation, nothing new is ever minted — supply only shrinks.</p>
             <div className="mt-3 text-lg font-medium tnum">{rev ? fmtUsd(rev.buybackUsd * 0.3) : "—"}</div>
           </Panel>
         </div>
@@ -332,21 +332,21 @@ function TokenSection() {
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
           <Panel className="p-5">
             <div className="text-[14px] font-medium">Holder · from 100,000 $LOOM</div>
-            <p className="mt-1.5 text-[13px] text-[#a89ec4]">25% off every trade, plus 1.5× rewards and 100 AI drafts a day.</p>
+            <p className="mt-1.5 text-[13px] text-[#9aa0ae]">25% off every trade, plus 1.5× rewards and 100 AI drafts a day.</p>
           </Panel>
           <Panel className="p-5">
             <div className="text-[14px] font-medium">Whale · from 1,000,000 $LOOM</div>
-            <p className="mt-1.5 text-[13px] text-[#a89ec4]">50% off every trade, plus 2× rewards and 100 AI drafts a day.</p>
+            <p className="mt-1.5 text-[13px] text-[#9aa0ae]">50% off every trade, plus 2× rewards and 100 AI drafts a day.</p>
           </Panel>
         </div>
 
-        <div className="mt-8 flex flex-wrap gap-x-8 gap-y-2 mono text-[11px] text-[#a89ec4]">
+        <div className="mt-8 flex flex-wrap gap-x-8 gap-y-2 mono text-[11px] text-[#9aa0ae]">
           <span>Fee on Hyperliquid: 0.10% perps · 1% spot sales</span>
           <span>Fee on Solana swaps: 1%</span>
           <span>Trading $LOOM: 3% (2% Loom · 0.4% buyback · 0.6% Meteora)</span>
         </div>
-        <p className="mt-4 text-[12px] text-[#a89ec4]">
-          Every fee, buyback, burn and reward is on the <Link to="/revenue" className="text-[#a855f7] hover:underline">Revenue page</Link>. Any other token calling itself $LOOM is fake.
+        <p className="mt-4 text-[12px] text-[#9aa0ae]">
+          Every fee, buyback, burn and reward is on the <Link to="/revenue" className="text-[#f1f5f9] hover:underline">Revenue page</Link>. Any other token calling itself $LOOM is fake.
           {rewards?.paused ? <span className="ml-2 mono text-[10px] uppercase tracking-wider text-[#fbbf24]">rewards paused</span> : null}
         </p>
       </div>

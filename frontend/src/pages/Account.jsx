@@ -87,11 +87,11 @@ export default function Account() {
   if (!signedIn) {
     return (
       <div className="mx-auto max-w-[860px] px-4 md:px-6 pt-20 text-center" data-testid="account-page">
-        <Wallet size={28} className="mx-auto text-[#a89ec4]" />
+        <Wallet size={28} className="mx-auto text-[#9aa0ae]" />
         <h1 className="mt-4 serif text-3xl font-light">Your account</h1>
-        <p className="mt-2 text-[13px] text-[#a89ec4]">Email and password — we generate your wallets. Or connect your own.</p>
+        <p className="mt-2 text-[13px] text-[#9aa0ae]">Email and password — we generate your wallets. Or connect your own.</p>
         <button onClick={() => setAuthOpen(true)} data-testid="account-signin-btn"
-          className="mt-6 h-11 rounded-full bg-[#9333ea] px-6 text-sm font-medium text-white shadow-[0_0_20px_rgba(168,85,247,0.35)] hover:bg-[#a855f7] transition-colors">
+          className="mt-6 h-11 rounded-full bg-[#e5e7eb] px-6 text-sm font-medium text-black shadow-[0_0_20px_rgba(226,232,255,0.35)] hover:bg-[#f1f5f9] transition-colors">
           Sign in
         </button>
         <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
@@ -104,23 +104,23 @@ export default function Account() {
       <div className="flex flex-wrap items-center gap-4">
         <div>
           <h1 className="serif text-4xl font-light tracking-tight">Your account</h1>
-          <p className="mt-1 mono text-[12px] text-[#a89ec4]" data-testid="account-wallet">{user?.email || short(wallet, 6, 6)}</p>
+          <p className="mt-1 mono text-[12px] text-[#9aa0ae]" data-testid="account-wallet">{user?.email || short(wallet, 6, 6)}</p>
         </div>
         <button onClick={signOut} data-testid="account-signout-btn"
-          className="ml-auto inline-flex h-9 items-center gap-1.5 rounded-full border border-[#a855f724] px-4 text-[12px] text-[#a89ec4] hover:text-[#f3f0fd]">
+          className="ml-auto inline-flex h-9 items-center gap-1.5 rounded-full border border-[#ffffff26] px-4 text-[12px] text-[#9aa0ae] hover:text-[#f4f4f5]">
           <LogOut size={12} /> Sign out
         </button>
       </div>
 
-      <Panel className="mt-8 grid grid-cols-2 md:grid-cols-4 divide-x divide-[#a855f724] overflow-hidden" data-testid="account-stats">
+      <Panel className="mt-8 grid grid-cols-2 md:grid-cols-4 divide-x divide-[#ffffff26] overflow-hidden" data-testid="account-stats">
         <div className="px-5 py-4">
-          <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#a89ec4]">Solana balance</div>
+          <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#9aa0ae]">Solana balance</div>
           <div className="mt-1 text-xl font-medium tnum" data-testid="acct-sol-bal">{solInfo ? `${solInfo.sol.toFixed(4)} SOL` : "—"}</div>
         </div>
         <div className="px-5 py-4">
-          <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#a89ec4]">Hyperliquid equity</div>
+          <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#9aa0ae]">Hyperliquid equity</div>
           <div className="mt-1 text-xl font-medium tnum" data-testid="acct-hl-eq">{hlInfo ? fmtUsd(hlInfo.equityUsd) : isEmail ? "—" : "n/a"}</div>
-          <div className="mt-0.5 text-[11px] text-[#a89ec4]">{hlInfo ? `${hlInfo.positions.length} open` : ""}</div>
+          <div className="mt-0.5 text-[11px] text-[#9aa0ae]">{hlInfo ? `${hlInfo.positions.length} open` : ""}</div>
           {hlInfo?.equityHistory?.length > 1 && (
             <div className="mt-2 -mx-1" data-testid="hl-equity-chart">
               <Sparkline points={hlInfo.equityHistory} height={34} />
@@ -128,13 +128,13 @@ export default function Account() {
           )}
         </div>
         <div className="px-5 py-4">
-          <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#a89ec4]">Saved strategies</div>
+          <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#9aa0ae]">Saved strategies</div>
           <div className="mt-1 text-xl font-medium tnum">{saved ? saved.length : "—"}</div>
         </div>
         <div className="px-5 py-4">
-          <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#a89ec4]">Rewards</div>
+          <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#9aa0ae]">Rewards</div>
           <div className="mt-1 text-xl font-medium tnum">{rewards ? (rewards.enabled ? (rewards.paused ? "Paused" : "Live") : "Off") : "—"}</div>
-          <div className="mt-0.5 text-[11px] text-[#a89ec4]">$LOOM share of fees</div>
+          <div className="mt-0.5 text-[11px] text-[#9aa0ae]">$LOOM share of fees</div>
         </div>
       </Panel>
 
@@ -176,7 +176,7 @@ export default function Account() {
       <div className="mt-4 space-y-4" data-testid="account-strategies">
         {!saved && <Loading label="Loading your strategies" />}
         {saved && saved.length === 0 && (
-          <Empty>Nothing saved yet. <Link to="/new" className="text-[#a855f7]">Draft a strategy →</Link></Empty>
+          <Empty>Nothing saved yet. <Link to="/new" className="text-[#f1f5f9]">Draft a strategy →</Link></Empty>
         )}
         {saved?.map((doc) => {
           const bt = btMap[doc.strategyId];
@@ -186,7 +186,7 @@ export default function Account() {
               <div className="flex flex-wrap items-center gap-3">
                 <div className="min-w-0">
                   <div className="text-[15px] font-medium">{doc.name}</div>
-                  <div className="mono text-[10px] text-[#a89ec4]">{doc.strategyId} · saved {fmtAge(doc.savedAt)}</div>
+                  <div className="mono text-[10px] text-[#9aa0ae]">{doc.strategyId} · saved {fmtAge(doc.savedAt)}</div>
                 </div>
                 <div className="ml-auto flex gap-2">
                   <button onClick={async () => {
@@ -196,11 +196,11 @@ export default function Account() {
                     catch (e) { toast.error(errorMessage(e)); }
                     finally { setBtBusy(""); }
                   }} disabled={btBusy === doc.strategyId} data-testid={`saved-bt-${doc.strategyId}`}
-                    className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[#a855f724] px-4 text-[12px] hover:border-[#a855f7] hover:text-[#c084fc] disabled:opacity-40 transition-colors">
+                    className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[#ffffff26] px-4 text-[12px] hover:border-[#f1f5f9] hover:text-[#cbd5e1] disabled:opacity-40 transition-colors">
                     {btBusy === doc.strategyId ? <Loader2 size={12} className="animate-spin" /> : <Play size={12} />} Backtest
                   </button>
                   <Link to={`/new?thesis=${encodeURIComponent(doc.thesis || doc.name)}`}
-                    className="inline-flex h-9 items-center rounded-full bg-[#9333ea] px-4 text-[12px] font-medium text-white shadow-[0_0_20px_rgba(168,85,247,0.35)] hover:bg-[#a855f7] transition-colors">
+                    className="inline-flex h-9 items-center rounded-full bg-[#e5e7eb] px-4 text-[12px] font-medium text-black shadow-[0_0_20px_rgba(226,232,255,0.35)] hover:bg-[#f1f5f9] transition-colors">
                     Open
                   </Link>
                 </div>
@@ -228,9 +228,9 @@ function HoldingsPanel({ holdings, solInfo }) {
   if (!holdings) return null;
   return (
     <Panel className="mt-4 p-5" data-testid="holdings-panel">
-      <div className="mono text-[10px] uppercase tracking-wider text-[#a89ec4]">Token holdings · Solana wallet</div>
+      <div className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae]">Token holdings · Solana wallet</div>
       {holdings.length === 0 ? (
-        <p className="mt-2 text-[12.5px] text-[#a89ec4]" data-testid="holdings-empty">
+        <p className="mt-2 text-[12.5px] text-[#9aa0ae]" data-testid="holdings-empty">
           No tokens yet{solInfo && solInfo.sol === 0 ? " — deposit SOL and swap into any token above" : ""}.
         </p>
       ) : (
@@ -238,10 +238,10 @@ function HoldingsPanel({ holdings, solInfo }) {
           {holdings.map((h) => (
             <div key={h.mint} className="flex flex-wrap items-center gap-3 text-[12.5px]" data-testid={`holding-${(h.symbol || h.mint).slice(0, 8)}`}>
               <span className="font-medium">{h.symbol || short(h.mint, 4, 4)}</span>
-              <span className="mono tnum text-[#a89ec4]">{h.amount.toLocaleString("en-US", { maximumFractionDigits: 4 })}</span>
+              <span className="mono tnum text-[#9aa0ae]">{h.amount.toLocaleString("en-US", { maximumFractionDigits: 4 })}</span>
               {h.valueUsd != null && <span className="mono tnum">{fmtUsd(h.valueUsd)}</span>}
               <a href={`https://solscan.io/token/${h.mint}`} target="_blank" rel="noopener noreferrer"
-                className="ml-auto mono text-[10px] text-[#a855f7] hover:underline">view ↗</a>
+                className="ml-auto mono text-[10px] text-[#f1f5f9] hover:underline">view ↗</a>
             </div>
           ))}
         </div>
@@ -254,27 +254,27 @@ function DepositCard({ title, address, hint, copyKey, copied, copy, testid }) {
   const [qr, setQr] = useState(null);
   const [showQr, setShowQr] = useState(false);
   useEffect(() => {
-    if (address) QRCode.toDataURL(address, { margin: 1, width: 220, color: { dark: "#f3f0fd", light: "#ffffff" } }).then(setQr).catch(() => {});
+    if (address) QRCode.toDataURL(address, { margin: 1, width: 220, color: { dark: "#f4f4f5", light: "#ffffff" } }).then(setQr).catch(() => {});
   }, [address]);
   return (
     <Panel className="p-5">
-      <div className="mono text-[10px] uppercase tracking-wider text-[#a89ec4]">{title}</div>
+      <div className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae]">{title}</div>
       <div className="mt-2 flex items-center gap-2">
-        <button onClick={() => copy(address, copyKey)} className="flex items-center gap-2 mono text-[12px] text-[#f3f0fd] hover:text-[#c084fc]" data-testid={testid}>
+        <button onClick={() => copy(address, copyKey)} className="flex items-center gap-2 mono text-[12px] text-[#f4f4f5] hover:text-[#cbd5e1]" data-testid={testid}>
           {copied === copyKey ? <Check size={12} className="text-[#10b981]" /> : <Copy size={12} />}
           {short(address, 10, 10)}
         </button>
         <button onClick={() => setShowQr(!showQr)} data-testid={`${testid}-qr-toggle`}
-          className="inline-flex items-center gap-1 rounded-full border border-[#a855f724] px-2.5 py-1 text-[10.5px] text-[#a89ec4] hover:text-[#f3f0fd] transition-colors">
+          className="inline-flex items-center gap-1 rounded-full border border-[#ffffff26] px-2.5 py-1 text-[10.5px] text-[#9aa0ae] hover:text-[#f4f4f5] transition-colors">
           <QrCode size={11} /> {showQr ? "Hide" : "QR"}
         </button>
       </div>
       {showQr && qr && (
-        <div className="mt-3 flex justify-center rounded-lg border border-[#a855f724] bg-[#171428] p-3 fadeup" data-testid={`${testid}-qr`}>
+        <div className="mt-3 flex justify-center rounded-lg border border-[#ffffff26] bg-[#17171b] p-3 fadeup" data-testid={`${testid}-qr`}>
           <img src={qr} alt="deposit address QR" className="h-36 w-36" />
         </div>
       )}
-      <p className="mt-2 text-[11.5px] text-[#a89ec4]">{hint}</p>
+      <p className="mt-2 text-[11.5px] text-[#9aa0ae]">{hint}</p>
     </Panel>
   );
 }
@@ -292,12 +292,12 @@ function HistoryPanel({ history }) {
             <div className="flex flex-wrap items-center gap-3 text-[12.5px]">
               <Tag tone={tone[h.type] || "neutral"}>{h.type}</Tag>
               <span className="font-medium">{h.title}</span>
-              <span className="text-[#a89ec4]">{h.detail}</span>
+              <span className="text-[#9aa0ae]">{h.detail}</span>
               {h.tx && (
                 <a href={`https://solscan.io/tx/${h.tx}`} target="_blank" rel="noopener noreferrer"
-                  className="mono text-[10px] text-[#a855f7] hover:underline">tx ↗</a>
+                  className="mono text-[10px] text-[#f1f5f9] hover:underline">tx ↗</a>
               )}
-              <span className="ml-auto mono text-[10px] text-[#a89ec4]">{fmtAge(h.at)}</span>
+              <span className="ml-auto mono text-[10px] text-[#9aa0ae]">{fmtAge(h.at)}</span>
             </div>
           </Panel>
         ))}
@@ -318,11 +318,11 @@ function DeploymentsPanel({ token, deployments, onDone }) {
   };
   return (
     <div className="mt-10" data-testid="deployments-section">
-      <h2 className="serif text-2xl font-light">Deployments <span className="text-[13px] text-[#a89ec4]">— the engine checks every ~25s</span></h2>
+      <h2 className="serif text-2xl font-light">Deployments <span className="text-[13px] text-[#9aa0ae]">— the engine checks every ~25s</span></h2>
       <div className="mt-4 space-y-3">
         {!deployments && <Loading label="Loading deployments" />}
         {deployments?.length === 0 && (
-          <Empty>Nothing running. <Link to="/new" className="text-[#a855f7]">Draft a strategy</Link> and start it as practice, alerts or live.</Empty>
+          <Empty>Nothing running. <Link to="/new" className="text-[#f1f5f9]">Draft a strategy</Link> and start it as practice, alerts or live.</Empty>
         )}
         {deployments?.map((d) => (
           <Panel key={d.id} className="p-5" data-testid={`deployment-${d.id}`}>
@@ -330,30 +330,30 @@ function DeploymentsPanel({ token, deployments, onDone }) {
               <Tag tone={d.mode === "live" ? "long" : d.mode === "paper" ? "accent" : "amber"}>{d.mode}</Tag>
               <div className="min-w-0">
                 <div className="text-[14px] font-medium truncate">{d.strategyName || d.kind}</div>
-                <div className="mono text-[10px] text-[#a89ec4]">{d.kind}{d.targetAddress ? ` · ${short(d.targetAddress, 6, 4)}` : ""} · {d.status}</div>
+                <div className="mono text-[10px] text-[#9aa0ae]">{d.kind}{d.targetAddress ? ` · ${short(d.targetAddress, 6, 4)}` : ""} · {d.status}</div>
               </div>
               <div className="ml-auto flex gap-2">
                 {d.status === "active" && (
                   <button onClick={() => control(d.id, "pause")} disabled={!!busy} data-testid={`dep-pause-${d.id}`}
-                    className="h-8 rounded-full border border-[#a855f724] px-3.5 text-[11.5px] text-[#a89ec4] hover:text-[#f3f0fd]">Pause</button>
+                    className="h-8 rounded-full border border-[#ffffff26] px-3.5 text-[11.5px] text-[#9aa0ae] hover:text-[#f4f4f5]">Pause</button>
                 )}
                 {d.status === "paused" && (
                   <button onClick={() => control(d.id, "resume")} disabled={!!busy} data-testid={`dep-resume-${d.id}`}
-                    className="h-8 rounded-full border border-[#a855f724] px-3.5 text-[11.5px] text-[#10b981] hover:border-[#10b981]">Resume</button>
+                    className="h-8 rounded-full border border-[#ffffff26] px-3.5 text-[11.5px] text-[#10b981] hover:border-[#10b981]">Resume</button>
                 )}
                 {(d.status === "active" || d.status === "paused") && (
                   <button onClick={() => control(d.id, "stop")} disabled={!!busy} data-testid={`dep-stop-${d.id}`}
-                    className="h-8 rounded-full border border-[#a855f724] px-3.5 text-[11.5px] text-[#f43f5e] hover:border-[#f43f5e]">Stop</button>
+                    className="h-8 rounded-full border border-[#ffffff26] px-3.5 text-[11.5px] text-[#f43f5e] hover:border-[#f43f5e]">Stop</button>
                 )}
               </div>
             </div>
             {d.events?.length > 0 && (
-              <div className="mt-3 border-t border-[#a855f724] pt-3 space-y-1" data-testid={`dep-events-${d.id}`}>
+              <div className="mt-3 border-t border-[#ffffff26] pt-3 space-y-1" data-testid={`dep-events-${d.id}`}>
                 {[...d.events].slice(-3).reverse().map((e, i) => (
                   <div key={i} className="flex gap-2 text-[11.5px]">
-                    <span className={`mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full ${e.kind === "fill" ? "bg-[#10b981]" : e.kind === "error" ? "bg-[#f43f5e]" : e.kind === "alert" ? "bg-[#a855f7]" : "bg-[#6d638c]"}`} />
-                    <span className="text-[#f3f0fd]">{e.msg}</span>
-                    <span className="ml-auto mono text-[10px] text-[#a89ec4]">{fmtAge(e.at)}</span>
+                    <span className={`mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full ${e.kind === "fill" ? "bg-[#10b981]" : e.kind === "error" ? "bg-[#f43f5e]" : e.kind === "alert" ? "bg-[#f1f5f9]" : "bg-[#6b7280]"}`} />
+                    <span className="text-[#f4f4f5]">{e.msg}</span>
+                    <span className="ml-auto mono text-[10px] text-[#9aa0ae]">{fmtAge(e.at)}</span>
                   </div>
                 ))}
               </div>
@@ -382,46 +382,46 @@ function PaperPanel({ paper, token, onDone }) {
       <div className="flex items-center gap-3">
         <h2 className="serif text-2xl font-light">Practice account</h2>
         <button onClick={reset} disabled={resetBusy} data-testid="paper-reset-btn"
-          className="rounded-full border border-[#a855f724] px-3 py-1 text-[11px] text-[#a89ec4] hover:text-[#f3f0fd] disabled:opacity-40 transition-colors">
+          className="rounded-full border border-[#ffffff26] px-3 py-1 text-[11px] text-[#9aa0ae] hover:text-[#f4f4f5] disabled:opacity-40 transition-colors">
           {resetBusy ? "Resetting…" : "Reset to $10,000"}
         </button>
       </div>
       <Panel className="mt-4 p-5">
         <div className="flex flex-wrap gap-x-10 gap-y-3">
           <div>
-            <div className="mono text-[10px] uppercase tracking-wider text-[#a89ec4]">Equity (pretend)</div>
+            <div className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae]">Equity (pretend)</div>
             <div className="mt-1 text-2xl font-medium tnum" data-testid="paper-equity">{fmtUsd(paper.equityUsd)}</div>
           </div>
           <div>
-            <div className="mono text-[10px] uppercase tracking-wider text-[#a89ec4]">All-time PnL</div>
+            <div className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae]">All-time PnL</div>
             <div className={`mt-1 text-2xl font-medium tnum ${pnl < 0 ? "text-[#f43f5e]" : "text-[#10b981]"}`} data-testid="paper-pnl">{fmtUsd(pnl)}</div>
           </div>
           <div>
-            <div className="mono text-[10px] uppercase tracking-wider text-[#a89ec4]">Cash</div>
+            <div className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae]">Cash</div>
             <div className="mt-1 text-2xl font-medium tnum">{fmtUsd(paper.balanceUsd)}</div>
           </div>
         </div>
         {paper.positions?.length > 0 && (
-          <div className="mt-4 border-t border-[#a855f724] pt-3 space-y-2" data-testid="paper-positions">
+          <div className="mt-4 border-t border-[#ffffff26] pt-3 space-y-2" data-testid="paper-positions">
             {paper.positions.map((p) => (
               <div key={p.id} className="flex flex-wrap items-center gap-3 text-[12px]">
                 <Tag tone={p.side === "short" ? "short" : "long"}>{p.symbol}</Tag>
-                <span className="text-[#a89ec4]">{p.side} ${p.sizeUsd} · {p.leverage}×</span>
+                <span className="text-[#9aa0ae]">{p.side} ${p.sizeUsd} · {p.leverage}×</span>
                 <span className="mono tnum">entry {Number(p.entryPx).toLocaleString()}</span>
-                <span className="mono text-[10px] text-[#a89ec4]">{fmtAge(p.openedAt)}</span>
+                <span className="mono text-[10px] text-[#9aa0ae]">{fmtAge(p.openedAt)}</span>
               </div>
             ))}
           </div>
         )}
         {paper.history?.length > 0 && (
-          <div className="mt-4 border-t border-[#a855f724] pt-3 space-y-2" data-testid="paper-history">
-            <div className="mono text-[10px] uppercase tracking-wider text-[#a89ec4]">Closed</div>
+          <div className="mt-4 border-t border-[#ffffff26] pt-3 space-y-2" data-testid="paper-history">
+            <div className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae]">Closed</div>
             {paper.history.slice(0, 8).map((p) => (
               <div key={p.id} className="flex flex-wrap items-center gap-3 text-[12px]">
                 <Tag tone={p.side === "short" ? "short" : "long"}>{p.symbol}</Tag>
-                <span className="text-[#a89ec4]">{p.closeReason}</span>
+                <span className="text-[#9aa0ae]">{p.closeReason}</span>
                 <span className={`mono tnum ${p.pnlUsd < 0 ? "text-[#f43f5e]" : "text-[#10b981]"}`}>{fmtUsd(p.pnlUsd)}</span>
-                <span className="mono text-[10px] text-[#a89ec4]">{fmtAge(p.closedAt)}</span>
+                <span className="mono text-[10px] text-[#9aa0ae]">{fmtAge(p.closedAt)}</span>
               </div>
             ))}
           </div>
@@ -439,7 +439,7 @@ function AlertsPanel({ token, alerts, onDone }) {
         <h2 className="serif text-2xl font-light">Alerts</h2>
         {alerts.unread > 0 && (
           <button onClick={async () => { await authed(token, "/alerts/read", {}); onDone(); }} data-testid="alerts-mark-read"
-            className="rounded-full border border-[#a855f724] px-3 py-1 text-[11px] text-[#a89ec4] hover:text-[#f3f0fd]">
+            className="rounded-full border border-[#ffffff26] px-3 py-1 text-[11px] text-[#9aa0ae] hover:text-[#f4f4f5]">
             Mark all read ({alerts.unread})
           </button>
         )}
@@ -449,9 +449,9 @@ function AlertsPanel({ token, alerts, onDone }) {
         {alerts.alerts?.slice(0, 10).map((a, i) => (
           <Panel key={i} className={`p-4 text-[13px] ${a.read ? "opacity-60" : ""}`} data-testid={`alert-${i}`}>
             <div className="flex items-center gap-2">
-              <span className={`h-1.5 w-1.5 rounded-full ${a.read ? "bg-[#6d638c]" : "bg-[#a855f7]"}`} />
+              <span className={`h-1.5 w-1.5 rounded-full ${a.read ? "bg-[#6b7280]" : "bg-[#f1f5f9]"}`} />
               <span>{a.message}</span>
-              <span className="ml-auto mono text-[10px] text-[#a89ec4]">{fmtAge(a.createdAt)}</span>
+              <span className="ml-auto mono text-[10px] text-[#9aa0ae]">{fmtAge(a.createdAt)}</span>
             </div>
           </Panel>
         ))}
@@ -476,22 +476,22 @@ function SolTradePanel({ token, onDone }) {
   };
   return (
     <Panel className="p-5" data-testid="sol-trade-panel">
-      <div className="flex items-center gap-2 mono text-[10px] uppercase tracking-wider text-[#a89ec4]"><ArrowDownUp size={12} /> Swap on Solana · real</div>
+      <div className="flex items-center gap-2 mono text-[10px] uppercase tracking-wider text-[#9aa0ae]"><ArrowDownUp size={12} /> Swap on Solana · real</div>
       <div className="mt-4 space-y-3">
         <div className="flex gap-2">
           <input type="number" min={0.001} step={0.001} value={amount} onChange={(e) => setAmount(Number(e.target.value) || 0)}
-            className="h-11 w-32 rounded-lg border border-[#a855f724] bg-[#171428] px-3 mono text-[13px] outline-none" data-testid="sol-trade-amount" />
-          <span className="self-center mono text-[12px] text-[#a89ec4]">SOL →</span>
+            className="h-11 w-32 rounded-lg border border-[#ffffff26] bg-[#17171b] px-3 mono text-[13px] outline-none" data-testid="sol-trade-amount" />
+          <span className="self-center mono text-[12px] text-[#9aa0ae]">SOL →</span>
           <select value={out} onChange={(e) => setOut(e.target.value)} data-testid="sol-trade-out"
-            className="h-11 flex-1 rounded-lg border border-[#a855f724] bg-[#171428] px-3 mono text-[12px] outline-none">
+            className="h-11 flex-1 rounded-lg border border-[#ffffff26] bg-[#17171b] px-3 mono text-[12px] outline-none">
             <option value={WEFT}>$LOOM</option>
             <option value={USDC}>USDC</option>
           </select>
         </div>
         <input value={out} onChange={(e) => setOut(e.target.value)} placeholder="or any SPL mint address"
-          className="h-10 w-full rounded-lg border border-[#a855f724] bg-[#171428] px-3 mono text-[11px] outline-none" data-testid="sol-trade-mint" />
+          className="h-10 w-full rounded-lg border border-[#ffffff26] bg-[#17171b] px-3 mono text-[11px] outline-none" data-testid="sol-trade-mint" />
         <button onClick={trade} disabled={busy || amount <= 0} data-testid="sol-trade-btn"
-          className="h-11 w-full rounded-full bg-[#9333ea] text-[13px] font-medium text-white shadow-[0_0_20px_rgba(168,85,247,0.35)] hover:bg-[#a855f7] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
+          className="h-11 w-full rounded-full bg-[#e5e7eb] text-[13px] font-medium text-black shadow-[0_0_20px_rgba(226,232,255,0.35)] hover:bg-[#f1f5f9] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
           {busy && <Loader2 size={14} className="animate-spin" />} Swap for real
         </button>
       </div>
@@ -544,11 +544,11 @@ function HlTradePanel({ token, markets, hlInfo, onDone }) {
   return (
     <Panel className="p-5" data-testid="hl-trade-panel">
       <div className="flex items-center gap-2">
-        <div className="mono text-[10px] uppercase tracking-wider text-[#a89ec4] flex items-center gap-2"><ArrowUpRight size={12} /> Hyperliquid · real</div>
-        <div className="ml-auto flex gap-1 rounded-full border border-[#a855f724] p-0.5">
+        <div className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae] flex items-center gap-2"><ArrowUpRight size={12} /> Hyperliquid · real</div>
+        <div className="ml-auto flex gap-1 rounded-full border border-[#ffffff26] p-0.5">
           {[["perp", "Perps"], ["spot", "Spot"], ["limit", "Limit"]].map(([k, l]) => (
             <button key={k} onClick={() => { setMktType(k); setSide("long"); }} data-testid={`hl-mkt-${k}`}
-              className={`h-7 rounded-full px-3 text-[11px] transition-colors ${mktType === k ? "bg-[#9333ea] text-white" : "text-[#a89ec4]"}`}>
+              className={`h-7 rounded-full px-3 text-[11px] transition-colors ${mktType === k ? "bg-[#f3f4f6] text-black" : "text-[#9aa0ae]"}`}>
               {l}
             </button>
           ))}
@@ -556,24 +556,24 @@ function HlTradePanel({ token, markets, hlInfo, onDone }) {
       </div>
       <div className="mt-4 grid grid-cols-2 gap-2">
         <select value={sel?.symbol || ""} onChange={(e) => setSymbol(e.target.value)} data-testid="hl-symbol"
-          className="h-11 rounded-lg border border-[#a855f724] bg-[#171428] px-3 mono text-[12px] outline-none">
+          className="h-11 rounded-lg border border-[#ffffff26] bg-[#17171b] px-3 mono text-[12px] outline-none">
           {list.slice(0, 40).map((m) => <option key={m.symbol} value={m.symbol}>{m.label || m.symbol} · ${m.price < 1 ? Number(m.price).toPrecision(3) : m.price.toLocaleString()}</option>)}
         </select>
-        <div className="flex gap-1 rounded-lg border border-[#a855f724] p-1">
+        <div className="flex gap-1 rounded-lg border border-[#ffffff26] p-1">
           {(isSpot ? [["long", "Buy"], ["short", "Sell"]] : [["long", "Long"], ["short", "Short"]]).map(([k, l]) => (
             <button key={k} onClick={() => setSide(k)} data-testid={`hl-side-${k}`}
-              className={`flex-1 rounded-md text-[12px] font-medium transition-colors ${side === k ? (k === "long" ? "bg-[#10b981] text-white" : "bg-[#f43f5e] text-white") : "text-[#a89ec4]"}`}>
+              className={`flex-1 rounded-md text-[12px] font-medium transition-colors ${side === k ? (k === "long" ? "bg-[#10b981] text-white" : "bg-[#f43f5e] text-white") : "text-[#9aa0ae]"}`}>
               {l}
             </button>
           ))}
         </div>
         <input type="number" min={10} value={sizeUsd} onChange={(e) => setSizeUsd(Number(e.target.value) || 0)}
-          className="h-11 rounded-lg border border-[#a855f724] bg-[#171428] px-3 mono text-[13px] outline-none" data-testid="hl-size" />
+          className="h-11 rounded-lg border border-[#ffffff26] bg-[#17171b] px-3 mono text-[13px] outline-none" data-testid="hl-size" />
         {isSpot ? (
-          <div className="h-11 flex items-center px-3 mono text-[11px] text-[#a89ec4] rounded-lg border border-[#a855f71a]">USDC size · no leverage</div>
+          <div className="h-11 flex items-center px-3 mono text-[11px] text-[#9aa0ae] rounded-lg border border-[#ffffff1c]">USDC size · no leverage</div>
         ) : (
           <select value={lev} onChange={(e) => setLev(Number(e.target.value))} data-testid="hl-lev"
-            className="h-11 rounded-lg border border-[#a855f724] bg-[#171428] px-3 mono text-[12px] outline-none">
+            className="h-11 rounded-lg border border-[#ffffff26] bg-[#17171b] px-3 mono text-[12px] outline-none">
             {[1, 2, 3, 5, 10, 20, 25, 40].map((l) => <option key={l} value={l}>{l}× leverage</option>)}
           </select>
         )}
@@ -581,33 +581,33 @@ function HlTradePanel({ token, markets, hlInfo, onDone }) {
       {isLimit && (
         <div className="mt-2 grid grid-cols-2 gap-2" data-testid="hl-limit-row">
           <select value={direction} onChange={(e) => setDirection(e.target.value)} data-testid="hl-limit-dir"
-            className="h-11 rounded-lg border border-[#a855f724] bg-[#171428] px-3 mono text-[12px] outline-none">
+            className="h-11 rounded-lg border border-[#ffffff26] bg-[#17171b] px-3 mono text-[12px] outline-none">
             <option value="below">When price drops to</option>
             <option value="above">When price rises to</option>
           </select>
           <input type="number" min={0} value={targetPx} onChange={(e) => setTargetPx(e.target.value)} placeholder={`now ${sel ? "$" + sel.price.toLocaleString() : ""}`}
-            className="h-11 rounded-lg border border-[#a855f724] bg-[#171428] px-3 mono text-[13px] outline-none" data-testid="hl-limit-price" />
+            className="h-11 rounded-lg border border-[#ffffff26] bg-[#17171b] px-3 mono text-[13px] outline-none" data-testid="hl-limit-price" />
         </div>
       )}
       {isLimit ? (
         <button onClick={placeLimit} disabled={busy || sizeUsd < 10 || !sel || !targetPx} data-testid="hl-trade-btn"
-          className="mt-3 h-11 w-full rounded-full bg-[#9333ea] text-[13px] font-medium text-white shadow-[0_0_20px_rgba(168,85,247,0.35)] hover:bg-[#a855f7] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
+          className="mt-3 h-11 w-full rounded-full bg-[#e5e7eb] text-[13px] font-medium text-black shadow-[0_0_20px_rgba(226,232,255,0.35)] hover:bg-[#f1f5f9] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
           {busy && <Loader2 size={14} className="animate-spin" />}
           Set limit order · {side} ${sizeUsd} {direction === "above" ? "≥" : "≤"} ${targetPx || "…"}
         </button>
       ) : (
       <button onClick={trade} disabled={busy || sizeUsd < 10 || !sel} data-testid="hl-trade-btn"
-        className="mt-3 h-11 w-full rounded-full bg-[#9333ea] text-[13px] font-medium text-white shadow-[0_0_20px_rgba(168,85,247,0.35)] hover:bg-[#a855f7] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
+        className="mt-3 h-11 w-full rounded-full bg-[#e5e7eb] text-[13px] font-medium text-black shadow-[0_0_20px_rgba(226,232,255,0.35)] hover:bg-[#f1f5f9] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
         {busy && <Loader2 size={14} className="animate-spin" />}
         {isSpot ? `${side === "long" ? "Buy" : "Sell"} ${sel?.symbol || ""} · $${sizeUsd}` : `Open ${side} · $${sizeUsd} · ${lev}×`}
       </button>
       )}
       {hlInfo?.positions?.length > 0 && (
-        <div className="mt-4 border-t border-[#a855f724] pt-3 space-y-2" data-testid="hl-positions">
+        <div className="mt-4 border-t border-[#ffffff26] pt-3 space-y-2" data-testid="hl-positions">
           {hlInfo.positions.map((p) => (
             <div key={p.symbol} className="flex items-center gap-3 text-[12px]">
               <Tag tone={Number(p.size) < 0 ? "short" : "long"}>{p.symbol}</Tag>
-              <span className="mono text-[#a89ec4]">{p.size} @ {Number(p.entryPx).toLocaleString()}</span>
+              <span className="mono text-[#9aa0ae]">{p.size} @ {Number(p.entryPx).toLocaleString()}</span>
               <span className={`mono tnum ${Number(p.unrealizedPnl) < 0 ? "text-[#f43f5e]" : "text-[#10b981]"}`}>{fmtUsd(Number(p.unrealizedPnl))}</span>
               <button onClick={() => close(p.symbol)} className="ml-auto inline-flex items-center gap-1 text-[11px] text-[#f43f5e] hover:underline" data-testid={`hl-close-${p.symbol}`}>
                 <CircleX size={11} /> Close
@@ -651,44 +651,44 @@ function WithdrawPanel({ token, hlInfo, onDone }) {
   return (
     <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4" data-testid="withdraw-panel">
       <Panel className="p-5">
-        <div className="mono text-[10px] uppercase tracking-wider text-[#a89ec4]">Withdraw SOL</div>
+        <div className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae]">Withdraw SOL</div>
         <div className="mt-3 space-y-2">
           <input value={to} onChange={(e) => setTo(e.target.value)} placeholder="Destination Solana address"
-            className="h-10 w-full rounded-lg border border-[#a855f724] bg-[#171428] px-3 mono text-[11px] outline-none" data-testid="sol-withdraw-to" />
+            className="h-10 w-full rounded-lg border border-[#ffffff26] bg-[#17171b] px-3 mono text-[11px] outline-none" data-testid="sol-withdraw-to" />
           <div className="flex gap-2">
             <input type="number" min={0.001} step={0.001} value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Amount (SOL)"
-              className="h-10 w-32 rounded-lg border border-[#a855f724] bg-[#171428] px-3 mono text-[12px] outline-none" data-testid="sol-withdraw-amount" />
+              className="h-10 w-32 rounded-lg border border-[#ffffff26] bg-[#17171b] px-3 mono text-[12px] outline-none" data-testid="sol-withdraw-amount" />
             <button onClick={solWithdraw} disabled={busy === "sol" || !to || !amount} data-testid="sol-withdraw-btn"
-              className="h-10 flex-1 rounded-full border border-[#a855f724] text-[12.5px] hover:border-[#a855f7] hover:text-[#c084fc] disabled:opacity-40 transition-colors">
+              className="h-10 flex-1 rounded-full border border-[#ffffff26] text-[12.5px] hover:border-[#f1f5f9] hover:text-[#cbd5e1] disabled:opacity-40 transition-colors">
               {busy === "sol" ? "Sending…" : "Send SOL"}
             </button>
           </div>
         </div>
       </Panel>
       <Panel className="p-5">
-        <div className="mono text-[10px] uppercase tracking-wider text-[#a89ec4]">Withdraw from Hyperliquid</div>
+        <div className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae]">Withdraw from Hyperliquid</div>
         <div className="mt-3 space-y-2">
-          <div className="flex gap-1 rounded-full border border-[#a855f724] p-0.5 w-fit">
+          <div className="flex gap-1 rounded-full border border-[#ffffff26] p-0.5 w-fit">
             {[["hl", "To a Hyperliquid account"], ["arb", "To Arbitrum chain"]].map(([k, l]) => (
               <button key={k} onClick={() => setHlDest(k)} data-testid={`hl-dest-${k}`}
-                className={`h-7 rounded-full px-3 text-[11px] transition-colors ${hlDest === k ? "bg-[#9333ea] text-white" : "text-[#a89ec4]"}`}>
+                className={`h-7 rounded-full px-3 text-[11px] transition-colors ${hlDest === k ? "bg-[#f3f4f6] text-black" : "text-[#9aa0ae]"}`}>
                 {l}
               </button>
             ))}
           </div>
           {hlDest === "hl" ? (
             <input value={hlTo} onChange={(e) => setHlTo(e.target.value)} placeholder="Any Hyperliquid account address (0x…)"
-              className="h-10 w-full rounded-lg border border-[#a855f724] bg-[#171428] px-3 mono text-[11px] outline-none" data-testid="hl-withdraw-to" />
+              className="h-10 w-full rounded-lg border border-[#ffffff26] bg-[#17171b] px-3 mono text-[11px] outline-none" data-testid="hl-withdraw-to" />
           ) : (
-            <p className="rounded-lg border border-[#a855f71a] bg-[#171428] px-3 py-2 text-[11px] text-[#a89ec4]" data-testid="hl-bridge-note">
+            <p className="rounded-lg border border-[#ffffff1c] bg-[#17171b] px-3 py-2 text-[11px] text-[#9aa0ae]" data-testid="hl-bridge-note">
               Goes to your generated address on the Arbitrum network. Hyperliquid charges ~1 USDC.
             </p>
           )}
           <div className="flex gap-2">
             <input type="number" min={1} value={hlAmount} onChange={(e) => setHlAmount(e.target.value)} placeholder={`Amount (USDC) · up to ${hlInfo ? hlInfo.withdrawableUsd.toFixed(2) : "0"}`}
-              className="h-10 w-44 rounded-lg border border-[#a855f724] bg-[#171428] px-3 mono text-[12px] outline-none" data-testid="hl-withdraw-amount" />
+              className="h-10 w-44 rounded-lg border border-[#ffffff26] bg-[#17171b] px-3 mono text-[12px] outline-none" data-testid="hl-withdraw-amount" />
             <button onClick={hlWithdraw} disabled={busy === "hl" || (hlDest === "hl" && !hlTo) || !hlAmount} data-testid="hl-withdraw-btn"
-              className="h-10 flex-1 rounded-full border border-[#a855f724] text-[12.5px] hover:border-[#a855f7] hover:text-[#c084fc] disabled:opacity-40 transition-colors">
+              className="h-10 flex-1 rounded-full border border-[#ffffff26] text-[12.5px] hover:border-[#f1f5f9] hover:text-[#cbd5e1] disabled:opacity-40 transition-colors">
               {busy === "hl" ? "Sending…" : "Send USDC"}
             </button>
           </div>

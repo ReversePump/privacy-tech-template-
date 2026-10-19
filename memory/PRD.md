@@ -3,8 +3,8 @@
 ## Product
 Loom (Loom Finance) is a thesis-trading platform: users write a market view in plain English; it
 becomes readable rules that backtest and trade automatically. Market data relays the public upstream
-API; accounts, wallets, trading and the 24/7 engine are native. Brand: **Loom** — dark UI
-(#07060d bg, #a855f7 purple accent family), knot logo + banner supplied by the user, only social
+API; accounts, wallets, trading and the 24/7 engine are native. Brand: **Loom** — monochrome chrome UI matching the user's X banner
+(#070708 black bg, white/silver accent family, white CTAs w/ black text; semantic green/red kept), knot logo + banner supplied by the user, only social
 link https://x.com/loomfiai, geometric Outfit display type, LoomWeave canvas hero animation
 (converging signal threads) + scroll-reveal on landing sections.
 

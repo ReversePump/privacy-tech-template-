@@ -52,18 +52,18 @@ export default function RulesView({ strategy, compact = false }) {
   return (
     <div className="space-y-5" data-testid="rules-view">
       {s.thesis && !compact && (
-        <p className="serif text-lg italic text-[#f3f0fd]">“{s.thesis}”</p>
+        <p className="serif text-lg italic text-[#f4f4f5]">“{s.thesis}”</p>
       )}
 
       {(s.signals || []).length > 0 && (
         <div>
-          <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#a89ec4] mb-2">Watches</div>
+          <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#9aa0ae] mb-2">Watches</div>
           <div className="flex flex-wrap gap-2">
             {s.signals.map((sig) => (
-              <span key={sig.id} className="inline-flex items-center gap-2 rounded-full border border-[#a855f724] bg-[#171428] px-3 py-1.5 text-xs">
+              <span key={sig.id} className="inline-flex items-center gap-2 rounded-full border border-[#ffffff26] bg-[#17171b] px-3 py-1.5 text-xs">
                 <CoinIcon symbol={sig.params?.instrument?.symbol} size={16} />
                 <span className="font-medium">{sig.label || sig.params?.instrument?.symbol || sig.id}</span>
-                <span className="mono text-[10px] text-[#a89ec4]">{KIND_LABEL[sig.kind] || sig.kind}</span>
+                <span className="mono text-[10px] text-[#9aa0ae]">{KIND_LABEL[sig.kind] || sig.kind}</span>
               </span>
             ))}
           </div>
@@ -72,15 +72,15 @@ export default function RulesView({ strategy, compact = false }) {
 
       {(s.triggers || []).length > 0 && (
         <div>
-          <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#a89ec4] mb-2">When</div>
+          <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#9aa0ae] mb-2">When</div>
           <ul className="space-y-1.5">
             {s.triggers.map((t) => (
               <li key={t.id} className="flex items-start gap-2 text-[13px]">
-                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-[#a855f7] shrink-0" />
+                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-[#f1f5f9] shrink-0" />
                 <span>
                   {condText(s, t.when)}
-                  {t.forMinutes ? <span className="text-[#a89ec4]"> · held for {fmtDuration(t.forMinutes)}</span> : null}
-                  {t.cooldownMinutes ? <span className="text-[#a89ec4]"> · cooldown {fmtDuration(t.cooldownMinutes)}</span> : null}
+                  {t.forMinutes ? <span className="text-[#9aa0ae]"> · held for {fmtDuration(t.forMinutes)}</span> : null}
+                  {t.cooldownMinutes ? <span className="text-[#9aa0ae]"> · cooldown {fmtDuration(t.cooldownMinutes)}</span> : null}
                 </span>
               </li>
             ))}
@@ -90,7 +90,7 @@ export default function RulesView({ strategy, compact = false }) {
 
       {(s.actions || []).length > 0 && (
         <div>
-          <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#a89ec4] mb-2">Does</div>
+          <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#9aa0ae] mb-2">Does</div>
           <ul className="space-y-1.5">
             {s.actions.map((a) => (
               <li key={a.id} className="flex items-start gap-2 text-[13px]">
@@ -99,9 +99,9 @@ export default function RulesView({ strategy, compact = false }) {
                   {a.type === "close" ? "Close" : a.type === "alert" ? "Alert" : "Open"}
                   {a.side && <Tag tone={a.side === "short" ? "short" : "long"}>{a.side}</Tag>}
                   <b>{a.instrument?.symbol}</b>
-                  {a.leverage ? <span className="mono text-[11px] text-[#a89ec4]">{a.leverage}×</span> : null}
-                  {sizeText(a.size) && <span className="text-[#a89ec4]">· {sizeText(a.size)}</span>}
-                  {a.instrument?.venue && <span className="mono text-[10px] text-[#a89ec4]">on {a.instrument.venue}</span>}
+                  {a.leverage ? <span className="mono text-[11px] text-[#9aa0ae]">{a.leverage}×</span> : null}
+                  {sizeText(a.size) && <span className="text-[#9aa0ae]">· {sizeText(a.size)}</span>}
+                  {a.instrument?.venue && <span className="mono text-[10px] text-[#9aa0ae]">on {a.instrument.venue}</span>}
                 </span>
               </li>
             ))}
@@ -123,7 +123,7 @@ export default function RulesView({ strategy, compact = false }) {
 
       {s.risk && !compact && (
         <div>
-          <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#a89ec4] mb-2">Risk</div>
+          <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#9aa0ae] mb-2">Risk</div>
           <div className="flex flex-wrap gap-2">
             {s.risk.maxLeverage != null && <Tag>max {s.risk.maxLeverage}× leverage</Tag>}
             {s.risk.maxDailyLossPct != null && <Tag>daily loss cap {fmtPct(s.risk.maxDailyLossPct, 0)}</Tag>}

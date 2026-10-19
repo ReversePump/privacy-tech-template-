@@ -166,16 +166,16 @@ export default function New() {
   return (
     <div className="mx-auto max-w-[860px] px-4 md:px-6 pt-14 md:pt-20" data-testid="new-page">
       <h1 className="serif text-4xl md:text-5xl font-light tracking-tight">New strategy</h1>
-      <p className="mt-3 text-[14px] text-[#a89ec4]">Describe a trade in your own words. Loom turns it into rules you can read before anything runs.</p>
+      <p className="mt-3 text-[14px] text-[#9aa0ae]">Describe a trade in your own words. Loom turns it into rules you can read before anything runs.</p>
 
       <Panel className="mt-8 p-5" data-testid="thesis-panel">
-        <label className="mono text-[10px] uppercase tracking-[0.16em] text-[#a89ec4]">Your idea</label>
+        <label className="mono text-[10px] uppercase tracking-[0.16em] text-[#9aa0ae]">Your idea</label>
         <textarea
           value={thesis}
           onChange={(e) => setThesis(e.target.value)}
           rows={3}
           placeholder="If @elonmusk posts about Dogecoin, long DOGE 5x with $100. 25% stop."
-          className="mt-2 w-full resize-none rounded-lg border border-[#a855f724] bg-[#171428] px-4 py-3 text-[14px] leading-relaxed outline-none focus:border-[#a855f766]"
+          className="mt-2 w-full resize-none rounded-lg border border-[#ffffff26] bg-[#17171b] px-4 py-3 text-[14px] leading-relaxed outline-none focus:border-[#ffffff66]"
           data-testid="thesis-input"
         />
         <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -183,13 +183,13 @@ export default function New() {
             onClick={() => draft()}
             disabled={busy || !thesis.trim()}
             data-testid="draft-btn"
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-[#9333ea] px-5 text-[13px] font-medium text-white shadow-[0_0_20px_rgba(168,85,247,0.35)] hover:bg-[#a855f7] disabled:opacity-40 transition-colors"
+            className="inline-flex h-10 items-center gap-2 rounded-full bg-[#e5e7eb] px-5 text-[13px] font-medium text-black shadow-[0_0_20px_rgba(226,232,255,0.35)] hover:bg-[#f1f5f9] disabled:opacity-40 transition-colors"
           >
             {busy ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
             {busy ? "Drafting…" : "Draft the rules"}
           </button>
           {strategy && (
-            <button onClick={() => { setStrategy(null); setBt(null); setProgress([]); }} className="inline-flex h-10 items-center gap-1.5 rounded-full border border-[#a855f724] px-4 text-[13px] text-[#a89ec4] hover:text-[#f3f0fd]" data-testid="reset-btn">
+            <button onClick={() => { setStrategy(null); setBt(null); setProgress([]); }} className="inline-flex h-10 items-center gap-1.5 rounded-full border border-[#ffffff26] px-4 text-[13px] text-[#9aa0ae] hover:text-[#f4f4f5]" data-testid="reset-btn">
               <RotateCcw size={13} /> Start over
             </button>
           )}
@@ -197,7 +197,7 @@ export default function New() {
         {!strategy && !busy && (
           <div className="mt-4 flex flex-wrap gap-2">
             {SUGGESTIONS.map((s) => (
-              <button key={s} onClick={() => { setThesis(s); }} className="rounded-full border border-[#a855f724] px-3.5 py-1.5 text-[11.5px] text-[#a89ec4] hover:border-[#a855f7] hover:text-[#c084fc] transition-colors" data-testid="suggestion-chip">
+              <button key={s} onClick={() => { setThesis(s); }} className="rounded-full border border-[#ffffff26] px-3.5 py-1.5 text-[11.5px] text-[#9aa0ae] hover:border-[#f1f5f9] hover:text-[#cbd5e1] transition-colors" data-testid="suggestion-chip">
                 {s.length > 52 ? `${s.slice(0, 52)}…` : s}
               </button>
             ))}
@@ -207,12 +207,12 @@ export default function New() {
 
       {busy && (
         <Panel className="mt-6 p-5" data-testid="progress-panel">
-          <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#a89ec4] mb-3">Working</div>
+          <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#9aa0ae] mb-3">Working</div>
           <ul className="space-y-2">
             {progress.map((m, i) => (
-              <li key={i} className="flex items-center gap-2.5 text-[13px] text-[#f3f0fd] fadeup">
+              <li key={i} className="flex items-center gap-2.5 text-[13px] text-[#f4f4f5] fadeup">
                 <span className="flex h-4 w-4 items-center justify-center">
-                  {i === progress.length - 1 ? <Loader2 size={12} className="animate-spin text-[#a855f7]" /> : <Check size={12} className="text-[#10b981]" />}
+                  {i === progress.length - 1 ? <Loader2 size={12} className="animate-spin text-[#f1f5f9]" /> : <Check size={12} className="text-[#10b981]" />}
                 </span>
                 {m}
               </li>
@@ -235,7 +235,7 @@ export default function New() {
               <Tag tone="accent">{strategy.id}</Tag>
               {signedIn && (
                 <button onClick={saveStrategy} disabled={saved} data-testid="save-strategy-btn"
-                  className="ml-auto inline-flex h-9 items-center gap-1.5 rounded-full border border-[#a855f724] px-4 text-[12px] hover:border-[#a855f7] hover:text-[#c084fc] disabled:opacity-50 transition-colors">
+                  className="ml-auto inline-flex h-9 items-center gap-1.5 rounded-full border border-[#ffffff26] px-4 text-[12px] hover:border-[#f1f5f9] hover:text-[#cbd5e1] disabled:opacity-50 transition-colors">
                   {saved ? "Saved ✓" : "Save to my account"}
                 </button>
               )}
@@ -245,8 +245,8 @@ export default function New() {
             </div>
 
             {/* AI refine — conversationally tune the draft */}
-            <div className="mt-5 border-t border-[#a855f724] pt-4" data-testid="refine-panel">
-              <div className="flex items-center gap-2 mono text-[10px] uppercase tracking-[0.16em] text-[#a89ec4]">
+            <div className="mt-5 border-t border-[#ffffff26] pt-4" data-testid="refine-panel">
+              <div className="flex items-center gap-2 mono text-[10px] uppercase tracking-[0.16em] text-[#9aa0ae]">
                 <MessageSquare size={11} /> Refine it
               </div>
               <div className="mt-2 flex gap-2">
@@ -255,11 +255,11 @@ export default function New() {
                   onChange={(e) => setRefineText(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && refine()}
                   placeholder='Try: "make the stop tighter" or "use 3x instead"'
-                  className="h-10 flex-1 rounded-lg border border-[#a855f724] bg-[#171428] px-3.5 text-[13px] outline-none focus:border-[#a855f766]"
+                  className="h-10 flex-1 rounded-lg border border-[#ffffff26] bg-[#17171b] px-3.5 text-[13px] outline-none focus:border-[#ffffff66]"
                   data-testid="refine-input"
                 />
                 <button onClick={refine} disabled={refineBusy || !refineText.trim()} data-testid="refine-btn"
-                  className="inline-flex h-10 items-center gap-1.5 rounded-full bg-[#9333ea] px-4 text-[12.5px] font-medium text-white shadow-[0_0_20px_rgba(168,85,247,0.35)] hover:bg-[#a855f7] disabled:opacity-40 transition-colors">
+                  className="inline-flex h-10 items-center gap-1.5 rounded-full bg-[#e5e7eb] px-4 text-[12.5px] font-medium text-black shadow-[0_0_20px_rgba(226,232,255,0.35)] hover:bg-[#f1f5f9] disabled:opacity-40 transition-colors">
                   {refineBusy ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />} Refine
                 </button>
               </div>
@@ -269,11 +269,11 @@ export default function New() {
           <Panel className="p-6" data-testid="backtest-panel">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#a89ec4]">Backtest</div>
-                <p className="mt-1 text-[13px] text-[#a89ec4]">Replay the last 30 days at real prices with $10,000 of pretend money.</p>
+                <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#9aa0ae]">Backtest</div>
+                <p className="mt-1 text-[13px] text-[#9aa0ae]">Replay the last 30 days at real prices with $10,000 of pretend money.</p>
               </div>
               <button onClick={runBacktest} disabled={btBusy} data-testid="backtest-btn"
-                className="inline-flex h-10 items-center gap-2 rounded-full bg-[#9333ea] px-5 text-[13px] font-medium text-white shadow-[0_0_20px_rgba(168,85,247,0.35)] hover:bg-[#a855f7] disabled:opacity-40 transition-colors">
+                className="inline-flex h-10 items-center gap-2 rounded-full bg-[#e5e7eb] px-5 text-[13px] font-medium text-black shadow-[0_0_20px_rgba(226,232,255,0.35)] hover:bg-[#f1f5f9] disabled:opacity-40 transition-colors">
                 {btBusy ? <Loader2 size={14} className="animate-spin" /> : <Play size={13} />} {btBusy ? "Running…" : "Run 30-day backtest"}
               </button>
             </div>
@@ -293,36 +293,36 @@ export default function New() {
                     ["Rejected", fmtNum(bt.stats?.rejectedOrders)],
                   ].map(([l, v]) => (
                     <div key={l}>
-                      <div className="mono text-[9px] uppercase tracking-wider text-[#a89ec4]">{l}</div>
+                      <div className="mono text-[9px] uppercase tracking-wider text-[#9aa0ae]">{l}</div>
                       <div className="mt-0.5 text-[15px] font-medium tnum">{v}</div>
                     </div>
                   ))}
                 </div>
-                <p className="mt-4 text-[11px] text-[#a89ec4]">Backtests replay the past at real prices. They do not guarantee future results.</p>
+                <p className="mt-4 text-[11px] text-[#9aa0ae]">Backtests replay the past at real prices. They do not guarantee future results.</p>
               </div>
             )}
           </Panel>
 
           <Panel className="p-6" data-testid="start-panel">
-            <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#a89ec4]">Start it</div>
-            <p className="mt-2 text-[13px] text-[#a89ec4]">
+            <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#9aa0ae]">Start it</div>
+            <p className="mt-2 text-[13px] text-[#9aa0ae]">
               Run it with $10,000 of pretend money at real prices, as alerts only, or live from your own account. Sign in with email — Loom creates the wallet and Hyperliquid account for you.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <button onClick={() => deploy("paper")} disabled={!!deployBusy} data-testid="start-practice-btn"
-                className="inline-flex h-10 items-center gap-2 rounded-full bg-[#9333ea] px-5 text-[13px] font-medium text-white shadow-[0_0_20px_rgba(168,85,247,0.35)] hover:bg-[#a855f7] disabled:opacity-40 transition-colors">
+                className="inline-flex h-10 items-center gap-2 rounded-full bg-[#e5e7eb] px-5 text-[13px] font-medium text-black shadow-[0_0_20px_rgba(226,232,255,0.35)] hover:bg-[#f1f5f9] disabled:opacity-40 transition-colors">
                 {deployBusy === "paper" ? <Loader2 size={13} className="animate-spin" /> : <Play size={13} />} Practice with $10,000
               </button>
               <button onClick={() => deploy("alerts")} disabled={!!deployBusy} data-testid="start-alerts-btn"
-                className="inline-flex h-10 items-center gap-2 rounded-full border border-[#a855f724] px-5 text-[13px] hover:border-[#a855f755] disabled:opacity-40 transition-colors">
+                className="inline-flex h-10 items-center gap-2 rounded-full border border-[#ffffff26] px-5 text-[13px] hover:border-[#ffffff59] disabled:opacity-40 transition-colors">
                 {deployBusy === "alerts" && <Loader2 size={13} className="animate-spin" />} Alerts only
               </button>
               <button onClick={() => deploy("live")} disabled={!!deployBusy} data-testid="start-live-btn"
-                className="inline-flex h-10 items-center gap-2 rounded-full border border-[#a855f724] px-5 text-[13px] hover:border-[#a855f755] disabled:opacity-40 transition-colors">
+                className="inline-flex h-10 items-center gap-2 rounded-full border border-[#ffffff26] px-5 text-[13px] hover:border-[#ffffff59] disabled:opacity-40 transition-colors">
                 {deployBusy === "live" && <Loader2 size={13} className="animate-spin" />} Go live
               </button>
             </div>
-            <p className="mt-3 text-[11px] text-[#a89ec4]">The engine checks your rules every ~25 seconds, around the clock. Manage deployments from your account.</p>
+            <p className="mt-3 text-[11px] text-[#9aa0ae]">The engine checks your rules every ~25 seconds, around the clock. Manage deployments from your account.</p>
           </Panel>
         </div>
       )}

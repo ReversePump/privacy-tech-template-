@@ -17,7 +17,7 @@ import Account from "./pages/Account";
 
 function App() {
   return (
-    <div className="App min-h-screen bg-[#07060d] text-[#f3f0fd]">
+    <div className="App min-h-screen bg-[#070708] text-[#f4f4f5]">
       <WalletContext>
         <AuthProvider>
           <BrowserRouter>
@@ -40,7 +40,7 @@ function App() {
         </AuthProvider>
       </WalletContext>
       <Toaster position="bottom-right" toastOptions={{
-        style: { background: "#ffffff", border: "1px solid #f3f0fd14", color: "#f3f0fd", fontFamily: "Instrument Sans, sans-serif" },
+        style: { background: "#ffffff", border: "1px solid #f4f4f514", color: "#f4f4f5", fontFamily: "Instrument Sans, sans-serif" },
       }} />
     </div>
   );
