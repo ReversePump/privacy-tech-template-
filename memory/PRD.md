@@ -8,6 +8,12 @@ API; accounts, wallets, trading and the 24/7 engine are native. Brand: **Loom** 
 link https://x.com/loomfiai, geometric Outfit display type, LoomWeave canvas hero animation
 (converging signal threads) + scroll-reveal on landing sections.
 
+## Code-branding rule
+- No brand but Loom anywhere in code: API client is `loom`, session key `loom:session`,
+  upstream base URL lives only in backend/.env (UPSTREAM_API_URL), tests in test_relay.py.
+- The only intentional non-Loom strings in code are the sanitizer's suppression patterns.
+- Rewards surfaces removed (account stats cell, api client method, home token economics).
+
 ## Upstream token scrub (hard rule)
 - The upstream token (its CA, $WEFT name, buybacks, claims, token-fee data) must NEVER surface.
 - Backend relay sanitizer `_sanitize_upstream` drops any relayed list entry whose payload contains the
@@ -97,3 +103,10 @@ link https://x.com/loomfiai, geometric Outfit display type, LoomWeave canvas her
 - No mock/paper data presented as real. Unavailable features fail loudly with clean errors.
 - Never expose private keys or WALLET_ENC_KEY anywhere outside backend env.
 - Upstream private/auth-bound endpoints are NOT reused; all authed features are native.
+
+## Domain & SEO (loomfi.app)
+- Canonical/OG/Twitter/JSON-LD/sitemap/robots/llms.txt all point at https://loomfi.app (user-confirmed domain).
+- og-image.png = 1200×630 crop of the user's banner; twitter:site @loomfiai; Organization + FAQPage JSON-LD.
+- Per-route titles/descriptions via react-helmet-async (Seo.jsx on all 7 pages).
+- Relay sanitizer also drops entries with social (X) signal kind — X-dependent examples/strategies never surface.
+- Deploy handoff: redeploy + enable Search Engine Crawling toggle + verify on live domain with Googlebot/OAI-SearchBot UAs.

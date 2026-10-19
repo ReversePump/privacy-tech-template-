@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { weft } from "../lib/api";
+import Seo from "../components/Seo";
+import { loom } from "../lib/api";
 import { Loading, Empty } from "../components/bits";
 import StrategyCard from "../components/StrategyCard";
 
@@ -9,8 +10,8 @@ export default function Strategies() {
   const [q, setQ] = useState("");
 
   useEffect(() => {
-    weft.strategies().then((d) => setItems(d.strategies || [])).catch(() => setItems([]));
-    weft.examples().then((d) => setExamples(d.strategies || [])).catch(() => setExamples([]));
+    loom.strategies().then((d) => setItems(d.strategies || [])).catch(() => setItems([]));
+    loom.examples().then((d) => setExamples(d.strategies || [])).catch(() => setExamples([]));
   }, []);
 
   const all = [...(items || []), ...(examples || []).filter((e) => !(items || []).some((s) => (s.strategy?.id || s.id) === e.id))];
@@ -22,6 +23,7 @@ export default function Strategies() {
 
   return (
     <div className="mx-auto max-w-[1200px] px-4 md:px-6 pt-14" data-testid="strategies-page">
+      <Seo title="Strategies · Loom" description="Browse public trading strategies written in plain English, each with readable rules and live backtests." path="/strategies" />
       <h1 className="serif text-4xl md:text-5xl font-light tracking-tight">Strategies</h1>
       <p className="mt-3 max-w-xl text-[14px] text-[#9aa0ae]">
         Public, with no names attached. Open one, read exactly what it does, change what you like. Examples to start from, not advice.

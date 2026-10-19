@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { errorMessage } from "../lib/api";
 
 const API = process.env.REACT_APP_BACKEND_URL;
-const TOKEN_KEY = "weft:session";
+const TOKEN_KEY = "loom:session";
 
 const AuthCtx = createContext(null);
 

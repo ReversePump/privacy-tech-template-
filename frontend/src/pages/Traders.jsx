@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { weft, errorMessage } from "../lib/api";
+import Seo from "../components/Seo";
+import { loom, errorMessage } from "../lib/api";
 import { fmtUsd0, fmtUsdSigned, fmtPctSigned, short } from "../lib/format";
 import { Panel, Tag, Loading, Empty } from "../components/bits";
 import { useAuth } from "../solana/AuthContext";
@@ -14,11 +15,12 @@ export default function Traders() {
   const { signedIn, token } = useAuth();
 
   useEffect(() => {
-    weft.traders().then((d) => setRows(d.traders || [])).catch(() => setRows([]));
+    loom.traders().then((d) => setRows(d.traders || [])).catch(() => setRows([]));
   }, []);
 
   return (
     <div className="mx-auto max-w-[1200px] px-4 md:px-6 pt-14" data-testid="traders-page">
+      <Seo title="Traders · Loom" description="Real Hyperliquid traders with live PnL — follow any of them with auto-copy at your own size." path="/traders" />
       <h1 className="serif text-4xl md:text-5xl font-light tracking-tight">Traders</h1>
       <p className="mt-3 max-w-xl text-[14px] text-[#9aa0ae]">
         Hyperliquid's public leaderboard. Copy a trader's entries with your own size and stop — or fade them. One sentence is enough.

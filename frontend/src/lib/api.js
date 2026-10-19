@@ -42,7 +42,7 @@ export async function* sseStream(path, body) {
   }
 }
 
-export const weft = {
+export const loom = {
   stats: () => req("GET", "/stats"),
   health: () => req("GET", "/health"),
   strategies: () => req("GET", "/strategies"),
@@ -50,7 +50,6 @@ export const weft = {
   traders: () => req("GET", "/traders"),
   leaderboard: () => req("GET", "/leaderboard"),
   revenue: () => req("GET", "/revenue"),
-  rewards: () => req("GET", "/rewards"),
   generate: (thesis) => req("POST", "/ai/generate", { thesis }),
   backtest: (payload) => req("POST", "/backtest", payload),
   validate: (strategy) => req("POST", "/strategies/validate", { strategy }),

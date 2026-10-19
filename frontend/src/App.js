@@ -1,6 +1,7 @@
 import React from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "sonner";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -20,6 +21,7 @@ function App() {
     <div className="App min-h-screen bg-[#070708] text-[#f4f4f5]">
       <WalletContext>
         <AuthProvider>
+          <HelmetProvider>
           <BrowserRouter>
             <Header />
             <main>
@@ -37,6 +39,7 @@ function App() {
             </main>
             <Footer />
           </BrowserRouter>
+          </HelmetProvider>
         </AuthProvider>
       </WalletContext>
       <Toaster position="bottom-right" toastOptions={{

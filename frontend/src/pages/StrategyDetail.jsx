@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowRight, Loader2, Play } from "lucide-react";
 import { toast } from "sonner";
-import { weft, errorMessage } from "../lib/api";
+import { loom, errorMessage } from "../lib/api";
 import { fmtUsd, fmtPct, fmtPctSigned, fmtNum } from "../lib/format";
 import { Panel, Tag, Sparkline, Loading, Empty } from "../components/bits";
 import RulesView from "../components/RulesView";
@@ -18,7 +18,7 @@ export default function StrategyDetail() {
     setStrategy(null);
     setMissing(false);
     setBt(null);
-    Promise.all([weft.strategies().catch(() => ({ strategies: [] })), weft.examples().catch(() => ({ strategies: [] }))])
+    Promise.all([loom.strategies().catch(() => ({ strategies: [] })), loom.examples().catch(() => ({ strategies: [] }))])
       .then(([a, b]) => {
         const all = [...(a.strategies || []), ...(b.strategies || [])];
         const found = all.find((s) => (s.strategy?.id || s.id) === id);
@@ -32,7 +32,7 @@ export default function StrategyDetail() {
     setBtBusy(true);
     setBt(null);
     try {
-      setBt(await weft.backtest({ strategy }));
+      setBt(await loom.backtest({ strategy }));
     } catch (e) {
       toast.error(errorMessage(e));
     } finally {

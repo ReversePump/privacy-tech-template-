@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { weft } from "../lib/api";
+import Seo from "../components/Seo";
+import { loom } from "../lib/api";
 import { fmtUsd, fmtUsd0 } from "../lib/format";
 import { Panel } from "../components/bits";
 
@@ -9,8 +10,8 @@ export default function Revenue() {
 
   useEffect(() => {
     const load = () => {
-      weft.revenue().then(setRev).catch(() => {});
-      weft.stats().then(setStats).catch(() => {});
+      loom.revenue().then(setRev).catch(() => {});
+      loom.stats().then(setStats).catch(() => {});
     };
     load();
     const t = setInterval(load, 30000);
@@ -21,6 +22,7 @@ export default function Revenue() {
 
   return (
     <div className="mx-auto max-w-[1200px] px-4 md:px-6 pt-14" data-testid="revenue-page">
+      <Seo title="Revenue · Loom" description="Every platform fee, public and on chain — Hyperliquid builder earnings, Solana fee wallet and traded volume." path="/revenue" />
       <h1 className="serif text-4xl md:text-5xl font-light tracking-tight">Revenue</h1>
       <p className="mt-3 max-w-xl text-[14px] text-[#9aa0ae]">
         Every fee the platform earns — public and on chain, refreshed live.

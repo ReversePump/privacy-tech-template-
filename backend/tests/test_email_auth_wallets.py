@@ -17,7 +17,7 @@ EVM_RE = re.compile(r"^0x[a-fA-F0-9]{40}$")
 SOL_RE = re.compile(r"^[1-9A-HJ-NP-Za-km-z]{32,44}$")
 
 # Fresh unique email per run so this suite is idempotent across retries
-EMAIL = f"testagent_{int(time.time())}@weft.test"
+EMAIL = f"testagent_{int(time.time())}@loom.test"
 PASSWORD = "agentpass123"
 
 _state = {}
@@ -26,7 +26,7 @@ _state = {}
 # --- email register ---
 def test_register_short_password():
     r = requests.post(f"{API}/auth/email/register",
-                      json={"email": f"short_{int(time.time())}@weft.test", "password": "short"}, timeout=20)
+                      json={"email": f"short_{int(time.time())}@loom.test", "password": "short"}, timeout=20)
     assert r.status_code == 400
     assert "password_too_short" in r.text
 

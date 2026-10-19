@@ -1,4 +1,4 @@
-"""Swift Fi transactional email via the Emergent managed email proxy (playbook-compliant)."""
+"""Loom transactional email via the Emergent managed email proxy (playbook-compliant)."""
 import os
 import re
 import ipaddress

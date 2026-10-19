@@ -12,7 +12,7 @@ if not BASE_URL:
                 BASE_URL = line.split("=", 1)[1].strip().rstrip("/")
 API = f"{BASE_URL}/api"
 
-EMAIL = f"gaps_{int(time.time())}@weft.test"
+EMAIL = f"gaps_{int(time.time())}@loom.test"
 PASSWORD = "gapspass123"
 _s = {}
 

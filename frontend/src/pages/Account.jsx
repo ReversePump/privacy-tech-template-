@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
+import Seo from "../components/Seo";
 import { Link } from "react-router-dom";
 import { Wallet, LogOut, Play, Loader2, Copy, Check, ArrowDownUp, ArrowUpRight, CircleX, QrCode } from "lucide-react";
 import QRCode from "qrcode";
 import { toast } from "sonner";
-import { weft, errorMessage } from "../lib/api";
+import { loom, errorMessage } from "../lib/api";
 import { fmtUsd, fmtPctSigned, fmtAge, short } from "../lib/format";
 import { Panel, Tag, Loading, Empty, Sparkline } from "../components/bits";
 import { useAuth } from "../solana/AuthContext";
@@ -28,7 +29,6 @@ export default function Account() {
   const { signedIn, signOut, token, wallet, user } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
   const [saved, setSaved] = useState(null);
-  const [rewards, setRewards] = useState(null);
   const [btMap, setBtMap] = useState({});
   const [btBusy, setBtBusy] = useState("");
   const [solInfo, setSolInfo] = useState(null);
@@ -68,7 +68,6 @@ export default function Account() {
   }, [signedIn, token, isEmail]);
 
   useEffect(() => {
-    weft.rewards().then(setRewards).catch(() => {});
     authedPublic();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [signedIn, token]);
@@ -86,6 +85,7 @@ export default function Account() {
   if (!signedIn) {
     return (
       <div className="mx-auto max-w-[860px] px-4 md:px-6 pt-20 text-center" data-testid="account-page">
+        <Seo title="Your account · Loom" description="Your generated wallets, live trading on Solana and Hyperliquid, deployments, practice account, alerts and history." path="/account" />
         <Wallet size={28} className="mx-auto text-[#9aa0ae]" />
         <h1 className="mt-4 serif text-3xl font-light">Your account</h1>
         <p className="mt-2 text-[13px] text-[#9aa0ae]">Email and password — we generate your wallets. Or connect your own.</p>
@@ -111,7 +111,7 @@ export default function Account() {
         </button>
       </div>
 
-      <Panel className="mt-8 grid grid-cols-2 md:grid-cols-4 divide-x divide-[#ffffff26] overflow-hidden" data-testid="account-stats">
+      <Panel className="mt-8 grid grid-cols-1 md:grid-cols-3 divide-x divide-[#ffffff26] overflow-hidden" data-testid="account-stats">
         <div className="px-5 py-4">
           <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#9aa0ae]">Solana balance</div>
           <div className="mt-1 text-xl font-medium tnum" data-testid="acct-sol-bal">{solInfo ? `${solInfo.sol.toFixed(4)} SOL` : "—"}</div>
@@ -129,11 +129,6 @@ export default function Account() {
         <div className="px-5 py-4">
           <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#9aa0ae]">Saved strategies</div>
           <div className="mt-1 text-xl font-medium tnum">{saved ? saved.length : "—"}</div>
-        </div>
-        <div className="px-5 py-4">
-          <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#9aa0ae]">Rewards</div>
-          <div className="mt-1 text-xl font-medium tnum">{rewards ? (rewards.enabled ? (rewards.paused ? "Paused" : "Live") : "Off") : "—"}</div>
-          <div className="mt-0.5 text-[11px] text-[#9aa0ae]">Fee-share rewards</div>
         </div>
       </Panel>
 
@@ -191,7 +186,7 @@ export default function Account() {
                   <button onClick={async () => {
                     if (btBusy) return;
                     setBtBusy(doc.strategyId);
-                    try { setBtMap((m) => ({ ...m, [doc.strategyId]: null })); const d = await weft.backtest({ strategy: doc.strategy }); setBtMap((m) => ({ ...m, [doc.strategyId]: d })); }
+                    try { setBtMap((m) => ({ ...m, [doc.strategyId]: null })); const d = await loom.backtest({ strategy: doc.strategy }); setBtMap((m) => ({ ...m, [doc.strategyId]: d })); }
                     catch (e) { toast.error(errorMessage(e)); }
                     finally { setBtBusy(""); }
                   }} disabled={btBusy === doc.strategyId} data-testid={`saved-bt-${doc.strategyId}`}

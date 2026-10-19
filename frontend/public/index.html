@@ -3,8 +3,55 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#07060d" />
-        <meta name="description" content="Loom · AI trading agent. Your strategy, automatically executed — write a market view in plain English and it trades from your own account." />
+        <meta name="theme-color" content="#070708" />
+        <meta name="description" content="Loom is an AI trading agent: describe a market view in plain English and it becomes rules you can read, traded automatically from your own account." />
+        <link rel="canonical" href="https://loomfi.app/" />
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Loom" />
+        <meta property="og:title" content="Loom · AI Trading Agent" />
+        <meta property="og:description" content="Your strategy, automatically executed. Write a market view in plain English; Loom turns it into rules and trades them from your own account, day and night." />
+        <meta property="og:url" content="https://loomfi.app/" />
+        <meta property="og:image" content="https://loomfi.app/og-image.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Loom — AI trading agent wordmark with an interwoven silver knot on black" />
+        <meta property="og:locale" content="en_US" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@loomfiai" />
+        <meta name="twitter:title" content="Loom · AI Trading Agent" />
+        <meta name="twitter:description" content="Your strategy, automatically executed. Write a market view in plain English; Loom trades it from your own account." />
+        <meta name="twitter:image" content="https://loomfi.app/og-image.png" />
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "Loom",
+          "alternateName": "Loom Finance",
+          "description": "AI trading agent: write a market view in plain English and it becomes readable rules, traded automatically from your own account.",
+          "url": "https://loomfi.app/",
+          "logo": "https://loomfi.app/logo.png",
+          "sameAs": ["https://x.com/loomfiai"]
+        }
+        </script>
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {"@type": "Question", "name": "Is the wallet Loom makes safe?", "acceptedAnswer": {"@type": "Answer", "text": "Your wallets are generated when you sign up and stored encrypted on our servers — never shown to anyone, never logged. You can withdraw everything, any time."}},
+            {"@type": "Question", "name": "Does Loom hold my money?", "acceptedAnswer": {"@type": "Answer", "text": "Only until you withdraw. Balances live in your generated Solana wallet and Hyperliquid account, and you can send everything out whenever you like."}},
+            {"@type": "Question", "name": "What can it watch?", "acceptedAnswer": {"@type": "Answer", "text": "Prices, funding, wallets, Hyperliquid traders, calendar events, Fear & Greed, token on-chain stats, weather and sports results — mixed in one sentence if you like."}},
+            {"@type": "Question", "name": "Can I copy other traders?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Pick a Hyperliquid trader and mirror their entries with your own size."}},
+            {"@type": "Question", "name": "What does it cost?", "acceptedAnswer": {"@type": "Answer", "text": "Writing strategies and paper trading are free. Network and exchange fees apply only when real orders execute."}},
+            {"@type": "Question", "name": "Is there a Loom token?", "acceptedAnswer": {"@type": "Answer", "text": "Not yet. When it launches, the contract address will be published here and on the Loom X account — nowhere else."}},
+            {"@type": "Question", "name": "Can I try it without real money?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — every strategy can run on a $10,000 paper account at real prices, or as alerts only."}},
+            {"@type": "Question", "name": "Can it just alert me instead?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Any strategy can run in alert-only mode and ping you instead of trading."}},
+            {"@type": "Question", "name": "What if Loom goes down?", "acceptedAnswer": {"@type": "Answer", "text": "Your money never leaves your account. Open positions keep their on-exchange stops; you can always manage them directly."}},
+            {"@type": "Question", "name": "Is this financial advice?", "acceptedAnswer": {"@type": "Answer", "text": "No. Loom executes the rules you write. You are responsible for your own trades."}}
+          ]
+        }
+        </script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap" rel="stylesheet" />
@@ -28,7 +75,12 @@
         <script src="https://assets.emergent.sh/scripts/emergent-main.js"></script>
     </head>
     <body>
-        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <noscript>
+          <h1>Loom — your strategy, automatically executed</h1>
+          <p>Loom is an AI trading agent. From "buy $50 of ETH" to "if funding stays low and price holds, go long" — Loom turns your words into rules you can read and trades them from your own wallet, day and night.</p>
+          <p>No wallet or Hyperliquid account needed: sign in with email and Loom makes them for you. Practice with a $10,000 account at real prices, get alerts only, or trade live on Solana and Hyperliquid.</p>
+          <p>JavaScript is required to use the live app.</p>
+        </noscript>
         <div id="root"></div>
         <!--
       This HTML file is a template.

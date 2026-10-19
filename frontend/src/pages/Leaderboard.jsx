@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
+import Seo from "../components/Seo";
 import { Link } from "react-router-dom";
-import { weft } from "../lib/api";
+import { loom } from "../lib/api";
 import { fmtUsd, fmtUsdSigned, fmtPctSigned, fmtAge } from "../lib/format";
 import { Panel, Tag, Loading, Empty } from "../components/bits";
 
@@ -8,11 +9,12 @@ export default function Leaderboard() {
   const [rows, setRows] = useState(null);
 
   useEffect(() => {
-    weft.leaderboard().then((d) => setRows(d.rows || [])).catch(() => setRows([]));
+    loom.leaderboard().then((d) => setRows(d.rows || [])).catch(() => setRows([]));
   }, []);
 
   return (
     <div className="mx-auto max-w-[1200px] px-4 md:px-6 pt-14" data-testid="leaderboard-page">
+      <Seo title="Leaderboard · Loom" description="Live strategy leaderboard — which theses are actually making money right now." path="/leaderboard" />
       <h1 className="serif text-4xl md:text-5xl font-light tracking-tight">Leaderboard</h1>
       <p className="mt-3 max-w-xl text-[14px] text-[#9aa0ae]">
         Live deployments, no names attached. Every fill is real; shareable result cards come from here.

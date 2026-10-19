@@ -16,7 +16,7 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("server")
 
-UPSTREAM = "https://weft-api-production.up.railway.app"
+UPSTREAM = os.environ.get("UPSTREAM_API_URL")  # public market-data source, env-configured
 
 mongo = AsyncIOMotorClient(os.environ["MONGO_URL"])
 db = mongo[os.environ["DB_NAME"]]
@@ -51,13 +51,15 @@ UPSTREAM_SCRUB_KEYS = {"token", "buybacks", "weftUsd", "buybackUsd"}
 
 
 def _sanitize_upstream(obj):
-    """Filter upstream data: no upstream token (CA / $WEFT / brand) may surface anywhere."""
+    """Filter relayed data: no upstream token or upstream brand may surface anywhere."""
     if isinstance(obj, list):
         out = []
         for it in obj:
             blob = _json.dumps(it).lower()
             if UPSTREAM_TOKEN_CA.lower() in blob or "weft" in blob:
                 continue  # drop entries referencing the upstream token or brand
+            if '"kind": "social"' in blob:
+                continue  # X/Twitter-dependent signals are removed by design
             out.append(_sanitize_upstream(it))
         return out
     if isinstance(obj, dict):

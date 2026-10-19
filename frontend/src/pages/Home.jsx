@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
+import Seo from "../components/Seo";
 import { Link } from "react-router-dom";
 import { ArrowRight, ShieldCheck, Wallet, BellRing, CircleStop, Eye } from "lucide-react";
-import { weft } from "../lib/api";
+import { loom } from "../lib/api";
 import LoomSignals from "../components/LoomSignals";
 import { fmtUsd0, fmtUsd, fmtNum } from "../lib/format";
 import { Panel, Stat, Tag, CoinIcon, Loading } from "../components/bits";
@@ -35,11 +36,11 @@ const TRADES = [
 const FAQ = [
   ["Do I need to know how to trade?", "You need an opinion, not a trading background. Loom turns it into concrete rules and shows you each one in plain English before anything runs. Practice it with pretend money first if you like, then start it with whatever amount you like."],
   ["Do I need a wallet or a Hyperliquid account?", "No. Sign in with email and Loom creates both for you. You can connect your own wallet instead if you prefer."],
-  ["Is the wallet Loom makes safe?", "It is a non-custodial embedded wallet. Only you hold the keys; Loom gets a trading-only agent key."],
-  ["Does Loom hold my money?", "No. Funds stay in your own Hyperliquid account or your Solana wallet. Loom can place orders and nothing else — withdrawals are blocked at the key level."],
-  ["What can it watch?", "Prices, funding, posts and buzz on X, wallets, Hyperliquid traders, prediction markets, news, Fear & Greed, macro rates, weather and sports results — mixed in one sentence if you like."],
-  ["Can I copy other traders?", "Yes. Pick a wallet or a Hyperliquid trader and mirror their entries with your own size and stop."],
-  ["What does it cost?", "Writing strategies is free. A small fee applies only when a strategy trades: 0.10% on perps, 1% on Solana swaps."],
+  ["Is the wallet Loom makes safe?", "Your wallets are generated when you sign up and stored encrypted on our servers — never shown to anyone, never logged. You can withdraw everything, any time."],
+  ["Does Loom hold my money?", "Only until you withdraw. Balances live in your generated Solana wallet and Hyperliquid account, and you can send everything out whenever you like."],
+  ["What can it watch?", "Prices, funding, wallets, Hyperliquid traders, calendar events, Fear & Greed, token on-chain stats, weather and sports results — mixed in one sentence if you like."],
+  ["Can I copy other traders?", "Yes. Pick a Hyperliquid trader and mirror their entries with your own size."],
+  ["What does it cost?", "Writing strategies and paper trading are free. Network and exchange fees apply only when real orders execute."],
   ["Is there a Loom token?", "Not yet. When it launches, the contract address will be published here and on the Loom X account — nowhere else."],
   ["Can I try it without real money?", "Yes — every strategy can run on a $10,000 paper account at real prices, or as alerts only."],
   ["Can it just alert me instead?", "Yes. Any strategy can run in alert-only mode and ping you instead of trading."],
@@ -53,8 +54,8 @@ export default function Home() {
   const [open, setOpen] = useState(0);
 
   useEffect(() => {
-    weft.stats().then(setStats).catch(() => {});
-    weft.strategies().then((d) => setStrategies((d.strategies || []).slice(0, 3))).catch(() => setStrategies([]));
+    loom.stats().then(setStats).catch(() => {});
+    loom.strategies().then((d) => setStrategies((d.strategies || []).slice(0, 3))).catch(() => setStrategies([]));
     // scroll reveal for sections below the hero
     const els = document.querySelectorAll("[data-testid='home-page'] section:not(:first-of-type)");
     els.forEach((el) => el.classList.add("loom-reveal"));
@@ -67,6 +68,7 @@ export default function Home() {
 
   return (
     <div data-testid="home-page">
+      <Seo title="Loom · AI Trading Agent" description="Your strategy, automatically executed. Write a market view in plain English; Loom turns it into rules and trades them from your own account, day and night." path="/" />
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-[#ffffff26]">
         <div className="absolute inset-0 z-0 pointer-events-none"

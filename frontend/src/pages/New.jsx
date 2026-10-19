@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
+import Seo from "../components/Seo";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Sparkles, Play, RotateCcw, Loader2, Check, X, MessageSquare, Send } from "lucide-react";
 import { toast } from "sonner";
-import { weft, sseStream, errorMessage } from "../lib/api";
+import { loom, sseStream, errorMessage } from "../lib/api";
 import { fmtUsd, fmtPct, fmtPctSigned, fmtNum } from "../lib/format";
 import { Panel, Tag, Sparkline } from "../components/bits";
 import RulesView from "../components/RulesView";
@@ -110,7 +111,7 @@ export default function New() {
     } catch (e) {
       // fall back to the non-streaming endpoint
       try {
-        const d = await weft.generate(t);
+        const d = await loom.generate(t);
         if (d.strategy) setStrategy(d.strategy);
       } catch (e2) {
         const msg = errorMessage(e2);
@@ -152,7 +153,7 @@ export default function New() {
     setBtBusy(true);
     setBt(null);
     try {
-      const d = await weft.backtest({ strategy });
+      const d = await loom.backtest({ strategy });
       setBt(d);
     } catch (e) {
       toast.error(errorMessage(e));
@@ -165,6 +166,7 @@ export default function New() {
 
   return (
     <div className="mx-auto max-w-[860px] px-4 md:px-6 pt-14 md:pt-20" data-testid="new-page">
+      <Seo title="New strategy · Loom" description="Describe a trade in your own words — Loom turns it into readable rules you can backtest, then run as practice, alerts or live." path="/new" />
       <h1 className="serif text-4xl md:text-5xl font-light tracking-tight">New strategy</h1>
       <p className="mt-3 text-[14px] text-[#9aa0ae]">Describe a trade in your own words. Loom turns it into rules you can read before anything runs.</p>
 

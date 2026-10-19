@@ -1,4 +1,4 @@
-"""Backend tests for relay API + wallet auth."""
+"""Backend tests for Loom relay API + wallet auth."""
 import json
 import os
 import pytest

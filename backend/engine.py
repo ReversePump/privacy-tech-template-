@@ -1,4 +1,4 @@
-"""Swift Fi core engine: runs deployments 24/7.
+"""Loom core engine: runs deployments 24/7.
 
 A deployment = a strategy (or copy target) + a mode:
   paper  -> trades a $10,000 pretend account at real prices

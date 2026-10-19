@@ -13,7 +13,7 @@ if not BASE_URL:
                 BASE_URL = line.split("=", 1)[1].strip().rstrip("/")
 API = f"{BASE_URL}/api"
 
-EMAIL = f"engine_{int(time.time())}@weft.test"
+EMAIL = f"engine_{int(time.time())}@loom.test"
 PASSWORD = "enginepass123"
 
 # Always-true strategy: ETH price > 1 (fires on first engine tick)
