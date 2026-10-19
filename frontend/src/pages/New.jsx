@@ -35,8 +35,13 @@ export default function New() {
   const [deployBusy, setDeployBusy] = useState("");
   const [refineText, setRefineText] = useState("");
   const [refineBusy, setRefineBusy] = useState(false);
+  const [practice, setPractice] = useState(null);
   const started = useRef(false);
   const nav = useNavigate();
+
+  useEffect(() => {
+    loom.practice().then(setPractice).catch(() => {});
+  }, []);
 
   const deploy = async (mode) => {
     if (!strategy) return;
@@ -325,6 +330,11 @@ export default function New() {
               </button>
             </div>
             <p className="mt-3 text-[11px] text-[#9aa0ae]">The engine checks your rules every ~25 seconds, around the clock. Manage deployments from your account.</p>
+            {practice?.enabled && (
+              <p className="mt-1.5 mono text-[10px] uppercase tracking-wider text-[#10b981]" data-testid="practice-status">
+                Practice live · ${practice.budgetUsd?.toLocaleString()} budget · up to {practice.maxRuns} runs at once
+              </p>
+            )}
           </Panel>
         </div>
       )}

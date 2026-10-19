@@ -129,3 +129,11 @@ link https://x.com/loomfiai, geometric Outfit display type, LoomWeave canvas her
 - Old-project TREASURY_* keys removed from backend/.env (0 code refs; boot clean).
 - Branding audit: zero old-brand prefixes in key/session/token handling; localStorage = loom:session.
 - 58 backend tests pass (16 new wallet-signed). Self-sign UI branch code-verified (needs real wallet ext to click).
+
+## Upstream public-surface scan (2026-07-19)
+- Full client-bundle scan of upstream: NO Supabase/any DB exposed client-side; stack = Next.js +
+  Railway FastAPI + Privy auth (domain-locked). Only public backend = the API we already relay.
+- Newly surfaced public endpoints: /practice (paper budget status — shown on /new deploy panel)
+  and /rift/assets (cross-chain deposit catalog — NOT shown: deposit submit is auth-gated upstream,
+  displaying it would promise deposits we cannot complete).
+- Everything else (alerts/me, live/*, papertrade/*, me/*, rewards/claim) is 401-gated upstream.

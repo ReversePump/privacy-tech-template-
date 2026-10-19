@@ -51,6 +51,7 @@ export const loom = {
   leaderboard: () => req("GET", "/leaderboard"),
   revenue: () => req("GET", "/revenue"),
   generate: (thesis) => req("POST", "/ai/generate", { thesis }),
+  practice: () => req("GET", "/practice"),
   backtest: (payload) => req("POST", "/backtest", payload),
   validate: (strategy) => req("POST", "/strategies/validate", { strategy }),
 };
