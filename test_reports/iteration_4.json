@@ -1,0 +1,46 @@
+{
+  "summary": "Full-stack test of Weft rebuild. Backend relay: all 6 upstream GET endpoints (stats, strategies, traders, leaderboard, revenue, rewards) return 200 with real data. POST /relay/backtest with eth-long returns stats+equityCurve. POST /relay/ai/generate hit upstream daily anon cap (429 'drafted 5 strategies today without an account') — expected since the preview shares one upstream IP. Frontend: all 7 public pages render clean (/, /new, /strategies, /strategies/eth-long, /traders 104 rows, /leaderboard 23 rows, /revenue), no MakeMarkets/launchpad/$MARKETS remnants, nav is Weft/Strategies/Traders/Leaderboard/Revenue, suggestion chips fill textarea, ?thesis=… URL param auto-populates. Fixed one bug: served HTML had stale <title>MakeMarkets…</title> — a frontend restart cleared the webpack-dev-server cache and index.html now serves 'Weft · Trade the thesis.' correctly. Remaining issue: when upstream /ai/generate(/stream) returns the 429 rate-limit error, the UI silently resets the Draft button and shows no toast/message to the user.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/relay/{path}/stream", "issue": "SSE relay always returns HTTP 200 via StreamingResponse — upstream status code (e.g. 429) is dropped. When upstream returns a non-SSE JSON error body it is streamed as raw bytes but the frontend sseStream parser ignores it (no 'event:' / 'data:' lines)."},
+      {"endpoint": "/api/relay/ai/generate", "issue": "Upstream enforces 5/day anon cap on this preview's IP → 429 with 'You’ve drafted 5 strategies today without an account.' Not a code bug but blocks live /new flow testing without auth. Consider surfacing this cleanly."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "pages/New.jsx — Draft the rules", "issue": "When the AI SSE endpoint responds with the upstream rate-limit JSON (non-SSE), sseStream yields nothing, the fallback weft.generate() also 429s, but no error toast was observed in the DOM; the Draft button quietly returns to idle. User gets zero feedback that nothing happened.", "selector": "button:has-text('Draft the rules')", "priority": "HIGH"}
+    ],
+    "integration_issues": [
+      {"flow": "Thesis → Draft the rules → Rules → Backtest on /new", "issue": "Could not verify the happy path end-to-end from the preview because upstream daily anon cap was already exhausted and the UI shows no indication. errorMessage(e2) toast did not render for this response.", "affected_selectors": ["textarea", "button:has-text('Draft the rules')", "[data-testid*='strategy-result']"]}
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_weft_relay.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Fix silent failure on /new when AI endpoint rate-limits: the SSE relay should either (a) relay the upstream 4xx status code when the response isn't event-stream, or (b) wrap non-SSE error payloads into an 'event: error\\ndata: …' frame. Alternatively, parse the error body in New.jsx and show a toast/inline banner.",
+    "Add data-testid attributes to key /new elements (textarea, draft button, suggestion chips, rules card, backtest button, equity sparkline, stats cells) and public page cards/rows for stronger E2E coverage.",
+    "Delete stale meta description in /app/frontend/public/index.html (<meta name=description> still says 'MakeMarkets — market makers for every coin…').",
+    "Verify that the public preview's upstream daily anon cap can be reset or that the preview can authenticate against the upstream for E2E AI drafting tests (Privy is domain-locked to weft.fi per request)."
+  ],
+  "critical_code_review_comments": [
+    "server.py relay/{path}/stream: StreamingResponse hard-codes media_type='text/event-stream' and status 200 regardless of upstream — should propagate upstream status code (and content-type) when the response isn't actually SSE.",
+    "server.py: shared _http client is created lazily but never used for /stream (new client per request is fine); minor — connection pool reuse would help.",
+    "frontend/public/index.html meta description still references MakeMarkets (title was fine but needed a server restart to flush dev-server cache; main agent should verify this on next deploy)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_weft_relay.py (new pytest suite — replaces deleted old backend_test.py)",
+    "deleted /app/backend/tests/backend_test.py (referenced old MakeMarkets app)",
+    "restarted frontend supervisor to flush stale index.html"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "85%"},
+  "test_credentials": "none — all tested surfaces are public; /app/memory/test_credentials.md was not present (not required for this scope).",
+  "seed_data_creation": "none",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Backend relay suite lives at /app/backend/tests/test_weft_relay.py (10 tests, all passing). test_relay_ai_generate accepts 200 OR 429 because upstream has a 5/day anon cap. All six public pages render cleanly; nav is 'Strategies | Traders | Leaderboard | Revenue'. The only unresolved functional issue is silent failure on /new when AI is rate-limited — reproduce by clicking 'Draft the rules' with any thesis after the daily cap is hit; SSE returns upstream JSON error body which the frontend doesn't surface. If upstream cap has reset, happy path should flow: textarea → draft → streaming progress → rules card (WHEN/WATCHES/DOES) → 'Run 30-day backtest' → equity sparkline + 8 stats.",
+  "rca_of_the_issue": "Reproduction: open /new, enter any thesis, click 'Draft the rules'. Observed: button goes blue briefly, SSE POST to /api/relay/ai/generate/stream returns 200 (via relay), body contains upstream JSON `{\"error\":\"You’ve drafted 5 strategies today…\"}`. Root cause: (1) backend relay for /stream always returns 200 with media_type=text/event-stream regardless of upstream status — see server.py lines 49-59 — and does not reframe non-SSE error bodies as `event: error` frames. (2) frontend sseStream in /lib/api.js parses only well-formed SSE events so the error JSON is dropped. (3) New.jsx fallback calls weft.generate() which 429s again; errorMessage(e2).toast call ran but no DOM error element was observed. Mitigation: in server.py, after opening the upstream stream check `r.status_code` and `r.headers['content-type']`; if not SSE, read body and yield `event: error\\ndata: {…}\\n\\n`, OR return a non-streaming Response that propagates upstream status. Additionally in New.jsx catch block, show an inline banner so toast isn't the only surface."
+}
