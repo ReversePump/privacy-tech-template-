@@ -14,7 +14,7 @@ const API = process.env.REACT_APP_BACKEND_URL;
 
 const SUGGESTIONS = [
   "Buy $50 of ETH now",
-  "If @elonmusk posts about Dogecoin, long DOGE 5x with $100",
+  "Long BTC 5x with $100 if price holds above $80,000 and funding stays under 0.01%",
   "Long BTC and ETH 20x with $100 each if Fear & Greed drops to 20",
   "Short SOL 3x with $50 if funding stays above 0.02% an hour",
   "If the Fear & Greed index reaches 20, open a 20x long on ETH and BTC with $100 on each",
@@ -176,7 +176,7 @@ export default function New() {
           value={thesis}
           onChange={(e) => setThesis(e.target.value)}
           rows={3}
-          placeholder="If @elonmusk posts about Dogecoin, long DOGE 5x with $100. 25% stop."
+          placeholder="Long BTC 5x with $100 if funding stays under 0.01% and price holds $80,000. 25% stop."
           className="mt-2 w-full resize-none rounded-lg border border-[#ffffff26] bg-[#17171b] px-4 py-3 text-[14px] leading-relaxed outline-none focus:border-[#ffffff66]"
           data-testid="thesis-input"
         />

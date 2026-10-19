@@ -11,8 +11,8 @@ import StrategyCard from "../components/StrategyCard";
 const WATCHES = [
   ["Prices", "ETH breaks $2,600", "Long ETH 5x with $50 if ETH breaks $2,600. 20% stop."],
   ["Funding", "Longs pay over 0.02% an hour", "Short SOL 5x with $50 when funding stays above 0.02% an hour. 15% stop."],
-  ["Posts on X", "@elonmusk posts about Dogecoin", "If @elonmusk posts about Dogecoin, long DOGE 5x with $100. 25% stop."],
-  ["Buzz on X", "$SOL mentions double in an hour", "Long SOL 3x with $50 if mentions of $SOL on X double in an hour and the mood is bullish."],
+  ["Token flows", "Buyers outnumber sellers 2-to-1", "Long a Solana token 3x with $50 when buys outnumber sells 2-to-1 in an hour. 20% stop."],
+  ["Prices", "ETH breaks $2,600", "Long ETH 3x with $50 when price breaks above $2,600. 15% stop."],
   ["Wallets", "A wallet you follow buys a token, and you buy too", null],
   ["Hyperliquid traders", "A trader you copy opens a BTC long, and so do you", null],
   ["Prediction markets", "The Spurs' title odds pass 25%, and you buy YES", "Put $1,000 on the Spurs winning the NBA title if their odds pass 25%. Sell if the odds drop below 15%."],
@@ -263,7 +263,7 @@ export default function Home() {
         <div className="mx-auto max-w-[1200px] px-4 md:px-6 py-20 text-center">
           <h2 className="serif text-4xl md:text-5xl font-light tracking-tight">What's your <span className="italic text-[#f1f5f9]">thesis?</span></h2>
           <div className="mt-6 flex flex-wrap justify-center gap-2">
-            {["Buy $50 of ETH now", "If @elonmusk posts about Dogecoin, long DOGE 5x with $100", "Long BTC and ETH 20x with $100 each if Fear & Greed drops to 20"].map((t) => (
+            {["Buy $50 of ETH now", "Long BTC 5x with $100 if price holds above $80,000 and funding stays under 0.01%", "Long BTC and ETH 20x with $100 each if Fear & Greed drops to 20"].map((t) => (
               <Link key={t} to={`/new?thesis=${encodeURIComponent(t)}`} className="rounded-full border border-[#ffffff26] bg-[#17171b] px-4 py-2 text-[12.5px] hover:border-[#f1f5f9] hover:text-[#cbd5e1] transition-colors">
                 {t}
               </Link>

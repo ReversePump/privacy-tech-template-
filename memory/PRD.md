@@ -116,3 +116,9 @@ link https://x.com/loomfiai, geometric Outfit display type, LoomWeave canvas her
   zero makemarkets/makers/$MAKERS/$MARKETS references remain in the codebase.
 - Relay sanitizer extended: also drops entries with post_match kind and text-level X references
   (@elonmusk, x.com, twitter.com, 'posts about/on X', 'buzz on X'). 23 fully clean strategies served.
+
+## Final pre-launch sweep (iteration_9, 2026-07-19)
+- 53 backend tests pass; 7/7 routes clean; quota error path graceful; sanitizer verified 0 leaks.
+- Fixed: hardcoded X-dependent example chips (Home/New) replaced with crypto-only examples.
+- Known constraint: upstream anonymous AI drafting = 5/day per server IP (site-wide). Resets daily.
+  Quota error surfaces cleanly via draft-error banner. AI path itself verified working in earlier runs.
