@@ -8,6 +8,8 @@ import { loom, errorMessage } from "../lib/api";
 import { fmtUsd, fmtPctSigned, fmtAge, short } from "../lib/format";
 import { Panel, Tag, Loading, Empty, Sparkline } from "../components/bits";
 import { useAuth } from "../solana/AuthContext";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { VersionedTransaction } from "@solana/web3.js";
 import AuthModal from "../components/AuthModal";
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -27,6 +29,7 @@ const authed = (token, path, body) =>
 
 export default function Account() {
   const { signedIn, signOut, token, wallet, user } = useAuth();
+  const { signTransaction } = useWallet();
   const [authOpen, setAuthOpen] = useState(false);
   const [saved, setSaved] = useState(null);
   const [btMap, setBtMap] = useState({});
@@ -159,6 +162,20 @@ export default function Account() {
 
           <WithdrawPanel token={token} hlInfo={hlInfo} onDone={refresh} />
         </>
+      )}
+
+      {!isEmail && signedIn && (
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-4" data-testid="wallet-trade-row">
+          <SolTradePanel token={token} onDone={refresh} selfSign signTransaction={signTransaction} />
+          <Panel className="p-5">
+            <div className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae]">Your own wallet</div>
+            <p className="mt-2 text-[13px] text-[#9aa0ae] leading-relaxed">
+              You connected your own wallet — swaps are built here and signed by you in your wallet app; Loom never touches your keys.
+              For Hyperliquid perps, limit orders, withdrawals and the 24/7 engine with real execution, sign in with email and a wallet is generated for you.
+            </p>
+            <p className="mt-3 mono text-[11px] text-[#6b7280]">Connected: {short(wallet, 6, 6)}</p>
+          </Panel>
+        </div>
       )}
 
       <DeploymentsPanel token={token} deployments={deployments} onDone={refresh} />
@@ -454,15 +471,27 @@ function AlertsPanel({ token, alerts, onDone }) {
   );
 }
 
-function SolTradePanel({ token, onDone }) {
+function SolTradePanel({ token, onDone, selfSign = false, signTransaction = null }) {
   const [out, setOut] = useState(USDC);
   const [amount, setAmount] = useState(0.01);
   const [busy, setBusy] = useState(false);
   const trade = async () => {
     setBusy(true);
     try {
-      const d = await authed(token, "/wallet/trade", { inputMint: WSOL, outputMint: out, amount: Math.round(amount * 1e9) });
-      toast.success("Trade executed on chain", { description: `Signature ${short(d.signature, 8, 8)}` });
+      if (selfSign) {
+        if (!signTransaction) throw new Error("Connected wallet cannot sign transactions");
+        const built = await authed(token, "/wallet/build_swap", { inputMint: WSOL, outputMint: out, amount: Math.round(amount * 1e9) });
+        const tx = VersionedTransaction.deserialize(Uint8Array.from(atob(built.swapTransaction), (c) => c.charCodeAt(0)));
+        const signed = await signTransaction(tx);
+        const d = await authed(token, "/wallet/send_signed", {
+          signedTransaction: btoa(String.fromCharCode(...signed.serialize())),
+          inputMint: WSOL, outputMint: out, amount: Math.round(amount * 1e9), outAmount: built.outAmount,
+        });
+        toast.success("Swap executed from your wallet", { description: `Signature ${short(d.signature, 8, 8)}` });
+      } else {
+        const d = await authed(token, "/wallet/trade", { inputMint: WSOL, outputMint: out, amount: Math.round(amount * 1e9) });
+        toast.success("Trade executed on chain", { description: `Signature ${short(d.signature, 8, 8)}` });
+      }
       onDone();
     } catch (e) {
       toast.error(errorMessage(e));
@@ -470,7 +499,7 @@ function SolTradePanel({ token, onDone }) {
   };
   return (
     <Panel className="p-5" data-testid="sol-trade-panel">
-      <div className="flex items-center gap-2 mono text-[10px] uppercase tracking-wider text-[#9aa0ae]"><ArrowDownUp size={12} /> Swap on Solana · real</div>
+      <div className="flex items-center gap-2 mono text-[10px] uppercase tracking-wider text-[#9aa0ae]"><ArrowDownUp size={12} /> Swap on Solana · real{selfSign ? " · signed by your wallet" : ""}</div>
       <div className="mt-4 space-y-3">
         <div className="flex gap-2">
           <input type="number" min={0.001} step={0.001} value={amount} onChange={(e) => setAmount(Number(e.target.value) || 0)}
@@ -485,7 +514,7 @@ function SolTradePanel({ token, onDone }) {
           className="h-10 w-full rounded-lg border border-[#ffffff26] bg-[#17171b] px-3 mono text-[11px] outline-none" data-testid="sol-trade-mint" />
         <button onClick={trade} disabled={busy || amount <= 0} data-testid="sol-trade-btn"
           className="h-11 w-full rounded-full bg-[#e5e7eb] text-[13px] font-medium text-black shadow-[0_0_20px_rgba(226,232,255,0.35)] hover:bg-[#f1f5f9] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
-          {busy && <Loader2 size={14} className="animate-spin" />} Swap for real
+          {busy && <Loader2 size={14} className="animate-spin" />} {selfSign ? "Build — sign in your wallet" : "Swap for real"}
         </button>
       </div>
     </Panel>

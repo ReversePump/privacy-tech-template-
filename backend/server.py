@@ -380,6 +380,57 @@ async def wallet_trade(request: Request):
             "priceImpactPct": quote.get("priceImpactPct")}
 
 
+# ---------- wallet-connected (own Phantom/Solflare) live trading: server builds, user signs ----------
+
+@auth_router.post("/wallet/build_swap")
+async def wallet_build_swap(request: Request):
+    """For wallet-connected users: return an unsigned Jupiter swap tx for the connected wallet."""
+    s = await _session_user(request)
+    if not s:
+        return _err("sign_in_required", 401)
+    body = await request.json()
+    try:
+        amount = int(body.get("amount") or 0)
+    except (TypeError, ValueError):
+        return _err("invalid_input", 400)
+    input_mint = body.get("inputMint") or ""
+    output_mint = body.get("outputMint") or ""
+    if amount <= 0 or not input_mint or not output_mint:
+        return _err("invalid_input", 400)
+    q = await _client().get(f"{JUP}/quote", params={
+        "inputMint": input_mint, "outputMint": output_mint, "amount": amount, "slippageBps": 100,
+    })
+    if q.status_code != 200:
+        return _err("no_route", 400)
+    quote = q.json()
+    sw = await _client().post(f"{JUP}/swap", json={"quoteResponse": quote, "userPublicKey": s["wallet"],
+                                                   "wrapAndUnwrapSol": True, "dynamicComputeUnitLimit": True})
+    if sw.status_code != 200:
+        return _err("swap_build_failed", 400)
+    return {"ok": True, "swapTransaction": sw.json().get("swapTransaction"),
+            "outAmount": quote.get("outAmount"), "priceImpactPct": quote.get("priceImpactPct")}
+
+
+@auth_router.post("/wallet/send_signed")
+async def wallet_send_signed(request: Request):
+    """Broadcast a swap tx the user signed in their own wallet."""
+    s = await _session_user(request)
+    if not s:
+        return _err("sign_in_required", 401)
+    body = await request.json()
+    signed_b64 = body.get("signedTransaction") or ""
+    if not signed_b64:
+        return _err("invalid_input", 400)
+    try:
+        sig = await _sol_rpc("sendTransaction", [signed_b64, {"encoding": "base64", "skipPreflight": False, "maxRetries": 3}])
+    except Exception as e:
+        return Response(_json.dumps({"error": str(e)[:200]}), status_code=400, media_type="application/json")
+    await db.trades.insert_one({"wallet": s["wallet"], "inputMint": body.get("inputMint"), "outputMint": body.get("outputMint"),
+                                "inAmount": body.get("amount"), "outAmount": body.get("outAmount"), "signature": sig,
+                                "selfSigned": True, "createdAt": datetime.now(timezone.utc).isoformat()})
+    return {"ok": True, "signature": sig}
+
+
 @auth_router.get("/wallet/trades")
 async def wallet_trades(request: Request):
     s = await _session_user(request)
