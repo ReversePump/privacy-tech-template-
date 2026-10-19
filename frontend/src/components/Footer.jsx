@@ -3,34 +3,26 @@ import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-black/5 mt-20">
-      <div className="mx-auto max-w-[1440px] px-4 md:px-8 py-10">
-        <div className="flex flex-wrap items-start justify-between gap-8">
+    <footer className="mt-24 border-t border-[#12121414]" data-testid="footer">
+      <div className="mx-auto max-w-[1200px] px-4 md:px-6 py-12">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-8">
           <div>
-            <div className="flex items-center gap-2.5">
-              <img src="/logo.png" alt="MakeMarkets" className="h-8 w-auto" style={{ imageRendering: "pixelated" }} />
-              <span className="text-[17px] font-medium tracking-tight text-[#131a0f]">Make<span className="text-[#3F9E00]">Markets</span></span>
-            </div>
-            <p className="mt-3 max-w-sm text-[13px] font-light leading-relaxed text-[#93a184]">
-              Market makers for every coin. They buy the dips, sell the rips, and run on the coin's own fees. Market making can lose money.
+            <div className="serif text-2xl font-medium">Weft<span className="text-[#2b59ff]">.</span></div>
+            <p className="mt-2 max-w-xs text-[13px] text-[#75777d]">
+              Trade the thesis. Write a market view in plain English; it becomes rules you can read, traded from your own account.
             </p>
           </div>
-          <div className="flex gap-14 font-mono text-xs">
-            <div className="flex flex-col gap-2.5">
-              <span className="uppercase tracking-[0.15em] text-[#93a184]">Platform</span>
-              <Link className="text-[#5c6b50] hover:text-[#3F9E00]" to="/explore">Explore</Link>
-              <Link className="text-[#5c6b50] hover:text-[#3F9E00]" to="/launch">Launch</Link>
-              <Link className="text-[#5c6b50] hover:text-[#3F9E00]" to="/mm">Onboard a coin</Link>
-              <Link className="text-[#5c6b50] hover:text-[#3F9E00]" to="/live">Live</Link>
-            </div>
-            <div className="flex flex-col gap-2.5">
-              <span className="uppercase tracking-[0.15em] text-[#93a184]">Learn</span>
-              <Link className="text-[#5c6b50] hover:text-[#3F9E00]" to="/docs">Docs</Link>
-            </div>
+          <div className="grid grid-cols-2 gap-x-16 gap-y-2 text-[13px]">
+            <Link to="/new" className="text-[#75777d] hover:text-[#121214]">New strategy</Link>
+            <Link to="/strategies" className="text-[#75777d] hover:text-[#121214]">Strategies</Link>
+            <Link to="/traders" className="text-[#75777d] hover:text-[#121214]">Traders</Link>
+            <Link to="/leaderboard" className="text-[#75777d] hover:text-[#121214]">Leaderboard</Link>
+            <Link to="/revenue" className="text-[#75777d] hover:text-[#121214]">Revenue</Link>
+            <a href="https://x.com/weftfinance" target="_blank" rel="noopener noreferrer" className="text-[#75777d] hover:text-[#121214]">@weftfinance</a>
           </div>
         </div>
-        <div className="mt-10 border-t border-black/5 pt-5 font-mono text-[11px] text-[#93a184]">
-          All wallets public · a maker's wallets never fill each other · market making can lose money
+        <div className="mt-10 border-t border-[#12121414] pt-6 text-[11px] text-[#75777d] leading-relaxed">
+          Not financial advice. Trading involves risk, including loss of principal. Past backtests do not guarantee future results.
         </div>
       </div>
     </footer>

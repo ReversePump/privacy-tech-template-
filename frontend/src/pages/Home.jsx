@@ -1,291 +1,339 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Rocket, Plus } from "lucide-react";
-import { makers } from "../lib/api";
-import { fmtSol, fmtUsd, fmtNum, lamportsToSol, solscanTx, short } from "../lib/format";
-import { Panel, KindPill, CoinAvatar, Loading, ExtLink } from "../components/bits";
-import { useOurDesks, feedItemBlocked, listBlocked, PLATFORM_MINT } from "../lib/useOurDesks";
-import { maskCoin, useMarketsMcap } from "../lib/alias";
+import { ArrowRight, ShieldCheck, Wallet, BellRing, CircleStop, Eye } from "lucide-react";
+import { weft } from "../lib/api";
+import { fmtUsd0, fmtUsd, fmtNum } from "../lib/format";
+import { Panel, Stat, Tag, CoinIcon, Loading } from "../components/bits";
+import StrategyCard from "../components/StrategyCard";
 
-function HeroActivity({ ourIds, hasOurs }) {
-  const [items, setItems] = useState(null);
-  const [oursRec, setOursRec] = useState({ desks: [], launches: [] });
+const WATCHES = [
+  ["Prices", "ETH breaks $2,600", "Long ETH 5x with $50 if ETH breaks $2,600. 20% stop."],
+  ["Funding", "Longs pay over 0.02% an hour", "Short SOL 5x with $50 when funding stays above 0.02% an hour. 15% stop."],
+  ["Posts on X", "@elonmusk posts about Dogecoin", "If @elonmusk posts about Dogecoin, long DOGE 5x with $100. 25% stop."],
+  ["Buzz on X", "$SOL mentions double in an hour", "Long SOL 3x with $50 if mentions of $SOL on X double in an hour and the mood is bullish."],
+  ["Wallets", "A wallet you follow buys a token, and you buy too", null],
+  ["Hyperliquid traders", "A trader you copy opens a BTC long, and so do you", null],
+  ["Prediction markets", "The Spurs' title odds pass 25%, and you buy YES", "Put $1,000 on the Spurs winning the NBA title if their odds pass 25%. Sell if the odds drop below 15%."],
+  ["News", "Three negative Solana headlines in an hour", "Short SOL 3x with $50 if there are 3 or more negative news headlines about Solana in an hour."],
+  ["Fear & Greed", "The index falls to 20", "If the Fear & Greed index reaches 20, open a 20x long on ETH and a 20x long on BTC with $100 on each."],
+  ["Rates and the economy", "The 2-year yield drops 10 bp in 5 days", "Long BTC 2x with $100 if the US 2-year yield falls 10 bp in 5 days."],
+  ["Weather", "Chicago gets 5°C colder next week", "Long natural gas 2x with $100 if Chicago is forecast to be 5°C colder next week than this week. Stop at -10% on the position."],
+  ["Sports results", "The Spurs win 10 of their first 15 games", "If the Spurs win at least 10 of their first 15 games and their title odds pass 25%, put $1,000 on them winning the NBA title. Sell if the odds drop below 15%."],
+];
 
-  useEffect(() => {
-    const load = () =>
-      Promise.all([
-        fetch(`${process.env.REACT_APP_BACKEND_URL}/api/our/desks`).then((r) => r.json()).catch(() => ({})),
-        fetch(`${process.env.REACT_APP_BACKEND_URL}/api/our/launches`).then((r) => r.json()).catch(() => ({})),
-      ]).then(([d, l]) => setOursRec({ desks: d.desks || [], launches: l.launches || [] }));
-    load();
-    const t = setInterval(load, 30000);
-    return () => clearInterval(t);
-  }, []);
+const TRADES = [
+  { icons: ["BTC", "ETH", "HYPE"], title: "Perps", where: "Hyperliquid", text: "Crypto perpetuals on Hyperliquid, up to each market's own max leverage. Your stop is placed on Hyperliquid too." },
+  { icons: ["BTC", "ETH"], title: "BTC and ETH at 1000×", where: "Papertrade", text: "Full-speed practice on the two majors with pretend size." },
+  { icons: ["NVDA", "TSLA", "GOLD"], title: "Stocks", where: "Hyperliquid, Solana", text: "Equity perps around the clock, even when Wall Street is closed." },
+  { icons: ["OUTCOME"], title: "Prediction markets", where: "Hyperliquid", text: "Sports, elections, macro prints — traded like any other market." },
+  { icons: ["SOL", "USDC"], title: "Liquidity pools", where: "Meteora", text: "Provide liquidity with rules, not vibes." },
+  { icons: ["PUMP", "WIF", "JUP"], title: "Solana tokens", where: "Solana, Jupiter", text: "Any SPL token, swapped from your own wallet." },
+  { icons: ["ETH", "BTC"], title: "Options", where: "Coming soon", text: "Defined-risk structures on the majors." },
+];
 
-  useEffect(() => {
-    if (!hasOurs && !oursRec.launches.length) { setItems([]); return; }
-    let live = true;
-    const load = () =>
-      makers.feed(100)
-        .then((d) => {
-          if (!live) return;
-          const upstream = (d.items || []).filter((it) => ourIds.has(it.deskId) && !feedItemBlocked(it));
-          const synth = [
-            ...oursRec.launches.map((l) => ({ kind: "launch", mint: l.mint, ticker: l.ticker, imageUrl: l.imageUrl, at: l.createdAt, ours: true })),
-            ...oursRec.desks.map((dk) => ({ kind: "onboard", mint: dk.mint, ticker: dk.ticker, imageUrl: dk.imageUrl, at: dk.createdAt, ours: true })),
-          ];
-          const seen = new Set(upstream.filter((i) => i.kind === "launch" && i.mint).map((i) => i.mint));
-          setItems([...upstream, ...synth.filter((s) => !s.mint || !seen.has(s.mint))]
-            .sort((a, b) => new Date(b.at || 0) - new Date(a.at || 0)).slice(0, 9));
-        })
-        .catch(() => live && setItems([]));
-    load();
-    const t = setInterval(load, 10000);
-    return () => { live = false; clearInterval(t); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ourIds, hasOurs, oursRec]);
-  return (
-    <Panel className="w-full lg:w-[420px] shrink-0 overflow-hidden" data-testid="hero-activity-panel">
-      <div className="flex items-center justify-between border-b border-black/5 px-4 py-3">
-        <span className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.15em] text-[#3F9E00]">
-          <span className="h-1.5 w-1.5 rounded-[3px] bg-[#3F9E00] pip-blink" /> Live maker activity
-        </span>
-        <Link to="/live" className="font-mono text-[11px] uppercase tracking-wider text-[#93a184] hover:text-[#3F9E00]" data-testid="hero-all-activity-link">
-          All activity →
-        </Link>
-      </div>
-      <div>
-        {!items && <Loading label="Connecting" />}
-        {items?.map((it, i) => (
-          <div key={it.signature || i} className="flex items-center gap-3 border-b border-black/5 px-4 py-2.5 last:border-0 hover:bg-black/[0.03] transition-colors">
-            <KindPill kind={it.kind} />
-            <CoinAvatar url={it.imageUrl} name={it.ticker} size={20} className="rounded" />
-            <span className="font-mono text-xs text-[#131a0f]">${it.ticker}</span>
-            <span className="ml-auto font-mono text-xs text-[#5c6b50] tnum">
-              {it.lamports != null ? lamportsToSol(it.lamports)?.toLocaleString("en-US", { maximumFractionDigits: 3 }) : ""}
-            </span>
-            {it.signature && (
-              <ExtLink href={solscanTx(it.signature)} className="font-mono text-[10px]">{short(it.signature, 2, 2)}</ExtLink>
-            )}
-          </div>
-        ))}
-        {items && !items.length && (
-          <div className="px-6 py-10 text-center" data-testid="hero-activity-empty">
-            <div className="font-mono text-xs text-[#3F9E00]">Waiting for the first coin from this site</div>
-            <p className="mt-2 text-[11px] font-light leading-relaxed text-[#93a184]">
-              Only coins launched here — or makers added here — show up in this feed. Launch one and watch it land here the moment it finalizes on chain.
-            </p>
-            <Link to="/launch" className="mt-4 inline-flex h-8 items-center rounded-[3px] bg-[#3F9E00] px-4 text-xs font-medium text-[#131a0f] hover:bg-[#54C400]" data-testid="hero-empty-launch-btn">
-              Launch the first coin
-            </Link>
-          </div>
-        )}
-      </div>
-    </Panel>
-  );
-}
+const FAQ = [
+  ["Do I need to know how to trade?", "You need an opinion, not a trading background. Weft turns it into concrete rules and shows you each one in plain English before anything runs. Practice it with pretend money first if you like, then start it with whatever amount you like."],
+  ["Do I need a wallet or a Hyperliquid account?", "No. Sign in with email and Weft creates both for you. You can connect your own wallet instead if you prefer."],
+  ["Is the wallet Weft makes safe?", "It is a non-custodial embedded wallet. Only you hold the keys; Weft gets a trading-only agent key."],
+  ["Does Weft hold my money?", "No. Funds stay in your own Hyperliquid account or your Solana wallet. Weft can place orders and nothing else — withdrawals are blocked at the key level."],
+  ["What can it watch?", "Prices, funding, posts and buzz on X, wallets, Hyperliquid traders, prediction markets, news, Fear & Greed, macro rates, weather and sports results — mixed in one sentence if you like."],
+  ["Can I copy other traders?", "Yes. Pick a wallet or a Hyperliquid trader and mirror their entries with your own size and stop."],
+  ["What does it cost?", "Writing strategies is free. A small fee applies only when a strategy trades: 0.10% on perps, 1% on Solana swaps."],
+  ["What is $WEFT for?", "Half of every fee buys $WEFT on the open market; holders get fee discounts and a share of daily rewards. The rest is burned, so supply only shrinks."],
+  ["Can I try it without real money?", "Yes — every strategy can run on a $10,000 paper account at real prices, or as alerts only."],
+  ["Can it just alert me instead?", "Yes. Any strategy can run in alert-only mode and ping you instead of trading."],
+  ["What if Weft goes down?", "Your money never leaves your account. Open positions keep their on-exchange stops; you can always manage them directly."],
+  ["Is this financial advice?", "No. Weft executes the rules you write. You are responsible for your own trades."],
+];
 
 export default function Home() {
-  const [config, setConfig] = useState(null);
-  const { ourIds, loading } = useOurDesks();
-  const caMcap = useMarketsMcap();
-  const [liveDesks, setLiveDesks] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [strategies, setStrategies] = useState(null);
+  const [open, setOpen] = useState(0);
 
   useEffect(() => {
-    makers.config().then(setConfig).catch(() => {});
+    weft.stats().then(setStats).catch(() => {});
+    weft.strategies().then((d) => setStrategies((d.strategies || []).slice(0, 3))).catch(() => setStrategies([]));
   }, []);
-
-  useEffect(() => {
-    let live = true;
-    const load = () => makers.desks({ limit: 60 }).then((d) => live && setLiveDesks(d.desks || [])).catch(() => live && setLiveDesks([]));
-    load();
-    const t = setInterval(load, 60000);
-    return () => { live = false; clearInterval(t); };
-  }, []);
-
-  const presets = config?.presets ? Object.entries(config.presets) : [];
-  const hasOurs = ourIds.size > 0;
-  const statsReady = liveDesks !== null;
-  const desks = (liveDesks || [])
-    .filter((d) => !listBlocked(d))
-    .sort((a, b) =>
-      (ourIds.has(b.id) ? 1 : 0) - (ourIds.has(a.id) ? 1 : 0) ||
-      (b.status === "running" ? 1 : 0) - (a.status === "running" ? 1 : 0) ||
-      (Number(b.totals?.volumeLamports) || 0) - (Number(a.totals?.volumeLamports) || 0)
-    )
-    .slice(0, 9);
 
   return (
     <div data-testid="home-page">
       {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 opacity-40"
-          style={{ background: "radial-gradient(60% 50% at 70% 20%, rgba(92,225,0,0.08), transparent 70%), radial-gradient(40% 40% at 20% 80%, rgba(92,225,0,0.05), transparent 70%)" }} />
-        <div className="pointer-events-none absolute inset-0 opacity-[0.15]"
-          style={{ backgroundImage: "linear-gradient(rgba(19,26,15,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(19,26,15,0.05) 1px, transparent 1px)", backgroundSize: "56px 56px" }} />
-        <div className="relative mx-auto max-w-[1440px] px-4 md:px-8 pt-16 md:pt-24 pb-14">
-          <div className="flex flex-col lg:flex-row lg:items-start gap-10">
-            <div className="min-w-0 flex-1">
-              <div className="mb-5 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-[#5c6b50]">
-                <span className="h-1.5 w-1.5 rounded-[3px] bg-[#3F9E00] pip-blink" />
-                Market makers for memecoins · bonding curve native · Solana
-              </div>
-              <h1 className="text-[44px] leading-[0.98] md:text-[76px] font-medium tracking-tighter text-[#131a0f]" data-testid="hero-headline">
-                your coin, with a<br /><em className="font-serif italic text-[#3F9E00]">market maker</em> built in.
-              </h1>
-              <p className="mt-6 max-w-md text-base md:text-lg font-light leading-relaxed text-[#5c6b50]">
-                it buys the dips, it sells the rips<br />
-                it runs on the coin's own creator fees<br />
-                every dial stays in your hands
-              </p>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Link to="/launch" data-testid="hero-launch-btn"
-                  className="inline-flex h-11 items-center gap-2 rounded-[3px] bg-[#3F9E00] px-6 text-sm font-medium text-[#131a0f] hover:bg-[#54C400] hover:shadow-[0_0_24px_rgba(92,225,0,0.4)] transition-all">
-                  <Rocket size={15} /> Launch a coin
-                </Link>
-                <Link to="/mm" data-testid="hero-anycoin-btn"
-                  className="inline-flex h-11 items-center gap-2 rounded-[3px] border border-black/15 px-6 text-sm text-[#131a0f] hover:border-[#3F9E00]/40 hover:text-[#3F9E00] transition-colors">
-                  <Plus size={15} /> Onboard an existing coin
-                </Link>
-              </div>
+      <section className="dotgrid border-b border-[#12121414]">
+        <div className="mx-auto max-w-[1200px] px-4 md:px-6 pt-16 md:pt-24 pb-14">
+          <div className="max-w-3xl">
+            <h1 className="serif text-5xl md:text-7xl font-light tracking-tight leading-[1.02]" data-testid="hero-title">
+              Trade the <span className="italic text-[#2b59ff]">thesis.</span>
+            </h1>
+            <p className="mt-6 max-w-xl text-[15px] leading-relaxed text-[#75777d]">
+              From “buy $50 of ETH” to “if this account posts, this wallet buys and funding is low, go long.”
+              Weft turns your words into rules you can read and trades them from your own wallet.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link to="/new" data-testid="hero-start-btn" className="inline-flex h-11 items-center gap-2 rounded-full bg-[#121214] px-6 text-sm font-medium text-white hover:bg-[#2b59ff] transition-colors">
+                Start trading <ArrowRight size={15} />
+              </Link>
+              <a href="#demo" data-testid="hero-demo-btn" className="inline-flex h-11 items-center rounded-full border border-[#12121414] bg-white px-6 text-sm text-[#121214] hover:border-[#12121433] transition-colors">
+                See it work
+              </a>
             </div>
-            <HeroActivity ourIds={ourIds} hasOurs={hasOurs && !loading} />
+            <p className="mt-4 mono text-[11px] text-[#75777d]">No wallet or Hyperliquid account needed: sign in with email and Weft makes them for you.</p>
+          </div>
+
+          {/* live stat strip */}
+          <Panel className="mt-14 grid grid-cols-2 md:grid-cols-4 divide-x divide-[#12121414] overflow-hidden" data-testid="home-stats">
+            <Stat label="Strategies" value={stats ? fmtNum(stats.strategies) : "—"} testId="stat-strategies" />
+            <Stat label="Deployments" value={stats ? fmtNum(stats.deployments) : "—"} sub={stats ? `${fmtNum(stats.running)} running now` : ""} testId="stat-deployments" />
+            <Stat label="Volume traded" value={stats ? fmtUsd0(stats.volumeUsd) : "—"} testId="stat-volume" />
+            <Stat label="Fills" value={stats ? fmtNum(stats.fills) : "—"} testId="stat-fills" />
+          </Panel>
+        </div>
+      </section>
+
+      {/* RULES DEMO */}
+      <section id="demo" className="mx-auto max-w-[1200px] px-4 md:px-6 py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+          <div>
+            <h2 className="serif text-3xl md:text-4xl font-light tracking-tight">Say it once. <span className="italic">Weft watches the market for you.</span></h2>
+            <p className="mt-4 text-[14px] leading-relaxed text-[#75777d]">
+              Type the trade the way you'd say it, with one condition or five: a price, a post on X, a wallet, the mood of the market.
+              Each part becomes a rule. Weft checks them every 15 to 30 seconds, day and night, and places the order once all of them hold.
+            </p>
+            <Link to="/new" className="mt-6 inline-flex items-center gap-1.5 text-[13px] font-medium text-[#2b59ff] hover:underline">
+              Write your own <ArrowRight size={13} />
+            </Link>
+          </div>
+          <Panel className="p-6 fadeup" data-testid="demo-card">
+            <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#75777d]">New strategy · your idea</div>
+            <p className="mt-3 serif text-lg italic">“Long ETH at 20× with $50 — when price is above $2,600 and funding is under 0.01% an hour.”</p>
+            <div className="mt-5 space-y-2 text-[13px]">
+              <div className="flex items-center gap-2"><Tag tone="accent">when</Tag> ETH price above $2,600</div>
+              <div className="flex items-center gap-2"><Tag tone="accent">when</Tag> funding under 0.01% / h</div>
+              <div className="flex items-center gap-2"><Tag tone="long">do</Tag> Long ETH 20× · $50 · stop −20%</div>
+            </div>
+            <div className="mt-5 border-t border-[#12121414] pt-4 flex items-center gap-2 mono text-[10px] text-[#75777d]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#0b9466] pulse-dot" /> checks every 15 s · Hyperliquid
+            </div>
+          </Panel>
+        </div>
+      </section>
+
+      {/* WHAT IT TRADES */}
+      <section className="border-t border-[#12121414] bg-white">
+        <div className="mx-auto max-w-[1200px] px-4 md:px-6 py-20">
+          <h2 className="serif text-3xl md:text-4xl font-light tracking-tight">What it can trade</h2>
+          <p className="mt-3 text-[14px] text-[#75777d]">You name the market. Weft knows where it trades and sends the order there.</p>
+          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="trades-grid">
+            {TRADES.map((t) => (
+              <Panel key={t.title} className="p-5">
+                <div className="flex items-center gap-1.5">{t.icons.map((i) => <CoinIcon key={i} symbol={i} size={24} />)}</div>
+                <h3 className="mt-3 text-[15px] font-medium">{t.title}</h3>
+                <div className="mono text-[10px] uppercase tracking-wider text-[#2b59ff]">{t.where}</div>
+                <p className="mt-2 text-[12.5px] leading-relaxed text-[#75777d]">{t.text}</p>
+              </Panel>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* LIVE MAKERS — this site's coins only */}
-      <section className="mx-auto max-w-[1440px] px-4 md:px-8 mt-16" data-testid="home-makers">
-        <div className="mb-6 flex items-end justify-between">
-          <h2 className="text-2xl md:text-3xl font-medium tracking-tight text-[#131a0f]">
-            Market makers <em className="font-serif italic text-[#3F9E00]">live now.</em>
-          </h2>
-          <Link to="/explore" className="font-mono text-xs uppercase tracking-wider text-[#5c6b50] hover:text-[#3F9E00]" data-testid="home-explore-link">
-            Explore all →
-          </Link>
-        </div>
-        {statsReady && !desks.length && (
-          <Panel className="px-6 py-14 text-center" data-testid="home-makers-empty">
-            <div className="font-mono text-xs uppercase tracking-[0.15em] text-[#3F9E00]">No coins from this site yet</div>
-            <p className="mx-auto mt-3 max-w-md text-[13px] font-light leading-relaxed text-[#5c6b50]">
-              This board only lists coins launched through this site or makers added through this site. Be the first — it shows up here the moment it lands on chain.
-            </p>
-            <div className="mt-6 flex justify-center gap-3">
-              <Link to="/launch" className="inline-flex h-10 items-center gap-2 rounded-[3px] bg-[#3F9E00] px-5 text-sm font-medium text-[#131a0f] hover:bg-[#54C400]" data-testid="makers-empty-launch-btn">
-                <Rocket size={14} /> Launch a coin
+      {/* WHAT IT WATCHES */}
+      <section className="mx-auto max-w-[1200px] px-4 md:px-6 py-20">
+        <h2 className="serif text-3xl md:text-4xl font-light tracking-tight">What it watches</h2>
+        <p className="mt-3 text-[14px] text-[#75777d]">Any of these can be a condition, and one sentence can mix as many as you like. Pick one to try it.</p>
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="watches-grid">
+          {WATCHES.map(([title, example, thesis]) => (
+            thesis ? (
+              <Link key={title} to={`/new?thesis=${encodeURIComponent(thesis)}`}>
+                <Panel className="group h-full p-5 hover:border-[#12121426] transition-colors">
+                  <div className="text-[14px] font-medium">{title}</div>
+                  <p className="mt-1.5 text-[12.5px] text-[#75777d]">“{example}”</p>
+                  <span className="mt-3 inline-flex items-center gap-1 text-[12px] text-[#2b59ff] group-hover:underline">Try it <ArrowRight size={12} /></span>
+                </Panel>
               </Link>
-              <Link to="/mm" className="inline-flex h-10 items-center gap-2 rounded-[3px] border border-black/15 px-5 text-sm text-[#131a0f] hover:border-[#3F9E00]/40 hover:text-[#3F9E00]" data-testid="makers-empty-mm-btn">
-                <Plus size={14} /> Add a maker
+            ) : (
+              <Link key={title} to="/new">
+                <Panel className="group h-full p-5 hover:border-[#12121426] transition-colors">
+                  <div className="text-[14px] font-medium">{title}</div>
+                  <p className="mt-1.5 text-[12.5px] text-[#75777d]">“{example}”</p>
+                  <span className="mt-3 inline-flex items-center gap-1 text-[12px] text-[#2b59ff] group-hover:underline">Try it <ArrowRight size={12} /></span>
+                </Panel>
               </Link>
-            </div>
-          </Panel>
-        )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {!statsReady && <Loading label="Loading makers" />}
-          {desks?.map((d) => {
-            const mk = maskCoin(d, ourIds.has(d.id), PLATFORM_MINT);
-            return (
-            <Link key={d.id} to={`/desk/${d.id}`} data-testid={`home-desk-${mk.ticker}`}>
-              <Panel className="group h-full p-5 hover:border-[#3F9E00]/30 hover:-translate-y-0.5 transition-all">
-                <div className="flex items-center gap-3">
-                  <CoinAvatar url={mk.imageUrl} name={mk.name} size={40} />
-                  <div className="min-w-0">
-                    <div className="truncate text-[#131a0f] group-hover:text-[#3F9E00] transition-colors">{mk.name}</div>
-                    <div className="font-mono text-[11px] text-[#93a184]">${mk.ticker}</div>
-                  </div>
-                  <span className={`ml-auto h-1.5 w-1.5 rounded-[3px] ${d.status === "running" ? "bg-[#38c973] pip-blink" : "bg-[#556b82]"}`} />
-                </div>
-                <div className="mt-4 grid grid-cols-3 gap-2 font-mono text-xs">
-                  <div>
-                    <div className="text-[9px] uppercase tracking-wider text-[#93a184]">Mcap</div>
-                    <div className="mt-0.5 text-[#131a0f] tnum">{fmtUsd(d.mint === PLATFORM_MINT && caMcap != null ? caMcap : d.market?.mcapUsd)}</div>
-                  </div>
-                  <div>
-                    <div className="text-[9px] uppercase tracking-wider text-[#93a184]">Volume</div>
-                    <div className="mt-0.5 text-[#131a0f] tnum">{fmtSol(d.totals?.volumeLamports, 1)}</div>
-                  </div>
-                  <div>
-                    <div className="text-[9px] uppercase tracking-wider text-[#93a184]">24h trades</div>
-                    <div className="mt-0.5 text-[#131a0f] tnum">{fmtNum(d.totals?.trades24h)}</div>
-                  </div>
-                </div>
-              </Panel>
-            </Link>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* MONEY FLOW */}
-      <section className="mx-auto max-w-[1440px] px-4 md:px-8 mt-20" data-testid="home-money-flow">
-        <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-[#3F9E00]">The journey of every SOL</div>
-        <h2 className="max-w-xl text-2xl md:text-4xl font-medium tracking-tight text-[#131a0f]">
-          One signature wires the <em className="font-serif italic text-[#3F9E00]">whole maker.</em>
-        </h2>
-        <p className="mt-3 max-w-2xl text-sm font-light text-[#5c6b50]">
-          From then on the vault collects fees, feeds the trading wallets and settles up with you — on its own.
-        </p>
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            ["Your wallet", "Approves the launch. SOL only ever flows out to you — plus a fixed 20% profit cut that gets torched forever.", "YOU"],
-            ["The maker's vault", "Holds the market maker's capital and your pending payouts. Claims the coin's fees by itself.", "VAULT"],
-            ["Trading wallets", "One to ten of them, each running its own book and price lines. All public, all on-chain.", "WALLETS"],
-            ["The coin's market", "Buys below its reference lines, sells above entry. Bonding curve first, then its liquidity pool.", "THE CURVE"],
-          ].map(([t, b, k], i) => (
-            <Panel key={t} className="p-5 hover:border-[#3F9E00]/25 transition-colors">
-              <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#93a184]">{String(i + 1).padStart(2, "0")} · {k}</div>
-              <div className="mt-3 text-[#131a0f] font-medium">{t}</div>
-              <p className="mt-2 text-[13px] font-light leading-relaxed text-[#5c6b50]">{b}</p>
-            </Panel>
+            )
           ))}
         </div>
       </section>
 
-      {/* PRESETS */}
-      {presets.length > 0 && (
-        <section className="mx-auto max-w-[1440px] px-4 md:px-8 mt-20" data-testid="home-presets">
-          <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-[#3F9E00]">Temperament</div>
-          <h2 className="text-2xl md:text-4xl font-medium tracking-tight text-[#131a0f]">
-            Pick a temperament. <em className="font-serif italic text-[#3F9E00]">Retune it anytime.</em>
-          </h2>
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {presets.map(([key, p]) => (
-              <Panel key={key} className="p-5">
-                <div className="text-[#131a0f] font-medium">{p.name}</div>
-                <p className="mt-1.5 text-[12px] font-light text-[#5c6b50]">{p.summary}</p>
-                <div className="mt-4 grid grid-cols-3 gap-2 border-t border-black/5 pt-3 font-mono text-[11px]">
-                  <div><div className="text-[9px] uppercase text-[#93a184]">Buy dips</div><div className="text-[#3F9E00]">{p.values.buyTriggerPct}%</div></div>
-                  <div><div className="text-[9px] uppercase text-[#93a184]">Sell rises</div><div className="text-[#3F9E00]">{p.values.sellTriggerPct}%</div></div>
-                  <div><div className="text-[9px] uppercase text-[#93a184]">Stop-loss</div><div className="text-[#3F9E00]">{p.values.stopLossPct ?? "off"}%</div></div>
-                </div>
-              </Panel>
+      {/* SECURITY */}
+      <section className="border-t border-[#12121414] bg-white">
+        <div className="mx-auto max-w-[1200px] px-4 md:px-6 py-20 grid grid-cols-1 lg:grid-cols-2 gap-10">
+          <div>
+            <h2 className="serif text-3xl md:text-4xl font-light tracking-tight">It can trade. <span className="italic">It can't withdraw.</span></h2>
+            <p className="mt-4 text-[14px] leading-relaxed text-[#75777d]">
+              Your money stays in your own account, on Hyperliquid and on Solana. Weft gets a key that can trade for you, and nothing else.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Panel className="p-5">
+              <ShieldCheck size={18} className="text-[#0b9466]" />
+              <div className="mt-2 text-[13px] font-medium">The agent can</div>
+              <ul className="mt-2 space-y-1 text-[12.5px] text-[#75777d]">
+                <li>Place and cancel orders</li>
+                <li>Set stops and targets</li>
+                <li>Swap tokens inside your own wallet</li>
+              </ul>
+            </Panel>
+            <Panel className="p-5">
+              <Wallet size={18} className="text-[#c23434]" />
+              <div className="mt-2 text-[13px] font-medium">The agent can't</div>
+              <ul className="mt-2 space-y-1 text-[12.5px] text-[#75777d]">
+                <li>Withdraw your money</li>
+                <li>Send it to another address</li>
+                <li>Trade a strategy you haven't started</li>
+              </ul>
+            </Panel>
+            <Panel className="p-5 sm:col-span-2 flex items-start gap-3">
+              <Eye size={18} className="text-[#2b59ff] mt-0.5" />
+              <div className="text-[12.5px] leading-relaxed text-[#75777d]">
+                <span className="text-[#121214] font-medium">Practice first.</span> Run any strategy with $10,000 of pretend money at real prices, or as alerts only. No money moves until you start it for real. Your amount, your stop. Hold the stop button and everything closes right away.
+              </div>
+            </Panel>
+          </div>
+        </div>
+      </section>
+
+      {/* STRATEGIES PREVIEW */}
+      <section className="mx-auto max-w-[1200px] px-4 md:px-6 py-20">
+        <div className="flex items-end justify-between">
+          <div>
+            <h2 className="serif text-3xl md:text-4xl font-light tracking-tight">Start from someone else's strategy</h2>
+            <p className="mt-3 max-w-lg text-[14px] text-[#75777d]">Saved strategies are public, with no names attached. Open one, read exactly what it does and change what you like.</p>
+          </div>
+          <Link to="/strategies" className="hidden sm:inline-flex items-center gap-1.5 text-[13px] font-medium text-[#2b59ff] hover:underline" data-testid="home-browse-strategies">
+            Browse all strategies <ArrowRight size={13} />
+          </Link>
+        </div>
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4" data-testid="home-strategies">
+          {!strategies && <Loading label="Loading strategies" />}
+          {strategies?.map((s) => <StrategyCard key={s.strategy?.id || s.id} entry={s} />)}
+        </div>
+      </section>
+
+      {/* TOKEN */}
+      <TokenSection />
+
+      {/* FAQ */}
+      <section className="border-t border-[#12121414]">
+        <div className="mx-auto max-w-[760px] px-4 md:px-6 py-20">
+          <h2 className="serif text-3xl md:text-4xl font-light tracking-tight">Questions</h2>
+          <div className="mt-8 divide-y divide-[#12121414]" data-testid="faq">
+            {FAQ.map(([q, a], i) => (
+              <div key={q}>
+                <button onClick={() => setOpen(open === i ? -1 : i)} className="flex w-full items-center justify-between py-4 text-left" data-testid={`faq-${i}`}>
+                  <span className="text-[14px] font-medium">{q}</span>
+                  <span className="mono text-[#75777d]">{open === i ? "−" : "+"}</span>
+                </button>
+                {open === i && <p className="pb-5 text-[13px] leading-relaxed text-[#75777d]">{a}</p>}
+              </div>
             ))}
           </div>
-        </section>
-      )}
+          <p className="mt-6 text-[13px] text-[#75777d]">Anything else? Ask us on <a href="https://x.com/weftfinance" target="_blank" rel="noopener noreferrer" className="text-[#2b59ff] hover:underline">X</a>.</p>
+        </div>
+      </section>
 
-      {/* CTA */}
-      <section className="mx-auto max-w-[1440px] px-4 md:px-8 mt-24" data-testid="home-cta">
-        <Panel className="relative overflow-hidden px-6 py-14 md:py-20 text-center">
-          <div className="pointer-events-none absolute inset-0"
-            style={{ background: "radial-gradient(50% 60% at 50% 100%, rgba(92,225,0,0.12), transparent 70%)" }} />
-          <h2 className="relative text-3xl md:text-5xl font-medium tracking-tight text-[#131a0f]">
-            Ship your coin with a <em className="font-serif italic text-[#3F9E00]">market maker</em> built in.
-          </h2>
-          <p className="relative mx-auto mt-4 max-w-lg text-sm font-light text-[#5c6b50]">
-            One approval from your wallet mints the coin, locks its fee split and funds the maker. Every dial remains yours after that.
-          </p>
-          <div className="relative mt-8 flex justify-center gap-3">
-            <Link to="/launch" data-testid="cta-launch-btn"
-              className="inline-flex h-11 items-center gap-2 rounded-[3px] bg-[#3F9E00] px-6 text-sm font-medium text-[#131a0f] hover:bg-[#54C400] hover:shadow-[0_0_24px_rgba(92,225,0,0.4)] transition-all">
-              <Rocket size={15} /> Launch a coin
-            </Link>
-            <Link to="/docs" className="inline-flex h-11 items-center gap-2 rounded-[3px] border border-black/15 px-6 text-sm text-[#131a0f] hover:border-[#3F9E00]/40 hover:text-[#3F9E00] transition-colors" data-testid="cta-docs-btn">
-              Read the docs
-            </Link>
+      {/* BOTTOM CTA */}
+      <section className="border-t border-[#12121414] bg-white">
+        <div className="mx-auto max-w-[1200px] px-4 md:px-6 py-20 text-center">
+          <h2 className="serif text-4xl md:text-5xl font-light tracking-tight">What's your <span className="italic text-[#2b59ff]">thesis?</span></h2>
+          <div className="mt-6 flex flex-wrap justify-center gap-2">
+            {["Buy $50 of ETH now", "If @elonmusk posts about Dogecoin, long DOGE 5x with $100", "Long BTC and ETH 20x with $100 each if Fear & Greed drops to 20"].map((t) => (
+              <Link key={t} to={`/new?thesis=${encodeURIComponent(t)}`} className="rounded-full border border-[#12121414] bg-[#faf9f7] px-4 py-2 text-[12.5px] hover:border-[#2b59ff] hover:text-[#2b59ff] transition-colors">
+                {t}
+              </Link>
+            ))}
           </div>
-        </Panel>
+          <p className="mt-6 mono text-[11px] text-[#75777d]">Free to write. A small fee only when it trades.</p>
+        </div>
       </section>
     </div>
+  );
+}
+
+function TokenSection() {
+  const [rev, setRev] = useState(null);
+  const [rewards, setRewards] = useState(null);
+  useEffect(() => {
+    weft.revenue().then(setRev).catch(() => {});
+    weft.rewards().then(setRewards).catch(() => {});
+  }, []);
+  const CA = "HqmFi85adLD8BQA7en1HfajdAfzVFps5REgQaYuw6Ax8";
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    navigator.clipboard?.writeText(CA);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+  return (
+    <section className="border-t border-[#12121414] bg-white" id="token">
+      <div className="mx-auto max-w-[1200px] px-4 md:px-6 py-20">
+        <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#75777d]">The $WEFT token</div>
+        <h2 className="mt-3 serif text-3xl md:text-4xl font-light tracking-tight max-w-2xl">
+          You trade a small fee. <span className="italic text-[#2b59ff]">$WEFT gets bought back.</span>
+        </h2>
+        <p className="mt-4 max-w-2xl text-[14px] leading-relaxed text-[#75777d]">
+          Weft buys $WEFT on the open market in small amounts about every ten minutes, around the clock: with half of every fee it earns, and 0.4% of every $WEFT trade. Then it goes back to the people who use Weft — traders, strategy creators — and the rest is burned.
+        </p>
+
+        <Panel className="mt-8 p-5 flex flex-wrap items-center gap-3" data-testid="weft-ca">
+          <span className="mono text-[10px] uppercase tracking-wider text-[#75777d]">$WEFT contract address · the only official one</span>
+          <button onClick={copy} className="mono text-[12px] text-[#121214] hover:text-[#2b59ff] transition-colors" data-testid="weft-ca-copy">
+            {copied ? "Copied" : CA}
+          </button>
+          <span className="flex gap-3 ml-auto text-[12px]">
+            <a className="text-[#2b59ff] hover:underline" href={`https://solscan.io/token/${CA}`} target="_blank" rel="noopener noreferrer">Solscan ↗</a>
+            <a className="text-[#2b59ff] hover:underline" href={`https://dexscreener.com/solana/${CA}`} target="_blank" rel="noopener noreferrer">DexScreener ↗</a>
+            <a className="text-[#2b59ff] hover:underline" href={`https://jup.ag/tokens/${CA}`} target="_blank" rel="noopener noreferrer">Jupiter ↗</a>
+          </span>
+        </Panel>
+
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Panel className="p-5">
+            <div className="mono text-[10px] uppercase tracking-wider text-[#75777d]">50% · back to traders</div>
+            <p className="mt-2 text-[12.5px] text-[#75777d]">Shared out every day. Your share is the fees you paid that day.</p>
+            <div className="mt-3 text-lg font-medium tnum" data-testid="weft-trader-share">{rev ? fmtUsd(rev.buybackUsd * 0.5) : "—"}</div>
+          </Panel>
+          <Panel className="p-5">
+            <div className="mono text-[10px] uppercase tracking-wider text-[#75777d]">20% · to creators</div>
+            <p className="mt-2 text-[12.5px] text-[#75777d]">Publish a strategy. When other people run it, you earn from the fees their runs pay.</p>
+            <div className="mt-3 text-lg font-medium tnum">{rev ? fmtUsd(rev.buybackUsd * 0.2) : "—"}</div>
+          </Panel>
+          <Panel className="p-5">
+            <div className="mono text-[10px] uppercase tracking-wider text-[#75777d]">30% · burned</div>
+            <p className="mt-2 text-[12.5px] text-[#75777d]">Burned the moment it's bought. No team allocation, nothing new is ever minted — supply only shrinks.</p>
+            <div className="mt-3 text-lg font-medium tnum">{rev ? fmtUsd(rev.buybackUsd * 0.3) : "—"}</div>
+          </Panel>
+        </div>
+
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Panel className="p-5">
+            <div className="text-[14px] font-medium">Holder · from 100,000 $WEFT</div>
+            <p className="mt-1.5 text-[13px] text-[#75777d]">25% off every trade, plus 1.5× rewards and 100 AI drafts a day.</p>
+          </Panel>
+          <Panel className="p-5">
+            <div className="text-[14px] font-medium">Whale · from 1,000,000 $WEFT</div>
+            <p className="mt-1.5 text-[13px] text-[#75777d]">50% off every trade, plus 2× rewards and 100 AI drafts a day.</p>
+          </Panel>
+        </div>
+
+        <div className="mt-8 flex flex-wrap gap-x-8 gap-y-2 mono text-[11px] text-[#75777d]">
+          <span>Fee on Hyperliquid: 0.10% perps · 1% spot sales</span>
+          <span>Fee on Solana swaps: 1%</span>
+          <span>Trading $WEFT: 3% (2% Weft · 0.4% buyback · 0.6% Meteora)</span>
+        </div>
+        <p className="mt-4 text-[12px] text-[#75777d]">
+          Every fee, buyback, burn and reward is on the <Link to="/revenue" className="text-[#2b59ff] hover:underline">Revenue page</Link>. Any other token calling itself $WEFT is fake.
+          {rewards?.paused ? <span className="ml-2 mono text-[10px] uppercase tracking-wider text-[#a36507]">rewards paused</span> : null}
+        </p>
+      </div>
+    </section>
   );
 }

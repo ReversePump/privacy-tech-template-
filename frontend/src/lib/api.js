@@ -1,92 +1,59 @@
-const BASE = `${process.env.REACT_APP_BACKEND_URL}/api/relay`;
+const BASE = process.env.REACT_APP_BACKEND_URL;
 
-export class ApiError extends Error {
-  constructor(status, code, message, field) {
-    super(message || "Request failed");
-    this.name = "ApiError";
-    this.status = status;
-    this.code = code;
-    this.field = field;
-  }
-}
-
-const TOKEN_KEY = "makers:session";
-export const getToken = () => localStorage.getItem(TOKEN_KEY);
-export const setToken = (t) => {
-  if (t) localStorage.setItem(TOKEN_KEY, t);
-  else localStorage.removeItem(TOKEN_KEY);
-};
-
-export async function api(path, { method = "GET", body, raw, contentType } = {}) {
-  const headers = {};
-  const tok = getToken();
-  if (tok) headers.Authorization = `Bearer ${tok}`;
-  let payload;
-  if (raw !== undefined) {
-    payload = raw;
-    if (contentType) headers["Content-Type"] = contentType;
-  } else if (body !== undefined) {
-    payload = JSON.stringify(body);
-    headers["Content-Type"] = "application/json";
-  }
-  const r = await fetch(`${BASE}${path}`, { method, headers, body: payload, cache: "no-store" });
-  const text = await r.text();
-  let data;
-  try { data = JSON.parse(text); } catch { data = text; }
+async function req(method, path, body) {
+  const r = await fetch(`${BASE}/api/relay${path}`, {
+    method,
+    headers: body !== undefined ? { "Content-Type": "application/json" } : undefined,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+  const data = await r.json().catch(() => ({}));
   if (!r.ok) {
-    throw new ApiError(r.status, data?.error, data?.message || r.statusText, data?.field);
+    const msg = typeof data?.error === "string" ? data.error : data?.message || `Request failed (${r.status})`;
+    throw new Error(msg);
   }
   return data;
 }
 
-const qs = (o) => {
-  const p = new URLSearchParams();
-  Object.entries(o || {}).forEach(([k, v]) => {
-    if (v !== undefined && v !== null && v !== "") p.set(k, v);
+// POST + SSE reader (EventSource can't POST) — yields {event, data}
+export async function* sseStream(path, body) {
+  const r = await fetch(`${BASE}/api/relay${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
   });
-  const s = p.toString();
-  return s ? `?${s}` : "";
+  if (!r.ok || !r.body) throw new Error(`Request failed (${r.status})`);
+  const reader = r.body.getReader();
+  const dec = new TextDecoder();
+  let buf = "";
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    const parts = buf.split("\n\n");
+    buf = parts.pop();
+    for (const p of parts) {
+      const m = p.match(/^event:\s*(\w+)\s*\ndata:\s*([\s\S]*)$/m);
+      if (m) {
+        try {
+          yield { event: m[1], data: JSON.parse(m[2]) };
+        } catch { /* keep-alive lines */ }
+      }
+    }
+  }
+}
+
+export const weft = {
+  stats: () => req("GET", "/stats"),
+  health: () => req("GET", "/health"),
+  strategies: () => req("GET", "/strategies"),
+  examples: () => req("GET", "/strategies/examples"),
+  traders: () => req("GET", "/traders"),
+  leaderboard: () => req("GET", "/leaderboard"),
+  revenue: () => req("GET", "/revenue"),
+  rewards: () => req("GET", "/rewards"),
+  generate: (thesis) => req("POST", "/ai/generate", { thesis }),
+  backtest: (payload) => req("POST", "/backtest", payload),
+  validate: (strategy) => req("POST", "/strategies/validate", { strategy }),
 };
 
-export const makers = {
-  config: () => api("/config"),
-  stats: () => api("/stats"),
-  native: () => api("/native"),
-  desks: (opts) => api(`/desks${qs(opts)}`),
-  desk: (id) => api(`/desks/${encodeURIComponent(id)}`),
-  trades: (id, before) => api(`/desks/${encodeURIComponent(id)}/trades${qs({ before })}`),
-  chart: (id, range) => api(`/desks/${encodeURIComponent(id)}/chart${qs({ range })}`),
-  feed: (limit, kind) => api(`/feed${qs({ limit, kind })}`),
-  burns: () => api("/burns"),
-  crown: () => api("/crown"),
-  crownPrepare: (body) => api("/crown/prepare", { method: "POST", body }),
-  crownSubmit: (mint, signedTransaction) =>
-    api(`/crown/${encodeURIComponent(mint)}/submit`, { method: "POST", body: { signedTransaction } }),
-  myDesks: () => api("/me/desks"),
-  checkCoin: (mint) => api(`/coins/${encodeURIComponent(mint)}/check`),
-  createDesk: (mint, settings) => api("/desks", { method: "POST", body: { mint, settings } }),
-  approval: (id, action, change) =>
-    api(`/desks/${encodeURIComponent(id)}/approvals`, {
-      method: "POST",
-      body: change === undefined ? { action } : { action, change },
-    }),
-  updateSettings: (id, settings) =>
-    api(`/desks/${encodeURIComponent(id)}/settings`, { method: "PATCH", body: settings }),
-  pause: (id) => api(`/desks/${encodeURIComponent(id)}/pause`, { method: "POST" }),
-  resume: (id) => api(`/desks/${encodeURIComponent(id)}/resume`, { method: "POST" }),
-  withdraw: (id, kind, extra) =>
-    api(`/desks/${encodeURIComponent(id)}/withdraw`, { method: "POST", body: { kind, ...(extra || {}) } }),
-  liquidate: (id) => api(`/desks/${encodeURIComponent(id)}/liquidate`, { method: "POST" }),
-  closeDesk: (id) => api(`/desks/${encodeURIComponent(id)}/close`, { method: "POST" }),
-  uploadImage: (blob) => api("/images", { method: "POST", raw: blob, contentType: blob.type || "application/octet-stream" }),
-  createLaunch: (body) => api("/launches", { method: "POST", body }),
-  prepareLaunch: (id) => api(`/launches/${encodeURIComponent(id)}/prepare`, { method: "POST" }),
-  submitLaunch: (id, signedTransaction) =>
-    api(`/launches/${encodeURIComponent(id)}/submit`, { method: "POST", body: { signedTransaction } }),
-  challenge: (wallet) => api("/auth/challenge", { method: "POST", body: { wallet } }),
-  verify: (body) => api("/auth/verify", { method: "POST", body }),
-  logout: () => api("/auth/logout", { method: "POST" }),
-};
-
-export const errorMessage = (e) =>
-  e instanceof ApiError ? e.message : e instanceof Error ? e.message : String(e);
+export const errorMessage = (e) => (e instanceof Error ? e.message : String(e));

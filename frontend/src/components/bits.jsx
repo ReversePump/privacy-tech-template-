@@ -1,154 +1,84 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Loader2 } from "lucide-react";
-import { smallPrice, subDigit } from "../lib/format";
-import { useOurDesks } from "../lib/useOurDesks";
 
 export const Panel = ({ className = "", children, ...rest }) => (
-  <div className={`rounded-xl border border-black/10 bg-black/[0.04] backdrop-blur-xl ${className}`} {...rest}>
-    {children}
-  </div>
+  <div className={`panel ${className}`} {...rest}>{children}</div>
 );
 
-export const Stat = ({ label, value, sub, testId }) => (
-  <div className="px-4 py-3 md:px-5 md:py-4" data-testid={testId}>
-    <div className="text-[10px] uppercase tracking-[0.14em] text-[#93a184] font-mono">{label}</div>
-    <div className="mt-1 font-mono text-base md:text-lg text-[#131a0f] tnum">{value}</div>
-    {sub && <div className="mt-0.5 text-[11px] text-[#93a184] font-mono">{sub}</div>}
-  </div>
-);
-
-export const StatRow = ({ children, className = "" }) => (
-  <Panel className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-${Math.min(children.length, 7)} divide-x divide-black/5 overflow-hidden ${className}`}>
-    {children}
-  </Panel>
-);
-
-export const CoinAvatar = ({ url, name, size = 32, className = "" }) => {
-  const [err, setErr] = React.useState(false);
-  if (!url || err) {
-    return (
-      <div
-        className={`flex items-center justify-center rounded-lg bg-[#3F9E00]/10 border border-[#3F9E00]/20 text-[#3F9E00] font-mono ${className}`}
-        style={{ width: size, height: size, fontSize: size * 0.4 }}
-      >
-        {(name || "?").slice(0, 1).toUpperCase()}
-      </div>
-    );
-  }
-  return (
-    <img
-      src={url}
-      alt={name || "coin"}
-      width={size}
-      height={size}
-      loading="lazy"
-      onError={() => setErr(true)}
-      className={`rounded-lg object-cover border border-black/10 ${className}`}
-      style={{ width: size, height: size }}
-    />
-  );
-};
-
-export const SubPrice = ({ value, prefix = "", className = "" }) => {
-  const p = smallPrice(value);
-  return (
-    <span className={`font-mono tnum ${className}`}>
-      {prefix}
-      {p.head}
-      {p.zeros > 0 && <sub className="text-[0.65em] text-[#5c6b50]">{p.zeros}</sub>}
-      {p.tail}
-    </span>
-  );
-};
-
-export const KindPill = ({ kind }) => {
-  const map = {
-    buy: ["Buy", "text-[#38c973]", "▲"],
-    sell: ["Sell", "text-[#ff4d4f]", "▼"],
-    claim: ["Claim", "text-[#3F9E00]", "◆"],
-    payout: ["Payout", "text-[#c8a24a]", "⭱"],
-    launch: ["Launch", "text-[#131a0f]", "✦"],
-    onboard: ["Onboard", "text-[#131a0f]", "✚"],
-  };
-  const [label, color, icon] = map[kind] || [kind, "text-[#5c6b50]", "•"];
-  return (
-    <span className={`inline-flex items-center gap-1.5 font-mono text-xs ${color}`}>
-      <span className="text-[9px]">{icon}</span>
-      {label}
-    </span>
-  );
-};
-
-export const ExtLink = ({ href, children, className = "", ...rest }) => (
-  <a
-    href={href}
-    target="_blank"
-    rel="noopener noreferrer"
-    className={`inline-flex items-center gap-1 text-[#5c6b50] hover:text-[#3F9E00] transition-colors ${className}`}
-    {...rest}
-  >
-    {children}
-    <ArrowUpRight size={12} />
+export const ExtLink = ({ href, className = "", children }) => (
+  <a href={href} target="_blank" rel="noopener noreferrer"
+    className={`inline-flex items-center gap-1 text-[#2b59ff] hover:underline ${className}`}>
+    {children} <ArrowUpRight size={12} />
   </a>
 );
 
 export const Loading = ({ label = "Loading" }) => (
-  <div className="flex items-center gap-2 py-10 justify-center text-[#93a184] font-mono text-sm" data-testid="loading">
-    <Loader2 size={16} className="animate-spin" />
-    {label}…
+  <div className="flex items-center justify-center gap-2 py-16 text-[#75777d]">
+    <Loader2 className="animate-spin" size={16} />
+    <span className="mono text-xs uppercase tracking-wider">{label}</span>
   </div>
 );
 
 export const Empty = ({ children }) => (
-  <div className="py-10 text-center text-[#93a184] font-mono text-sm" data-testid="empty-state">{children}</div>
+  <div className="py-14 text-center text-sm text-[#75777d]">{children}</div>
 );
 
-export const PageHead = ({ kicker, title, accent, sub, right }) => (
-  <div className="mb-8 md:mb-10">
-    {kicker && (
-      <div className="mb-3 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-[#3F9E00]">
-        <span className="inline-block h-1.5 w-1.5 rounded-[3px] bg-[#3F9E00] pip-blink" />
-        {kicker}
-      </div>
-    )}
-    <div className="flex flex-wrap items-end justify-between gap-4">
-      <h1 className="text-3xl md:text-5xl font-medium tracking-tight text-[#131a0f]">
-        {title} {accent && <em className="font-serif italic text-[#3F9E00]">{accent}</em>}
-      </h1>
-      {right}
-    </div>
-    {sub && <p className="mt-3 max-w-2xl text-sm md:text-base text-[#5c6b50] font-light leading-relaxed">{sub}</p>}
+export const Tag = ({ children, tone = "neutral" }) => {
+  const tones = {
+    neutral: "bg-[#12121408] text-[#121214] border-[#12121414]",
+    long: "bg-[#0b946614] text-[#0b9466] border-[#0b946622]",
+    short: "bg-[#d43d3d12] text-[#c23434] border-[#d43d3d22]",
+    accent: "bg-[#2b59ff10] text-[#2b59ff] border-[#2b59ff22]",
+    amber: "bg-[#d4820a12] text-[#a36507] border-[#d4820a22]",
+  };
+  return (
+    <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 mono text-[10px] uppercase tracking-wider ${tones[tone]}`}>
+      {children}
+    </span>
+  );
+};
+
+export const CoinIcon = ({ symbol, size = 20 }) => {
+  const [err, setErr] = React.useState(false);
+  if (!symbol || err) {
+    return (
+      <span className="inline-flex items-center justify-center rounded-full bg-[#12121408] mono text-[9px] text-[#75777d]"
+        style={{ width: size, height: size }}>
+        {(symbol || "?").slice(0, 2)}
+      </span>
+    );
+  }
+  return (
+    <img src={`/coins/${symbol}.svg`} alt={symbol} width={size} height={size} className="rounded-full" onError={() => setErr(true)} />
+  );
+};
+
+export const Stat = ({ label, value, sub, testId }) => (
+  <div className="px-5 py-4" data-testid={testId}>
+    <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#75777d]">{label}</div>
+    <div className="mt-1 text-xl font-medium text-[#121214] tnum">{value}</div>
+    {sub && <div className="mt-0.5 text-[11px] text-[#75777d]">{sub}</div>}
   </div>
 );
 
-export const TypeBadge = ({ desk }) => {
-  const { ourIds } = useOurDesks();
-  if (!ourIds.has(desk?.id)) return null;
-  const t = desk.origin === "launch" ? "LAUNCHED HERE" : "ONBOARDED";
+// minimal inline area chart for equity curves
+export const Sparkline = ({ points, height = 120, stroke = "#0b9466" }) => {
+  if (!points || points.length < 2) return null;
+  const w = 600, h = height;
+  const xs = points.map((p) => p.t);
+  const ys = points.map((p) => p.v);
+  const min = Math.min(...ys), max = Math.max(...ys);
+  const span = max - min || 1;
+  const sx = (t) => ((t - xs[0]) / (xs[xs.length - 1] - xs[0] || 1)) * w;
+  const sy = (v) => h - 6 - ((v - min) / span) * (h - 12);
+  const line = points.map((p, i) => `${i ? "L" : "M"}${sx(p.t).toFixed(1)},${sy(p.v).toFixed(1)}`).join(" ");
+  const last = ys[ys.length - 1];
+  const color = last >= ys[0] ? "#0b9466" : "#c23434";
   return (
-    <span className="rounded-[3px] border border-black/10 bg-black/5 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-[#5c6b50]">
-      {t}
-    </span>
+    <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ height }} preserveAspectRatio="none" data-testid="sparkline">
+      <path d={`${line} L${w},${h} L0,${h} Z`} fill={color} opacity="0.08" stroke="none" />
+      <path d={line} fill="none" stroke={stroke === "#0b9466" ? color : stroke} strokeWidth="1.6" />
+    </svg>
   );
 };
-
-export const StatusDot = ({ status }) => {
-  const live = status === "running";
-  return (
-    <span className="inline-flex items-center gap-1.5 font-mono text-xs text-[#5c6b50]">
-      <span className={`h-1.5 w-1.5 rounded-[3px] ${live ? "bg-[#38c973] pip-blink" : "bg-[#556b82]"}`} />
-      {live ? "Running" : status || "—"}
-    </span>
-  );
-};
-
-export const CoinCell = ({ imageUrl, name, ticker, id }) => (
-  <Link to={`/desk/${id}`} className="flex items-center gap-2.5 min-w-0 group" data-testid={`coin-cell-${ticker || id}`}>
-    <CoinAvatar url={imageUrl} name={name} size={28} />
-    <span className="min-w-0">
-      <span className="block truncate text-[#131a0f] group-hover:text-[#3F9E00] transition-colors text-[13px]">{name}</span>
-      <span className="block font-mono text-[11px] text-[#93a184]">${ticker}</span>
-    </span>
-  </Link>
-);
