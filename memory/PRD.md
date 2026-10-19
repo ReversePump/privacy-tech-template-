@@ -63,6 +63,9 @@ link https://x.com/loomfiai, geometric Outfit display type, LoomWeave canvas her
 - Wallet-signature sign-in path retained for users with their own Phantom/Solflare.
 - Tests: 44 backend tests pass (17 email-auth + 16 relay + 11 engine). Test agent iteration_7:
   100% frontend surfaces, zero critical issues.
+- Hero weave shows REAL live data: /api/signals/hero feeds ETH 1h change (HL candles), DOGE funding
+  (HL), Fear & Greed (alternative.me), $LOOM buy/sell ratio (DexScreener); checks evaluate honestly
+  (✓/✗) and the node only fires 'order placed' when all live conditions hold. 15s refresh.
 - Branding: **Loom / $LOOM** everywhere visible; favicon + header/footer logo from user-supplied
   knot asset (IMG_1040 828f00ac); dark purple theme across all pages (verified desktop/tablet/mobile);
   hero carries the LoomSignals convergence animation;

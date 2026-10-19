@@ -925,6 +925,31 @@ async def hl_limit_order(request: Request):
     return {"ok": True, "deployment": dep}
 
 
+@app.get("/api/signals/hero")
+async def hero_signals():
+    """Live values for the landing hero weave — real market data, cached by the engine."""
+    out = {"eth_change_1h": None, "doge_funding_1h_pct": None, "fear_greed": None, "loom_buy_sell_1h": None}
+    try:
+        m = engine._mkt
+        if m.ts:
+            out["eth_change_1h"] = await asyncio.to_thread(m.candles_change_pct, "ETH", "1h")
+            doge = m.ctxs.get("DOGE", {})
+            if doge.get("funding") is not None:
+                out["doge_funding_1h_pct"] = float(doge["funding"]) * 100
+            out["fear_greed"] = m.fear_greed
+    except Exception as e:
+        logger.warning(f"hero signals hl: {e}")
+    try:
+        d = await engine._dex_token("HqmFi85adLD8BQA7en1HfajdAfzVFps5REgQaYuw6Ax8")
+        h1 = (d or {}).get("txns", {}).get("h1") or {}
+        buys, sells = h1.get("buys", 0), h1.get("sells", 0)
+        if buys or sells:
+            out["loom_buy_sell_1h"] = (buys / sells) if sells else float(buys)
+    except Exception as e:
+        logger.warning(f"hero signals dex: {e}")
+    return out
+
+
 app.include_router(auth_router)
 
 engine.init(db, _hl, _hl_exchange)

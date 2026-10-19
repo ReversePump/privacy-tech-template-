@@ -7,22 +7,20 @@ import React, { useEffect, useMemo, useState } from "react";
  * lands, the node fires "order placed". Native SVG, unique composition.
  */
 const SIGNALS = [
-  { label: "ETH price, 1h", value: "+2.4%", check: "> 0%", color: "#94a3b8" },
-  { label: "DOGE funding, /h", value: "0.0038%", check: "< 0.01%", color: "#b6bcc9" },
-  { label: "Fear & Greed", value: "34", check: "< 40", color: "#cbd5e1" },
-  { label: "$LOOM buys/sells, 1h", value: "1.8×", check: "> 1", color: "#e2e8f0" },
+  { key: "eth_change_1h", label: "ETH price, 1h", fallback: "+2.4%", check: "> 0%", color: "#94a3b8",
+    fmt: (v) => `${v >= 0 ? "+" : ""}${v.toFixed(1)}%`, holds: (v) => v > 0 },
+  { key: "doge_funding_1h_pct", label: "DOGE funding, /h", fallback: "0.0038%", check: "< 0.01%", color: "#b6bcc9",
+    fmt: (v) => `${v.toFixed(4)}%`, holds: (v) => v < 0.01 },
+  { key: "fear_greed", label: "Fear & Greed", fallback: "34", check: "< 40", color: "#cbd5e1",
+    fmt: (v) => `${Math.round(v)}`, holds: (v) => v < 40 },
+  { key: "loom_buy_sell_1h", label: "$LOOM buys/sells, 1h", fallback: "1.8×", check: "> 1", color: "#e2e8f0",
+    fmt: (v) => `${v.toFixed(1)}×`, holds: (v) => v > 1 },
 ];
 
 const VB = { w: 760, h: 452 };
 const ROW_Y = [70, 176, 282, 388];
 const NODE = { x: 672, y: 229 };
 const WEAVE_START = 250;
-const JITTER = [
-  () => `+${(1.8 + Math.random() * 1.4).toFixed(1)}%`,
-  () => `${(0.0028 + Math.random() * 0.0024).toFixed(4)}%`,
-  () => `${Math.round(31 + Math.random() * 7)}`,
-  () => `${(1.4 + Math.random() * 0.9).toFixed(1)}×`,
-];
 
 const smooth = (t) => t * t * (3 - 2 * t);
 
@@ -55,15 +53,30 @@ function weavePath(y0, phase, color) {
 }
 
 export default function LoomSignals({ className = "" }) {
-  const [vals, setVals] = useState(SIGNALS.map((s) => s.value));
+  // live values from real market data; fallbacks show until first fetch lands
+  const [live, setLive] = useState({});
   const [fired, setFired] = useState(false);
+
+  useEffect(() => {
+    let dead = false;
+    const pull = () => fetch(`${process.env.REACT_APP_BACKEND_URL}/api/signals/hero`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d && !dead) setLive(d); })
+      .catch(() => {});
+    pull();
+    const iv = setInterval(pull, 15000);
+    return () => { dead = true; clearInterval(iv); };
+  }, []);
+
+  const rows = SIGNALS.map((s) => {
+    const v = live[s.key];
+    const real = v !== null && v !== undefined;
+    return { ...s, text: real ? s.fmt(v) : s.fallback, real, holds: real ? s.holds(v) : true };
+  });
+  const allHold = rows.every((r) => r.holds);
 
   const paths = useMemo(() => SIGNALS.map((s, i) => weavePath(ROW_Y[i], i * 1.9)), []);
 
-  useEffect(() => {
-    const iv = setInterval(() => setVals(JITTER.map((j) => j())), 2400);
-    return () => clearInterval(iv);
-  }, []);
   useEffect(() => {
     const iv = setInterval(() => {
       setFired(true);
@@ -78,7 +91,7 @@ export default function LoomSignals({ className = "" }) {
         <div className="absolute inset-0 pointer-events-none opacity-50"
           style={{ backgroundImage: "repeating-linear-gradient(90deg, rgba(226,232,255,0.06) 0 1px, transparent 1px 56px)" }} />
         <svg viewBox={`0 0 ${VB.w} ${VB.h}`} className="relative w-full" style={{ minHeight: 340 }}>
-          {SIGNALS.map((s, i) => (
+          {rows.map((s, i) => (
             <g key={i}>
               <path d={paths[i]} fill="none" stroke={s.color} strokeOpacity="0.55" strokeWidth="2.2"
                 strokeDasharray="3 10" strokeLinecap="round" className="loom-dash" />
@@ -90,8 +103,13 @@ export default function LoomSignals({ className = "" }) {
                 <rect x="-6" y={ROW_Y[i] - 34} rx="10" width="222" height="52" fill="#131316" stroke="#ffffff26" />
                 <circle cx="12" cy={ROW_Y[i] - 8} r="4" fill={s.color} />
                 <text x="24" y={ROW_Y[i] - 15} fill="#9aa0ae" fontSize="13" fontFamily="Instrument Sans, sans-serif">{s.label}</text>
-                <text x="24" y={ROW_Y[i] + 5} fill="#f4f4f5" fontSize="14.5" fontWeight="600" fontFamily="Geist Mono, monospace">{vals[i]}</text>
-                <text x={28 + vals[i].length * 9.2} y={ROW_Y[i] + 5} fill="#10b981" fontSize="12" fontFamily="Geist Mono, monospace">✓{s.check}</text>
+                <text x="24" y={ROW_Y[i] + 5} fill="#f4f4f5" fontSize="14.5" fontWeight="600" fontFamily="Geist Mono, monospace">{s.text}</text>
+                <text x={28 + s.text.length * 9.2} y={ROW_Y[i] + 5} fill={s.holds ? "#10b981" : "#f43f5e"} fontSize="12" fontFamily="Geist Mono, monospace">
+                  {s.holds ? "✓" : "✗"}{s.check}
+                </text>
+                {s.real && (
+                  <text x="212" y={ROW_Y[i] - 20} fill="#6b7280" fontSize="8.5" textAnchor="end" fontFamily="Geist Mono, monospace">LIVE</text>
+                )}
               </g>
             </g>
           ))}
@@ -105,9 +123,9 @@ export default function LoomSignals({ className = "" }) {
             <circle cx={NODE.x} cy={NODE.y} r="6.5" fill="#cbd5e1" style={{ filter: "drop-shadow(0 0 8px #f1f5f9)" }}>
               <animate attributeName="r" values="5.5;7.5;5.5" dur="1.7s" repeatCount="indefinite" />
             </circle>
-            <text x={NODE.x} y={NODE.y + 52} fill="#cbd5e1" fontSize="12.5" textAnchor="middle"
-              fontFamily="Geist Mono, monospace" opacity={fired ? 1 : 0.55} style={{ transition: "opacity 0.4s" }}>
-              {fired ? "order placed" : "all threads agree"}
+            <text x={NODE.x} y={NODE.y + 52} fill={allHold ? "#cbd5e1" : "#6b7280"} fontSize="12.5" textAnchor="middle"
+              fontFamily="Geist Mono, monospace" opacity={fired ? 1 : 0.6} style={{ transition: "opacity 0.4s" }}>
+              {allHold ? (fired ? "order placed" : "all threads agree") : "weaving · waiting on signals"}
             </text>
           </g>
         </svg>
