@@ -36,6 +36,14 @@ export default function New() {
   const [refineText, setRefineText] = useState("");
   const [refineBusy, setRefineBusy] = useState(false);
   const [practice, setPractice] = useState(null);
+  const [valid, setValid] = useState(null); // null=unknown, true=validated, string=issue
+
+  const validateDraft = (s) => {
+    setValid(null);
+    loom.validate(s)
+      .then((d) => setValid(d.ok === false ? (d.errors?.[0]?.message || "validation failed") : true))
+      .catch(() => setValid(null));
+  };
   const started = useRef(false);
   const nav = useNavigate();
 
@@ -80,6 +88,7 @@ export default function New() {
       }
       if (got) {
         setStrategy(got);
+        validateDraft(got);
         setBt(null);
         setSaved(false);
         setRefineText("");
@@ -109,6 +118,7 @@ export default function New() {
           setProgress((p) => [...p, ev.data.message]);
         } else if (ev.event === "result" && ev.data?.strategy) {
           setStrategy(ev.data.strategy);
+          validateDraft(ev.data.strategy);
         } else if (ev.event === "error") {
           throw new Error(ev.data?.error || ev.data?.message || "Drafting failed");
         }

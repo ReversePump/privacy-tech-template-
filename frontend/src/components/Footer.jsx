@@ -18,9 +18,13 @@ export default function Footer() {
           <div className="grid grid-cols-2 gap-x-16 gap-y-2 text-[13px]">
             <Link to="/new" className="text-[#9aa0ae] hover:text-[#f4f4f5]">New strategy</Link>
             <Link to="/strategies" className="text-[#9aa0ae] hover:text-[#f4f4f5]">Strategies</Link>
+            <Link to="/markets" className="text-[#9aa0ae] hover:text-[#f4f4f5]">Markets</Link>
             <Link to="/traders" className="text-[#9aa0ae] hover:text-[#f4f4f5]">Traders</Link>
             <Link to="/leaderboard" className="text-[#9aa0ae] hover:text-[#f4f4f5]">Leaderboard</Link>
             <Link to="/revenue" className="text-[#9aa0ae] hover:text-[#f4f4f5]">Revenue</Link>
+            <Link to="/terms" className="text-[#9aa0ae] hover:text-[#f4f4f5]">Terms</Link>
+            <Link to="/privacy" className="text-[#9aa0ae] hover:text-[#f4f4f5]">Privacy</Link>
+            <Link to="/risk" className="text-[#9aa0ae] hover:text-[#f4f4f5]">Risk disclosure</Link>
             <a href="https://x.com/loomfiai" target="_blank" rel="noopener noreferrer" className="text-[#9aa0ae] hover:text-[#cbd5e1]">X</a>
           </div>
         </div>

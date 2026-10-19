@@ -7,6 +7,7 @@ import AuthModal from "./AuthModal";
 
 const NAV = [
   { to: "/strategies", label: "Strategies" },
+  { to: "/markets", label: "Markets" },
   { to: "/traders", label: "Traders" },
   { to: "/leaderboard", label: "Leaderboard" },
   { to: "/revenue", label: "Revenue" },

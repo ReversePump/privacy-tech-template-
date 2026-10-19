@@ -15,6 +15,8 @@ import Traders from "./pages/Traders";
 import Leaderboard from "./pages/Leaderboard";
 import Revenue from "./pages/Revenue";
 import Account from "./pages/Account";
+import Markets from "./pages/Markets";
+import Legal from "./pages/Legal";
 
 function App() {
   return (
@@ -33,6 +35,10 @@ function App() {
                 <Route path="/traders" element={<Traders />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
                 <Route path="/revenue" element={<Revenue />} />
+                <Route path="/markets" element={<Markets />} />
+                <Route path="/terms" element={<Legal page="terms" />} />
+                <Route path="/privacy" element={<Legal page="privacy" />} />
+                <Route path="/risk" element={<Legal page="risk" />} />
                 <Route path="/account" element={<Account />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>

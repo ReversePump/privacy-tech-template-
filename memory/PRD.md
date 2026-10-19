@@ -137,3 +137,14 @@ link https://x.com/loomfiai, geometric Outfit display type, LoomWeave canvas her
   and /rift/assets (cross-chain deposit catalog — NOT shown: deposit submit is auth-gated upstream,
   displaying it would promise deposits we cannot complete).
 - Everything else (alerts/me, live/*, papertrade/*, me/*, rewards/claim) is 401-gated upstream.
+
+## Upstream deep recon + parity adds (2026-07-19)
+- Recon: Vercel frontend (iad1) + Railway FastAPI (railway-hikari) + Gandi DNS/mail; no Supabase/DB
+  client-side; Privy embedded wallets (EVM+Solana, 30s poll); Segment + gtag analytics; feature flags
+  APP_CLOSED (kill switch) + DEMO_USER (demo mode); source maps 403; 1 Wayback snapshot; no public repo.
+- New public endpoints incorporated: /market (per-instrument detail), /chart (OHLC candles),
+  /quote, /practice, /rift/assets (catalog only, not surfaced — deposits not completable).
+- New pages: /markets (all perps+spot, live detail expander w/ 24h change/volume/OI + candle chart +
+  range tabs + trade shortcut), /terms /privacy /risk (own legal copy), footer links added.
+- Leaderboard enriched: returnCurve sparklines + tags + since. New.jsx: drafts validated via relayed
+  /strategies/validate. Their Telegram-alerts feature noted (auth-gated upstream; ours = in-app+email).
