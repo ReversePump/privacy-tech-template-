@@ -1,0 +1,36 @@
+{
+  "summary": "Iteration 8: Verified all gap-closing features end-to-end. Backend: 54/54 pytest pass (test_gaps.py adds 10 new: reset_request no enumeration, reset_confirm bad_code & short_password 400s, paper reset -> 10000 + positions cleared, wallet holdings empty-state, hl/limit_order validation 4 bad payloads -> 400, limit_order with pre-true condition fires paper fill + one-shot auto-stop within ~90s, hl/account equityHistory present, history endpoint shape). Frontend live: Registered fresh testagent_<ts>@weft.test, Account page confirms (a) HoldingsPanel renders with holdings-empty state for new wallet, (b) paper-reset-btn resets paper-equity to $10,000.00 immediately, (c) hl-equity-chart sparkline present under HL stat, (d) hl-mkt-limit tab reveals hl-limit-row with direction + price inputs + hl-trade-btn, (e) Auth modal forgot flow: login -> auth-forgot -> forgot-email + forgot-submit -> reset-code + reset-password + reset-submit stages render correctly with 'If that email is registered, a 6-digit code is on its way' toast (no account enumeration). Code review: engine.py resolvers _dex_token (DexScreener), _espn_team (ESPN), _weather (Open-Meteo) all guarded with try/except in _tick_deployment — engine loop safe. _notify sends email for email-account owners via emails.send_strategy_alert, cooldown 10min per deployment (deployment['_last_email']). _session_user enforces 30d expiry (SESSION_TTL = 30*86400). No new backend errors in logs. No new frontend console errors beyond prior dev-only x-component hydration warning (<span> inside <option> from dev overlay — harmless, same as iter7).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Account.jsx <option> elements in hl-lev / hl-symbol / sol-trade-out", "issues": ["Pre-existing dev-only hydration warning '<span> cannot be a child of <option>' caused by x-component dev-overlay wrapper. Harmless in production build; same as iter7. No functional impact."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_gaps.py",
+    "/app/backend/tests/test_engine.py",
+    "/app/backend/tests/test_email_auth_wallets.py",
+    "/app/backend/tests/test_weft_relay.py",
+    "/app/test_reports/pytest/iter8_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py reset_request correctly returns {ok:true} unconditionally (no enumeration). reset_confirm uses constant-time code compare path via dict lookup + explicit 400 on invalid_code / password_too_short. Good.",
+    "engine.py new resolvers (_dex_token, _espn_team, _weather) use aiohttp with timeout and fall back to {} on error; _tick_deployment wraps per-deployment work in try/except so one bad resolver can't crash the loop. Good.",
+    "hl/limit_order server-side validates sizeUsd>=10, direction in {above,below}, side in {long,short}, targetPrice>0 — all four edge cases return 400 (verified by test_limit_order_validation).",
+    "Once-deployment auto-stop path (engine stops deployment after first fill when strategy.once=true) verified live by test_limit_order_fires_and_stops — fill event contains 'paper long ETH' and 'one-shot', status transitions to 'stopped'.",
+    "Email rate limiting on _notify uses deployment['_last_email'] (10-minute window). Correct: prevents alert spam while still creating in-app alert row each tick that passes trigger.",
+    "SESSION_TTL=30*86400 enforced in _session_user via created_at comparison; sessions older than 30d treated as unauthenticated. Verified by code read.",
+    "HoldingsPanel defensively renders empty state when holdings=[]; GET /api/wallet/holdings uses Jupiter / Helius path for Solana token accounts and returns {holdings:[]} for fresh (unfunded) wallets. Good."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (54/54 pytest)", "frontend": "100% of gap surfaces exercised (register, holdings empty, paper reset, hl equity chart, limit tab inputs, forgot->reset modal transitions)"},
+  "test_credentials": "Fresh testagent_<unix_ts>@weft.test / agentpass123 per run.",
+  "seed_data_creation": "1 db.users row + 1 db.sessions row per run; 1 db.paper_accounts row (reset to 10000). No cleanup needed.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "All 54 backend tests passing (test_weft_relay=16, test_email_auth_wallets=17, test_engine=11, test_gaps=10). Full ~85s runtime due to engine tick-waits in test_engine + test_gaps::test_limit_order_fires_and_stops. New gap-closing testids: holdings-panel, holdings-empty, paper-reset-btn, hl-equity-chart, hl-mkt-limit, hl-limit-row, hl-limit-dir, hl-limit-price, hl-trade-btn (dual-mapped — same testid for market and limit submit, only one renders at a time based on mktType). Auth modal reset stage testids: auth-forgot, forgot-email, forgot-submit, reset-code, reset-password, reset-submit, forgot-back. Fake @weft.test emails are REFUSED by Emergent email proxy (undeliverable) — only delivered@resend.dev receives — so a true end-to-end reset-code-paste cannot be done from a fake address in test; backend code paths covered via unit tests instead. No open issues.",
+  "rca_of_the_issue": "N/A — zero critical/minor issues this iteration."
+}

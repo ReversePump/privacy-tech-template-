@@ -8,29 +8,29 @@ export const Panel = ({ className = "", children, ...rest }) => (
 
 export const ExtLink = ({ href, className = "", children }) => (
   <a href={href} target="_blank" rel="noopener noreferrer"
-    className={`inline-flex items-center gap-1 text-[#2b59ff] hover:underline ${className}`}>
+    className={`inline-flex items-center gap-1 text-[#a855f7] hover:underline ${className}`}>
     {children} <ArrowUpRight size={12} />
   </a>
 );
 
 export const Loading = ({ label = "Loading" }) => (
-  <div className="flex items-center justify-center gap-2 py-16 text-[#75777d]">
+  <div className="flex items-center justify-center gap-2 py-16 text-[#a89ec4]">
     <Loader2 className="animate-spin" size={16} />
     <span className="mono text-xs uppercase tracking-wider">{label}</span>
   </div>
 );
 
 export const Empty = ({ children }) => (
-  <div className="py-14 text-center text-sm text-[#75777d]">{children}</div>
+  <div className="py-14 text-center text-sm text-[#a89ec4]">{children}</div>
 );
 
 export const Tag = ({ children, tone = "neutral" }) => {
   const tones = {
-    neutral: "bg-[#12121408] text-[#121214] border-[#12121414]",
-    long: "bg-[#0b946614] text-[#0b9466] border-[#0b946622]",
-    short: "bg-[#d43d3d12] text-[#c23434] border-[#d43d3d22]",
-    accent: "bg-[#2b59ff10] text-[#2b59ff] border-[#2b59ff22]",
-    amber: "bg-[#d4820a12] text-[#a36507] border-[#d4820a22]",
+    neutral: "bg-[#a855f714] text-[#f3f0fd] border-[#a855f724]",
+    long: "bg-[#10b98124] text-[#10b981] border-[#10b98138]",
+    short: "bg-[#f43f5e1f] text-[#f43f5e] border-[#f43f5e38]",
+    accent: "bg-[#a855f71a] text-[#a855f7] border-[#a855f738]",
+    amber: "bg-[#f59e0b1f] text-[#fbbf24] border-[#f59e0b38]",
   };
   return (
     <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 mono text-[10px] uppercase tracking-wider ${tones[tone]}`}>
@@ -43,7 +43,7 @@ export const CoinIcon = ({ symbol, size = 20 }) => {
   const [err, setErr] = React.useState(false);
   if (!symbol || err) {
     return (
-      <span className="inline-flex items-center justify-center rounded-full bg-[#12121408] mono text-[9px] text-[#75777d]"
+      <span className="inline-flex items-center justify-center rounded-full bg-[#a855f714] mono text-[9px] text-[#a89ec4]"
         style={{ width: size, height: size }}>
         {(symbol || "?").slice(0, 2)}
       </span>
@@ -56,14 +56,14 @@ export const CoinIcon = ({ symbol, size = 20 }) => {
 
 export const Stat = ({ label, value, sub, testId }) => (
   <div className="px-5 py-4" data-testid={testId}>
-    <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#75777d]">{label}</div>
-    <div className="mt-1 text-xl font-medium text-[#121214] tnum">{value}</div>
-    {sub && <div className="mt-0.5 text-[11px] text-[#75777d]">{sub}</div>}
+    <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#a89ec4]">{label}</div>
+    <div className="mt-1 text-xl font-medium text-[#f3f0fd] tnum">{value}</div>
+    {sub && <div className="mt-0.5 text-[11px] text-[#a89ec4]">{sub}</div>}
   </div>
 );
 
 // minimal inline area chart for equity curves
-export const Sparkline = ({ points, height = 120, stroke = "#0b9466" }) => {
+export const Sparkline = ({ points, height = 120, stroke = "#10b981" }) => {
   if (!points || points.length < 2) return null;
   const w = 600, h = height;
   const xs = points.map((p) => p.t);
@@ -74,11 +74,11 @@ export const Sparkline = ({ points, height = 120, stroke = "#0b9466" }) => {
   const sy = (v) => h - 6 - ((v - min) / span) * (h - 12);
   const line = points.map((p, i) => `${i ? "L" : "M"}${sx(p.t).toFixed(1)},${sy(p.v).toFixed(1)}`).join(" ");
   const last = ys[ys.length - 1];
-  const color = last >= ys[0] ? "#0b9466" : "#c23434";
+  const color = last >= ys[0] ? "#10b981" : "#f43f5e";
   return (
     <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ height }} preserveAspectRatio="none" data-testid="sparkline">
       <path d={`${line} L${w},${h} L0,${h} Z`} fill={color} opacity="0.08" stroke="none" />
-      <path d={line} fill="none" stroke={stroke === "#0b9466" ? color : stroke} strokeWidth="1.6" />
+      <path d={line} fill="none" stroke={stroke === "#10b981" ? color : stroke} strokeWidth="1.6" />
     </svg>
   );
 };

@@ -3,25 +3,28 @@ import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
-    <footer className="mt-24 border-t border-[#12121414]" data-testid="footer">
+    <footer className="mt-24 border-t border-[#a855f724]" data-testid="footer">
       <div className="mx-auto max-w-[1200px] px-4 md:px-6 py-12">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-8">
           <div>
-            <div className="serif text-2xl font-medium">SwiftFi<span className="text-[#2b59ff]">.</span></div>
-            <p className="mt-2 max-w-xs text-[13px] text-[#75777d]">
-              Trade the thesis. Write a market view in plain English; it becomes rules you can read, traded from your own account.
+            <div className="flex items-center gap-2.5">
+              <img src="/logo.png" alt="Loom" className="h-8 w-8 rounded-lg border border-[#a855f73d] object-cover" />
+              <span className="serif text-xl font-semibold uppercase tracking-[0.22em] text-[#f3f0fd]">Loom</span>
+            </div>
+            <p className="mt-2 max-w-xs text-[13px] text-[#a89ec4]">
+              Your strategy. Automatically executed. Write a market view in plain English; it becomes rules you can read, traded from your own account.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-x-16 gap-y-2 text-[13px]">
-            <Link to="/new" className="text-[#75777d] hover:text-[#121214]">New strategy</Link>
-            <Link to="/strategies" className="text-[#75777d] hover:text-[#121214]">Strategies</Link>
-            <Link to="/traders" className="text-[#75777d] hover:text-[#121214]">Traders</Link>
-            <Link to="/leaderboard" className="text-[#75777d] hover:text-[#121214]">Leaderboard</Link>
-            <Link to="/revenue" className="text-[#75777d] hover:text-[#121214]">Revenue</Link>
-            <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="text-[#75777d] hover:text-[#121214]">X</a>
+            <Link to="/new" className="text-[#a89ec4] hover:text-[#f3f0fd]">New strategy</Link>
+            <Link to="/strategies" className="text-[#a89ec4] hover:text-[#f3f0fd]">Strategies</Link>
+            <Link to="/traders" className="text-[#a89ec4] hover:text-[#f3f0fd]">Traders</Link>
+            <Link to="/leaderboard" className="text-[#a89ec4] hover:text-[#f3f0fd]">Leaderboard</Link>
+            <Link to="/revenue" className="text-[#a89ec4] hover:text-[#f3f0fd]">Revenue</Link>
+            <a href="https://x.com/loomfiai" target="_blank" rel="noopener noreferrer" className="text-[#a89ec4] hover:text-[#c084fc]">X</a>
           </div>
         </div>
-        <div className="mt-10 border-t border-[#12121414] pt-6 text-[11px] text-[#75777d] leading-relaxed">
+        <div className="mt-10 border-t border-[#a855f724] pt-6 text-[11px] text-[#a89ec4] leading-relaxed">
           Not financial advice. Trading involves risk, including loss of principal. Past backtests do not guarantee future results.
         </div>
       </div>

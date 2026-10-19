@@ -1,11 +1,12 @@
-# Swift Fi — Trade the thesis. (Project PRD)
+# Loom — AI Trading Agent (Project PRD)
 
 ## Product
-Swift Fi is a Weft-style thesis-trading platform (upstream data relayed from the public Weft API;
-all visible branding is Swift Fi / SwiftFi / $SWIFT — no Weft marks anywhere). Users write a market
-view in plain English; it becomes a readable strategy that can be backtested and traded. The platform
-relays public market data from the upstream Weft API and adds its own native accounts with
-auto-generated wallets and REAL trading.
+Loom (Loom Finance) is a thesis-trading platform: users write a market view in plain English; it
+becomes readable rules that backtest and trade automatically. Market data relays the public upstream
+API; accounts, wallets, trading and the 24/7 engine are native. Brand: **Loom** — dark UI
+(#07060d bg, #a855f7 purple accent family), knot logo + banner supplied by the user, only social
+link https://x.com/loomfiai, geometric Outfit display type, LoomWeave canvas hero animation
+(converging signal threads) + scroll-reveal on landing sections.
 
 ## Architecture
 - **Frontend**: React (CRA) at :3000, Weft-inspired design system in `/app/frontend/src/index.css`.
@@ -62,7 +63,9 @@ auto-generated wallets and REAL trading.
 - Wallet-signature sign-in path retained for users with their own Phantom/Solflare.
 - Tests: 44 backend tests pass (17 email-auth + 16 relay + 11 engine). Test agent iteration_7:
   100% frontend surfaces, zero critical issues.
-- Branding: Swift Fi / SwiftFi / $SWIFT everywhere visible (zero upstream brand leaks).
+- Branding: **Loom / $LOOM** everywhere visible; favicon + header/footer logo from user-supplied
+  knot asset; hero banner art; dark purple theme across all pages (verified desktop/tablet/mobile);
+  sign-in message "Loom sign-in"; emails sent as "Loom"; zero old-brand strings.
 
 ## NOT yet verified with real funds
 - Actual Jupiter swap execution and HL perp order placement require a funded generated wallet

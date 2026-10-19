@@ -14,7 +14,7 @@ export default function Leaderboard() {
   return (
     <div className="mx-auto max-w-[1200px] px-4 md:px-6 pt-14" data-testid="leaderboard-page">
       <h1 className="serif text-4xl md:text-5xl font-light tracking-tight">Leaderboard</h1>
-      <p className="mt-3 max-w-xl text-[14px] text-[#75777d]">
+      <p className="mt-3 max-w-xl text-[14px] text-[#a89ec4]">
         Live deployments, no names attached. Every fill is real; shareable result cards come from here.
       </p>
 
@@ -34,20 +34,20 @@ export default function Leaderboard() {
                   const ret = r.returnPct ?? r.stats?.returnPct;
                   return (
                     <tr key={r.deploymentId || i} data-testid={`lb-row-${i}`}>
-                      <td className="mono text-[#75777d]">{i + 1}</td>
+                      <td className="mono text-[#a89ec4]">{i + 1}</td>
                       <td>
-                        <Link to={`/strategies/${s.id || r.strategyId}`} className="hover:text-[#2b59ff]">
+                        <Link to={`/strategies/${s.id || r.strategyId}`} className="hover:text-[#c084fc]">
                           <div className="text-[13px] font-medium">{s.name || r.strategyId}</div>
-                          <div className="mono text-[10px] text-[#75777d]">{s.id || r.strategyId}</div>
+                          <div className="mono text-[10px] text-[#a89ec4]">{s.id || r.strategyId}</div>
                         </Link>
                       </td>
                       <td><Tag tone={r.mode === "live" ? "long" : "neutral"}>{r.mode || "practice"}</Tag></td>
-                      <td className={`text-right mono tnum ${(pnl ?? 0) < 0 ? "text-[#c23434]" : "text-[#0b9466]"}`}>{fmtUsdSigned(pnl)}</td>
-                      <td className={`text-right mono tnum ${(ret ?? 0) < 0 ? "text-[#c23434]" : "text-[#0b9466]"}`}>{fmtPctSigned(ret)}</td>
+                      <td className={`text-right mono tnum ${(pnl ?? 0) < 0 ? "text-[#f43f5e]" : "text-[#10b981]"}`}>{fmtUsdSigned(pnl)}</td>
+                      <td className={`text-right mono tnum ${(ret ?? 0) < 0 ? "text-[#f43f5e]" : "text-[#10b981]"}`}>{fmtPctSigned(ret)}</td>
                       <td className="text-right mono tnum">{r.trades ?? r.stats?.trades ?? "—"}</td>
-                      <td className="text-right mono text-[11px] text-[#75777d]">{fmtAge(r.startedAt || r.createdAt)}</td>
+                      <td className="text-right mono text-[11px] text-[#a89ec4]">{fmtAge(r.startedAt || r.createdAt)}</td>
                       <td className="text-right">
-                        <Link to={`/strategies/${s.id || r.strategyId}`} className="text-[12px] text-[#2b59ff] hover:underline">Open →</Link>
+                        <Link to={`/strategies/${s.id || r.strategyId}`} className="text-[12px] text-[#a855f7] hover:underline">Open →</Link>
                       </td>
                     </tr>
                   );

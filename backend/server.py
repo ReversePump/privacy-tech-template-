@@ -97,7 +97,7 @@ async def auth_challenge(request: Request):
     if not wallet:
         return Response('{"error":"wallet_required"}', status_code=400, media_type="application/json")
     nonce = uuid.uuid4().hex
-    message = f"Swift Fi sign-in\nwallet: {wallet}\nnonce: {nonce}"
+    message = f"Loom sign-in\nwallet: {wallet}\nnonce: {nonce}"
     await db.auth_challenges.update_one(
         {"wallet": wallet},
         {"$set": {"wallet": wallet, "nonce": nonce, "createdAt": datetime.now(timezone.utc).isoformat()}},
@@ -116,7 +116,7 @@ async def auth_verify(request: Request):
     ch = await db.auth_challenges.find_one({"wallet": wallet})
     if not ch or not sig_b58:
         return Response('{"error":"no_challenge"}', status_code=400, media_type="application/json")
-    message = f"Swift Fi sign-in\nwallet: {wallet}\nnonce: {ch['nonce']}".encode()
+    message = f"Loom sign-in\nwallet: {wallet}\nnonce: {ch['nonce']}".encode()
     try:
         ok = Signature.from_string(sig_b58).verify(Pubkey.from_string(wallet), message)
     except Exception:

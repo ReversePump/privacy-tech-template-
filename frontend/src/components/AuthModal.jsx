@@ -76,16 +76,16 @@ export default function AuthModal({ open, onClose }) {
       <div className="panel w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
           <h2 className="serif text-2xl font-light">{mode === "register" ? "Create your account" : "Welcome back"}</h2>
-          <button onClick={onClose} className="text-[#75777d] hover:text-[#121214]" data-testid="auth-close"><X size={18} /></button>
+          <button onClick={onClose} className="text-[#a89ec4] hover:text-[#f3f0fd]" data-testid="auth-close"><X size={18} /></button>
         </div>
-        <p className="mt-1.5 text-[12.5px] text-[#75777d]">
+        <p className="mt-1.5 text-[12.5px] text-[#a89ec4]">
           {mode === "register" ? "Email and password — a Solana wallet is generated for you instantly. Deposit SOL or USDC and trade for real." : "Your generated wallet and strategies are waiting."}
         </p>
 
-        <div className="mt-5 flex gap-1 rounded-full border border-[#12121414] p-1">
+        <div className="mt-5 flex gap-1 rounded-full border border-[#a855f724] p-1">
           {[["email", "Email", Mail], ["wallet", "Wallet", Wallet]].map(([k, l, Icon]) => (
             <button key={k} onClick={() => setTab(k)} data-testid={`auth-tab-${k}`}
-              className={`flex-1 inline-flex h-9 items-center justify-center gap-1.5 rounded-full text-[12.5px] transition-colors ${tab === k ? "bg-[#121214] text-white" : "text-[#75777d]"}`}>
+              className={`flex-1 inline-flex h-9 items-center justify-center gap-1.5 rounded-full text-[12.5px] transition-colors ${tab === k ? "bg-[#9333ea] text-white" : "text-[#a89ec4]"}`}>
               <Icon size={13} /> {l}
             </button>
           ))}
@@ -95,49 +95,49 @@ export default function AuthModal({ open, onClose }) {
           mode === "forgot" ? (
             <div className="mt-5 space-y-3">
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com"
-                className="h-11 w-full rounded-lg border border-[#12121414] bg-[#faf9f7] px-4 text-[13.5px] outline-none focus:border-[#2b59ff55]"
+                className="h-11 w-full rounded-lg border border-[#a855f724] bg-[#171428] px-4 text-[13.5px] outline-none focus:border-[#a855f766]"
                 data-testid="forgot-email" />
               <button onClick={forgot} disabled={busy || !email} data-testid="forgot-submit"
-                className="h-11 w-full rounded-full bg-[#121214] text-[13px] font-medium text-white hover:bg-[#2b59ff] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
+                className="h-11 w-full rounded-full bg-[#9333ea] text-[13px] font-medium text-white shadow-[0_0_20px_rgba(168,85,247,0.35)] hover:bg-[#a855f7] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
                 {busy && <Loader2 size={14} className="animate-spin" />} Email me a reset code
               </button>
-              <button onClick={() => setMode("login")} className="w-full text-center text-[12px] text-[#75777d] hover:text-[#2b59ff]" data-testid="forgot-back">
+              <button onClick={() => setMode("login")} className="w-full text-center text-[12px] text-[#a89ec4] hover:text-[#c084fc]" data-testid="forgot-back">
                 Back to log in
               </button>
             </div>
           ) : mode === "reset" ? (
             <div className="mt-5 space-y-3">
               <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="6-digit code from your email"
-                className="h-11 w-full rounded-lg border border-[#12121414] bg-[#faf9f7] px-4 mono text-[15px] tracking-[0.3em] outline-none focus:border-[#2b59ff55]"
+                className="h-11 w-full rounded-lg border border-[#a855f724] bg-[#171428] px-4 mono text-[15px] tracking-[0.3em] outline-none focus:border-[#a855f766]"
                 data-testid="reset-code" />
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="New password (8+ characters)"
-                className="h-11 w-full rounded-lg border border-[#12121414] bg-[#faf9f7] px-4 text-[13.5px] outline-none focus:border-[#2b59ff55]"
+                className="h-11 w-full rounded-lg border border-[#a855f724] bg-[#171428] px-4 text-[13.5px] outline-none focus:border-[#a855f766]"
                 data-testid="reset-password" />
               <button onClick={resetPw} disabled={busy || code.length !== 6 || password.length < 8} data-testid="reset-submit"
-                className="h-11 w-full rounded-full bg-[#121214] text-[13px] font-medium text-white hover:bg-[#2b59ff] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
+                className="h-11 w-full rounded-full bg-[#9333ea] text-[13px] font-medium text-white shadow-[0_0_20px_rgba(168,85,247,0.35)] hover:bg-[#a855f7] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
                 {busy && <Loader2 size={14} className="animate-spin" />} Set new password
               </button>
             </div>
           ) : (
           <div className="mt-5 space-y-3">
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com"
-              className="h-11 w-full rounded-lg border border-[#12121414] bg-[#faf9f7] px-4 text-[13.5px] outline-none focus:border-[#2b59ff55]"
+              className="h-11 w-full rounded-lg border border-[#a855f724] bg-[#171428] px-4 text-[13.5px] outline-none focus:border-[#a855f766]"
               data-testid="auth-email" />
             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password (8+ characters)"
-              className="h-11 w-full rounded-lg border border-[#12121414] bg-[#faf9f7] px-4 text-[13.5px] outline-none focus:border-[#2b59ff55]"
+              className="h-11 w-full rounded-lg border border-[#a855f724] bg-[#171428] px-4 text-[13.5px] outline-none focus:border-[#a855f766]"
               data-testid="auth-password"
               onKeyDown={(e) => e.key === "Enter" && submit()} />
             <button onClick={submit} disabled={busy || !email || password.length < 8} data-testid="auth-submit"
-              className="h-11 w-full rounded-full bg-[#121214] text-[13px] font-medium text-white hover:bg-[#2b59ff] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
+              className="h-11 w-full rounded-full bg-[#9333ea] text-[13px] font-medium text-white shadow-[0_0_20px_rgba(168,85,247,0.35)] hover:bg-[#a855f7] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
               {busy && <Loader2 size={14} className="animate-spin" />}
               {mode === "register" ? "Create account + wallet" : "Log in"}
             </button>
             <div className="flex justify-between text-[12px]">
-              <button onClick={() => setMode(mode === "register" ? "login" : "register")} className="text-[#75777d] hover:text-[#2b59ff]" data-testid="auth-switch-mode">
+              <button onClick={() => setMode(mode === "register" ? "login" : "register")} className="text-[#a89ec4] hover:text-[#c084fc]" data-testid="auth-switch-mode">
                 {mode === "register" ? "Already have an account? Log in" : "New here? Create an account"}
               </button>
               {mode === "login" && (
-                <button onClick={() => setMode("forgot")} className="text-[#75777d] hover:text-[#2b59ff]" data-testid="auth-forgot">
+                <button onClick={() => setMode("forgot")} className="text-[#a89ec4] hover:text-[#c084fc]" data-testid="auth-forgot">
                   Forgot password?
                 </button>
               )}
@@ -147,10 +147,10 @@ export default function AuthModal({ open, onClose }) {
         ) : (
           <div className="mt-5">
             <button onClick={walletSignIn} data-testid="auth-wallet-btn"
-              className="h-11 w-full rounded-full border border-[#12121414] text-[13px] font-medium hover:border-[#2b59ff] hover:text-[#2b59ff] transition-colors inline-flex items-center justify-center gap-2">
+              className="h-11 w-full rounded-full border border-[#a855f724] text-[13px] font-medium hover:border-[#a855f7] hover:text-[#c084fc] transition-colors inline-flex items-center justify-center gap-2">
               <Wallet size={14} /> Connect Phantom / Solflare
             </button>
-            <p className="mt-3 text-center text-[11px] text-[#75777d]">Your own wallet, your keys — sign a message to sign in.</p>
+            <p className="mt-3 text-center text-[11px] text-[#a89ec4]">Your own wallet, your keys — sign a message to sign in.</p>
           </div>
         )}
       </div>
