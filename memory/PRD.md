@@ -8,6 +8,13 @@ API; accounts, wallets, trading and the 24/7 engine are native. Brand: **Loom** 
 link https://x.com/loomfiai, geometric Outfit display type, LoomWeave canvas hero animation
 (converging signal threads) + scroll-reveal on landing sections.
 
+## Upstream token scrub (hard rule)
+- The upstream token (its CA, $WEFT name, buybacks, claims, token-fee data) must NEVER surface.
+- Backend relay sanitizer `_sanitize_upstream` drops any relayed list entry whose payload contains the
+  CA or 'weft' (case-insensitive) and strips revenue keys token/buybacks/weftUsd/buybackUsd.
+- No trade path into that token anywhere (swap panel offers USDC + custom mint only).
+- Token section = 'not launched yet, announced on X @loomfiai'. Hero 4th signal = BTC 24h (HL data).
+
 ## Architecture
 - **Frontend**: React (CRA) at :3000, Weft-inspired design system in `/app/frontend/src/index.css`.
   Pages: Home, New (AI thesis builder w/ SSE streaming), Strategies, StrategyDetail, Traders,

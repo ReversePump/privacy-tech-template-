@@ -12,7 +12,6 @@ import AuthModal from "../components/AuthModal";
 const API = process.env.REACT_APP_BACKEND_URL;
 const WSOL = "So11111111111111111111111111111111111111112";
 const USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
-const WEFT = "HqmFi85adLD8BQA7en1HfajdAfzVFps5REgQaYuw6Ax8";
 
 const authed = (token, path, body) =>
   fetch(`${API}/api${path}`, {
@@ -134,7 +133,7 @@ export default function Account() {
         <div className="px-5 py-4">
           <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#9aa0ae]">Rewards</div>
           <div className="mt-1 text-xl font-medium tnum">{rewards ? (rewards.enabled ? (rewards.paused ? "Paused" : "Live") : "Off") : "—"}</div>
-          <div className="mt-0.5 text-[11px] text-[#9aa0ae]">$LOOM share of fees</div>
+          <div className="mt-0.5 text-[11px] text-[#9aa0ae]">Fee-share rewards</div>
         </div>
       </Panel>
 
@@ -461,7 +460,7 @@ function AlertsPanel({ token, alerts, onDone }) {
 }
 
 function SolTradePanel({ token, onDone }) {
-  const [out, setOut] = useState(WEFT);
+  const [out, setOut] = useState(USDC);
   const [amount, setAmount] = useState(0.01);
   const [busy, setBusy] = useState(false);
   const trade = async () => {
@@ -484,7 +483,6 @@ function SolTradePanel({ token, onDone }) {
           <span className="self-center mono text-[12px] text-[#9aa0ae]">SOL →</span>
           <select value={out} onChange={(e) => setOut(e.target.value)} data-testid="sol-trade-out"
             className="h-11 flex-1 rounded-lg border border-[#ffffff26] bg-[#17171b] px-3 mono text-[12px] outline-none">
-            <option value={WEFT}>$LOOM</option>
             <option value={USDC}>USDC</option>
           </select>
         </div>

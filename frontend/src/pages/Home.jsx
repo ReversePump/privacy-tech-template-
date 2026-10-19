@@ -40,7 +40,7 @@ const FAQ = [
   ["What can it watch?", "Prices, funding, posts and buzz on X, wallets, Hyperliquid traders, prediction markets, news, Fear & Greed, macro rates, weather and sports results — mixed in one sentence if you like."],
   ["Can I copy other traders?", "Yes. Pick a wallet or a Hyperliquid trader and mirror their entries with your own size and stop."],
   ["What does it cost?", "Writing strategies is free. A small fee applies only when a strategy trades: 0.10% on perps, 1% on Solana swaps."],
-  ["What is $LOOM for?", "Half of every fee buys $LOOM on the open market; holders get fee discounts and a share of daily rewards. The rest is burned, so supply only shrinks."],
+  ["Is there a Loom token?", "Not yet. When it launches, the contract address will be published here and on the Loom X account — nowhere else."],
   ["Can I try it without real money?", "Yes — every strategy can run on a $10,000 paper account at real prices, or as alerts only."],
   ["Can it just alert me instead?", "Yes. Any strategy can run in alert-only mode and ping you instead of trading."],
   ["What if Loom goes down?", "Your money never leaves your account. Open positions keep their on-exchange stops; you can always manage them directly."],
@@ -275,80 +275,21 @@ export default function Home() {
 }
 
 function TokenSection() {
-  const [rev, setRev] = useState(null);
-  const [rewards, setRewards] = useState(null);
-  useEffect(() => {
-    weft.revenue().then(setRev).catch(() => {});
-    weft.rewards().then(setRewards).catch(() => {});
-  }, []);
-  const CA = "HqmFi85adLD8BQA7en1HfajdAfzVFps5REgQaYuw6Ax8";
-  const [copied, setCopied] = useState(false);
-  const copy = () => {
-    navigator.clipboard?.writeText(CA);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  };
   return (
     <section className="border-t border-[#ffffff26] bg-[#17171b]" id="token">
       <div className="mx-auto max-w-[1200px] px-4 md:px-6 py-20">
-        <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#9aa0ae]">The $LOOM token</div>
+        <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#9aa0ae]">The Loom token</div>
         <h2 className="mt-3 serif text-3xl md:text-4xl font-light tracking-tight max-w-2xl">
-          You trade a small fee. <span className="italic text-[#f1f5f9]">$LOOM gets bought back.</span>
+          Not launched yet. <span className="italic text-[#f1f5f9]">Announced here first.</span>
         </h2>
-        <p className="mt-4 max-w-2xl text-[14px] leading-relaxed text-[#9aa0ae]">
-          Loom buys $LOOM on the open market in small amounts about every ten minutes, around the clock: with half of every fee it earns, and 0.4% of every $LOOM trade. Then it goes back to the people who use Loom — traders, strategy creators — and the rest is burned.
-        </p>
-
-        <Panel className="mt-8 p-5 flex flex-wrap items-center gap-3" data-testid="weft-ca">
-          <span className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae]">$LOOM contract address · the only official one</span>
-          <button onClick={copy} className="mono text-[12px] text-[#f4f4f5] hover:text-[#cbd5e1] transition-colors" data-testid="weft-ca-copy">
-            {copied ? "Copied" : CA}
-          </button>
-          <span className="flex gap-3 ml-auto text-[12px]">
-            <a className="text-[#f1f5f9] hover:underline" href={`https://solscan.io/token/${CA}`} target="_blank" rel="noopener noreferrer">Solscan ↗</a>
-            <a className="text-[#f1f5f9] hover:underline" href={`https://dexscreener.com/solana/${CA}`} target="_blank" rel="noopener noreferrer">DexScreener ↗</a>
-            <a className="text-[#f1f5f9] hover:underline" href={`https://jup.ag/tokens/${CA}`} target="_blank" rel="noopener noreferrer">Jupiter ↗</a>
-          </span>
+        <Panel className="mt-8 p-6 max-w-2xl" data-testid="loom-token-note">
+          <p className="text-[14px] leading-relaxed text-[#9aa0ae]">
+            There is no official Loom token today. When it launches, the contract address will be published on this page
+            and on <a href="https://x.com/loomfiai" target="_blank" rel="noopener noreferrer" className="text-[#f1f5f9] hover:underline">X @loomfiai</a> — and nowhere else.
+            Anything trading before that is fake.
+          </p>
+          <p className="mt-4 mono text-[11px] text-[#6b7280]">Follow along — every platform fee is public on the <Link to="/revenue" className="text-[#f1f5f9] hover:underline">Revenue page</Link>.</p>
         </Panel>
-
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Panel className="p-5">
-            <div className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae]">50% · back to traders</div>
-            <p className="mt-2 text-[12.5px] text-[#9aa0ae]">Shared out every day. Your share is the fees you paid that day.</p>
-            <div className="mt-3 text-lg font-medium tnum" data-testid="weft-trader-share">{rev ? fmtUsd(rev.buybackUsd * 0.5) : "—"}</div>
-          </Panel>
-          <Panel className="p-5">
-            <div className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae]">20% · to creators</div>
-            <p className="mt-2 text-[12.5px] text-[#9aa0ae]">Publish a strategy. When other people run it, you earn from the fees their runs pay.</p>
-            <div className="mt-3 text-lg font-medium tnum">{rev ? fmtUsd(rev.buybackUsd * 0.2) : "—"}</div>
-          </Panel>
-          <Panel className="p-5">
-            <div className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae]">30% · burned</div>
-            <p className="mt-2 text-[12.5px] text-[#9aa0ae]">Burned the moment it's bought. No team allocation, nothing new is ever minted — supply only shrinks.</p>
-            <div className="mt-3 text-lg font-medium tnum">{rev ? fmtUsd(rev.buybackUsd * 0.3) : "—"}</div>
-          </Panel>
-        </div>
-
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Panel className="p-5">
-            <div className="text-[14px] font-medium">Holder · from 100,000 $LOOM</div>
-            <p className="mt-1.5 text-[13px] text-[#9aa0ae]">25% off every trade, plus 1.5× rewards and 100 AI drafts a day.</p>
-          </Panel>
-          <Panel className="p-5">
-            <div className="text-[14px] font-medium">Whale · from 1,000,000 $LOOM</div>
-            <p className="mt-1.5 text-[13px] text-[#9aa0ae]">50% off every trade, plus 2× rewards and 100 AI drafts a day.</p>
-          </Panel>
-        </div>
-
-        <div className="mt-8 flex flex-wrap gap-x-8 gap-y-2 mono text-[11px] text-[#9aa0ae]">
-          <span>Fee on Hyperliquid: 0.10% perps · 1% spot sales</span>
-          <span>Fee on Solana swaps: 1%</span>
-          <span>Trading $LOOM: 3% (2% Loom · 0.4% buyback · 0.6% Meteora)</span>
-        </div>
-        <p className="mt-4 text-[12px] text-[#9aa0ae]">
-          Every fee, buyback, burn and reward is on the <Link to="/revenue" className="text-[#f1f5f9] hover:underline">Revenue page</Link>. Any other token calling itself $LOOM is fake.
-          {rewards?.paused ? <span className="ml-2 mono text-[10px] uppercase tracking-wider text-[#fbbf24]">rewards paused</span> : null}
-        </p>
       </div>
     </section>
   );

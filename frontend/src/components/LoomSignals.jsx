@@ -13,8 +13,8 @@ const SIGNALS = [
     fmt: (v) => `${v.toFixed(4)}%`, holds: (v) => v < 0.01 },
   { key: "fear_greed", label: "Fear & Greed", fallback: "34", check: "< 40", color: "#cbd5e1",
     fmt: (v) => `${Math.round(v)}`, holds: (v) => v < 40 },
-  { key: "loom_buy_sell_1h", label: "$LOOM buys/sells, 1h", fallback: "1.8×", check: "> 1", color: "#e2e8f0",
-    fmt: (v) => `${v.toFixed(1)}×`, holds: (v) => v > 1 },
+  { key: "btc_change_24h", label: "BTC price, 24h", fallback: "+1.8%", check: "> 0%", color: "#e2e8f0",
+    fmt: (v) => `${v >= 0 ? "+" : ""}${v.toFixed(1)}%`, holds: (v) => v > 0 },
 ];
 
 const VB = { w: 760, h: 452 };

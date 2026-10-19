@@ -46,6 +46,25 @@ def _fwd_headers(request: Request) -> dict:
     return h
 
 
+UPSTREAM_TOKEN_CA = "HqmFi85adLD8BQA7en1HfajdAfzVFps5REgQaYuw6Ax8"
+UPSTREAM_SCRUB_KEYS = {"token", "buybacks", "weftUsd", "buybackUsd"}
+
+
+def _sanitize_upstream(obj):
+    """Filter upstream data: no upstream token (CA / $WEFT / brand) may surface anywhere."""
+    if isinstance(obj, list):
+        out = []
+        for it in obj:
+            blob = _json.dumps(it).lower()
+            if UPSTREAM_TOKEN_CA.lower() in blob or "weft" in blob:
+                continue  # drop entries referencing the upstream token or brand
+            out.append(_sanitize_upstream(it))
+        return out
+    if isinstance(obj, dict):
+        return {k: _sanitize_upstream(v) for k, v in obj.items() if k not in UPSTREAM_SCRUB_KEYS}
+    return obj
+
+
 @api_router.api_route("/relay/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
 async def relay(path: str, request: Request):
     body = await request.body()
@@ -76,10 +95,17 @@ async def relay(path: str, request: Request):
     except httpx.HTTPError as e:
         logger.warning(f"upstream error {path}: {e}")
         return Response('{"error":"upstream_unreachable"}', status_code=502, media_type="application/json")
+    content = r.content
+    ctype = r.headers.get("content-type", "application/json")
+    if r.status_code == 200 and "json" in ctype:
+        try:
+            content = _json.dumps(_sanitize_upstream(r.json())).encode()
+        except Exception:
+            pass
     return Response(
-        content=r.content,
+        content=content,
         status_code=r.status_code,
-        media_type=r.headers.get("content-type", "application/json"),
+        media_type=ctype,
     )
 
 
@@ -928,7 +954,7 @@ async def hl_limit_order(request: Request):
 @app.get("/api/signals/hero")
 async def hero_signals():
     """Live values for the landing hero weave — real market data, cached by the engine."""
-    out = {"eth_change_1h": None, "doge_funding_1h_pct": None, "fear_greed": None, "loom_buy_sell_1h": None}
+    out = {"eth_change_1h": None, "doge_funding_1h_pct": None, "fear_greed": None, "btc_change_24h": None}
     try:
         m = engine._mkt
         if m.ts:
@@ -936,17 +962,13 @@ async def hero_signals():
             doge = m.ctxs.get("DOGE", {})
             if doge.get("funding") is not None:
                 out["doge_funding_1h_pct"] = float(doge["funding"]) * 100
+            btc = m.ctxs.get("BTC", {})
+            btc_px = m.mids.get("BTC")
+            if btc.get("prevDayPx") and btc_px:
+                out["btc_change_24h"] = (float(btc_px) - float(btc["prevDayPx"])) / float(btc["prevDayPx"]) * 100
             out["fear_greed"] = m.fear_greed
     except Exception as e:
         logger.warning(f"hero signals hl: {e}")
-    try:
-        d = await engine._dex_token("HqmFi85adLD8BQA7en1HfajdAfzVFps5REgQaYuw6Ax8")
-        h1 = (d or {}).get("txns", {}).get("h1") or {}
-        buys, sells = h1.get("buys", 0), h1.get("sells", 0)
-        if buys or sells:
-            out["loom_buy_sell_1h"] = (buys / sells) if sells else float(buys)
-    except Exception as e:
-        logger.warning(f"hero signals dex: {e}")
     return out
 
 
