@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { X, Wallet, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { useAuth } from "../solana/AuthContext";
 import { errorMessage } from "../lib/api";
@@ -11,8 +12,18 @@ export default function AuthModal({ open, onClose }) {
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
+  const wantWalletSignIn = useRef(false);
   const { emailAuth, signIn } = useAuth();
+  const { connected } = useWallet();
   const { setVisible } = useWalletModal();
+
+  // once a wallet finishes connecting while the modal is open, sign the challenge automatically
+  useEffect(() => {
+    if (open && connected && wantWalletSignIn.current) {
+      wantWalletSignIn.current = false;
+      signIn().then(onClose).catch((e) => toast.error(errorMessage(e)));
+    }
+  }, [open, connected]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!open) return null;
 
@@ -61,12 +72,17 @@ export default function AuthModal({ open, onClose }) {
   };
 
   const walletSignIn = async () => {
+    if (!connected) {
+      // no wallet selected yet — open the wallet picker first; sign-in continues automatically on connect
+      wantWalletSignIn.current = true;
+      setVisible(true);
+      return;
+    }
     try {
       await signIn();
       onClose();
     } catch (e) {
-      if (!/connect/i.test(errorMessage(e))) toast.error(errorMessage(e));
-      else setVisible(true);
+      toast.error(errorMessage(e));
     }
   };
 

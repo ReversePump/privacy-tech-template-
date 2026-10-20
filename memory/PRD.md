@@ -232,3 +232,9 @@ User supplied a complete recon spec of the reference site; audited every item ag
 ## 2026-07-20 — Enter-to-submit bugfix on /new
 - User-reported bug: typing a thesis and pressing Enter sent no request (textarea had no onKeyDown). Fixed: Enter (no Shift) calls draft(); Shift+Enter still newline; placeholder hints "Enter to draft".
 - Verified by testing agent (iteration_11.json): Enter fires /api/ai/generate/stream and renders the rules card in ~13s, button click works (~6s), Shift+Enter doesn't submit, zero old-brand text after drafting. 100% pass, no issues.
+
+## 2026-07-20 — Auth modal restructure + wallet connect prominence
+- Reviewer issue: Connect opened email sign-up with the wallet option hidden behind a tab; burner wallet never got a request. Fixed: AuthModal is single-view — email form AND "Connect Phantom / Solflare" button visible together (divider "or your own wallet", copy states "Only you can withdraw"). No tabs.
+- Wallet flow hardened: explicit connected-check (no error-string sniffing); if no wallet selected, opens the wallet picker and auto-continues sign-in when the wallet connects (useEffect on connected). Backend wallet auth verified with a real ed25519 challenge signature → token issued.
+- Testing agent iteration_12: 4/4 PASS (Enter-draft regression ~45s render, both options visible together, wallet button opens adapter modal, email login works).
+- Post-pass fixes (self-verified by browser): duplicate React key on Home WATCHES list (index-based keys), hook-order compile error from the useRef placement (fixed, page renders clean, adapter modal opens).

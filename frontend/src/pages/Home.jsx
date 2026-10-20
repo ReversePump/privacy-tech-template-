@@ -149,9 +149,9 @@ export default function Home() {
         <h2 className="serif text-3xl md:text-4xl font-light tracking-tight">What it watches</h2>
         <p className="mt-3 text-[14px] text-[#9aa0ae]">Any of these can be a condition, and one sentence can mix as many as you like. Pick one to try it.</p>
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="watches-grid">
-          {WATCHES.map(([title, example, thesis]) => (
+          {WATCHES.map(([title, example, thesis], idx) => (
             thesis ? (
-              <Link key={title} to={`/new?thesis=${encodeURIComponent(thesis)}`}>
+              <Link key={`${title}-${idx}`} to={`/new?thesis=${encodeURIComponent(thesis)}`}>
                 <Panel className="group h-full p-5 hover:border-[#ffffff40] transition-colors">
                   <div className="text-[14px] font-medium">{title}</div>
                   <p className="mt-1.5 text-[12.5px] text-[#9aa0ae]">“{example}”</p>
@@ -159,7 +159,7 @@ export default function Home() {
                 </Panel>
               </Link>
             ) : (
-              <Link key={title} to="/new">
+              <Link key={`${title}-${idx}`} to="/new">
                 <Panel className="group h-full p-5 hover:border-[#ffffff40] transition-colors">
                   <div className="text-[14px] font-medium">{title}</div>
                   <p className="mt-1.5 text-[12.5px] text-[#9aa0ae]">“{example}”</p>
