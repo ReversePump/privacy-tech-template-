@@ -156,3 +156,6 @@ link https://x.com/loomfiai, geometric Outfit display type, LoomWeave canvas her
 - TRADE PATH FIX: Solana swaps hit Jupiter 429 rate limits under parallel load (shared gateway). Added dual-host fallback (api.jup.ag + lite-api.jup.ag), per-IP throttle (0.4s spacing), and 7-attempt backoff. Full suite 70/70 green. Real trade path verified to Solana simulation stage; unfunded wallets correctly return the debit/simulation error.
 - Branding scrub: renamed test accounts to @loom.test, deleted 43 old @weft/@swiftfi throwaway DB accounts, relay error renamed to market_data_unreachable. Final sweep: zero weft/swiftfi/makemarkets/railway references in shipped code (only the scrub filter itself names them to strip them); relay responses carry 0 upstream brand refs.
 - Test creds now: trader1@loom.test / testpass123, uitest1@loom.test / uitestpass123.
+
+## 2026-07-20 — X link in header on all screens
+- Header X link (https://x.com/loomfiai) was desktop-only (hidden below sm). Now visible at every viewport, on every page (header is global). Verified on /markets and /strategies at 375px and 1366px.
