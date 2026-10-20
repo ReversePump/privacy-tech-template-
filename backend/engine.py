@@ -10,6 +10,7 @@ manage open positions (stop-loss / take-profit / trailing).
 """
 import asyncio
 import logging
+import math
 import time
 import uuid
 from datetime import datetime, timezone
@@ -195,6 +196,21 @@ async def _signal_fields(sig, owner_positions):
         series = p.get("series", "")
         city = series.split(":", 1)[1] if ":" in series else ""
         return await _weather(city)
+    if kind == "sky":
+        # moon phase — pure astronomy, no network. Strategy refs: sky.new_moon / sky.full_moon (hours until)
+        SYNODIC = 29.53058867
+        epoch = datetime(2000, 1, 6, 18, 14, tzinfo=timezone.utc)  # known new moon
+        age = ((datetime.now(timezone.utc) - epoch).total_seconds() / 86400) % SYNODIC
+        illum = (1 - math.cos(2 * math.pi * age / SYNODIC)) / 2 * 100
+        return {"age_days": round(age, 2), "illumination_pct": round(illum, 1),
+                "new_moon": round((SYNODIC - age) * 24, 2),
+                "full_moon": round(((SYNODIC / 2 - age) % SYNODIC) * 24, 2)}
+    if kind == "space_weather":
+        return await _noaa_kp()
+    if kind in ("trader", "wallet") and (p.get("address") or "").startswith("0x"):
+        return await _hl_user(p["address"], kind)
+    if kind == "liquidity" and sym:
+        return await _l2_depth(sym)
     # social (X), odds, post_match — no live source (X removed by design)
     return {}
 
@@ -224,6 +240,77 @@ async def _dex_token(mint):
         except Exception:
             return None
     return await _cached(f"dex:{mint}", 60, go)
+
+
+async def _noaa_kp():
+    """Space weather: latest planetary K-index from NOAA (free, no key)."""
+    async def go():
+        try:
+            async with httpx.AsyncClient(timeout=15) as c:
+                r = await c.get("https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json")
+                rows = r.json()
+                last = rows[-1]
+                kp = last.get("Kp") if isinstance(last, dict) else last[1]
+                return {"kp": float(kp)}
+        except Exception:
+            return None
+    return await _cached("noaa_kp", 900, go) or {}
+
+
+async def _hl_user(addr, kind):
+    """Public Hyperliquid account signals for a watched trader/wallet address."""
+    async def go():
+        try:
+            st = _hl_info().user_state(addr)
+        except Exception:
+            return None
+        mv = float(st.get("marginSummary", {}).get("accountValue", 0) or 0)
+        positions = [ap for ap in st.get("assetPositions", [])
+                     if float(ap.get("position", {}).get("szi", 0) or 0) != 0]
+        out = {"account_value_usd": mv, "open_positions": len(positions)}
+        if kind == "wallet":
+            out["withdrawable_usd"] = float(st.get("withdrawable", 0) or 0)
+        else:
+            try:
+                fills = _hl_info().user_fills(addr) or []
+            except Exception:
+                fills = []
+            now_ms = time.time() * 1000
+            out["fills_24h"] = sum(1 for f in fills if now_ms - f.get("time", 0) < 86_400_000)
+            out["last_fill_minutes"] = (round((now_ms - max(f.get("time", 0) for f in fills)) / 60000, 1)
+                                        if fills else None)
+        return out
+    return await _cached(f"hluser:{kind}:{addr}", 60, go) or {}
+
+
+async def _l2_depth(sym):
+    """Perp liquidity: order-book depth within 0.5% of mid, plus spread."""
+    async def go():
+        try:
+            book = _hl_info().l2_snapshot(sym)
+        except Exception:
+            return None
+        mid = _mkt.mids.get(sym)
+        if not mid:
+            return None
+        levels = book.get("levels", [[], []])
+        band = mid * 0.005
+
+        def depth(side_levels, is_bid):
+            total = 0.0
+            for lv in side_levels:
+                px_l, sz = float(lv["px"]), float(lv["sz"])
+                if (mid - px_l <= band) if is_bid else (px_l - mid <= band):
+                    total += px_l * sz
+            return round(total, 0)
+
+        bids, asks = levels[0], levels[1]
+        out = {"bid_depth_usd": depth(bids, True), "ask_depth_usd": depth(asks, False)}
+        if bids and asks:
+            out["spread_bps"] = round((float(asks[0]["px"]) - float(bids[0]["px"])) / mid * 10000, 1)
+        return out
+    return await _cached(f"l2:{sym}", 60, go) or {}
+
 
 
 _NBA = {"hawks": "atl", "celtics": "bos", "nets": "bkn", "hornets": "cha", "bulls": "chi",

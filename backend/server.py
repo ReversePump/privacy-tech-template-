@@ -48,17 +48,26 @@ def _fwd_headers(request: Request) -> dict:
 
 
 UPSTREAM_TOKEN_CA = "HqmFi85adLD8BQA7en1HfajdAfzVFps5REgQaYuw6Ax8"
-UPSTREAM_SCRUB_KEYS = {"token", "buybacks", "weftUsd", "buybackUsd"}
+UPSTREAM_SCRUB_KEYS = {"token", "buybacks", "weftUsd", "buybackUsd", "weft"}
+
+
+def _scrub_str(s):
+    """Rewrite any upstream brand mention inside a string to Loom equivalents."""
+    s = s.replace("weft.fi", "loomfi.app").replace("Weft.fi", "loomfi.app")
+    s = s.replace("@weftfinance", "@loomfiai").replace("weftfinance", "loomfiai")
+    return s.replace("WEFT", "LOOM").replace("Weft", "Loom").replace("weft", "loom")
 
 
 def _sanitize_upstream(obj):
     """Filter relayed data: no upstream token or upstream brand may surface anywhere."""
+    if isinstance(obj, str):
+        return _scrub_str(obj)
     if isinstance(obj, list):
         out = []
         for it in obj:
             blob = _json.dumps(it).lower()
-            if UPSTREAM_TOKEN_CA.lower() in blob or "weft" in blob:
-                continue  # drop entries referencing the upstream token or brand
+            if UPSTREAM_TOKEN_CA.lower() in blob or "$weft" in blob or "weft token" in blob or "buyback" in blob:
+                continue  # drop entries about the upstream token
             if '"kind": "social"' in blob or '"kind": "post_match"' in blob:
                 continue  # X/Twitter-dependent signals are removed by design
             if any(t in blob for t in ("@elonmusk", "posts about", "posts on x", "x.com", "twitter.com", "buzz on x")):
@@ -66,7 +75,15 @@ def _sanitize_upstream(obj):
             out.append(_sanitize_upstream(it))
         return out
     if isinstance(obj, dict):
-        return {k: _sanitize_upstream(v) for k, v in obj.items() if k not in UPSTREAM_SCRUB_KEYS}
+        out = {}
+        for k, v in obj.items():
+            if k in UPSTREAM_SCRUB_KEYS:
+                continue
+            if k == "creator":
+                out[k] = {"name": "Loom creator", "handle": None}
+                continue
+            out[k] = _sanitize_upstream(v)
+        return out
     return obj
 
 
@@ -882,6 +899,105 @@ async def control_deployment(dep_id: str, request: Request):
     await engine._event(dep_id, f"deployment {new} by user", "info")
     return {"ok": True, "status": new}
 
+
+
+
+@auth_router.get("/deployments/{dep_id}")
+async def get_deployment(dep_id: str, request: Request):
+    s = await _session_user(request)
+    if not s:
+        return _err("sign_in_required", 401)
+    owner_key = s.get("email") or s["wallet"]
+    dep = await db.deployments.find_one({"id": dep_id, "ownerKey": owner_key}, {"_id": 0})
+    if not dep:
+        return _err("not_found", 404)
+    return {"deployment": dep}
+
+
+@auth_router.post("/deployments/{dep_id}/positions/{pos_id}/close")
+async def close_deployment_position(dep_id: str, pos_id: str, request: Request):
+    s = await _session_user(request)
+    if not s:
+        return _err("sign_in_required", 401)
+    owner_key = s.get("email") or s["wallet"]
+    pos = await db.positions.find_one({"id": pos_id, "deploymentId": dep_id, "ownerKey": owner_key, "status": "open"})
+    if not pos:
+        return _err("not_found", 404)
+    await engine._close_position(pos, "manual-close")
+    return {"ok": True}
+
+
+@auth_router.post("/account/stop-all")
+async def stop_all_deployments(request: Request):
+    """Kill switch: stop every active/paused deployment the user owns."""
+    s = await _session_user(request)
+    if not s:
+        return _err("sign_in_required", 401)
+    owner_key = s.get("email") or s["wallet"]
+    r = await db.deployments.update_many(
+        {"ownerKey": owner_key, "status": {"$in": ["active", "paused"]}},
+        {"$set": {"status": "stopped"}})
+    return {"ok": True, "stopped": r.modified_count}
+
+
+async def _ai_refine(strategy, instruction):
+    """Collect the AI refine stream server-side. Returns (strategy, error)."""
+    payload = {"strategy": strategy, "instruction": instruction}
+    try:
+        async with _client().stream("POST", f"{UPSTREAM}/ai/refine/stream", json=payload) as r:
+            if r.status_code != 200:
+                raw = (await r.aread()).decode(errors="replace")[:300]
+                try:
+                    d = _json.loads(raw)
+                    return None, d.get("error") or d.get("message") or f"refine failed ({r.status_code})"
+                except Exception:
+                    return None, f"refine failed ({r.status_code})"
+            got, err, event = None, None, None
+            async for line in r.aiter_lines():
+                if line.startswith("event:"):
+                    event = line[6:].strip()
+                elif line.startswith("data:"):
+                    try:
+                        d = _json.loads(line[5:].strip())
+                    except Exception:
+                        continue
+                    if event in ("result", "strategy") and isinstance(d, dict) and d.get("strategy"):
+                        got = d["strategy"]
+                    elif event == "error" and isinstance(d, dict):
+                        err = d.get("error") or d.get("message")
+            return got, err
+    except Exception as e:
+        logger.warning(f"ai refine failed: {e}")
+        return None, "ai_refine_unreachable"
+
+
+@auth_router.post("/deployments/{dep_id}/instruct")
+async def instruct_deployment(dep_id: str, request: Request):
+    """Apply a natural-language edit to a running deployment's strategy via the AI refiner."""
+    s = await _session_user(request)
+    if not s:
+        return _err("sign_in_required", 401)
+    owner_key = s.get("email") or s["wallet"]
+    dep = await db.deployments.find_one({"id": dep_id, "ownerKey": owner_key})
+    if not dep or dep.get("kind") != "strategy":
+        return _err("not_found", 404)
+    body = await request.json()
+    instruction = (body.get("instruction") or "").strip()
+    if not instruction:
+        return _err("instruction_required", 400)
+    new_strategy, err = await _ai_refine(dep.get("strategy") or {}, instruction)
+    if not new_strategy:
+        return _err(err or "refine_failed", 400)
+    new_strategy = _sanitize_upstream(new_strategy)
+    if not isinstance(new_strategy, dict) or not new_strategy.get("actions"):
+        return _err("refine_invalid", 400)
+    await db.deployments.update_one({"id": dep_id}, {"$set": {
+        "strategy": new_strategy,
+        "strategyName": new_strategy.get("name") or dep.get("strategyName"),
+        "state": {},  # fresh trigger state for the edited rules
+    }})
+    await engine._event(dep_id, f"strategy updated: {instruction[:80]}", "info")
+    return {"ok": True, "strategy": new_strategy}
 
 @auth_router.get("/paper/account")
 async def paper_account(request: Request):

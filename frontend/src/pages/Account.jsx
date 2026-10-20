@@ -319,6 +319,8 @@ function HistoryPanel({ history }) {
 
 function DeploymentsPanel({ token, deployments, onDone }) {
   const [busy, setBusy] = useState("");
+  const [instructFor, setInstructFor] = useState("");
+  const [instructText, setInstructText] = useState("");
   const control = async (id, action) => {
     setBusy(id + action);
     try {
@@ -327,9 +329,37 @@ function DeploymentsPanel({ token, deployments, onDone }) {
       onDone();
     } catch (e) { toast.error(errorMessage(e)); } finally { setBusy(""); }
   };
+  const stopAll = async () => {
+    setBusy("all");
+    try {
+      const d = await authed(token, "/account/stop-all", {});
+      toast.success(`Stopped ${d.stopped} deployment${d.stopped === 1 ? "" : "s"}`);
+      onDone();
+    } catch (e) { toast.error(errorMessage(e)); } finally { setBusy(""); }
+  };
+  const instruct = async (id) => {
+    const t = instructText.trim();
+    if (!t) return;
+    setBusy(id + "instruct");
+    try {
+      await authed(token, `/deployments/${id}/instruct`, { instruction: t });
+      toast.success("Strategy updated — running with the new rules");
+      setInstructFor(""); setInstructText("");
+      onDone();
+    } catch (e) { toast.error(errorMessage(e)); } finally { setBusy(""); }
+  };
+  const anyActive = deployments?.some((d) => d.status === "active" || d.status === "paused");
   return (
     <div className="mt-10" data-testid="deployments-section">
-      <h2 className="serif text-2xl font-light">Deployments <span className="text-[13px] text-[#9aa0ae]">— the engine checks every ~25s</span></h2>
+      <div className="flex items-center gap-3">
+        <h2 className="serif text-2xl font-light">Deployments <span className="text-[13px] text-[#9aa0ae]">— the engine checks every ~25s</span></h2>
+        {anyActive && (
+          <button onClick={stopAll} disabled={!!busy} data-testid="stop-all-btn"
+            className="rounded-full border border-[#f43f5e55] px-3 py-1 text-[11px] text-[#f43f5e] hover:border-[#f43f5e] disabled:opacity-40 transition-colors">
+            {busy === "all" ? "Stopping…" : "Stop all"}
+          </button>
+        )}
+      </div>
       <div className="mt-4 space-y-3">
         {!deployments && <Loading label="Loading deployments" />}
         {deployments?.length === 0 && (
@@ -356,8 +386,28 @@ function DeploymentsPanel({ token, deployments, onDone }) {
                   <button onClick={() => control(d.id, "stop")} disabled={!!busy} data-testid={`dep-stop-${d.id}`}
                     className="h-8 rounded-full border border-[#ffffff26] px-3.5 text-[11.5px] text-[#f43f5e] hover:border-[#f43f5e]">Stop</button>
                 )}
+                {d.kind === "strategy" && d.status !== "stopped" && (
+                  <button onClick={() => { setInstructFor(instructFor === d.id ? "" : d.id); setInstructText(""); }} disabled={!!busy} data-testid={`dep-instruct-${d.id}`}
+                    className="h-8 rounded-full border border-[#ffffff26] px-3.5 text-[11.5px] text-[#9aa0ae] hover:text-[#f4f4f5]">Edit with AI</button>
+                )}
               </div>
             </div>
+            {instructFor === d.id && (
+              <div className="mt-3 flex gap-2 border-t border-[#ffffff26] pt-3" data-testid={`dep-instruct-form-${d.id}`}>
+                <input
+                  value={instructText}
+                  onChange={(e) => setInstructText(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && instruct(d.id)}
+                  placeholder="e.g. lower the stop to 10% and use $100 instead"
+                  data-testid={`dep-instruct-input-${d.id}`}
+                  className="h-9 flex-1 rounded-full border border-[#ffffff26] bg-transparent px-4 text-[12.5px] text-[#f4f4f5] placeholder-[#6b7280] outline-none focus:border-[#ffffff59]"
+                />
+                <button onClick={() => instruct(d.id)} disabled={!!busy || !instructText.trim()} data-testid={`dep-instruct-apply-${d.id}`}
+                  className="h-9 rounded-full bg-[#e5e7eb] px-4 text-[12px] font-medium text-black hover:bg-[#f1f5f9] disabled:opacity-40 transition-colors">
+                  {busy === d.id + "instruct" ? "Applying…" : "Apply"}
+                </button>
+              </div>
+            )}
             {d.events?.length > 0 && (
               <div className="mt-3 border-t border-[#ffffff26] pt-3 space-y-1" data-testid={`dep-events-${d.id}`}>
                 {[...d.events].slice(-3).reverse().map((e, i) => (
@@ -378,6 +428,7 @@ function DeploymentsPanel({ token, deployments, onDone }) {
 
 function PaperPanel({ paper, token, onDone }) {
   const [resetBusy, setResetBusy] = useState(false);
+  const [closeBusy, setCloseBusy] = useState("");
   if (!paper) return null;
   const pnl = paper.equityUsd - paper.startUsd;
   const reset = async () => {
@@ -387,6 +438,14 @@ function PaperPanel({ paper, token, onDone }) {
       toast.success("Practice account reset to $10,000");
       onDone();
     } catch (e) { toast.error(errorMessage(e)); } finally { setResetBusy(false); }
+  };
+  const closePos = async (p) => {
+    setCloseBusy(p.id);
+    try {
+      await authed(token, `/deployments/${p.deploymentId}/positions/${p.id}/close`, {});
+      toast.success(`Closed ${p.side} ${p.symbol}`);
+      onDone();
+    } catch (e) { toast.error(errorMessage(e)); } finally { setCloseBusy(""); }
   };
   return (
     <div className="mt-10" data-testid="paper-section">
@@ -420,6 +479,10 @@ function PaperPanel({ paper, token, onDone }) {
                 <span className="text-[#9aa0ae]">{p.side} ${p.sizeUsd} · {p.leverage}×</span>
                 <span className="mono tnum">entry {Number(p.entryPx).toLocaleString()}</span>
                 <span className="mono text-[10px] text-[#9aa0ae]">{fmtAge(p.openedAt)}</span>
+                <button onClick={() => closePos(p)} disabled={closeBusy === p.id} data-testid={`paper-close-${p.id}`}
+                  className="ml-auto text-[11px] text-[#f43f5e] hover:underline disabled:opacity-40">
+                  {closeBusy === p.id ? "Closing…" : "Close"}
+                </button>
               </div>
             ))}
           </div>
