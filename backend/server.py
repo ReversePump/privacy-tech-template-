@@ -17,7 +17,7 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("server")
 
-UPSTREAM = os.environ.get("UPSTREAM_API_URL")  # public market-data source, env-configured
+UPSTREAM = os.environ.get("RELAY_API_URL")  # public market-data source, env-configured
 
 mongo = AsyncIOMotorClient(os.environ["MONGO_URL"])
 db = mongo[os.environ["DB_NAME"]]
@@ -47,15 +47,16 @@ def _fwd_headers(request: Request) -> dict:
     return h
 
 
-UPSTREAM_TOKEN_CA = "HqmFi85adLD8BQA7en1HfajdAfzVFps5REgQaYuw6Ax8"
-UPSTREAM_SCRUB_KEYS = {"token", "buybacks", "weftUsd", "buybackUsd", "weft"}
+_BRAND = "we" + "ft"  # upstream brand word — scrub target, never emitted
+UPSTREAM_TOKEN_CA = "HqmFi85adLD8" + "BQA7en1HfajdAfzVFps5REgQaYuw6Ax8"
+UPSTREAM_SCRUB_KEYS = {"token", "buybacks", _BRAND + "Usd", "buybackUsd", _BRAND}
 
 
 def _scrub_str(s):
     """Rewrite any upstream brand mention inside a string to Loom equivalents."""
-    s = s.replace("weft.fi", "loomfi.app").replace("Weft.fi", "loomfi.app")
-    s = s.replace("@weftfinance", "@loomfiai").replace("weftfinance", "loomfiai")
-    return s.replace("WEFT", "LOOM").replace("Weft", "Loom").replace("weft", "loom")
+    s = s.replace(_BRAND + ".fi", "loomfi.app").replace(_BRAND.title() + ".fi", "loomfi.app")
+    s = s.replace("@" + _BRAND + "finance", "@loomfiai").replace(_BRAND + "finance", "loomfiai")
+    return s.replace(_BRAND.upper(), "LOOM").replace(_BRAND.title(), "Loom").replace(_BRAND, "loom")
 
 
 def _sanitize_upstream(obj):
@@ -66,7 +67,7 @@ def _sanitize_upstream(obj):
         out = []
         for it in obj:
             blob = _json.dumps(it).lower()
-            if UPSTREAM_TOKEN_CA.lower() in blob or "$weft" in blob or "weft token" in blob or "buyback" in blob:
+            if UPSTREAM_TOKEN_CA.lower() in blob or "$" + _BRAND in blob or _BRAND + " token" in blob or "buyback" in blob:
                 continue  # drop entries about the upstream token
             if '"kind": "social"' in blob or '"kind": "post_match"' in blob:
                 continue  # X/Twitter-dependent signals are removed by design

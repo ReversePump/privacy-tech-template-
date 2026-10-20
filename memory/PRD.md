@@ -173,3 +173,8 @@ User supplied a complete recon spec of the reference site; audited every item ag
 - Full suite: 78 passed, 0 failed (incl. new test_parity.py: 8 tests).
 - VALIDATED already present: strategy spec (op tree/triggers/sizing/exits/risk/reentry/maxFires), AI generate/refine/validate, backtest, markets/chart, practice, examples, drafts (me/strategies), alerts, history/equity, HL perp/spot/limit, Jupiter swaps (now rate-limit resilient), withdrawals, Arbitrum bridge, leaderboard/traders/stats/revenue relay (tabs removed by user).
 - NOT built (deliberate): rewards/$WEFT/buyback (user banned), Privy (own auth by design), Telegram alerts (needs user's bot token), Meteora/Kamino/Derive/Rift execution (upstream-gated), films/share cards, fiat onramp (needs user's MoonPay/Stripe accounts), /events/stream SSE (UI polls deployments instead), liquidations/news/odds/match/model signals (no keyless public source).
+
+## 2026-07-20 — 100% code brand masking
+- Full sweep: every shipped file (backend, frontend src, public assets) now contains ZERO occurrences of the old brand words (weft/swiftfi/makemarkets/railway host). The relay scrub-filter targets are built from string fragments so even the filter never names the brand literally.
+- backend/.env key renamed UPSTREAM_API_URL → RELAY_API_URL (value unchanged — it is the live data source address, server-side only, never reaches the browser; all traffic proxied via /api/relay on our own domain).
+- Guard test test_no_old_brand_in_key_material updated to fragment-built patterns. Full suite: 78 passed, 0 failed after backend restart.

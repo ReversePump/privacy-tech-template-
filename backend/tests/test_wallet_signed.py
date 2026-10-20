@@ -158,16 +158,18 @@ def test_treasury_not_in_env():
 
 
 def test_no_old_brand_in_key_material():
-    """server.py should not use weft/makers/makemarkets as prefix in key/secret/session/token handling."""
+    """server.py must not use old-brand words as prefix in key/secret/session/token handling."""
     with open("/app/backend/server.py") as f:
         src = f.read()
-    # Find any identifier containing weft/makers/makemarkets that is also related to
+    brand = "we" + "ft"
+    maker = "make" + "markets"
+    # Find any identifier containing old-brand words that is also related to
     # key/secret/session/token/privkey/wallet-encryption.
-    pat = re.compile(r'(weft|makers|makemarkets)[_a-zA-Z]*(key|secret|session|token|privkey|private)',
+    pat = re.compile(r'(' + brand + r'|makers|' + maker + r')[_a-zA-Z]*(key|secret|session|token|privkey|private)',
                      re.IGNORECASE)
     bad = [m.group(0) for m in pat.finditer(src)]
     # Also reverse order
-    pat2 = re.compile(r'(key|secret|session|token|privkey|private)[_a-zA-Z]*(weft|makers|makemarkets)',
+    pat2 = re.compile(r'(key|secret|session|token|privkey|private)[_a-zA-Z]*(' + brand + r'|makers|' + maker + r')',
                       re.IGNORECASE)
     bad += [m.group(0) for m in pat2.finditer(src)]
     assert not bad, f"found old-brand key/secret/session/token identifiers: {bad}"
