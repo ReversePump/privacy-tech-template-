@@ -191,8 +191,14 @@ export default function New() {
         <textarea
           value={thesis}
           onChange={(e) => setThesis(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              draft();
+            }
+          }}
           rows={3}
-          placeholder="Long BTC 5x with $100 if funding stays under 0.01% and price holds $80,000. 25% stop."
+          placeholder="Long BTC 5x with $100 if funding stays under 0.01% and price holds $80,000. 25% stop. (Enter to draft)"
           className="mt-2 w-full resize-none rounded-lg border border-[#ffffff26] bg-[#17171b] px-4 py-3 text-[14px] leading-relaxed outline-none focus:border-[#ffffff66]"
           data-testid="thesis-input"
         />
