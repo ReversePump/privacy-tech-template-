@@ -196,3 +196,8 @@ User supplied a complete recon spec of the reference site; audited every item ag
 - STRUCTURAL FIX: app.include_router(api_router) was at line 135 — every api_router route added later (including the new AI routes) would never have registered. Both routers now included at end of file.
 - Verified: user's exact screenshot thesis drafted in ~10s in a real browser (mobile viewport), result card rendered, zero weft text on page; all 3 AI endpoints return source=loom; full suite 78/78 green.
 - Note: local drafts spend the user's universal key balance (Profile → Manage plan → Universal Key to top up).
+
+## 2026-07-20 — Telegram links removed, X is the only social
+- Relayed upstream data leaked Telegram: strategies carried notify actions with channel "telegram" and the practice config had 6 t.me links. Scrub now: t.me URLs removed (rewritten to our only social https://x.com/loomfiai), the word telegram rewritten to "Loom alerts", and notify channel "telegram" mapped to "in-app".
+- Full link audit: frontend code has only x.com/loomfiai (social) + solscan.io tx/token explorer links (functional trade proof, not social) + loomfi.app canonical. Relayed data: zero external links remain.
+- Relay tests 16/16 green.

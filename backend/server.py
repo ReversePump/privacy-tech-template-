@@ -2,6 +2,7 @@ import os
 import logging
 import uuid
 import json as _json
+import re
 import time
 import asyncio
 import httpx
@@ -54,6 +55,8 @@ UPSTREAM_SCRUB_KEYS = {"token", "buybacks", _BRAND + "Usd", "buybackUsd", _BRAND
 
 def _scrub_str(s):
     """Rewrite any upstream brand mention inside a string to Loom equivalents."""
+    s = re.sub(r"https?://t\.me/\S*", "https://x.com/loomfiai", s)  # telegram links → our only social
+    s = re.sub(r"\b[Tt]elegram\b", "Loom alerts", s)
     s = s.replace(_BRAND + ".fi", "loomfi.app").replace(_BRAND.title() + ".fi", "loomfi.app")
     s = s.replace("@" + _BRAND + "finance", "@loomfiai").replace(_BRAND + "finance", "loomfiai")
     return s.replace(_BRAND.upper(), "LOOM").replace(_BRAND.title(), "Loom").replace(_BRAND, "loom")
@@ -82,6 +85,9 @@ def _sanitize_upstream(obj):
                 continue
             if k == "creator":
                 out[k] = {"name": "Loom creator", "handle": None}
+                continue
+            if k == "channel" and v == "telegram":
+                out[k] = "in-app"  # telegram alerts removed by design
                 continue
             out[k] = _sanitize_upstream(v)
         return out
