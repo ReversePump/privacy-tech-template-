@@ -201,3 +201,7 @@ User supplied a complete recon spec of the reference site; audited every item ag
 - Relayed upstream data leaked Telegram: strategies carried notify actions with channel "telegram" and the practice config had 6 t.me links. Scrub now: t.me URLs removed (rewritten to our only social https://x.com/loomfiai), the word telegram rewritten to "Loom alerts", and notify channel "telegram" mapped to "in-app".
 - Full link audit: frontend code has only x.com/loomfiai (social) + solscan.io tx/token explorer links (functional trade proof, not social) + loomfi.app canonical. Relayed data: zero external links remain.
 - Relay tests 16/16 green.
+
+## 2026-07-20 — Trade card brand audit: clean
+- Full rendered-page scan (home, strategies, strategy detail, markets, new, terms, privacy, risk, signed-in account): zero occurrences of old brand, telegram, t.me, makemarkets, swiftfi.
+- Trade/history/holdings APIs carry zero brand strings; the only external link on the signed-in account page is https://x.com/loomfiai. Only remaining non-Loom names are venue labels (Hyperliquid etc.) which users need for funding — same as the reference site.
