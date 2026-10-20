@@ -19,6 +19,7 @@ export default function Footer() {
             <Link to="/new" className="text-[#9aa0ae] hover:text-[#f4f4f5]">New strategy</Link>
             <Link to="/strategies" className="text-[#9aa0ae] hover:text-[#f4f4f5]">Strategies</Link>
             <Link to="/markets" className="text-[#9aa0ae] hover:text-[#f4f4f5]">Markets</Link>
+            <Link to="/token" className="text-[#9aa0ae] hover:text-[#f4f4f5]">$LOOM token</Link>
             <Link to="/terms" className="text-[#9aa0ae] hover:text-[#f4f4f5]">Terms</Link>
             <Link to="/privacy" className="text-[#9aa0ae] hover:text-[#f4f4f5]">Privacy</Link>
             <Link to="/risk" className="text-[#9aa0ae] hover:text-[#f4f4f5]">Risk disclosure</Link>

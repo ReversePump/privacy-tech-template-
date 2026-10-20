@@ -9,6 +9,7 @@ import AuthModal from "./AuthModal";
 const NAV = [
   { to: "/strategies", label: "Strategies" },
   { to: "/markets", label: "Markets" },
+  { to: "/token", label: "$LOOM" },
 ];
 
 export default function Header() {

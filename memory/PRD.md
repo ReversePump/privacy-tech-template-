@@ -222,3 +222,9 @@ User supplied a complete recon spec of the reference site; audited every item ag
 ## 2026-07-20 — Header airdrop pill
 - Header CA pill now reads "Operate & earn $LOOM airdrop Uiun…pump" (desktop), "$LOOM airdrop" compact (mobile), tap copies the CA. Mobile header spacing fixed: LOOM wordmark hides below 480px, tighter gaps — verified zero horizontal overflow at 375px and 480px.
 - Note: airdrop copy is marketing only — no airdrop tracking/snapshot system exists (rewards infra was removed per earlier user request).
+
+## 2026-07-20 — Dedicated $LOOM token page
+- New /token page: live price/market cap/volume/buys/sells (DexScreener via cached backend proxy GET /api/loom/token), on-chain supply verified via Solana RPC (1B, mint+freeze revoked shown as facts), CA card with copy + Solscan/DexScreener links, airdrop panel, CTAs.
+- Own chrome-styled live chart (GET /api/loom/chart — GeckoTerminal 15m OHLCV, cached 5min) after DexScreener iframe refused to embed; animated last-price dot, gradient area, green/red by trend. Chart endpoint self-resolves pair address (cold-cache fix).
+- Nav (desktop+mobile) and footer gained $LOOM links; Home token section links to /token; sitemap.xml + llms.txt updated; Seo component set.
+- Verified: page at 1366px + 375px, live data confirmed (price moved $9.0K→$10.7K mcap during testing), 26 regression tests green.

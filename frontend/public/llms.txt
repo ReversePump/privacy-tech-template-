@@ -17,6 +17,7 @@
 - /new — AI strategy builder (write a thesis, get rules, backtest, deploy)
 - /strategies — public strategy catalog
 - /markets — live prices, volume and charts for every market
+- /token — the $LOOM token: live price, contract address, on-chain facts, airdrop info
 
 ## Contact
 - X: https://x.com/loomfiai

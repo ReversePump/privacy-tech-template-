@@ -13,6 +13,7 @@ import Strategies from "./pages/Strategies";
 import StrategyDetail from "./pages/StrategyDetail";
 import Account from "./pages/Account";
 import Markets from "./pages/Markets";
+import Token from "./pages/Token";
 import Legal from "./pages/Legal";
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
                 <Route path="/strategies" element={<Strategies />} />
                 <Route path="/strategies/:id" element={<StrategyDetail />} />
                 <Route path="/markets" element={<Markets />} />
+                <Route path="/token" element={<Token />} />
                 <Route path="/terms" element={<Legal page="terms" />} />
                 <Route path="/privacy" element={<Legal page="privacy" />} />
                 <Route path="/risk" element={<Legal page="risk" />} />

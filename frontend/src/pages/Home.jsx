@@ -297,6 +297,10 @@ function TokenSection() {
               className="inline-flex h-9 items-center rounded-full border border-[#ffffff26] px-4 text-[12px] text-[#9aa0ae] hover:text-[#f4f4f5] hover:border-[#ffffff59] transition-colors">
               Solscan ↗
             </a>
+            <Link to="/token" data-testid="loom-token-page-link"
+              className="inline-flex h-9 items-center rounded-full bg-[#e5e7eb] px-4 text-[12px] font-medium text-black hover:bg-[#f1f5f9] transition-colors">
+              $LOOM token page
+            </Link>
           </div>
         </Panel>
       </div>

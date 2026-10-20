@@ -140,6 +140,83 @@ async def relay(path: str, request: Request):
     )
 
 
+# ---------- $LOOM token page data ----------
+
+LOOM_MINT = "UiunBXF9R9Ee58eNSxfcCW9iotsSAjSP69HMLDdpump"
+_loom_token_cache = {"at": 0.0, "data": None}
+
+
+@api_router.get("/loom/token")
+async def loom_token():
+    """Live $LOOM market data: DexScreener pair + on-chain supply. Cached 60s."""
+    now = time.time()
+    if _loom_token_cache["data"] and now - _loom_token_cache["at"] < 60:
+        return _loom_token_cache["data"]
+    out = {"mint": LOOM_MINT, "symbol": "LOOM", "decimals": 6, "supply": 1_000_000_000,
+           "mintAuthorityRevoked": True, "freezeAuthorityRevoked": True}
+    try:
+        r = await _sol_rpc("getTokenSupply", [LOOM_MINT])
+        amt = r.get("value", {})
+        if amt.get("uiAmount"):
+            out["supply"] = amt["uiAmount"]
+    except Exception as e:
+        logger.warning(f"loom supply: {e}")
+    try:
+        async with httpx.AsyncClient(timeout=15) as c:
+            r = await c.get(f"https://api.dexscreener.com/latest/dex/tokens/{LOOM_MINT}")
+            pairs = r.json().get("pairs") or []
+        if pairs:
+            p = max(pairs, key=lambda x: (x.get("liquidity") or {}).get("usd") or 0)
+            out.update({
+                "priceUsd": float(p["priceUsd"]) if p.get("priceUsd") else None,
+                "change24hPct": (p.get("priceChange") or {}).get("h24"),
+                "volume24hUsd": (p.get("volume") or {}).get("h24"),
+                "liquidityUsd": (p.get("liquidity") or {}).get("usd"),
+                "fdvUsd": p.get("fdv"), "marketCapUsd": p.get("marketCap"),
+                "buys24h": (p.get("txns") or {}).get("h24", {}).get("buys"),
+                "sells24h": (p.get("txns") or {}).get("h24", {}).get("sells"),
+                "dex": p.get("dexId"), "pairUrl": p.get("url"), "pairAddress": p.get("pairAddress"),
+                "imageUrl": (p.get("info") or {}).get("imageUrl"),
+            })
+    except Exception as e:
+        logger.warning(f"loom dexscreener: {e}")
+    out["ts"] = datetime.now(timezone.utc).isoformat()
+    _loom_token_cache.update({"at": now, "data": out})
+    return out
+
+
+_loom_chart_cache = {"at": 0.0, "data": None}
+
+
+@api_router.get("/loom/chart")
+async def loom_chart():
+    """15-minute OHLCV candles for $LOOM from GeckoTerminal (public, no key). Cached 5 min."""
+    now = time.time()
+    if _loom_chart_cache["data"] and now - _loom_chart_cache["at"] < 300:
+        return _loom_chart_cache["data"]
+    pair = (_loom_token_cache["data"] or {}).get("pairAddress")
+    candles = []
+    if not pair:
+        try:
+            await loom_token()  # resolves and caches the pair address
+            pair = (_loom_token_cache["data"] or {}).get("pairAddress")
+        except Exception:
+            pass
+    if pair:
+        try:
+            async with httpx.AsyncClient(timeout=15) as c:
+                r = await c.get(f"https://api.geckoterminal.com/api/v2/networks/solana/pools/{pair}/ohlcv/minute",
+                                params={"aggregate": 15, "limit": 96})
+                rows = r.json().get("data", {}).get("attributes", {}).get("ohlcv_list", [])
+            candles = sorted([[row[0], row[4]] for row in rows], key=lambda x: x[0])  # [ts, close] ascending
+        except Exception as e:
+            logger.warning(f"loom chart: {e}")
+    out = {"candles": candles, "intervalMinutes": 15}
+    if candles:
+        _loom_chart_cache.update({"at": now, "data": out})
+    return out
+
+
 # ---------- local accounts: wallet sign-in + saved strategies ----------
 
 auth_router = APIRouter(prefix="/api")
