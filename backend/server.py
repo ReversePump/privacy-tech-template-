@@ -676,12 +676,25 @@ async def hl_trade(request: Request):
             logger.warning(f"spot px: {e}")
     if not px:
         return _err("unknown_market", 400)
+    # pre-check funds so users get a human answer instead of a raw API error
+    try:
+        st = _hl().user_state(user["evmAddress"])
+        equity = float(st.get("marginSummary", {}).get("accountValue", 0) or 0)
+    except Exception:
+        equity = 0.0  # account is created on Hyperliquid by its first deposit
+    if equity <= 0:
+        return _err("account_not_funded — deposit USDC on Arbitrum to your Loom address to activate trading", 400)
+    if equity < size_usd / leverage:
+        return _err(f"insufficient_balance — your Hyperliquid account has ${equity:,.2f}; this order needs ${size_usd / leverage:,.2f} margin", 400)
     sz = round(size_usd / px, 6)
     try:
         res = ex.market_open(symbol, side == "long", sz)
     except Exception as e:
         logger.warning(f"hl trade error: {e}")
-        return Response(_json.dumps({"error": str(e)[:200]}), status_code=400, media_type="application/json")
+        msg = str(e)
+        if "does not exist" in msg:
+            msg = "account_not_funded — deposit USDC on Arbitrum to your Loom address to activate trading"
+        return Response(_json.dumps({"error": msg[:200]}), status_code=400, media_type="application/json")
     ok = res.get("status") == "ok"
     await db.hl_trades.insert_one({"email": user["email"], "symbol": symbol, "side": side, "sizeUsd": size_usd,
                                    "leverage": leverage, "sz": sz, "spot": is_spot, "response": res,
@@ -866,6 +879,16 @@ async def create_deployment(request: Request):
         strategy = body.get("strategy")
         if not isinstance(strategy, dict) or not strategy.get("actions"):
             return _err("strategy_required", 400)
+        # optional per-trade size override (USD) — applies to every open action sized in usd
+        size_override = body.get("sizeUsd")
+        if size_override is not None:
+            try:
+                size_override = min(max(float(size_override), 10), 10000)
+            except (TypeError, ValueError):
+                return _err("invalid_size", 400)
+            for a in strategy.get("actions", []):
+                if a.get("type") == "open" and (a.get("size") or {}).get("unit") == "usd":
+                    a["size"]["value"] = size_override
         dep.update({"kind": "strategy", "strategy": strategy, "strategyName": strategy.get("name") or "Strategy"})
     await db.deployments.insert_one(dep)
     await engine._event(dep["id"], f"deployed in {mode} mode — engine is watching", "info")
@@ -939,6 +962,22 @@ async def stop_all_deployments(request: Request):
         {"ownerKey": owner_key, "status": {"$in": ["active", "paused"]}},
         {"$set": {"status": "stopped"}})
     return {"ok": True, "stopped": r.modified_count}
+
+
+@auth_router.delete("/deployments/{dep_id}")
+async def delete_deployment(dep_id: str, request: Request):
+    """Remove a deployment from the list. Running ones are stopped first. Positions/history are kept."""
+    s = await _session_user(request)
+    if not s:
+        return _err("sign_in_required", 401)
+    owner_key = s.get("email") or s["wallet"]
+    dep = await db.deployments.find_one({"id": dep_id, "ownerKey": owner_key})
+    if not dep:
+        return _err("not_found", 404)
+    if dep.get("status") in ("active", "paused"):
+        await db.deployments.update_one({"id": dep_id}, {"$set": {"status": "stopped"}})
+    await db.deployments.delete_one({"id": dep_id})
+    return {"ok": True}
 
 
 async def _ai_refine(strategy, instruction):

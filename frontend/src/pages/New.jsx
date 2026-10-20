@@ -37,6 +37,7 @@ export default function New() {
   const [refineBusy, setRefineBusy] = useState(false);
   const [practice, setPractice] = useState(null);
   const [valid, setValid] = useState(null); // null=unknown, true=validated, string=issue
+  const [sizeOverride, setSizeOverride] = useState("");
 
   const validateDraft = (s) => {
     setValid(null);
@@ -59,7 +60,7 @@ export default function New() {
       const r = await fetch(`${API}/api/deployments`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ mode, strategy }),
+        body: JSON.stringify({ mode, strategy, ...(Number(sizeOverride) > 0 ? { sizeUsd: Number(sizeOverride) } : {}) }),
       });
       const d = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(d.error === "live_needs_email_account" ? "Live mode needs an email account — sign in with email so a wallet can be generated for you" : d.error || `failed (${r.status})`);
@@ -325,6 +326,14 @@ export default function New() {
             <p className="mt-2 text-[13px] text-[#9aa0ae]">
               Run it with $10,000 of pretend money at real prices, as alerts only, or live from your own account. Sign in with email — Loom creates the wallet and Hyperliquid account for you.
             </p>
+            <div className="mt-4 flex flex-wrap items-center gap-2" data-testid="size-override-row">
+              <span className="mono text-[10px] uppercase tracking-wider text-[#9aa0ae]">Size per trade</span>
+              <input type="number" min={10} max={10000} value={sizeOverride} onChange={(e) => setSizeOverride(e.target.value)}
+                placeholder={`$${(strategy.actions || []).find((a) => a.type === "open" && a.size?.unit === "usd")?.size?.value || 50}`}
+                data-testid="size-override-input"
+                className="h-9 w-24 rounded-lg border border-[#ffffff26] bg-[#17171b] px-3 mono text-[12px] outline-none focus:border-[#ffffff59]" />
+              <span className="text-[11px] text-[#9aa0ae]">every time it fires — type to change, or leave the strategy default</span>
+            </div>
             <div className="mt-4 flex flex-wrap gap-3">
               <button onClick={() => deploy("paper")} disabled={!!deployBusy} data-testid="start-practice-btn"
                 className="inline-flex h-10 items-center gap-2 rounded-full bg-[#e5e7eb] px-5 text-[13px] font-medium text-black shadow-[0_0_20px_rgba(226,232,255,0.35)] hover:bg-[#f1f5f9] disabled:opacity-40 transition-colors">

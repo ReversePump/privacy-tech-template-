@@ -16,9 +16,9 @@ const API = process.env.REACT_APP_BACKEND_URL;
 const WSOL = "So11111111111111111111111111111111111111112";
 const USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 
-const authed = (token, path, body) =>
+const authed = (token, path, body, method) =>
   fetch(`${API}/api${path}`, {
-    method: body ? "POST" : "GET",
+    method: method || (body ? "POST" : "GET"),
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
     body: body ? JSON.stringify(body) : undefined,
   }).then(async (r) => {
@@ -337,6 +337,14 @@ function DeploymentsPanel({ token, deployments, onDone }) {
       onDone();
     } catch (e) { toast.error(errorMessage(e)); } finally { setBusy(""); }
   };
+  const del = async (id) => {
+    setBusy(id + "delete");
+    try {
+      await authed(token, `/deployments/${id}`, null, "DELETE");
+      toast.success("Deployment deleted");
+      onDone();
+    } catch (e) { toast.error(errorMessage(e)); } finally { setBusy(""); }
+  };
   const instruct = async (id) => {
     const t = instructText.trim();
     if (!t) return;
@@ -385,6 +393,10 @@ function DeploymentsPanel({ token, deployments, onDone }) {
                 {(d.status === "active" || d.status === "paused") && (
                   <button onClick={() => control(d.id, "stop")} disabled={!!busy} data-testid={`dep-stop-${d.id}`}
                     className="h-8 rounded-full border border-[#ffffff26] px-3.5 text-[11.5px] text-[#f43f5e] hover:border-[#f43f5e]">Stop</button>
+                )}
+                {d.status === "stopped" && (
+                  <button onClick={() => del(d.id)} disabled={!!busy} data-testid={`dep-delete-${d.id}`}
+                    className="h-8 rounded-full border border-[#ffffff26] px-3.5 text-[11.5px] text-[#9aa0ae] hover:text-[#f43f5e] hover:border-[#f43f5e66]">Delete</button>
                 )}
                 {d.kind === "strategy" && d.status !== "stopped" && (
                   <button onClick={() => { setInstructFor(instructFor === d.id ? "" : d.id); setInstructText(""); }} disabled={!!busy} data-testid={`dep-instruct-${d.id}`}
@@ -639,9 +651,16 @@ function HlTradePanel({ token, markets, hlInfo, onDone }) {
           ))}
         </div>
       </div>
+      {hlInfo && (
+        <div className="mt-3 text-[11px]" data-testid="hl-balance-line">
+          <span className="mono text-[#9aa0ae]">Balance <span className="text-[#f4f4f5]">{fmtUsd(hlInfo.equityUsd)}</span> · available <span className="text-[#f4f4f5]">{fmtUsd(hlInfo.withdrawableUsd)}</span></span>
+          {hlInfo.equityUsd <= 0 && (
+            <p className="mt-1.5 text-[#f43f5e]" data-testid="hl-unfunded-hint">Not funded yet — send USDC on Arbitrum to your Loom address above to activate real trading.</p>
+          )}
+        </div>
+      )}
       <div className="mt-4 grid grid-cols-2 gap-2">
-        <select value={sel?.symbol || ""} onChange={(e) => setSymbol(e.target.value)} data-testid="hl-symbol"
-          className="h-11 rounded-lg border border-[#ffffff26] bg-[#17171b] px-3 mono text-[12px] outline-none">
+        <select value={sel?.symbol || ""} onChange={(e) => setSymbol(e.target.value)} data-testid="hl-symbol"  className="h-11 rounded-lg border border-[#ffffff26] bg-[#17171b] px-3 mono text-[12px] outline-none">
           {list.slice(0, 40).map((m) => <option key={m.symbol} value={m.symbol}>{m.label || m.symbol} · ${m.price < 1 ? Number(m.price).toPrecision(3) : m.price.toLocaleString()}</option>)}
         </select>
         <div className="flex gap-1 rounded-lg border border-[#ffffff26] p-1">
@@ -681,7 +700,7 @@ function HlTradePanel({ token, markets, hlInfo, onDone }) {
           Set limit order · {side} ${sizeUsd} {direction === "above" ? "≥" : "≤"} ${targetPx || "…"}
         </button>
       ) : (
-      <button onClick={trade} disabled={busy || sizeUsd < 10 || !sel} data-testid="hl-trade-btn"
+      <button onClick={trade} disabled={busy || sizeUsd < 10 || !sel || (hlInfo ? hlInfo.equityUsd <= 0 : false)} data-testid="hl-trade-btn"
         className="mt-3 h-11 w-full rounded-full bg-[#e5e7eb] text-[13px] font-medium text-black shadow-[0_0_20px_rgba(226,232,255,0.35)] hover:bg-[#f1f5f9] disabled:opacity-40 transition-colors inline-flex items-center justify-center gap-2">
         {busy && <Loader2 size={14} className="animate-spin" />}
         {isSpot ? `${side === "long" ? "Buy" : "Sell"} ${sel?.symbol || ""} · $${sizeUsd}` : `Open ${side} · $${sizeUsd} · ${lev}×`}

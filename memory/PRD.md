@@ -178,3 +178,10 @@ User supplied a complete recon spec of the reference site; audited every item ag
 - Full sweep: every shipped file (backend, frontend src, public assets) now contains ZERO occurrences of the old brand words (weft/swiftfi/makemarkets/railway host). The relay scrub-filter targets are built from string fragments so even the filter never names the brand literally.
 - backend/.env key renamed UPSTREAM_API_URL → RELAY_API_URL (value unchanged — it is the live data source address, server-side only, never reaches the browser; all traffic proxied via /api/relay on our own domain).
 - Guard test test_no_old_brand_in_key_material updated to fragment-built patterns. Full suite: 78 passed, 0 failed after backend restart.
+
+## 2026-07-20 — HL trade UX, deployment delete, size override
+- Reproduced user's "api error" on Hyperliquid trade: raw "User or API Wallet … does not exist" dump. Root cause: a generated HL account only exists on-chain after its first USDC (Arbitrum) deposit. Fixed: /hl/trade pre-checks equity and returns human errors (account_not_funded / insufficient_balance with exact margin needed), and maps the raw exchange error too.
+- UI: HL trade panel now shows Balance/available line, a red funding hint when unfunded, and disables the trade button until funded. Confirmed HL is real mainnet (MAINNET_API_URL for Info + Exchange).
+- ADDED: DELETE /deployments/{id} (auto-stops first, keeps position history) + Delete button on stopped deployments.
+- ADDED: size-per-trade override at deploy time (New page input, backend sizeUsd override rewrites usd-sized open actions, clamped $10–$10,000). Answers "how much does a live strategy use": each fire trades this size; margin needed = size ÷ leverage.
+- Full suite 78/78 green; UI screenshot-verified signed-in at 1366px (balance line, hint, disabled button, Delete).
