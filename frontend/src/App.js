@@ -43,7 +43,7 @@ function App() {
         </AuthProvider>
       </WalletContext>
       <Toaster position="bottom-right" toastOptions={{
-        style: { background: "#ffffff", border: "1px solid #f4f4f514", color: "#f4f4f5", fontFamily: "Instrument Sans, sans-serif" },
+        style: { background: "#17171b", border: "1px solid #ffffff26", color: "#f4f4f5", fontFamily: "Instrument Sans, sans-serif" },
       }} />
     </div>
   );

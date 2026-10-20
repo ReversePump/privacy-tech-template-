@@ -185,3 +185,6 @@ User supplied a complete recon spec of the reference site; audited every item ag
 - ADDED: DELETE /deployments/{id} (auto-stops first, keeps position history) + Delete button on stopped deployments.
 - ADDED: size-per-trade override at deploy time (New page input, backend sizeUsd override rewrites usd-sized open actions, clamped $10–$10,000). Answers "how much does a live strategy use": each fire trades this size; margin needed = size ÷ leverage.
 - Full suite 78/78 green; UI screenshot-verified signed-in at 1366px (balance line, hint, disabled button, Delete).
+
+## 2026-07-20 — Toast contrast fix
+- Toast notifications were white background (#ffffff) with near-white text (#f4f4f5) — invisible messages. Now dark chrome (#17171b bg, #ffffff26 border, light text). Verified live: "Welcome back" toast renders dark with readable text.
