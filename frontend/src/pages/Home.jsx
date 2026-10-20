@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import Seo from "../components/Seo";
 import { Link } from "react-router-dom";
-import { ArrowRight, ShieldCheck, Wallet, BellRing, CircleStop, Eye } from "lucide-react";
+import { ArrowRight, ShieldCheck, Wallet, BellRing, CircleStop, Eye, Copy, Check } from "lucide-react";
 import { loom } from "../lib/api";
+import { LOOM_CA, LOOM_X } from "../lib/brand";
 import LoomSignals from "../components/LoomSignals";
 import { Panel, Tag, CoinIcon, Loading } from "../components/bits";
 import StrategyCard from "../components/StrategyCard";
@@ -40,7 +41,7 @@ const FAQ = [
   ["What can it watch?", "Prices, funding, wallets, Hyperliquid traders, calendar events, Fear & Greed, token on-chain stats, weather and sports results — mixed in one sentence if you like."],
   ["Can I copy other traders?", "Yes. Pick a Hyperliquid trader and mirror their entries with your own size."],
   ["What does it cost?", "Writing strategies and paper trading are free. Network and exchange fees apply only when real orders execute."],
-  ["Is there a Loom token?", "Not yet. When it launches, the contract address will be published here and on the Loom X account — nowhere else."],
+  ["Is there a Loom token?", "Yes — $LOOM is live. The only official contract address is published on this page and on the Loom X account — nowhere else."],
   ["Can I try it without real money?", "Yes — every strategy can run on a $10,000 paper account at real prices, or as alerts only."],
   ["Can it just alert me instead?", "Yes. Any strategy can run in alert-only mode and ping you instead of trading."],
   ["What if Loom goes down?", "Your money never leaves your account. Open positions keep their on-exchange stops; you can always manage them directly."],
@@ -266,19 +267,37 @@ export default function Home() {
 }
 
 function TokenSection() {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(LOOM_CA);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch { /* clipboard blocked */ }
+  };
   return (
     <section className="border-t border-[#ffffff26] bg-[#17171b]" id="token">
       <div className="mx-auto max-w-[1200px] px-4 md:px-6 py-20">
         <div className="mono text-[10px] uppercase tracking-[0.16em] text-[#9aa0ae]">The Loom token</div>
         <h2 className="mt-3 serif text-3xl md:text-4xl font-light tracking-tight max-w-2xl">
-          Not launched yet. <span className="italic text-[#f1f5f9]">Announced here first.</span>
+          $LOOM is live. <span className="italic text-[#f1f5f9]">One address — nowhere else.</span>
         </h2>
         <Panel className="mt-8 p-6 max-w-2xl" data-testid="loom-token-note">
           <p className="text-[14px] leading-relaxed text-[#9aa0ae]">
-            There is no official Loom token today. When it launches, the contract address will be published on this page
-            and on <a href="https://x.com/loomfiai" target="_blank" rel="noopener noreferrer" className="text-[#f1f5f9] hover:underline">X @loomfiai</a> — and nowhere else.
-            Anything trading before that is fake.
+            The only official contract address. Always verify it here or on <a href={LOOM_X} target="_blank" rel="noopener noreferrer" className="text-[#f1f5f9] hover:underline">X @loomfiai</a> — anything else is fake.
           </p>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <code className="mono text-[12px] text-[#f4f4f5] break-all rounded-lg border border-[#ffffff26] bg-[#0a0a0c] px-3 py-2" data-testid="loom-ca">{LOOM_CA}</code>
+            <button onClick={copy} data-testid="loom-ca-copy"
+              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[#ffffff26] px-4 text-[12px] text-[#9aa0ae] hover:text-[#f4f4f5] hover:border-[#ffffff59] transition-colors">
+              {copied ? <Check size={12} className="text-[#34d399]" /> : <Copy size={12} />}
+              {copied ? "Copied" : "Copy CA"}
+            </button>
+            <a href={`https://solscan.io/token/${LOOM_CA}`} target="_blank" rel="noopener noreferrer" data-testid="loom-ca-solscan"
+              className="inline-flex h-9 items-center rounded-full border border-[#ffffff26] px-4 text-[12px] text-[#9aa0ae] hover:text-[#f4f4f5] hover:border-[#ffffff59] transition-colors">
+              Solscan ↗
+            </a>
+          </div>
         </Panel>
       </div>
     </section>

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { LayoutDashboard, Wallet } from "lucide-react";
+import { LayoutDashboard, Wallet, Copy, Check } from "lucide-react";
 import { useAuth } from "../solana/AuthContext";
+import { LOOM_CA, LOOM_X, shortCa } from "../lib/brand";
 import AuthModal from "./AuthModal";
 
 const NAV = [
@@ -15,6 +16,15 @@ export default function Header() {
   const { connected } = useWallet();
   const { signedIn } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const copyCa = async () => {
+    try {
+      await navigator.clipboard.writeText(LOOM_CA);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch { /* clipboard blocked */ }
+  };
 
   const onAccount = () => {
     if (signedIn) { nav("/account"); return; }
@@ -35,8 +45,13 @@ export default function Header() {
             </Link>
           ))}
         </nav>
+        <button onClick={copyCa} data-testid="header-ca" title={`$LOOM contract: ${LOOM_CA} — tap to copy`}
+          className="inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-[#ffffff26] px-3 mono text-[10.5px] text-[#9aa0ae] hover:text-[#f4f4f5] hover:border-[#ffffff59] transition-colors">
+          <span className="text-[#cbd5e1]">$LOOM</span> <span className="hidden sm:inline">{shortCa()}</span>
+          {copied ? <Check size={11} className="text-[#34d399]" /> : <Copy size={11} />}
+        </button>
         <div className="ml-auto flex items-center gap-3">
-          <a href="https://x.com/loomfiai" target="_blank" rel="noopener noreferrer" data-testid="header-x-link" aria-label="Loom on X"
+          <a href={LOOM_X} target="_blank" rel="noopener noreferrer" data-testid="header-x-link" aria-label="Loom on X"
             className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#ffffff26] text-[#9aa0ae] hover:text-[#cbd5e1] hover:border-[#ffffff59] transition-colors">
             <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
           </a>
@@ -51,7 +66,7 @@ export default function Header() {
           <button
             onClick={() => nav("/new")}
             data-testid="header-start-btn"
-            className="h-9 rounded-full bg-[#e5e7eb] px-4 text-[13px] font-medium text-black shadow-[0_0_20px_rgba(226,232,255,0.35)] hover:bg-[#f1f5f9] transition-colors"
+            className="hidden sm:inline-flex h-9 rounded-full bg-[#e5e7eb] px-4 text-[13px] font-medium text-black shadow-[0_0_20px_rgba(226,232,255,0.35)] hover:bg-[#f1f5f9] transition-colors"
           >
             Start trading
           </button>

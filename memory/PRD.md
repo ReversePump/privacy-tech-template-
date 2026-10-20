@@ -212,3 +212,9 @@ User supplied a complete recon spec of the reference site; audited every item ag
 - WITHDRAWALS: all 3 paths verified unfunded with clean human errors now: SOL (/wallet/withdraw pre-checks balance: "your Solana wallet has 0.0000 SOL; deposit first"), HL account-to-account and HL→Arbitrum bridge map raw "Must deposit" dumps to account_not_funded guidance. Frontend field names verified matching backend.
 - UI: Practice equity added to the top stats row (tap scrolls to the practice section); synth badge on papertrade-venue positions.
 - Full suite 78/78 green (test updated to assert friendly unfunded wording).
+
+## 2026-07-20 — $LOOM token CA live in header on all pages
+- $LOOM mint UiunBXF9R9Ee58eNSxfcCW9iotsSAjSP69HMLDdpump verified on-chain first: 1B supply, 6 decimals, mint+freeze authorities revoked (clean pump.fun launch).
+- Header (global, all pages): $LOOM CA pill with tap-to-copy; desktop shows truncated address, mobile shows compact $LOOM + copy icon; Start trading hides below sm to prevent clipping (hero CTA remains).
+- Home token section replaced "not launched" with live CA display + Copy CA + Solscan link; FAQ answer updated. Brand constants centralized in src/lib/brand.js (LOOM_CA, LOOM_X).
+- Verified by screenshot at 1366px and 375px on / and /markets.
