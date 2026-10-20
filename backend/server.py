@@ -543,6 +543,13 @@ async def wallet_withdraw(request: Request):
         return _err("invalid_input", 400)
     if lamports <= 5000:
         return _err("amount_too_small", 400)
+    # pre-check balance so users get a human answer instead of a broadcast error
+    try:
+        bal = (await _sol_rpc("getBalance", [str(_custodial_keypair(user).pubkey())])).get("value", 0)
+    except Exception:
+        bal = None
+    if bal is not None and bal < lamports + 5000:
+        return _err(f"insufficient_balance — your Solana wallet has {bal / 1e9:.4f} SOL; deposit SOL first", 400)
     kp = _custodial_keypair(user)
     sig = None
     last = None
@@ -746,13 +753,19 @@ async def hl_withdraw(request: Request):
         res = ex.usd_transfer(amount, dest)
     except Exception as e:
         logger.warning(f"hl withdraw error: {e}")
-        return Response(_json.dumps({"error": str(e)[:200]}), status_code=400, media_type="application/json")
+        msg = str(e)
+        if "Must deposit" in msg or "does not exist" in msg:
+            msg = "account_not_funded — deposit USDC on Arbitrum to your Loom address to activate your Hyperliquid account first"
+        return Response(_json.dumps({"error": msg[:200]}), status_code=400, media_type="application/json")
     ok = res.get("status") == "ok"
     if ok:
         await db.hl_withdrawals.insert_one({"email": user["email"], "destination": dest, "amountUsd": amount,
                                             "createdAt": datetime.now(timezone.utc).isoformat()})
         return {"ok": True}
-    return Response(_json.dumps({"error": str(res)[:200]}), status_code=400, media_type="application/json")
+    raw = str(res)
+    if "Must deposit" in raw or "does not exist" in raw:
+        raw = "account_not_funded — deposit USDC on Arbitrum to your Loom address first"
+    return Response(_json.dumps({"error": raw[:200]}), status_code=400, media_type="application/json")
 
 
 @auth_router.post("/hl/withdraw_bridge")
@@ -773,13 +786,19 @@ async def hl_withdraw_bridge(request: Request):
         res = ex.withdraw_from_bridge(amount, user["evmAddress"])
     except Exception as e:
         logger.warning(f"hl bridge withdraw error: {e}")
-        return Response(_json.dumps({"error": str(e)[:200]}), status_code=400, media_type="application/json")
+        msg = str(e)
+        if "Must deposit" in msg or "does not exist" in msg:
+            msg = "account_not_funded — deposit USDC on Arbitrum to your Loom address to activate your Hyperliquid account first"
+        return Response(_json.dumps({"error": msg[:200]}), status_code=400, media_type="application/json")
     ok = res.get("status") == "ok"
     if ok:
         await db.hl_withdrawals.insert_one({"email": user["email"], "kind": "bridge", "destination": user["evmAddress"],
                                             "amountUsd": amount, "createdAt": datetime.now(timezone.utc).isoformat()})
         return {"ok": True, "destination": user["evmAddress"]}
-    return Response(_json.dumps({"error": str(res)[:200]}), status_code=400, media_type="application/json")
+    raw = str(res)
+    if "Must deposit" in raw or "does not exist" in raw:
+        raw = "account_not_funded — deposit USDC on Arbitrum to your Loom address first"
+    return Response(_json.dumps({"error": raw[:200]}), status_code=400, media_type="application/json")
 
 
 @auth_router.get("/history")
@@ -1099,21 +1118,36 @@ def _parse_ai_strategy(text):
     return d
 
 
+AI_MODELS = [("gemini", "gemini-3.5-flash"), ("anthropic", "claude-sonnet-5-5")]  # fast first, then strong
+
+
 async def _local_ai_generate(prompt):
-    """Draft (or refine) a strategy spec with Claude via the platform LLM key."""
+    """Draft (or refine) a strategy spec with the platform LLM key — fast model first, strong model backup."""
     from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
-    chat = LlmChat(
-        api_key=os.environ.get("EMERGENT_LLM_KEY"),
-        session_id=f"draft-{uuid.uuid4().hex[:12]}",
-        system_message=AI_SYSTEM,
-    ).with_model("anthropic", "claude-sonnet-5-5")
-    buf = ""
-    async for ev in chat.stream_message(UserMessage(text=prompt)):
-        if isinstance(ev, TextDelta):
-            buf += ev.content
-        elif isinstance(ev, StreamDone):
-            break
-    return _parse_ai_strategy(buf)
+    last_err = None
+    for provider, model in AI_MODELS:
+        try:
+            chat = LlmChat(
+                api_key=os.environ.get("EMERGENT_LLM_KEY"),
+                session_id=f"draft-{uuid.uuid4().hex[:12]}",
+                system_message=AI_SYSTEM,
+            ).with_model(provider, model)
+            buf = ""
+            async for ev in chat.stream_message(UserMessage(text=prompt)):
+                if isinstance(ev, TextDelta):
+                    buf += ev.content
+                elif isinstance(ev, StreamDone):
+                    break
+            strategy = _parse_ai_strategy(buf)
+            if strategy:
+                return strategy
+            logger.warning(f"ai {provider}/{model}: unparseable reply ({len(buf)} chars)")
+        except Exception as e:
+            last_err = e
+            logger.warning(f"ai {provider}/{model} failed: {e}")
+    if last_err:
+        raise last_err
+    return None
 
 
 def _sse(event, data):
@@ -1444,7 +1478,26 @@ async def hero_signals():
 app.include_router(api_router)
 app.include_router(auth_router)
 
-engine.init(db, _hl, _hl_exchange)
+
+
+async def _user_balances(user):
+    """(sol_balance, hl_equity) for the deposit watcher."""
+    sol = None
+    if user.get("wallet"):
+        try:
+            r = await _sol_rpc("getBalance", [user["wallet"]])
+            sol = (r.get("value") or 0) / 1e9
+        except Exception:
+            pass
+    hl = None
+    if user.get("evmAddress"):
+        try:
+            st = _hl().user_state(user["evmAddress"])
+            hl = float(st.get("marginSummary", {}).get("accountValue", 0) or 0)
+        except Exception:
+            hl = 0.0  # account not created on-chain until first deposit
+    return sol, hl
+engine.init(db, _hl, _hl_exchange, _user_balances)
 
 
 @app.on_event("startup")

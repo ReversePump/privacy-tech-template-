@@ -114,7 +114,7 @@ export default function Account() {
         </button>
       </div>
 
-      <Panel className="mt-8 grid grid-cols-1 md:grid-cols-3 divide-x divide-[#ffffff26] overflow-hidden" data-testid="account-stats">
+      <Panel className="mt-8 grid grid-cols-1 md:grid-cols-4 md:divide-x divide-[#ffffff26] overflow-hidden" data-testid="account-stats">
         <div className="px-5 py-4">
           <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#9aa0ae]">Solana balance</div>
           <div className="mt-1 text-xl font-medium tnum" data-testid="acct-sol-bal">{solInfo ? `${solInfo.sol.toFixed(4)} SOL` : "—"}</div>
@@ -129,6 +129,12 @@ export default function Account() {
             </div>
           )}
         </div>
+        <button className="px-5 py-4 text-left hover:bg-[#ffffff08] transition-colors" data-testid="acct-practice-link"
+          onClick={() => document.querySelector("[data-testid='paper-section']")?.scrollIntoView({ behavior: "smooth" })}>
+          <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#9aa0ae]">Practice equity</div>
+          <div className="mt-1 text-xl font-medium tnum" data-testid="acct-practice-eq">{paper ? fmtUsd(paper.equityUsd) : "—"}</div>
+          <div className="mt-0.5 text-[11px] text-[#9aa0ae]">pretend money, real prices — tap to jump</div>
+        </button>
         <div className="px-5 py-4">
           <div className="mono text-[10px] uppercase tracking-[0.14em] text-[#9aa0ae]">Saved strategies</div>
           <div className="mt-1 text-xl font-medium tnum">{saved ? saved.length : "—"}</div>
@@ -488,6 +494,9 @@ function PaperPanel({ paper, token, onDone }) {
             {paper.positions.map((p) => (
               <div key={p.id} className="flex flex-wrap items-center gap-3 text-[12px]">
                 <Tag tone={p.side === "short" ? "short" : "long"}>{p.symbol}</Tag>
+                {p.venue === "papertrade" && (
+                  <span className="mono text-[9px] uppercase tracking-wider text-[#9aa0ae] border border-[#ffffff26] rounded px-1.5 py-0.5">synth</span>
+                )}
                 <span className="text-[#9aa0ae]">{p.side} ${p.sizeUsd} · {p.leverage}×</span>
                 <span className="mono tnum">entry {Number(p.entryPx).toLocaleString()}</span>
                 <span className="mono text-[10px] text-[#9aa0ae]">{fmtAge(p.openedAt)}</span>

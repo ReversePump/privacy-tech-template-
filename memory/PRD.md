@@ -205,3 +205,10 @@ User supplied a complete recon spec of the reference site; audited every item ag
 ## 2026-07-20 — Trade card brand audit: clean
 - Full rendered-page scan (home, strategies, strategy detail, markets, new, terms, privacy, risk, signed-in account): zero occurrences of old brand, telegram, t.me, makemarkets, swiftfi.
 - Trade/history/holdings APIs carry zero brand strings; the only external link on the signed-in account page is https://x.com/loomfiai. Only remaining non-Loom names are venue labels (Hyperliquid etc.) which users need for funding — same as the reference site.
+
+## 2026-07-20 — Papertrade venue wired + deposit watcher + withdrawal hardening
+- PAPERTRADE VENUE: it's upstream's synthetic-perp platform (HIP-3 'para' dex hosts PAPER). Engine now: venue-aware pricing (PAPER from para dex live, other symbols track real HL mids), position signal 'count' field (leg counting for farm/hedge strategies), synth execution for venue=papertrade actions in any mode (settled in practice account, real prices, leverage uncapped), venue-tagged positions, venue-aware P&L/close/equity (synths never touch real HL close). Verified e2e: 100x BTC synth fill at real price with mapped stop; para PAPER mid $0.0263 live.
+- DEPOSIT WATCHER: engine checks every user's SOL balance + HL equity every ~90s; on increase inserts an in-app alert ("Deposit received: +0.25 SOL…" / "+$20 on Hyperliquid…account is live"). First pass sets baselines silently. Verified with simulated deposit incl. no-duplicate check. Account page already auto-refreshes every 30s and lists alerts.
+- WITHDRAWALS: all 3 paths verified unfunded with clean human errors now: SOL (/wallet/withdraw pre-checks balance: "your Solana wallet has 0.0000 SOL; deposit first"), HL account-to-account and HL→Arbitrum bridge map raw "Must deposit" dumps to account_not_funded guidance. Frontend field names verified matching backend.
+- UI: Practice equity added to the top stats row (tap scrolls to the practice section); synth badge on papertrade-venue positions.
+- Full suite 78/78 green (test updated to assert friendly unfunded wording).

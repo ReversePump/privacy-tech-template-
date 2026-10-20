@@ -144,7 +144,9 @@ def test_live_mode_requires_email_account_note():
             dep = [d for d in deps if d["id"] == dep_id][0]
             errs = [e for e in dep.get("events", []) if e["kind"] == "error"]
             if errs:
-                assert "reject" in errs[0]["msg"] or "fail" in errs[0]["msg"]
+                msg = errs[0]["msg"]
+                assert "reject" in msg or "fail" in msg or "not funded" in msg or "isn't funded" in msg
+                assert "0x" not in msg or "isn't funded" in msg  # raw API wallet dumps must not surface
                 return
             time.sleep(6)
         pytest.fail("live deployment with empty wallet produced no error event")

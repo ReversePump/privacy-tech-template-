@@ -28,12 +28,17 @@ PAPER_START_USD = 10_000.0
 TICK_SECONDS = 25
 
 
-def init(db, hl_info, hl_exchange_fn):
-    global _db, _hl_info, _hl_exchange_fn, _users_coll
+def init(db, hl_info, hl_exchange_fn, balances_fn=None):
+    global _db, _hl_info, _hl_exchange_fn, _users_coll, _balances_fn
     _db = db
     _hl_info = hl_info
     _hl_exchange_fn = hl_exchange_fn
+    _balances_fn = balances_fn
     _users_coll = db.users
+
+
+_balances_fn = None
+_last_deposit_watch = 0.0
 
 
 def _now():
@@ -141,8 +146,14 @@ async def _signal_fields(sig, owner_positions):
     inst = p.get("instrument", {})
     sym = (inst.get("symbol") or "").upper()
     if kind == "price":
-        px = _mkt.mids.get(sym)
-        ctx = _mkt.ctxs.get(sym, {})
+        venue = inst.get("venue", "")
+        if venue == "papertrade" and sym == "PAPER":
+            para = await _para_ctx()
+            px = para["mids"].get("PAPER")
+            ctx = para["ctxs"].get("PAPER", {})
+        else:
+            px = _mkt.mids.get(sym)  # papertrade synths track the real asset's price
+            ctx = _mkt.ctxs.get(sym, {})
         out = {"price": px}
         prev_day = ctx.get("prevDayPx")
         if px and prev_day:
@@ -171,10 +182,11 @@ async def _signal_fields(sig, owner_positions):
         except Exception:
             return {}
     if kind == "position":
-        for pos in owner_positions:
-            if pos.get("symbol", "").upper() == sym:
-                return {"open": 1, "pnl_pct": pos.get("pnlPct", 0)}
-        return {"open": 0, "pnl_pct": 0}
+        side_f = (p.get("side") or "").lower()
+        matches = [pos for pos in owner_positions
+                   if pos.get("symbol", "").upper() == sym and (not side_f or pos.get("side") == side_f)]
+        first = matches[0] if matches else {}
+        return {"open": 1 if matches else 0, "count": len(matches), "pnl_pct": first.get("pnlPct", 0)}
     if kind == "token_onchain" and p.get("mint"):
         d = await _dex_token(p["mint"])
         if d:
@@ -240,6 +252,27 @@ async def _dex_token(mint):
         except Exception:
             return None
     return await _cached(f"dex:{mint}", 60, go)
+
+
+async def _para_ctx():
+    """Papertrade venue = Hyperliquid HIP-3 builder dex 'para' (PAPER and friends). Public market data."""
+    async def go():
+        try:
+            async with httpx.AsyncClient(timeout=15) as c:
+                r = await c.post("https://api.hyperliquid.xyz/info",
+                                 json={"type": "metaAndAssetCtxs", "dex": "para"})
+                meta, ctxs = r.json()
+                mids, ctx_map = {}, {}
+                for i, u in enumerate(meta.get("universe", [])):
+                    short = u["name"].split(":")[-1]
+                    if i < len(ctxs):
+                        ctx_map[short] = ctxs[i]
+                        if ctxs[i].get("markPx"):
+                            mids[short] = float(ctxs[i]["markPx"])
+                return {"mids": mids, "ctxs": ctx_map}
+        except Exception:
+            return None
+    return await _cached("para_dex", 60, go) or {"mids": {}, "ctxs": {}}
 
 
 async def _noaa_kp():
@@ -419,7 +452,7 @@ async def _paper_equity(owner_key):
     for p in await _owner_positions({"ownerKey": owner_key}):
         d = await _db.positions.find_one({"id": p["id"]})
         if d and d.get("entryPx"):
-            px = _mkt.mids.get(d["symbol"].upper())
+            px = await _position_px(d)
             if px:
                 diff = (px - d["entryPx"]) / d["entryPx"]
                 eq += diff * d["sizeUsd"] * d.get("leverage", 1) * (1 if d["side"] == "long" else -1)
@@ -432,7 +465,15 @@ async def _open_position(dep, action):
     sym = (inst.get("symbol") or "").upper()
     side = action.get("side", "long")
     lev = int(action.get("leverage") or 1)
-    px = _mkt.mids.get(sym)
+    avenue = inst.get("venue", "")
+    synth = avenue == "papertrade"  # papertrade venue = synthetic perps at real prices (up to 1000x)
+    if synth:
+        if sym == "PAPER":
+            px = (await _para_ctx())["mids"].get("PAPER")
+        else:
+            px = _mkt.mids.get(sym)  # synth tracks the real asset
+    else:
+        px = _mkt.mids.get(sym)
     if not px:
         await _event(dep["id"], f"no live price for {sym} — skipped", "error")
         return
@@ -460,19 +501,20 @@ async def _open_position(dep, action):
         return None
     pos = {
         "id": uuid.uuid4().hex[:12], "deploymentId": dep["id"], "ownerKey": dep["ownerKey"],
-        "mode": mode, "venue": "hyperliquid", "symbol": sym, "side": side,
+        "mode": mode, "venue": "papertrade" if synth else "hyperliquid", "symbol": sym, "side": side,
         "sizeUsd": round(size_usd, 2), "leverage": lev, "entryPx": px,
         "slPct": _exit_pct(sl), "tpPct": _exit_pct(tp),
         "trailPct": exits.get("trailingStopPct") or _exit_pct(tr), "peakPx": px,
         "status": "open", "openedAt": _now(),
     }
-    if mode == "paper":
+    if mode == "paper" or synth:
         acct = await _paper_account(dep["ownerKey"])
         if acct["balanceUsd"] < size_usd / lev:
-            await _event(dep["id"], f"paper account too small for ${size_usd:.0f} {side} {sym}", "error")
+            await _event(dep["id"], f"practice account too small for ${size_usd:.0f} {side} {sym}", "error")
             return
         await _db.positions.insert_one(pos)
-        await _event(dep["id"], f"paper {side} {sym} ${size_usd:.0f} @ {px:g} ({lev}x)", "fill")
+        tag = "synth" if synth else "paper"
+        await _event(dep["id"], f"{tag} {side} {sym} ${size_usd:.0f} @ {px:g} ({lev}x)", "fill")
     elif mode == "live":
         user = await _get_owner_user(dep)
         if not user or not user.get("encEvmSecret"):
@@ -486,25 +528,41 @@ async def _open_position(dep, action):
                 pass
             res = ex.market_open(sym, side == "long", round(size_usd / px, 6))
             if res.get("status") != "ok":
-                await _event(dep["id"], f"live order rejected: {str(res)[:140]}", "error")
+                raw = str(res)
+                if "does not exist" in raw:
+                    msg = "order skipped — your Hyperliquid account isn't funded yet. Send USDC on Arbitrum to your Loom address (Account page) and it fires on the next check"
+                else:
+                    msg = f"live order rejected: {raw[:140]}"
+                await _event(dep["id"], msg, "error")
                 return
             pos["hlOrder"] = res
             await _db.positions.insert_one(pos)
             await _event(dep["id"], f"LIVE {side} {sym} ${size_usd:.0f} @ {px:g} ({lev}x)", "fill")
         except Exception as e:
-            await _event(dep["id"], f"live order failed: {str(e)[:140]}", "error")
+            raw = str(e)
+            if "does not exist" in raw:
+                raw = "your Hyperliquid account isn't funded yet — send USDC on Arbitrum to your Loom address (Account page)"
+            await _event(dep["id"], f"live order failed: {raw[:140]}", "error")
     else:  # alerts
         await _notify(dep, f"Trigger fired: {side} {sym} @ {px:g} — strategy “{dep.get('strategyName', '')}”")
         await _event(dep["id"], f"alert sent: {side} {sym} @ {px:g}", "alert")
 
 
+async def _position_px(pos):
+    """Venue-aware mark price for an open position (papertrade synths: PAPER from the para dex, others track the real asset)."""
+    sym = pos["symbol"].upper()
+    if pos.get("venue") == "papertrade" and sym == "PAPER":
+        return (await _para_ctx())["mids"].get("PAPER")
+    return _mkt.mids.get(sym)
+
+
 async def _close_position(pos, reason):
-    px = _mkt.mids.get(pos["symbol"].upper())
+    px = await _position_px(pos)
     if not px:
         return
     diff = (px - pos["entryPx"]) / pos["entryPx"]
     pnl = diff * pos["sizeUsd"] * pos.get("leverage", 1) * (1 if pos["side"] == "long" else -1)
-    if pos["mode"] == "live":
+    if pos["mode"] == "live" and pos.get("venue") == "hyperliquid":
         user = await _users_coll.find_one({"email": pos["ownerKey"]})
         if user and user.get("encEvmSecret"):
             try:
@@ -512,7 +570,7 @@ async def _close_position(pos, reason):
             except Exception as e:
                 logger.warning(f"live close failed {pos['id']}: {e}")
                 return
-    elif pos["mode"] == "paper":
+    else:  # paper mode and papertrade synths both settle in the practice account
         await _db.paper_accounts.update_one({"ownerKey": pos["ownerKey"]}, {"$inc": {"balanceUsd": pnl}})
     await _db.positions.update_one({"id": pos["id"]}, {"$set": {
         "status": "closed", "closePx": px, "pnlUsd": round(pnl, 2), "closedAt": _now(), "closeReason": reason}})
@@ -521,7 +579,7 @@ async def _close_position(pos, reason):
 
 async def _manage_positions():
     for pos in await _db.positions.find({"status": "open"}).to_list(200):
-        px = _mkt.mids.get(pos["symbol"].upper())
+        px = await _position_px(pos)
         if not px or not pos.get("entryPx"):
             continue
         is_long = pos["side"] == "long"
@@ -648,6 +706,7 @@ async def _tick_copy(dep):
 async def engine_tick():
     await _mkt.refresh()
     await _manage_positions()
+    await _watch_deposits()
     deps = await _db.deployments.find({"status": "active"}).to_list(200)
     for dep in deps:
         try:
@@ -657,6 +716,44 @@ async def engine_tick():
                 await _tick_deployment(dep)
         except Exception as e:
             logger.warning(f"deployment {dep.get('id')} tick failed: {e}")
+
+
+async def _watch_deposits():
+    """Detect funds landing in generated wallets; alert the owner. Runs every ~90s; first pass only sets baselines."""
+    global _last_deposit_watch
+    if not _balances_fn or _users_coll is None:
+        return
+    if time.time() - _last_deposit_watch < 90:
+        return
+    _last_deposit_watch = time.time()
+    users = await _users_coll.find({"evmAddress": {"$exists": True}},
+                                   {"wallet": 1, "evmAddress": 1, "email": 1, "lastSolBal": 1, "lastHlEq": 1}).to_list(200)
+    for u in users:
+        owner = u.get("email") or u.get("wallet")
+        if not owner:
+            continue
+        try:
+            sol, hl = await _balances_fn(u)
+        except Exception as e:
+            logger.warning(f"deposit watch failed for {owner}: {e}")
+            continue
+        upd, notes = {}, []
+        if sol is not None:
+            prev = u.get("lastSolBal")
+            if prev is not None and sol > prev + 1e-6:
+                notes.append(f"Deposit received: +{sol - prev:.4f} SOL — Solana balance now {sol:.4f} SOL")
+            upd["lastSolBal"] = sol
+        if hl is not None:
+            prev = u.get("lastHlEq")
+            if prev is not None and hl > prev + 0.01:
+                notes.append(f"Deposit received: +${hl - prev:,.2f} on Hyperliquid — equity now ${hl:,.2f}. Your account is live for real trading.")
+            upd["lastHlEq"] = hl
+        for msg in notes:
+            await _db.alerts.insert_one({"ownerKey": owner, "deploymentId": None, "read": False,
+                                         "message": msg, "createdAt": _now()})
+            logger.info(f"deposit alert for {owner}: {msg}")
+        if upd:
+            await _users_coll.update_one({"_id": u["_id"]}, {"$set": upd})
 
 
 async def engine_loop():
