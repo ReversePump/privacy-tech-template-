@@ -1,70 +1,40 @@
 const BASE = process.env.REACT_APP_BACKEND_URL;
 
-async function req(method, path, body) {
-  const r = await fetch(`${BASE}/api/relay${path}`, {
-    method,
-    headers: body !== undefined ? { "Content-Type": "application/json" } : undefined,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
-  const data = await r.json().catch(() => ({}));
-  if (!r.ok) {
-    const msg = typeof data?.error === "string" ? data.error : data?.message || `Request failed (${r.status})`;
-    throw new Error(msg);
-  }
-  return data;
-}
+export const money = (v, dec = 0) =>
+  v == null ? "—" : `$${Number(v).toLocaleString("en-US", { minimumFractionDigits: dec, maximumFractionDigits: dec })}`;
 
-// local (non-relay) endpoints — Loom's own AI drafting
-async function localReq(method, path, body) {
-  const r = await fetch(`${BASE}/api${path}`, {
-    method,
-    headers: body !== undefined ? { "Content-Type": "application/json" } : undefined,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
-  const data = await r.json().catch(() => ({}));
-  if (!r.ok) {
-    const msg = typeof data?.error === "string" ? data.error : data?.message || `Request failed (${r.status})`;
-    throw new Error(msg);
-  }
-  return data;
-}
-
-// POST + SSE reader (EventSource can't POST) — yields {event, data}
-export async function* sseStream(path, body) {
-  const r = await fetch(`${BASE}/api${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  if (!r.ok || !r.body) throw new Error(`Request failed (${r.status})`);
-  const reader = r.body.getReader();
-  const dec = new TextDecoder();
-  let buf = "";
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buf += dec.decode(value, { stream: true });
-    const parts = buf.split("\n\n");
-    buf = parts.pop();
-    for (const p of parts) {
-      const m = p.match(/^event:\s*(\w+)\s*\ndata:\s*([\s\S]*)$/m);
-      if (m) {
-        try {
-          yield { event: m[1], data: JSON.parse(m[2]) };
-        } catch { /* keep-alive lines */ }
-      }
-    }
-  }
-}
-
-export const loom = {
-  health: () => req("GET", "/health"),
-  strategies: () => req("GET", "/strategies"),
-  examples: () => req("GET", "/strategies/examples"),
-  generate: (thesis) => localReq("POST", "/ai/generate", { thesis }),
-  practice: () => req("GET", "/practice"),
-  backtest: (payload) => req("POST", "/backtest", payload),
-  validate: (strategy) => req("POST", "/strategies/validate", { strategy }),
+export const timeAgo = (iso) => {
+  if (!iso) return "";
+  const s = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (s < 60) return "just now";
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return `${Math.floor(s / 86400)}d ago`;
 };
 
-export const errorMessage = (e) => (e instanceof Error ? e.message : String(e));
+export const packArt = (price, small) => {
+  const TIERS = [[25, "t25"], [50, "t50"], [100, "t100"], [250, "t250"], [500, "t500"], [1000, "t1000"], [2500, "t2500"], [1e9, "t5000"]];
+  const t = TIERS.find((x) => price <= x[0])[1];
+  return `${BASE}/api/img/packs/${t}${small ? "-s" : ""}.webp`;
+};
+
+async function req(method, path, body, token) {
+  const r = await fetch(`${BASE}/api${path}`, {
+    method,
+    headers: {
+      ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(typeof data?.error === "string" ? data.error : `Request failed (${r.status})`);
+  return data;
+}
+
+export const gh = (path) => req("GET", `/gh${path}`); // relayed live platform data
+export const local = {
+  get: (p, token) => req("GET", p, undefined, token),
+  post: (p, body, token) => req("POST", p, body ?? {}, token),
+};
+export { BASE };

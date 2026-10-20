@@ -1,54 +1,65 @@
 import React from "react";
-import "@/App.css";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { HelmetProvider } from "react-helmet-async";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react";
+import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
+import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
 import { Toaster } from "sonner";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import WalletContext from "./solana/WalletContext";
-import { AuthProvider } from "./solana/AuthContext";
-import Home from "./pages/Home";
-import New from "./pages/New";
-import Strategies from "./pages/Strategies";
-import StrategyDetail from "./pages/StrategyDetail";
-import Account from "./pages/Account";
-import Markets from "./pages/Markets";
-import Token from "./pages/Token";
-import Legal from "./pages/Legal";
+import { AuthProvider } from "./AuthContext";
+import TopNav from "./components/TopNav";
+import MobileTabs from "./components/MobileTabs";
+import { LeftRail, RightRail } from "./components/Rails";
+import Lobby from "./pages/Lobby";
+import Gacha from "./pages/Gacha";
+import Breaks from "./pages/Breaks";
+import Hits from "./pages/Hits";
+import How from "./pages/How";
+import Battle from "./pages/Battle";
+import Live from "./pages/Live";
+import Graildex from "./pages/Graildex";
+import BuildBreak from "./pages/BuildBreak";
+import Me from "./pages/Me";
 
-function App() {
+import "@solana/wallet-adapter-react-ui/styles.css";
+
+const wallets = [new PhantomWalletAdapter(), new SolflareWalletAdapter()];
+const RPC = "https://api.mainnet-beta.solana.com";
+
+export default function App() {
   return (
-    <div className="App min-h-screen bg-[#070708] text-[#f4f4f5]">
-      <WalletContext>
-        <AuthProvider>
-          <HelmetProvider>
-          <BrowserRouter>
-            <Header />
-            <main>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/new" element={<New />} />
-                <Route path="/strategies" element={<Strategies />} />
-                <Route path="/strategies/:id" element={<StrategyDetail />} />
-                <Route path="/markets" element={<Markets />} />
-                <Route path="/token" element={<Token />} />
-                <Route path="/terms" element={<Legal page="terms" />} />
-                <Route path="/privacy" element={<Legal page="privacy" />} />
-                <Route path="/risk" element={<Legal page="risk" />} />
-                <Route path="/account" element={<Account />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </main>
-            <Footer />
-          </BrowserRouter>
-          </HelmetProvider>
-        </AuthProvider>
-      </WalletContext>
-      <Toaster position="bottom-right" toastOptions={{
-        style: { background: "#17171b", border: "1px solid #ffffff26", color: "#f4f4f5", fontFamily: "Instrument Sans, sans-serif" },
-      }} />
-    </div>
+    <ConnectionProvider endpoint={RPC}>
+      <WalletProvider wallets={wallets} autoConnect={false}>
+        <WalletModalProvider>
+          <AuthProvider>
+            <BrowserRouter>
+              <TopNav />
+              <div className="shell">
+                <aside className="rail-l"><LeftRail /></aside>
+                <main style={{ minWidth: 0 }}>
+                  <Routes>
+                    <Route path="/" element={<Lobby />} />
+                    <Route path="/gacha" element={<Gacha />} />
+                    <Route path="/breaks" element={<Breaks />} />
+                    <Route path="/hits" element={<Hits />} />
+                    <Route path="/how" element={<How />} />
+                    <Route path="/battle" element={<Battle />} />
+                    <Route path="/live" element={<Live />} />
+                    <Route path="/graildex" element={<Graildex />} />
+                    <Route path="/build" element={<BuildBreak />} />
+                    <Route path="/me" element={<Me />} />
+                    <Route path="*" element={<Lobby />} />
+                  </Routes>
+                </main>
+                <aside className="rail-r"><RightRail /></aside>
+              </div>
+              <MobileTabs />
+              <Toaster position="bottom-right" toastOptions={{
+                style: { background: "#121214", border: "1px solid rgba(255,255,255,.08)", color: "#f4f4f2", fontFamily: "Inter, sans-serif" },
+              }} />
+            </BrowserRouter>
+          </AuthProvider>
+        </WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
   );
 }
-
-export default App;
