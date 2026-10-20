@@ -1,0 +1,27 @@
+{
+  "summary": "Full-stack regression for Grail Break clone (both backend + frontend). Backend: all 13 pytest tests PASS (relay/assets, auth email+wallet, pull engine, sellback, odds distribution, breaks join/create, battle full cycle). Frontend: all 10 routes render with live data (/, /gacha, /breaks, /hits, /how, /battle, /live, /graildex, /build, /me). Sign-in modal + auth-switch + registration (gives $250) → nav-balance chip shows $250.00. Gacha pull end-to-end verified: pull-gb-poke-25 → rip-stage fullscreen overlay → video (foil_bronze.webm, readyState 4, currentTime advancing) → rip-result reveal at ~25s showing card name/value (e.g. 'Persian · $24 COMMON', 'Sudowoodo · $18 COMMON') → rip-keep debits $25 (balance $250→$225). Sell-back flow reached rip-sellback and clicked successfully. Breaks: cards use data-testid='break-{id}', clicking opens break-detail modal with seat-grid (20 seats visible) + proof-of-fair ('cheapest pack first, grand prize opens last'). Graildex renders 39 card images. Mobile 375px: mobile-tabs shows exactly Lobby/Breaks/Gacha/Build a break/More, gacha machines 2-per-row (x=35 & x=210), tab navigation works. 768px and 1366px render fine. Branding scan passed — no 'Loom', 'Weft', 'MakeMarkets', 'Hyperliquid' anywhere in UI.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/battle (Battle Slabs)", "issues": ["React hydration warning: '<span> cannot be a child of <option>'. In Battle.jsx line 81, the <option> for players select wraps dynamic text in a <span>. Browsers strip the inner <span> which causes hydration mismatch. Fix: render the number directly inside <option> without a span wrapper (e.g. <option value={n} key={n}>{n} players</option>)."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_grailbreak.py", "/app/test_reports/pytest/iter13.xml"],
+  "action_items": [
+    "Minor: Fix <span> inside <option> in /app/frontend/src/pages/Battle.jsx (hydration warning only — no functional impact)."
+  ],
+  "critical_code_review_comments": [
+    "Battle.jsx player count <select> wraps option children in an auto-injected <span> (likely from a dev-time instrumentation layer injecting x-* attrs). Harmless at runtime but logs a React hydration warning on every /battle render.",
+    "Breaks list uses clickable div cards (data-testid='break-*') that open an in-page modal rather than a real route — fine as a design choice, but note: no deep-linkable URL per break (e.g. /breaks/:id)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (13/13)", "frontend": "100% of required flows"},
+  "test_credentials": "breaker@test.dev / testpass123 (existing). Agent also registered fresh gbtest_<ts>@test.dev / agentpass123 which starts with $250 — all gacha-pull assertions used this.",
+  "seed_data_creation": "Registered two throwaway test accounts (gbtest_<ts>@test.dev) via UI during gacha pull testing; each spent $25 and partially recouped via keep or sellback. test_create_local_break pytest also creates 'Test Night Break' entries visible on /breaks (5 such entries present).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend fully green (13/13). RipStage portal + VP9/Vorbis transcode fallback working: reveal ~25s. Breaks list shows 7 real + 5 local 'Test Night Break' seeded entries — those stale test seeds can be ignored or pruned. Mobile tabs + 2-per-row gacha confirmed. Only remaining dev-console noise is a <span>-in-<option> hydration warning on /battle.",
+  "rca of the issue": "N/A — no functional bugs. The /battle hydration warning stems from Battle.jsx:81 where option children are wrapped by a <span> (injected by the x-source instrumentation). HTML parser disallows <span> inside <option>, so React warns on hydration. Mitigation: ensure option label is a plain string/number expression, not wrapped by any dynamic span."
+}

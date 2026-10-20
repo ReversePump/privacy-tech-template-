@@ -644,6 +644,18 @@ async def local_breaks():
     return {"breaks": docs}
 
 
+@auth_router.delete("/breaks/local/{bid}")
+async def delete_local_break(bid: str, request: Request):
+    u = await _session_user(request)
+    if not u:
+        return _err("sign_in_required", 401)
+    r = await db.gb_breaks.delete_one({"id": bid, "by": u["email"]})
+    if not r.deleted_count:
+        return _err("not_found", 404)
+    await db.gb_seats.delete_many({"breakId": bid})
+    return {"ok": True}
+
+
 app.include_router(api_router)
 app.include_router(auth_router)
 

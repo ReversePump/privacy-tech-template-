@@ -147,6 +147,7 @@ def test_create_local_break():
     bid = r.json()["break"]["id"]
     local = requests.get(f"{API}/breaks/local", timeout=20).json()["breaks"]
     assert any(b["id"] == bid for b in local)
+    requests.delete(f"{API}/breaks/local/{bid}", headers=_tok(), timeout=20)
 
 
 # ---------- battles ----------

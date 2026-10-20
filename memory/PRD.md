@@ -35,7 +35,12 @@ sign-in. No mocks where public upstream data exists.
 - Backend test suite: 13 passed (`backend/tests/test_grailbreak.py`).
 - Mobile parity with reference: collapsed top bar, 2-col machine grid, fixed bottom tab bar
   (Lobby · Breaks · Gacha · Build a break · More).
-- Full legacy wipe: zero Loom/Weft/MakeMarkets/Hyperliquid/Jupiter references in code or content.
+- Full legacy wipe: zero Loom/Weft/MakeMarkets/Hyperliquid/Jupiter references in code, content, or
+  the database (16 legacy Mongo collections dropped; only gb_* remain).
+- Testing-agent regression (iteration_13): backend 100% (13/13), frontend 100% of required flows —
+  all routes, sign-in/out, pull + keep, pull + sell-back, break detail/seats, battle, graildex,
+  mobile tabs + 2-col grid at 375px, 768/1366 sanity, branding scan clean.
+- Local breaks can be deleted by their creator (DELETE /api/breaks/local/{id}); test suite self-cleans.
 
 ## Boundaries (intentional, lawful)
 - Upstream-gated writes (real money purchases, shipping, withdrawals on the reference site) are NOT
