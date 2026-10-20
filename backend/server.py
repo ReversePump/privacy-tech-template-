@@ -95,7 +95,7 @@ async def relay(path: str, request: Request):
     headers = _fwd_headers(request)
     url = f"{UPSTREAM}/{path}"
 
-    # SSE endpoints stream progress events — passthrough without buffering
+    # SSE endpoints stream progress events — passthrough with brand scrubbing
     if path.endswith("/stream"):
         async def gen():
             try:
@@ -104,14 +104,14 @@ async def relay(path: str, request: Request):
                         ctype = r.headers.get("content-type", "")
                         if r.status_code != 200 or "event-stream" not in ctype:
                             err_body = await r.aread()
-                            yield b"event: error\ndata: " + err_body.replace(b"\n", b" ") + b"\n\n"
+                            yield b"event: error\ndata: " + _scrub_str(err_body.decode(errors="replace")).replace("\n", " ").encode() + b"\n\n"
                             return
                         async for chunk in r.aiter_raw():
-                            yield chunk
+                            yield _scrub_str(chunk.decode(errors="replace")).encode()
             except Exception as e:
                 logger.warning(f"stream relay failed for {path}: {e}")
                 yield f'event: error\ndata: {{"message":"stream failed"}}\n\n'.encode()
-        return StreamingResponse(gen(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"})
+        return StreamingResponse(gen(), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
     try:
         r = await _client().request(request.method, f"/{path}", params=params, content=body or None, headers=headers)
@@ -120,19 +120,19 @@ async def relay(path: str, request: Request):
         return Response('{"error":"market_data_unreachable"}', status_code=502, media_type="application/json")
     content = r.content
     ctype = r.headers.get("content-type", "application/json")
-    if r.status_code == 200 and "json" in ctype:
+    if "json" in ctype:
         try:
             content = _json.dumps(_sanitize_upstream(r.json())).encode()
         except Exception:
-            pass
+            content = _scrub_str(r.text).encode()
+    else:
+        content = _scrub_str(r.text).encode()
     return Response(
         content=content,
         status_code=r.status_code,
         media_type=ctype,
     )
 
-
-app.include_router(api_router)
 
 # ---------- local accounts: wallet sign-in + saved strategies ----------
 
@@ -981,7 +981,15 @@ async def delete_deployment(dep_id: str, request: Request):
 
 
 async def _ai_refine(strategy, instruction):
-    """Collect the AI refine stream server-side. Returns (strategy, error)."""
+    """Refine a strategy spec — Loom AI first, relayed AI as backup. Returns (strategy, error)."""
+    prompt = (f"Here is a strategy spec:\n\n{_json.dumps(strategy)}\n\n"
+              f"Apply this change and return the full updated spec:\n\n{instruction}")
+    try:
+        got = await _local_ai_generate(prompt)
+        if got:
+            return got, None
+    except Exception as e:
+        logger.warning(f"local ai refine failed: {e}")
     payload = {"strategy": strategy, "instruction": instruction}
     try:
         async with _client().stream("POST", f"{UPSTREAM}/ai/refine/stream", json=payload) as r:
@@ -1038,6 +1046,188 @@ async def instruct_deployment(dep_id: str, request: Request):
     }})
     await engine._event(dep_id, f"strategy updated: {instruction[:80]}", "info")
     return {"ok": True, "strategy": new_strategy}
+
+
+# ---------- AI drafting (upstream relay first, local Claude fallback — drafting must always work) ----------
+
+AI_SYSTEM = """You are Loom's strategy compiler. Turn a trading thesis into a machine-readable strategy spec.
+Output ONLY valid JSON — no markdown fences, no commentary.
+
+Schema (every field required unless noted):
+{
+ "schemaVersion": 1,
+ "id": "short-kebab-id",
+ "name": "Short name",
+ "thesis": "one sentence restating the idea",
+ "signals": [{"id": "eth_px", "kind": "price", "params": {"instrument": {"kind": "perp", "venue": "hyperliquid", "symbol": "ETH", "assetClass": "crypto"}}}],
+ "triggers": [{"id": "go", "label": "when to fire", "when": {"op": "gt", "left": {"ref": "eth_px.price"}, "right": {"value": 2600}}, "cooldownMinutes": 60, "maxFires": 1}],
+ "actions": [{"id": "long_eth", "on": ["go"], "type": "open",
+   "instrument": {"kind": "perp", "venue": "hyperliquid", "symbol": "ETH", "assetClass": "crypto"},
+   "side": "long", "size": {"unit": "usd", "value": 50}, "leverage": 2,
+   "exits": {"takeProfit": {"positionPct": 50}, "stopLoss": {"positionPct": 20}}, "reentry": "never"}],
+ "risk": {"maxPositionPct": 10, "maxTotalExposurePct": 50, "maxLeverage": 20, "maxDailyLossPct": 10, "defaultMaxSlippageBps": 100},
+ "tags": ["perps"]
+}
+
+Rules:
+- Operand refs: "<signalId>.<field>". Ops: and or gt gte lt lte eq crosses_above between abs div add mul.
+- Signal kinds: price (fields price, change_24h_pct), funding (rate_1h_pct), liquidity (bid_depth_usd, ask_depth_usd, spread_bps), token_onchain (mint param; liquidity_usd, buys_1h, sells_1h, price_impact_buy_1000_pct), macro (source=fear_greed; field value), calendar (earnings_today), forecast (temp_f), sky (new_moon/full_moon hours, illumination_pct), space_weather (kp), sports (param team; win_pct), trader (param address; open_positions, fills_24h), position (open, unrealized_pnl_usd).
+- Immediate-fire theses ("buy now", "open a long") use a trigger that is true now, e.g. {"op":"gt","left":{"ref":"px.price"},"right":{"value":0}}.
+- If the thesis names an unsupported venue, use hyperliquid perps and note it in the thesis string. Cap leverage at 40. size default $50, leverage default 2. stopLoss required on every open action.
+- For refine requests: return the FULL updated spec with the requested change applied."""
+
+
+def _parse_ai_strategy(text):
+    """Extract the strategy JSON from an LLM reply."""
+    if not text:
+        return None
+    start, end = text.find("{"), text.rfind("}")
+    if start < 0 or end <= start:
+        return None
+    try:
+        d = _json.loads(text[start:end + 1])
+    except Exception:
+        return None
+    if not isinstance(d, dict) or not d.get("signals") or not d.get("triggers") or not d.get("actions"):
+        return None
+    return d
+
+
+async def _local_ai_generate(prompt):
+    """Draft (or refine) a strategy spec with Claude via the platform LLM key."""
+    from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
+    chat = LlmChat(
+        api_key=os.environ.get("EMERGENT_LLM_KEY"),
+        session_id=f"draft-{uuid.uuid4().hex[:12]}",
+        system_message=AI_SYSTEM,
+    ).with_model("anthropic", "claude-sonnet-5-5")
+    buf = ""
+    async for ev in chat.stream_message(UserMessage(text=prompt)):
+        if isinstance(ev, TextDelta):
+            buf += ev.content
+        elif isinstance(ev, StreamDone):
+            break
+    return _parse_ai_strategy(buf)
+
+
+def _sse(event, data):
+    return f"event: {event}\ndata: {_json.dumps(data)}\n\n"
+
+
+async def _collect_upstream_stream(path, payload):
+    """Collect an upstream AI SSE stream. Returns (strategy, progress_msgs, failed)."""
+    strategy, progress, failed = None, [], False
+    try:
+        async with _client().stream("POST", f"{UPSTREAM}{path}", json=payload) as r:
+            if r.status_code != 200:
+                return None, [], True
+            event = None
+            async for line in r.aiter_lines():
+                if line.startswith("event:"):
+                    event = line[6:].strip()
+                elif line.startswith("data:"):
+                    try:
+                        d = _json.loads(line[5:].strip())
+                    except Exception:
+                        continue
+                    if event == "progress" and isinstance(d, dict) and d.get("message"):
+                        progress.append(str(d["message"])[:200])
+                    elif event in ("result", "strategy") and isinstance(d, dict) and d.get("strategy"):
+                        strategy = d["strategy"]
+                    elif event == "error":
+                        failed = True
+    except Exception as e:
+        logger.warning(f"upstream ai stream failed: {e}")
+        failed = True
+    return strategy, progress, failed
+
+
+@api_router.post("/ai/generate/stream")
+async def ai_generate_stream(request: Request):
+    body = await request.json()
+    thesis = (body.get("thesis") or "").strip()
+    if not thesis:
+        return _err("thesis_required", 400)
+
+    async def stream():
+        yield _sse("progress", {"message": "Reading your thesis"})
+        # Loom's own AI first — always on, no shared quota
+        try:
+            strategy = await _local_ai_generate(f"Draft a strategy for this thesis:\n\n{thesis}")
+        except Exception as e:
+            logger.warning(f"local ai generate failed: {e}")
+            strategy = None
+        if strategy:
+            yield _sse("progress", {"message": "Compiling rules"})
+            yield _sse("result", {"strategy": _sanitize_upstream(strategy), "source": "loom"})
+            return
+        # backup: relayed market-data AI
+        strategy, progress, failed = await _collect_upstream_stream("/ai/generate/stream", {"thesis": thesis})
+        if strategy:
+            for m in progress[:6]:
+                yield _sse("progress", {"message": m})
+            yield _sse("result", {"strategy": _sanitize_upstream(strategy), "source": "relay"})
+            return
+        yield _sse("error", {"error": "Loom's AI couldn't draft that one — try rephrasing the thesis"})
+
+    return StreamingResponse(stream(), media_type="text/event-stream",
+                             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+@api_router.post("/ai/refine/stream")
+async def ai_refine_stream(request: Request):
+    body = await request.json()
+    strategy, instruction = body.get("strategy"), (body.get("instruction") or "").strip()
+    if not isinstance(strategy, dict) or not instruction:
+        return _err("strategy_and_instruction_required", 400)
+
+    async def stream():
+        yield _sse("progress", {"message": "Applying your change"})
+        prompt = (f"Here is a strategy spec:\n\n{_json.dumps(strategy)}\n\n"
+                  f"Apply this change and return the full updated spec:\n\n{instruction}")
+        try:
+            result = await _local_ai_generate(prompt)
+        except Exception as e:
+            logger.warning(f"local ai refine failed: {e}")
+            result = None
+        if result:
+            yield _sse("result", {"strategy": _sanitize_upstream(result), "source": "loom"})
+            return
+        result, progress, failed = await _collect_upstream_stream("/ai/refine/stream",
+                                                                  {"strategy": strategy, "instruction": instruction})
+        if result:
+            for m in progress[:6]:
+                yield _sse("progress", {"message": m})
+            yield _sse("result", {"strategy": _sanitize_upstream(result), "source": "relay"})
+            return
+        yield _sse("error", {"error": "Loom's AI couldn't apply that — try rephrasing"})
+
+    return StreamingResponse(stream(), media_type="text/event-stream",
+                             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+@api_router.post("/ai/generate")
+async def ai_generate(request: Request):
+    """Non-streaming draft — same relay-first, local-fallback behavior."""
+    body = await request.json()
+    thesis = (body.get("thesis") or "").strip()
+    if not thesis:
+        return _err("thesis_required", 400)
+    try:
+        strategy = await _local_ai_generate(f"Draft a strategy for this thesis:\n\n{thesis}")
+    except Exception as e:
+        logger.warning(f"local ai generate failed: {e}")
+        strategy = None
+    if strategy:
+        return {"strategy": _sanitize_upstream(strategy), "source": "loom"}
+    try:
+        r = await _client().post(f"{UPSTREAM}/ai/generate", json={"thesis": thesis})
+        if r.status_code == 200 and r.json().get("strategy"):
+            return {"strategy": _sanitize_upstream(r.json()["strategy"]), "source": "relay"}
+    except Exception as e:
+        logger.warning(f"upstream ai generate failed: {e}")
+    return _err("ai_draft_failed — try rephrasing the thesis", 400)
+
 
 @auth_router.get("/paper/account")
 async def paper_account(request: Request):
@@ -1245,6 +1435,7 @@ async def hero_signals():
     return out
 
 
+app.include_router(api_router)
 app.include_router(auth_router)
 
 engine.init(db, _hl, _hl_exchange)

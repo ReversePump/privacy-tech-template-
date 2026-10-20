@@ -14,9 +14,24 @@ async function req(method, path, body) {
   return data;
 }
 
+// local (non-relay) endpoints — Loom's own AI drafting
+async function localReq(method, path, body) {
+  const r = await fetch(`${BASE}/api${path}`, {
+    method,
+    headers: body !== undefined ? { "Content-Type": "application/json" } : undefined,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    const msg = typeof data?.error === "string" ? data.error : data?.message || `Request failed (${r.status})`;
+    throw new Error(msg);
+  }
+  return data;
+}
+
 // POST + SSE reader (EventSource can't POST) — yields {event, data}
 export async function* sseStream(path, body) {
-  const r = await fetch(`${BASE}/api/relay${path}`, {
+  const r = await fetch(`${BASE}/api${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -46,7 +61,7 @@ export const loom = {
   health: () => req("GET", "/health"),
   strategies: () => req("GET", "/strategies"),
   examples: () => req("GET", "/strategies/examples"),
-  generate: (thesis) => req("POST", "/ai/generate", { thesis }),
+  generate: (thesis) => localReq("POST", "/ai/generate", { thesis }),
   practice: () => req("GET", "/practice"),
   backtest: (payload) => req("POST", "/backtest", payload),
   validate: (strategy) => req("POST", "/strategies/validate", { strategy }),

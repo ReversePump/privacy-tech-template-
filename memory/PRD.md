@@ -188,3 +188,11 @@ User supplied a complete recon spec of the reference site; audited every item ag
 
 ## 2026-07-20 — Toast contrast fix
 - Toast notifications were white background (#ffffff) with near-white text (#f4f4f5) — invisible messages. Now dark chrome (#17171b bg, #ffffff26 border, light text). Verified live: "Welcome back" toast renders dark with readable text.
+
+## 2026-07-20 — AI drafting is now Loom-owned and always-on
+- LEAK FIXED: upstream AI error text ("Weft's AI can't draft…") reached the browser raw because the SSE relay passed streamed bytes unscrubbed, and non-200 relay bodies were unsanitized. Now: all SSE chunks scrubbed, all relay bodies scrubbed at every status code.
+- AI ARCHITECTURE: Loom's own Claude (claude-sonnet-5-5 via EMERGENT_LLM_KEY) is now PRIMARY for drafting/refining; upstream relayed AI is the automatic backup. New dedicated endpoints: POST /api/ai/generate/stream, /api/ai/refine/stream, /api/ai/generate (non-stream). Same SSE event shapes (progress/result/error). Local compiler emits the exact strategy spec schema (signals/triggers/op-tree/actions/exits/risk), caps leverage at 40, maps unsupported venues to Hyperliquid perps.
+- The deployment instruct endpoint also falls back to local AI now.
+- STRUCTURAL FIX: app.include_router(api_router) was at line 135 — every api_router route added later (including the new AI routes) would never have registered. Both routers now included at end of file.
+- Verified: user's exact screenshot thesis drafted in ~10s in a real browser (mobile viewport), result card rendered, zero weft text on page; all 3 AI endpoints return source=loom; full suite 78/78 green.
+- Note: local drafts spend the user's universal key balance (Profile → Manage plan → Universal Key to top up).
