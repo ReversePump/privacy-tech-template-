@@ -1,0 +1,22 @@
+{
+  "summary": "Retested the Enter-to-submit bugfix on /new. All 4 scenarios passed: (1) Enter in thesis textarea fires POST /api/ai/generate/stream and renders a strategy card with start-practice-btn in ~13s with no error banner; (2) 'Draft the rules' button still works and card appears ~6s; (3) Shift+Enter inserts newline and does NOT fire a request; (4) no 'weft' text appears anywhere on the page after drafting.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "During button-click regression a transient 422 was logged in the console once (resource load error) but the stream recovered and the strategy card still rendered successfully — worth a passive check in server logs that /api/ai/generate/stream never rejects valid thesis payloads."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (frontend-only test)", "frontend": "100%"},
+  "test_credentials": "not used",
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Bugfix for Enter-key submit on /new thesis-input is verified working. Enter triggers draft(), Shift+Enter inserts newline. Strategy card renders in 6-13s on preview env. No 'weft' leakage. Draft button regression also passes.",
+  "rca of the issue": "Original bug: textarea had no onKeyDown so Enter did nothing. Fix in New.jsx adds onKeyDown that calls draft() on Enter (without Shift). Verified via Playwright: request fired, card rendered."
+}

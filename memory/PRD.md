@@ -228,3 +228,7 @@ User supplied a complete recon spec of the reference site; audited every item ag
 - Own chrome-styled live chart (GET /api/loom/chart — GeckoTerminal 15m OHLCV, cached 5min) after DexScreener iframe refused to embed; animated last-price dot, gradient area, green/red by trend. Chart endpoint self-resolves pair address (cold-cache fix).
 - Nav (desktop+mobile) and footer gained $LOOM links; Home token section links to /token; sitemap.xml + llms.txt updated; Seo component set.
 - Verified: page at 1366px + 375px, live data confirmed (price moved $9.0K→$10.7K mcap during testing), 26 regression tests green.
+
+## 2026-07-20 — Enter-to-submit bugfix on /new
+- User-reported bug: typing a thesis and pressing Enter sent no request (textarea had no onKeyDown). Fixed: Enter (no Shift) calls draft(); Shift+Enter still newline; placeholder hints "Enter to draft".
+- Verified by testing agent (iteration_11.json): Enter fires /api/ai/generate/stream and renders the rules card in ~13s, button click works (~6s), Shift+Enter doesn't submit, zero old-brand text after drafting. 100% pass, no issues.
