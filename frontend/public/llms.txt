@@ -9,16 +9,14 @@
 - Live trading on Solana (token swaps) and Hyperliquid (perps and spot) from a wallet generated at sign-up
 - Copy-trading: mirror any Hyperliquid trader's fills with your own size
 - Limit orders, stop-loss, take-profit and trailing stops managed automatically
-- Public strategy catalog, trader leaderboard and platform revenue transparency
+- Public strategy catalog and live market data for every supported perp and spot pair
 - Email sign-in; no crypto wallet needed to start
 
 ## Key pages
-- / — overview, live platform stats, how it works, FAQ
+- / — overview, how it works, FAQ
 - /new — AI strategy builder (write a thesis, get rules, backtest, deploy)
 - /strategies — public strategy catalog
-- /traders — real Hyperliquid traders with live PnL, with auto-copy
-- /leaderboard — live strategy leaderboard
-- /revenue — platform earnings, public and on chain
+- /markets — live prices, volume and charts for every market
 
 ## Contact
 - X: https://x.com/loomfiai

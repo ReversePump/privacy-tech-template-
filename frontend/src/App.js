@@ -11,9 +11,6 @@ import Home from "./pages/Home";
 import New from "./pages/New";
 import Strategies from "./pages/Strategies";
 import StrategyDetail from "./pages/StrategyDetail";
-import Traders from "./pages/Traders";
-import Leaderboard from "./pages/Leaderboard";
-import Revenue from "./pages/Revenue";
 import Account from "./pages/Account";
 import Markets from "./pages/Markets";
 import Legal from "./pages/Legal";
@@ -32,9 +29,6 @@ function App() {
                 <Route path="/new" element={<New />} />
                 <Route path="/strategies" element={<Strategies />} />
                 <Route path="/strategies/:id" element={<StrategyDetail />} />
-                <Route path="/traders" element={<Traders />} />
-                <Route path="/leaderboard" element={<Leaderboard />} />
-                <Route path="/revenue" element={<Revenue />} />
                 <Route path="/markets" element={<Markets />} />
                 <Route path="/terms" element={<Legal page="terms" />} />
                 <Route path="/privacy" element={<Legal page="privacy" />} />

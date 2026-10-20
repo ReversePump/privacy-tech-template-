@@ -43,13 +43,9 @@ export async function* sseStream(path, body) {
 }
 
 export const loom = {
-  stats: () => req("GET", "/stats"),
   health: () => req("GET", "/health"),
   strategies: () => req("GET", "/strategies"),
   examples: () => req("GET", "/strategies/examples"),
-  traders: () => req("GET", "/traders"),
-  leaderboard: () => req("GET", "/leaderboard"),
-  revenue: () => req("GET", "/revenue"),
   generate: (thesis) => req("POST", "/ai/generate", { thesis }),
   practice: () => req("GET", "/practice"),
   backtest: (payload) => req("POST", "/backtest", payload),

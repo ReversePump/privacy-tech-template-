@@ -30,7 +30,7 @@ USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
 def email_session():
     s = requests.Session()
     r = s.post(f"{BASE}/api/auth/email/login",
-               json={"email": "trader1@weft.test", "password": "testpass123"}, timeout=20)
+               json={"email": "trader1@loom.test", "password": "testpass123"}, timeout=20)
     if r.status_code != 200:
         email = f"testagent_{int(time.time())}@loom.test"
         r = s.post(f"{BASE}/api/auth/email/register",

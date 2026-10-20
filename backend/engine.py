@@ -361,12 +361,22 @@ async def _open_position(dep, action):
     if size_usd < 10:
         size_usd = 10.0
     exits = action.get("exits", {}) or {}
+    sl = exits.get("stopLoss") or {}
+    tp = exits.get("takeProfit") or {}
+    tr = exits.get("trailingStop") or {}
+    # strategies express exits as price-move pct OR position-notional pct (positionPct / leverage = price pct)
+    def _exit_pct(d):
+        if d.get("pct"):
+            return float(d["pct"])
+        if d.get("positionPct"):
+            return float(d["positionPct"]) / max(lev, 1)
+        return None
     pos = {
         "id": uuid.uuid4().hex[:12], "deploymentId": dep["id"], "ownerKey": dep["ownerKey"],
         "mode": mode, "venue": "hyperliquid", "symbol": sym, "side": side,
         "sizeUsd": round(size_usd, 2), "leverage": lev, "entryPx": px,
-        "slPct": (exits.get("stopLoss") or {}).get("pct"), "tpPct": (exits.get("takeProfit") or {}).get("pct"),
-        "trailPct": exits.get("trailingStopPct"), "peakPx": px,
+        "slPct": _exit_pct(sl), "tpPct": _exit_pct(tp),
+        "trailPct": exits.get("trailingStopPct") or _exit_pct(tr), "peakPx": px,
         "status": "open", "openedAt": _now(),
     }
     if mode == "paper":
@@ -469,6 +479,9 @@ async def _tick_deployment(dep):
             cooldown = max(trig.get("cooldownMinutes") or 0, 1) * 60  # min 1 min — no alert/fill spam
             if tstate.get("lastFiredAt") and now - tstate["lastFiredAt"] < cooldown:
                 continue
+            max_fires = trig.get("maxFires")
+            if max_fires and tstate.get("fires", 0) >= max_fires:
+                continue
             cond = _eval(trig.get("when"), refval, cross_state)
             for_min = (trig.get("forMinutes") or 0) * 60
             fired = False
@@ -482,6 +495,7 @@ async def _tick_deployment(dep):
                 tstate.pop("firstTrueAt", None)
             if fired:
                 tstate["lastFiredAt"] = now
+                tstate["fires"] = tstate.get("fires", 0) + 1
                 tstate.pop("firstTrueAt", None)
                 state.setdefault("firedActions", []).append(action["id"]) if action.get("reentry") == "never" else None
                 if action.get("type") == "open":

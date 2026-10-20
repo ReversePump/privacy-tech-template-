@@ -4,8 +4,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, ShieldCheck, Wallet, BellRing, CircleStop, Eye } from "lucide-react";
 import { loom } from "../lib/api";
 import LoomSignals from "../components/LoomSignals";
-import { fmtUsd0, fmtUsd, fmtNum } from "../lib/format";
-import { Panel, Stat, Tag, CoinIcon, Loading } from "../components/bits";
+import { Panel, Tag, CoinIcon, Loading } from "../components/bits";
 import StrategyCard from "../components/StrategyCard";
 
 const WATCHES = [
@@ -49,12 +48,10 @@ const FAQ = [
 ];
 
 export default function Home() {
-  const [stats, setStats] = useState(null);
   const [strategies, setStrategies] = useState(null);
   const [open, setOpen] = useState(0);
 
   useEffect(() => {
-    loom.stats().then(setStats).catch(() => {});
     loom.strategies().then((d) => setStrategies((d.strategies || []).slice(0, 3))).catch(() => setStrategies([]));
     // scroll reveal for sections below the hero
     const els = document.querySelectorAll("[data-testid='home-page'] section:not(:first-of-type)");
@@ -97,14 +94,6 @@ export default function Home() {
             </div>
             <LoomSignals className="fadeup" />
           </div>
-
-          {/* live stat strip */}
-          <Panel className="mt-8 grid grid-cols-2 md:grid-cols-4 divide-x divide-[#ffffff26] overflow-hidden" data-testid="home-stats">
-            <Stat label="Strategies" value={stats ? fmtNum(stats.strategies) : "—"} testId="stat-strategies" />
-            <Stat label="Deployments" value={stats ? fmtNum(stats.deployments) : "—"} sub={stats ? `${fmtNum(stats.running)} running now` : ""} testId="stat-deployments" />
-            <Stat label="Volume traded" value={stats ? fmtUsd0(stats.volumeUsd) : "—"} testId="stat-volume" />
-            <Stat label="Fills" value={stats ? fmtNum(stats.fills) : "—"} testId="stat-fills" />
-          </Panel>
         </div>
       </section>
 
@@ -290,7 +279,6 @@ function TokenSection() {
             and on <a href="https://x.com/loomfiai" target="_blank" rel="noopener noreferrer" className="text-[#f1f5f9] hover:underline">X @loomfiai</a> — and nowhere else.
             Anything trading before that is fake.
           </p>
-          <p className="mt-4 mono text-[11px] text-[#6b7280]">Follow along — every platform fee is public on the <Link to="/revenue" className="text-[#f1f5f9] hover:underline">Revenue page</Link>.</p>
         </Panel>
       </div>
     </section>

@@ -148,3 +148,11 @@ link https://x.com/loomfiai, geometric Outfit display type, LoomWeave canvas her
   range tabs + trade shortcut), /terms /privacy /risk (own legal copy), footer links added.
 - Leaderboard enriched: returnCurve sparklines + tags + since. New.jsx: drafts validated via relayed
   /strategies/validate. Their Telegram-alerts feature noted (auth-gated upstream; ours = in-app+email).
+
+## 2026-07-20 — Tab removal, stats strip, engine + trade fixes, final brand scrub
+- Removed Traders / Leaderboard / Revenue tabs and pages (header, footer, routes, sitemap.xml, llms.txt, api client methods); deleted the 3 page files.
+- Removed the hero stats panel (Strategies/Deployments/Volume/Fills) from Home per user request; verified absent at 375/768/1366px.
+- ENGINE FIX (paper trading "stuck"): upstream AI strategies express exits as `positionPct`; engine only read `pct`, so stops were null and paper positions never closed. Now maps positionPct/leverage → price pct for stopLoss/takeProfit/trailingStop. Also added `maxFires` trigger support (was ignored). Verified live: paper position opened at real ETH price with slPct=10/tpPct=25 and maxFires stopped refires.
+- TRADE PATH FIX: Solana swaps hit Jupiter 429 rate limits under parallel load (shared gateway). Added dual-host fallback (api.jup.ag + lite-api.jup.ag), per-IP throttle (0.4s spacing), and 7-attempt backoff. Full suite 70/70 green. Real trade path verified to Solana simulation stage; unfunded wallets correctly return the debit/simulation error.
+- Branding scrub: renamed test accounts to @loom.test, deleted 43 old @weft/@swiftfi throwaway DB accounts, relay error renamed to market_data_unreachable. Final sweep: zero weft/swiftfi/makemarkets/railway references in shipped code (only the scrub filter itself names them to strip them); relay responses carry 0 upstream brand refs.
+- Test creds now: trader1@loom.test / testpass123, uitest1@loom.test / uitestpass123.

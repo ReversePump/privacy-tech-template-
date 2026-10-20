@@ -3,6 +3,7 @@ import logging
 import uuid
 import json as _json
 import time
+import asyncio
 import httpx
 from datetime import datetime, timezone
 from fastapi import FastAPI, APIRouter, Request
@@ -98,7 +99,7 @@ async def relay(path: str, request: Request):
         r = await _client().request(request.method, f"/{path}", params=params, content=body or None, headers=headers)
     except httpx.HTTPError as e:
         logger.warning(f"upstream error {path}: {e}")
-        return Response('{"error":"upstream_unreachable"}', status_code=502, media_type="application/json")
+        return Response('{"error":"market_data_unreachable"}', status_code=502, media_type="application/json")
     content = r.content
     ctype = r.headers.get("content-type", "application/json")
     if r.status_code == 200 and "json" in ctype:
@@ -225,7 +226,64 @@ from solders.message import Message
 from solders.transaction import Transaction
 
 SOLANA_RPC = os.environ.get("SOLANA_RPC", "https://api.mainnet-beta.solana.com")
-JUP = "https://api.jup.ag/swap/v1"
+JUP_HOSTS = ("https://api.jup.ag/swap/v1", "https://lite-api.jup.ag/swap/v1")
+
+
+_JUP_LOCK = asyncio.Lock()
+_JUP_LAST = [0.0]
+
+
+async def _jup_throttle():
+    """Serialize Jupiter calls from this server with min spacing — the public gateway rate-limits per IP."""
+    async with _JUP_LOCK:
+        wait = 0.4 - (time.time() - _JUP_LAST[0])
+        if wait > 0:
+            await asyncio.sleep(wait)
+        _JUP_LAST[0] = time.time()
+
+
+async def _jup_get(path, params):
+    r = None
+    for attempt in range(7):
+        host = JUP_HOSTS[attempt % len(JUP_HOSTS)]
+        try:
+            await _jup_throttle()
+            r = await _client().get(f"{host}{path}", params=params)
+            if r.status_code == 200:
+                return r
+            if r.status_code == 429:
+                logger.warning(f"jupiter quote {host}: rate limited, retrying")
+                await asyncio.sleep(min(1.0 * (attempt + 1), 5.0))
+                continue
+            logger.warning(f"jupiter quote {host}: HTTP {r.status_code} {r.text[:160]}")
+        except Exception as e:
+            logger.warning(f"jupiter {host} unreachable: {e}")
+            r = None
+    if r is None:
+        raise RuntimeError("swap quote service unreachable")
+    return r
+
+
+async def _jup_post(path, payload):
+    r = None
+    for attempt in range(7):
+        host = JUP_HOSTS[attempt % len(JUP_HOSTS)]
+        try:
+            await _jup_throttle()
+            r = await _client().post(f"{host}{path}", json=payload)
+            if r.status_code == 200:
+                return r
+            if r.status_code == 429:
+                logger.warning(f"jupiter swap build {host}: rate limited, retrying")
+                await asyncio.sleep(min(1.0 * (attempt + 1), 5.0))
+                continue
+            logger.warning(f"jupiter swap build {host}: HTTP {r.status_code} {r.text[:160]}")
+        except Exception as e:
+            logger.warning(f"jupiter {host} unreachable: {e}")
+            r = None
+    if r is None:
+        raise RuntimeError("swap build service unreachable")
+    return r
 _fernet = Fernet(os.environ["WALLET_ENC_KEY"].encode())
 WSOL = "So11111111111111111111111111111111111111112"
 USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
@@ -340,15 +398,15 @@ async def wallet_trade(request: Request):
     kp = _custodial_keypair(user)
     try:
         # quote
-        q = await _client().get(f"{JUP}/quote", params={
+        q = await _jup_get("/quote", {
             "inputMint": input_mint, "outputMint": output_mint, "amount": amount, "slippageBps": 100,
         })
         if q.status_code != 200:
             return _err("no_route", 400)
         quote = q.json()
         # swap tx
-        sw = await _client().post(f"{JUP}/swap", json={"quoteResponse": quote, "userPublicKey": str(kp.pubkey()),
-                                                       "wrapAndUnwrapSol": True, "dynamicComputeUnitLimit": True})
+        sw = await _jup_post("/swap", {"quoteResponse": quote, "userPublicKey": str(kp.pubkey()),
+                                       "wrapAndUnwrapSol": True, "dynamicComputeUnitLimit": True})
         if sw.status_code != 200:
             return _err("swap_build_failed", 400)
         tx_b64 = sw.json().get("swapTransaction")
@@ -397,14 +455,18 @@ async def wallet_build_swap(request: Request):
     output_mint = body.get("outputMint") or ""
     if amount <= 0 or not input_mint or not output_mint:
         return _err("invalid_input", 400)
-    q = await _client().get(f"{JUP}/quote", params={
-        "inputMint": input_mint, "outputMint": output_mint, "amount": amount, "slippageBps": 100,
-    })
-    if q.status_code != 200:
-        return _err("no_route", 400)
-    quote = q.json()
-    sw = await _client().post(f"{JUP}/swap", json={"quoteResponse": quote, "userPublicKey": s["wallet"],
-                                                   "wrapAndUnwrapSol": True, "dynamicComputeUnitLimit": True})
+    try:
+        q = await _jup_get("/quote", {
+            "inputMint": input_mint, "outputMint": output_mint, "amount": amount, "slippageBps": 100,
+        })
+        if q.status_code != 200:
+            return _err("no_route", 400)
+        quote = q.json()
+        sw = await _jup_post("/swap", {"quoteResponse": quote, "userPublicKey": s["wallet"],
+                                       "wrapAndUnwrapSol": True, "dynamicComputeUnitLimit": True})
+    except Exception as e:
+        logger.warning(f"build_swap failed: {e}")
+        return _err("swap_service_unreachable", 502)
     if sw.status_code != 200:
         return _err("swap_build_failed", 400)
     return {"ok": True, "swapTransaction": sw.json().get("swapTransaction"),
