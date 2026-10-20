@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { X, Mail, Wallet, Loader2 } from "lucide-react";
+import { X, Wallet, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { useAuth } from "../solana/AuthContext";
 import { errorMessage } from "../lib/api";
 
 export default function AuthModal({ open, onClose }) {
-  const [tab, setTab] = useState("email");
   const [mode, setMode] = useState("register"); // register | login | forgot | reset
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -79,20 +78,10 @@ export default function AuthModal({ open, onClose }) {
           <button onClick={onClose} className="text-[#9aa0ae] hover:text-[#f4f4f5]" data-testid="auth-close"><X size={18} /></button>
         </div>
         <p className="mt-1.5 text-[12.5px] text-[#9aa0ae]">
-          {mode === "register" ? "Email and password — a Solana wallet is generated for you instantly. Deposit SOL or USDC and trade for real." : "Your generated wallet and strategies are waiting."}
+          {mode === "register" ? "Email and password — a Solana wallet is generated for you instantly. Or connect your own wallet below: your keys, only you can withdraw." : "Your generated wallet and strategies are waiting."}
         </p>
 
-        <div className="mt-5 flex gap-1 rounded-full border border-[#ffffff26] p-1">
-          {[["email", "Email", Mail], ["wallet", "Wallet", Wallet]].map(([k, l, Icon]) => (
-            <button key={k} onClick={() => setTab(k)} data-testid={`auth-tab-${k}`}
-              className={`flex-1 inline-flex h-9 items-center justify-center gap-1.5 rounded-full text-[12.5px] transition-colors ${tab === k ? "bg-[#f3f4f6] text-black" : "text-[#9aa0ae]"}`}>
-              <Icon size={13} /> {l}
-            </button>
-          ))}
-        </div>
-
-        {tab === "email" ? (
-          mode === "forgot" ? (
+        {mode === "forgot" ? (
             <div className="mt-5 space-y-3">
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com"
                 className="h-11 w-full rounded-lg border border-[#ffffff26] bg-[#17171b] px-4 text-[13.5px] outline-none focus:border-[#ffffff66]"
@@ -143,14 +132,20 @@ export default function AuthModal({ open, onClose }) {
               )}
             </div>
           </div>
-          )
-        ) : (
+          )}
+
+        {(mode === "register" || mode === "login") && (
           <div className="mt-5">
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-[#ffffff26]" />
+              <span className="mono text-[10px] uppercase tracking-wider text-[#6b7280]">or your own wallet</span>
+              <div className="h-px flex-1 bg-[#ffffff26]" />
+            </div>
             <button onClick={walletSignIn} data-testid="auth-wallet-btn"
-              className="h-11 w-full rounded-full border border-[#ffffff26] text-[13px] font-medium hover:border-[#f1f5f9] hover:text-[#cbd5e1] transition-colors inline-flex items-center justify-center gap-2">
+              className="mt-4 h-11 w-full rounded-full border border-[#ffffff26] text-[13px] font-medium hover:border-[#f1f5f9] hover:text-[#cbd5e1] transition-colors inline-flex items-center justify-center gap-2">
               <Wallet size={14} /> Connect Phantom / Solflare
             </button>
-            <p className="mt-3 text-center text-[11px] text-[#9aa0ae]">Your own wallet, your keys — sign a message to sign in.</p>
+            <p className="mt-3 text-center text-[11px] text-[#9aa0ae]">Your own wallet, your keys — sign a message to sign in. Only you can withdraw.</p>
           </div>
         )}
       </div>
