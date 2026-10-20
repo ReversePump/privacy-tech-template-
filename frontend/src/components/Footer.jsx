@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-8">
           <div>
             <div className="flex items-center gap-2.5">
-              <img src="/logo.png" alt="Loom" className="h-8 w-8 rounded-lg border border-[#ffffff40] object-cover" />
+              <img src="/logo.png" alt="Loom" className="h-8 w-8 object-contain" />
               <span className="serif text-xl font-semibold uppercase tracking-[0.22em] text-[#f4f4f5]">Loom</span>
             </div>
             <p className="mt-2 max-w-xs text-[13px] text-[#9aa0ae]">

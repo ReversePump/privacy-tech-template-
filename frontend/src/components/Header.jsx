@@ -25,7 +25,7 @@ export default function Header() {
     <header className="sticky top-0 z-40 border-b border-[#ffffff26] bg-[#17171bf2] backdrop-blur-md" data-testid="header">
       <div className="mx-auto flex h-14 max-w-[1200px] items-center gap-6 px-4 md:px-6">
         <Link to="/" className="flex items-center gap-2.5" data-testid="logo-link">
-          <img src="/logo.png" alt="Loom" className="h-8 w-8 rounded-lg border border-[#ffffff40] object-cover" />
+          <img src="/logo.png" alt="Loom" className="h-8 w-8 object-contain" />
           <span className="serif text-[20px] font-semibold uppercase tracking-[0.22em] text-[#f4f4f5]">Loom</span>
         </Link>
         <nav className="hidden md:flex items-center gap-5" data-testid="main-nav">

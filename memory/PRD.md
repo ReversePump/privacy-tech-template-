@@ -159,3 +159,7 @@ link https://x.com/loomfiai, geometric Outfit display type, LoomWeave canvas her
 
 ## 2026-07-20 — X link in header on all screens
 - Header X link (https://x.com/loomfiai) was desktop-only (hidden below sm). Now visible at every viewport, on every page (header is global). Verified on /markets and /strategies at 375px and 1366px.
+
+## 2026-07-20 — Logo cleanup: no border, no white box
+- logo.png had a white background showing as a boxed tile with a border in header/footer. Regenerated with true transparency (flood-fill bg removal, feathered edges, content-cropped). Favicon regenerated from the same transparent knot; logo192.png (apple touch icon) kept on near-black for iOS.
+- Removed rounded-lg border classes from Header and Footer logo; apple-touch-icon now points to logo192.png. Verified: bare knot renders on dark header/footer at 375px and 1366px, favicon served as image/png, all routes 200 after frontend restart (restart was required for index.html change).
