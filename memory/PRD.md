@@ -218,3 +218,7 @@ User supplied a complete recon spec of the reference site; audited every item ag
 - Header (global, all pages): $LOOM CA pill with tap-to-copy; desktop shows truncated address, mobile shows compact $LOOM + copy icon; Start trading hides below sm to prevent clipping (hero CTA remains).
 - Home token section replaced "not launched" with live CA display + Copy CA + Solscan link; FAQ answer updated. Brand constants centralized in src/lib/brand.js (LOOM_CA, LOOM_X).
 - Verified by screenshot at 1366px and 375px on / and /markets.
+
+## 2026-07-20 — Header airdrop pill
+- Header CA pill now reads "Operate & earn $LOOM airdrop Uiun…pump" (desktop), "$LOOM airdrop" compact (mobile), tap copies the CA. Mobile header spacing fixed: LOOM wordmark hides below 480px, tighter gaps — verified zero horizontal overflow at 375px and 480px.
+- Note: airdrop copy is marketing only — no airdrop tracking/snapshot system exists (rewards infra was removed per earlier user request).

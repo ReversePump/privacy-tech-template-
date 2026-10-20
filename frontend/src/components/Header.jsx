@@ -36,7 +36,7 @@ export default function Header() {
       <div className="mx-auto flex h-14 max-w-[1200px] items-center gap-6 px-4 md:px-6">
         <Link to="/" className="flex items-center gap-2.5" data-testid="logo-link">
           <img src="/logo.png" alt="Loom" className="h-8 w-8 object-contain" />
-          <span className="serif text-[20px] font-semibold uppercase tracking-[0.22em] text-[#f4f4f5]">Loom</span>
+          <span className="hidden min-[480px]:inline serif text-[20px] font-semibold uppercase tracking-[0.22em] text-[#f4f4f5]">Loom</span>
         </Link>
         <nav className="hidden md:flex items-center gap-5" data-testid="main-nav">
           {NAV.map((n) => (
@@ -45,12 +45,13 @@ export default function Header() {
             </Link>
           ))}
         </nav>
-        <button onClick={copyCa} data-testid="header-ca" title={`$LOOM contract: ${LOOM_CA} — tap to copy`}
-          className="inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-[#ffffff26] px-3 mono text-[10.5px] text-[#9aa0ae] hover:text-[#f4f4f5] hover:border-[#ffffff59] transition-colors">
-          <span className="text-[#cbd5e1]">$LOOM</span> <span className="hidden sm:inline">{shortCa()}</span>
+        <button onClick={copyCa} data-testid="header-ca" title={`Operate & earn the $LOOM airdrop — contract: ${LOOM_CA} (tap to copy)`}
+          className="inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-[#ffffff26] px-2 sm:px-3 mono text-[10.5px] text-[#9aa0ae] hover:text-[#f4f4f5] hover:border-[#ffffff59] transition-colors">
+          <span className="hidden md:inline">Operate &amp; earn</span>
+          <span className="text-[#cbd5e1]">$LOOM airdrop</span> <span className="hidden sm:inline">{shortCa()}</span>
           {copied ? <Check size={11} className="text-[#34d399]" /> : <Copy size={11} />}
         </button>
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
           <a href={LOOM_X} target="_blank" rel="noopener noreferrer" data-testid="header-x-link" aria-label="Loom on X"
             className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#ffffff26] text-[#9aa0ae] hover:text-[#cbd5e1] hover:border-[#ffffff59] transition-colors">
             <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
