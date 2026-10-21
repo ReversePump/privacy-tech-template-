@@ -1352,13 +1352,19 @@
   }
   /* ---- Camo Cash: header tagline — First Alpenglow ZK shield on Solana ---- */
   function ensureTagline() {
-    var brand = document.querySelector('header a.brand');
-    if (!brand || document.getElementById('cc-tagline')) return;
-    var tr = document.querySelector('header .top-right'); if (!tr) return;
+    if (!document.querySelector('main.main')) return;
+    if (document.getElementById('cc-tagline')) return;
     var t = document.createElement('span');
     t.id = 'cc-tagline'; t.className = 'cc-tag'; t.setAttribute('data-testid', 'cc-tagline');
     t.textContent = 'First Alpenglow ZK shield on Solana';
-    tr.insertBefore(t, tr.firstChild);
+    document.body.appendChild(t);
+  }
+  function fixTaglineOverlap() {
+    var t = document.getElementById('cc-tagline'); if (!t) return;
+    var wb = document.querySelector('header .wallet-btn');
+    var connected = wb && /\u00b7/.test(wb.textContent || '');
+    var show = connected ? 'none' : '';
+    if (t.style.display !== show) t.style.display = show;
   }
   /* ---- Camo Cash: keep desktop top tabs clear of the header controls ---- */
   var OVF_ORDER = ['chain', 'history', 'bridge', 'track', 'send', 'privacy swap', 'shield', 'private route', 'swap'];
@@ -1614,7 +1620,7 @@
     var d = document.getElementById('cc-dock');
     if (!d) {
       d = document.createElement('nav'); d.id = 'cc-dock'; d.setAttribute('data-testid', 'cc-dock');
-      d.innerHTML = DOCK.map(function (t) { return '<button type="button" data-k="' + t.k + '" data-testid="cc-dock-' + t.k + '"><i>' + dsv(t.ico) + '</i><span>' + t.label + '</span></button>'; }).join('');
+      d.innerHTML = DOCK.map(function (t) { return '<button type="button" data-k="' + t.k + '" data-testid="cc-dock-' + t.k.replace(/^(dk|gx):/, '') + '"><i>' + dsv(t.ico) + '</i><span>' + t.label + '</span></button>'; }).join('');
       d.addEventListener('click', function (e) {
         var b = e.target.closest('button'); if (!b) return;
         var k = b.getAttribute('data-k');
@@ -1698,23 +1704,55 @@
   }
 
   /* ---- Camo Cash: wallet sheet — Camo Wallet first, non-native wallets under a dropdown ---- */
+  var EXT_WALLETS = [
+    ['Phantom', 'The popular Solana wallet', 'https://phantom.com'],
+    ['Solflare', 'Solana wallet, web and mobile', 'https://solflare.com'],
+    ['Backpack', 'Wallet for Solana and more', 'https://backpack.app']
+  ];
+  function woptClone(o) {
+    // clone visually, never move React-managed nodes
+    var name = (o.querySelector('b') || {}).textContent || 'Wallet';
+    var subEl = o.querySelector('span span');
+    var sub = subEl ? subEl.textContent : '';
+    var img = o.querySelector('img');
+    var href = o.tagName === 'A' ? o.getAttribute('href') : null;
+    var el = document.createElement(href ? 'a' : 'button');
+    el.className = 'wopt wext';
+    el.setAttribute('data-testid', 'wallet-ext-' + name.toLowerCase());
+    if (href) { el.href = href; el.target = '_blank'; el.rel = 'noopener noreferrer'; }
+    else { el.type = 'button'; el.addEventListener('click', function () { try { o.click(); } catch (e) {} }); }
+    el.innerHTML = (img ? '<img src="' + img.getAttribute('src') + '" alt="" style="width:30px;height:30px">' : '') +
+      '<span><b></b><span></span></span><span class="wg-go">' + (href ? 'Install' : 'Open') + '</span>';
+    el.querySelector('b').textContent = name;
+    el.querySelector('span span').textContent = sub;
+    return el;
+  }
   function ensureWalletGroup() {
     var card = document.querySelector('.card.onb'); if (!card) return;
     if (card.querySelector('.wgroup')) return;
-    var opts = Array.prototype.slice.call(card.querySelectorAll('.wopt'));
-    var rest = opts.filter(function (o) { return !o.classList.contains('wopt-own'); });
-    if (!rest.length) return;
+    var own = card.querySelector('.wopt-own'); if (!own) return;
+    var rest = Array.prototype.slice.call(card.querySelectorAll('.wopt:not(.wopt-own)'));
     var g = document.createElement('div'); g.className = 'wgroup';
     var t = document.createElement('button'); t.type = 'button'; t.className = 'wgroup-t';
     t.setAttribute('data-testid', 'wallet-other-toggle'); t.setAttribute('aria-expanded', 'false');
     t.innerHTML = '<span>Other wallets <em>not ZK-native</em></span><i class="wg-chev"></i>';
     var list = document.createElement('div'); list.className = 'wgroup-list';
-    rest.forEach(function (o) { list.appendChild(o); });
-    rest[0].parentNode.insertBefore(g, rest[0]);
-    g.appendChild(t); g.appendChild(list);
-    t.addEventListener('click', function () {
-      var open = g.classList.toggle('open'); t.setAttribute('aria-expanded', open ? 'true' : 'false');
-    });
+    if (rest.length) {
+      card.classList.add('wg-has-ext');
+      rest.forEach(function (o) { try { list.appendChild(woptClone(o)); } catch (e) {} });
+    } else {
+      list.innerHTML = EXT_WALLETS.map(function (w) {
+        return '<a class="wopt wext" href="' + w[2] + '" target="_blank" rel="noopener noreferrer" data-testid="wallet-ext-' + w[0].toLowerCase() + '">' +
+          '<span><b>' + w[0] + '</b><span>' + w[1] + '</span></span><span class="wg-go">Install</span></a>';
+      }).join('');
+    }
+    try {
+      own.parentNode.insertBefore(g, own.nextSibling);
+      g.appendChild(t); g.appendChild(list);
+      t.addEventListener('click', function () {
+        var open = g.classList.toggle('open'); t.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+    } catch (e) {}
   }
 
   /* ---- Camo Cash boot loader: square radar sweep + cycling field actions ---- */
@@ -1802,16 +1840,7 @@
   })();
   document.addEventListener('input', function () { setTimeout(ensureFees, 120); }, true);
   window.addEventListener('hashchange', function () { Array.prototype.forEach.call(document.querySelectorAll('.cc-fee-tog'), function (b) { b.setAttribute('data-open', '0'); }); ensureFees(); });
-  function fixCreateCopy() {
-    var els = document.querySelectorAll('.card.onb p, .card.onb span, .sheet-wrap p, .sheet-wrap span');
-    for (var i = 0; i < els.length; i++) {
-      var t = els[i].textContent || '';
-      if (t.indexOf('be reset') >= 0 && t.indexOf('recovery key') >= 0 && els[i].children.length === 0) {
-        els[i].textContent = 'Unlocks on this device only. Your recovery key restores everything.';
-      }
-    }
-  }
-  function tick() { orderNav(); ensureX(); ensureTagline(); syncIntro(); fixCreateCopy(); ensureMore(); fitNav(); ensureFoot(); ensureWalletBtn(); ensureDock(); ensurePitch(); ensureSplash(); ensureFees(); ensureWalletGroup(); }
+  function tick() { orderNav(); ensureX(); ensureTagline(); fixTaglineOverlap(); syncIntro(); ensureMore(); fitNav(); ensureFoot(); ensureWalletBtn(); ensureDock(); ensurePitch(); ensureSplash(); ensureFees(); ensureWalletGroup(); }
   setTimeout(function () { if (document.querySelector('main.main')) showTour(false); }, 1400);
   function boot() { ensure(); sync(); tick(); setInterval(tick, 700); document.addEventListener('click', function () { setTimeout(tick, 60); }, true); window.addEventListener('hashchange', function () { setTimeout(tick, 60); }); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
