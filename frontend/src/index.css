@@ -207,49 +207,49 @@ code {
 }
 
 /* ---------- Camo Cash landing (original) ---------- */
-.nc-landing{font-family:'Space Grotesk','Inter',system-ui,sans-serif}
-.nc-display{font-family:'Space Grotesk','Inter',system-ui,sans-serif}
-.nc-lime-btn{background:linear-gradient(180deg,#3a3f46,#23272c);color:#f4f5f7!important;box-shadow:0 8px 24px -8px rgba(20,22,25,.55),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -2px 0 rgba(0,0,0,.08);transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .25s}
-.nc-lime-btn:hover{transform:translateY(-1px);box-shadow:0 12px 30px -8px rgba(170,215,20,.95),inset 0 1px 0 rgba(255,255,255,.6)}
-.nc-lime-btn:active{transform:scale(.97)}
-.nc-hl{background:linear-gradient(180deg,transparent 58%,#c5ccd6 58%,#c5ccd6 92%,transparent 92%);padding:0 .06em}
+.cc-landing{font-family:'Space Grotesk','Inter',system-ui,sans-serif}
+.cc-display{font-family:'Space Grotesk','Inter',system-ui,sans-serif}
+.cc-lime-btn{background:linear-gradient(180deg,#3a3f46,#23272c);color:#f4f5f7!important;box-shadow:0 8px 24px -8px rgba(20,22,25,.55),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -2px 0 rgba(0,0,0,.08);transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .25s}
+.cc-lime-btn:hover{transform:translateY(-1px);box-shadow:0 12px 30px -8px rgba(170,215,20,.95),inset 0 1px 0 rgba(255,255,255,.6)}
+.cc-lime-btn:active{transform:scale(.97)}
+.cc-hl{background:linear-gradient(180deg,transparent 58%,#c5ccd6 58%,#c5ccd6 92%,transparent 92%);padding:0 .06em}
 @keyframes ncSpin{to{transform:rotate(360deg)}}
-.nc-ring{animation:ncSpin linear infinite}
-.nc-spin-slow{animation:ncSpin 40s linear infinite}
+.cc-ring{animation:ncSpin linear infinite}
+.cc-spin-slow{animation:ncSpin 40s linear infinite}
 @keyframes ncFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-.nc-float{animation:ncFloat 6s ease-in-out infinite}
-.nc-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:0;background:#fff;border:1px solid rgba(20,22,15,.08);box-shadow:0 12px 30px -16px rgba(20,22,15,.4);font-size:12.5px;font-weight:600;color:#14160f;animation:ncFloat 5s ease-in-out infinite}
+.cc-float{animation:ncFloat 6s ease-in-out infinite}
+.cc-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:0;background:#fff;border:1px solid rgba(20,22,15,.08);box-shadow:0 12px 30px -16px rgba(20,22,15,.4);font-size:12.5px;font-weight:600;color:#14160f;animation:ncFloat 5s ease-in-out infinite}
 @keyframes ncPulseL{0%,100%{box-shadow:0 0 0 0 rgba(154,197,12,.55)}50%{box-shadow:0 0 0 6px rgba(154,197,12,0)}}
-.nc-pulse{animation:ncPulseL 2s ease-in-out infinite}
+.cc-pulse{animation:ncPulseL 2s ease-in-out infinite}
 @keyframes ncRiseL{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.nc-rise{animation:ncRiseL .45s cubic-bezier(.2,.9,.25,1) both}
-@media (prefers-reduced-motion:reduce){.nc-ring,.nc-spin-slow,.nc-float,.nc-chip,.nc-pulse{animation:none}}
+.cc-rise{animation:ncRiseL .45s cubic-bezier(.2,.9,.25,1) both}
+@media (prefers-reduced-motion:reduce){.cc-ring,.cc-spin-slow,.cc-float,.cc-chip,.cc-pulse{animation:none}}
 
 /* ---- Camo Cash landing (gloam-style etched monochrome) ---- */
-.nm-landing{font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
-.nm-landing .nm-h{font-family:'Inter',system-ui,-apple-system,sans-serif;letter-spacing:-.03em}
-.nm-landing .font-mono{font-family:'Space Mono',ui-monospace,monospace}
-.nm-landing ::selection{background:#08090c;color:#ffffff}
-.nm-lime{background:#08090c;color:#ffffff!important;border:1px solid #08090c;border-radius:0;box-shadow:0 1px 2px rgba(8,9,12,.18);transition:transform .22s cubic-bezier(.2,.9,.25,1),box-shadow .25s,background .2s}
-.nm-lime:hover{background:#1c1f26;transform:scale(1.05);box-shadow:0 6px 18px rgba(8,9,12,.22)}
-[data-nm-theme=dark] .nm-lime,.nm-live .nm-lime{background:#ffffff;color:#08090c!important;border-color:#ffffff}
-[data-nm-theme=dark] .nm-lime:hover,.nm-live .nm-lime:hover{background:#f3f4f6}
-.nm-lime:active{transform:scale(.97)}
-.nm-live{box-shadow:0 0 0 6px rgba(8,9,12,.08),0 24px 50px -28px rgba(8,9,12,.7)}
-.nm-pulse{width:7px;height:7px;border-radius:50%;background:#d4d4d8;box-shadow:0 0 0 0 rgba(212,212,216,.7);animation:nmPulse 1.8s infinite}
+.cx-landing{font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+.cx-landing .cx-h{font-family:'Inter',system-ui,-apple-system,sans-serif;letter-spacing:-.03em}
+.cx-landing .font-mono{font-family:'Space Mono',ui-monospace,monospace}
+.cx-landing ::selection{background:#08090c;color:#ffffff}
+.cx-lime{background:#08090c;color:#ffffff!important;border:1px solid #08090c;border-radius:0;box-shadow:0 1px 2px rgba(8,9,12,.18);transition:transform .22s cubic-bezier(.2,.9,.25,1),box-shadow .25s,background .2s}
+.cx-lime:hover{background:#1c1f26;transform:scale(1.05);box-shadow:0 6px 18px rgba(8,9,12,.22)}
+[data-cx-theme=dark] .cx-lime,.cx-live .cx-lime{background:#ffffff;color:#08090c!important;border-color:#ffffff}
+[data-cx-theme=dark] .cx-lime:hover,.cx-live .cx-lime:hover{background:#f3f4f6}
+.cx-lime:active{transform:scale(.97)}
+.cx-live{box-shadow:0 0 0 6px rgba(8,9,12,.08),0 24px 50px -28px rgba(8,9,12,.7)}
+.cx-pulse{width:7px;height:7px;border-radius:50%;background:#d4d4d8;box-shadow:0 0 0 0 rgba(212,212,216,.7);animation:nmPulse 1.8s infinite}
 @keyframes nmPulse{0%{box-shadow:0 0 0 0 rgba(212,212,216,.65)}70%{box-shadow:0 0 0 9px rgba(212,212,216,0)}100%{box-shadow:0 0 0 0 rgba(212,212,216,0)}}
-.nm-dots{background-image:radial-gradient(#08090c 1.3px,transparent 1.4px);background-size:14px 14px;opacity:.35;-webkit-mask-image:radial-gradient(circle,#000 45%,transparent 70%);mask-image:radial-gradient(circle,#000 45%,transparent 70%)}
-.nm-float{animation:nmFloat 6s ease-in-out infinite}
-.nm-float-slow{animation:nmFloat 8s ease-in-out infinite}
+.cx-dots{background-image:radial-gradient(#08090c 1.3px,transparent 1.4px);background-size:14px 14px;opacity:.35;-webkit-mask-image:radial-gradient(circle,#000 45%,transparent 70%);mask-image:radial-gradient(circle,#000 45%,transparent 70%)}
+.cx-float{animation:nmFloat 6s ease-in-out infinite}
+.cx-float-slow{animation:nmFloat 8s ease-in-out infinite}
 @keyframes nmFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-.nm-card{transition:transform .35s cubic-bezier(.2,.9,.25,1),box-shadow .35s,border-color .25s}
-.nm-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
-.nm-chev{display:inline-block;letter-spacing:-.08em;margin-right:.25em;animation:nmChev 1.6s steps(1) infinite}
+.cx-card{transition:transform .35s cubic-bezier(.2,.9,.25,1),box-shadow .35s,border-color .25s}
+.cx-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.cx-chev{display:inline-block;letter-spacing:-.08em;margin-right:.25em;animation:nmChev 1.6s steps(1) infinite}
 @keyframes nmChev{0%{opacity:1}50%{opacity:.55}}
-.nm-drop{animation:nmDrop .25s cubic-bezier(.2,.9,.25,1) both}
+.cx-drop{animation:nmDrop .25s cubic-bezier(.2,.9,.25,1) both}
 @keyframes nmDrop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
-.nm-btnline{transition:transform .22s cubic-bezier(.2,.9,.25,1),background .2s,color .2s,border-color .2s}
-.nm-btnline:hover{transform:scale(1.05)}
+.cx-btnline{transition:transform .22s cubic-bezier(.2,.9,.25,1),background .2s,color .2s,border-color .2s}
+.cx-btnline:hover{transform:scale(1.05)}
 
 /* ---- Camo Cash · gloam-style controls + military-stealth HUD bits ---- */
 .cm-kicker{position:relative;display:inline-flex;align-items:center;gap:8px;padding:7px 12px;font-family:'Space Mono',ui-monospace,monospace;font-size:11px;text-transform:uppercase;letter-spacing:.2em;color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.04)}
@@ -270,13 +270,13 @@ code {
 .cm-card{box-shadow:0 1px 2px rgba(0,0,0,.35);transition:transform .35s cubic-bezier(.16,1,.3,1),box-shadow .35s,border-color .25s}
 .cm-card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.25);box-shadow:0 6px 20px rgba(0,0,0,.45)}
 
-@media (prefers-reduced-motion:reduce){.nm-float,.nm-float-slow,.nm-chev,.nm-pulse{animation:none}}
-.nm-burger{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;transition:background .2s}
-.nm-burger:hover{background:rgba(32,34,33,.08)}
-.nm-bl{display:block;width:26px;height:2.5px;border-radius:0;background:currentColor;transition:transform .35s cubic-bezier(.2,.9,.25,1),opacity .25s}
-.nm-bl.o1{transform:translateY(7.5px) rotate(45deg)}
-.nm-bl.o2{opacity:0}
-.nm-bl.o3{transform:translateY(-7.5px) rotate(-45deg)}
+@media (prefers-reduced-motion:reduce){.cx-float,.cx-float-slow,.cx-chev,.cx-pulse{animation:none}}
+.cx-burger{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;transition:background .2s}
+.cx-burger:hover{background:rgba(32,34,33,.08)}
+.cx-bl{display:block;width:26px;height:2.5px;border-radius:0;background:currentColor;transition:transform .35s cubic-bezier(.2,.9,.25,1),opacity .25s}
+.cx-bl.o1{transform:translateY(7.5px) rotate(45deg)}
+.cx-bl.o2{opacity:0}
+.cx-bl.o3{transform:translateY(-7.5px) rotate(-45deg)}
 
 /* ---- Camo radar (square stealth sweep) ---- */
 .cm-radar{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.02)}

@@ -7,6 +7,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 import asyncio
+import re
 import time
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
@@ -268,6 +269,32 @@ async def _start_warm():
     asyncio.create_task(_ds_warm_loop())
     asyncio.create_task(warm_logos())
     asyncio.create_task(live_relay())
+    asyncio.create_task(_mirror_warm())
+
+
+async def _mirror_warm():
+    """Pre-warm the app mirror: render the app page once and pull its chunks through the local proxy cache,
+    so the first real visitor gets a warm boot."""
+    try:
+        await asyncio.sleep(2)
+        async with httpx.AsyncClient(timeout=45) as c:
+            r = await c.get("http://localhost:8001/api/bifrost/v1/app/")
+            if r.status_code != 200:
+                return
+            urls = set(re.findall(r'(?:src|href)="([^"]+)"', r.text))
+            jobs = []
+            for u in urls:
+                if "/api/bifrost/" not in u:
+                    continue
+                path = u[u.index("/api/bifrost/"):]
+                jobs.append(c.get(f"http://localhost:8001{path}"))
+            for job in asyncio.as_completed(jobs):
+                try:
+                    await job
+                except Exception:
+                    pass
+    except Exception:
+        pass
 
 
 def _scrub(body: bytes) -> bytes:

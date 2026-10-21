@@ -1,7 +1,7 @@
 """Iteration 10 leak audit + per-tab explainer backend tests.
 
 Validates:
-  (a) /api/bifrost/v1/app/ and /api/bifrost/v1/_brand/dk-swap.js leak hiding
+  (a) /api/bifrost/v1/app/ and /api/bifrost/v1/_brand/camo-app.js leak hiding
   (b) /api/ds/tokens scrubbing + opaque image URLs
   (c) /api/bifrost/v1/indexer/v1/assets hides upstream mints
   (d) HTML title / brand strings
@@ -57,13 +57,13 @@ def test_app_html_no_leaks():
 
 
 def test_dk_swap_js_no_leaks():
-    r = requests.get(f"{BASE}/api/bifrost/v1/_brand/dk-swap.js", timeout=30)
+    r = requests.get(f"{BASE}/api/bifrost/v1/_brand/camo-app.js", timeout=30)
     assert r.status_code == 200, r.status_code
     body = r.text
-    assert "Veil" not in body, "Capital 'Veil' in dk-swap.js"
+    assert "Veil" not in body, "Capital 'Veil' in camo-app.js"
     for term in FORBIDDEN_CI:
         c = _ci_count(body, term)
-        assert c == 0, f"'{term}' x{c} in dk-swap.js"
+        assert c == 0, f"'{term}' x{c} in camo-app.js"
 
 
 def test_ds_tokens_source_scrubbed():

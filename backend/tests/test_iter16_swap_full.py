@@ -103,7 +103,7 @@ def test_private_route_full_flow(sess):
 # ---------- Privacy swap (NEAR Intents) ----------
 def test_privacy_swap_full_flow(sess):
     src = _find(sess, "source", "SOL", near=True)
-    # ETH native may not have a privacy route; USDC on ethereum is the common pair used by dk-swap.js
+    # ETH native may not have a privacy route; USDC on ethereum is the common pair used by camo-app.js
     dst = _find(sess, "destination", "USDC", chain="eth", near=True) or _find(sess, "destination", "ETH", chain="eth", near=True)
     assert src and dst, f"near token lookup failed src={src} dst={dst}"
     nq = sess.post(f"{BASE}/api/ds/near/quote", json={

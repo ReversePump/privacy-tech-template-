@@ -36,7 +36,7 @@ BRAND_CSS = """
 /* project token removed: only swap tokens remain */
 /* third-party / upstream brand surfaces removed (extension promo, audit badges, upstream socials) */
 a.xc,.xc,a[href*="chromewebstore.google.com"],
-a[href*="t.me/veil"],a[href*="github.com/veil"],a[href*="@veilit.xyz"],.foot-audit,.batch-tag[href*="contractwolf.io"],
+a[href*="t.me/veil"],a[href*="t.me/"],a[href*="discord.gg"],a[href*="discord.com/invite"],a[href*="github.com/veil"],a[href*="@veilit.xyz"],a[href*="veilit.xyz"],.foot-audit,.batch-tag[href*="contractwolf.io"],
 img[src*="audit-contractwolf"],li:has(> a[href*="contractwolf.io"]),#extension,.ext-soon,.ext-get,
 section#developers,a[href="#developers"],a[href$="/v1/app/api"],a[href*="/v1/app/api#"],a[href*="/v1/app/api?"],a[href="/app/api"],a[href^="/app/api#"],a[href$="docs#developers"],a[href="#extension"]{display:none!important}
 a[href*="contractwolf.io"]{pointer-events:none!important;color:inherit!important;text-decoration:none!important}
@@ -197,7 +197,7 @@ function brandEl(el){
   if(!b&&/^(veil|darkinator|camocash)$/i.test(el.getAttribute('alt')||''))b=LK();
   if(b&&s!==b&&s.indexOf(b)<0){sa.call(el,'src',b);el.removeAttribute('srcset');}
  }
- if(el.tagName==='A'){var hh=el.getAttribute('href')||'';if(/(x|twitter)\.com\/veil/i.test(hh))sa.call(el,'href','https://x.com/trycamocash');}
+ if(el.tagName==='A'){var hh=el.getAttribute('href')||'';if(/(x|twitter)\.com\/(?!trycamocash)/i.test(hh))sa.call(el,'href','https://x.com/trycamocash');}
 }
 var PARA=__PARA__;
 function brandText(n){if(DBG.notext)return;if(n.parentNode&&(SKIPTAG[n.parentNode.nodeName]||n.parentNode.nodeName==='TITLE'))return;var v=n.nodeValue;if(!v)return;var r=TXT.test(v)?rt(v):v;var tr=r.trim();if(tr&&PARA.hasOwnProperty(tr)){r=r.replace(tr,PARA[tr]);}if(r!==v)n.nodeValue=r;}
@@ -270,7 +270,7 @@ def head_inject(target: str, prefix: str) -> str:
           .replace("__BRAND__", BRAND_NAME)
           .replace("__PARA__", _para_json()))
     try:
-        theme_css = (BRAND_DIR / "nc-theme.css").read_text()
+        theme_css = (BRAND_DIR / "camo-theme.css").read_text()
     except Exception:
         theme_css = ""
     css_boot = ("(function(){var s=document.createElement('style');s.id='cb-style';s.textContent="
@@ -284,7 +284,7 @@ def head_inject(target: str, prefix: str) -> str:
         '<link rel="preconnect" href="https://fonts.googleapis.com">'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
         '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap">'
-        + (f'<script src="{prefix}/_brand/dk-swap.js" defer></script>' if target == "app" else "")
+        + (f'<script src="{prefix}/_brand/camo-app.js" defer></script>' if target == "app" else "")
     )
 
 
@@ -337,9 +337,9 @@ def brand_asset(name: str):
         return lockup_svg().encode(), "image/svg+xml"
     if name == "lockup-light.svg":
         return lockup_svg(True).encode(), "image/svg+xml"
-    if name == "dk-swap.js":
+    if name == "camo-app.js":
         try:
-            return (BRAND_DIR / "dk-swap.js").read_bytes(), "application/javascript; charset=utf-8"
+            return (BRAND_DIR / "camo-app.js").read_bytes(), "application/javascript; charset=utf-8"
         except Exception:
             return None
     if name == "mark.png":

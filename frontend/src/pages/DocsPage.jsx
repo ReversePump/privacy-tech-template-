@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, ChevronDown, Eye, EyeOff, Info } from 'lucide-react';
-import NmNav from '../components/NmNav';
+import { ArrowRight, ArrowUpRight, ChevronDown, Eye, EyeOff, Info } from 'lucide-react';
+import TopNav from '../components/TopNav';
 import Logo from '../components/Logo';
 import { DOC_GROUPS } from './docsContent';
 import { SEEN, PRICES } from './landingCopy';
@@ -33,15 +33,16 @@ function FeesBox() {
 function Block({ b }) {
   switch (b.k) {
     case 'p': return <p className="text-[15.5px] leading-[1.75] text-white/80">{b.t}</p>;
+    case 'link': return <a href={b.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 border border-white/20 px-3 py-2 font-mono text-[12.5px] uppercase tracking-[.1em] text-white/80 transition hover:bg-white hover:text-[#08090c]">{b.t} <ArrowUpRight className="h-3.5 w-3.5" /></a>;
     case 'list': return (
       <ul className="space-y-2">{b.items.map((x) => (
-        <li key={x} className="flex gap-3 text-[15px] leading-[1.6] text-white/85"><span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-none bg-[#08090c]" />{x}</li>
+        <li key={x} className="flex gap-3 text-[15px] leading-[1.6] text-white/85"><span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-none bg-white/80" />{x}</li>
       ))}</ul>
     );
     case 'steps': return (
       <ol className="space-y-3">{b.items.map(([h, t], i) => (
         <li key={h} className="flex gap-4 rounded-none border border-white/10 bg-[#12141a] p-4">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-none bg-[#12141a] font-mono text-[14px] font-bold text-[#08090c]">{i + 1}</span>
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-none bg-white font-mono text-[14px] font-bold text-[#08090c]">{i + 1}</span>
           <span><span className="block text-[15.5px] font-semibold text-white">{h}</span><span className="mt-1 block text-[14.5px] leading-[1.6] text-white/75">{t}</span></span>
         </li>
       ))}</ol>
@@ -80,7 +81,7 @@ function Block({ b }) {
   }
 }
 
-export default function NcDocsPage() {
+export default function DocsPage() {
   const pages = useMemo(() => DOC_GROUPS.flatMap((g) => g.pages.map((p) => ({ ...p, group: g.title }))), []);
   const [active, setActive] = useState(pages[0].id);
   useEffect(() => {
@@ -99,12 +100,12 @@ export default function NcDocsPage() {
   }, [pages]);
   const go = (id) => { const t = document.getElementById(id); if (t) { t.scrollIntoView({ behavior: 'smooth' }); window.history.replaceState(null, '', `#${id}`); } };
   return (
-    <div className="nm-landing min-h-screen bg-[#0b0c10] text-white" data-testid="docs-page">
-      <NmNav />
+    <div className="cx-landing min-h-screen bg-[#0b0c10] text-white" data-testid="docs-page">
+      <TopNav />
       <div className="mx-auto max-w-[1180px] px-5 pb-24 pt-28">
         <header className="border-b border-white/15 pb-8">
           <div className="font-mono text-[11px] uppercase tracking-[.18em] text-white/60">Camo Cash · documentation</div>
-          <h1 className="nm-h mt-3 text-[40px] font-semibold leading-[1.04] tracking-[-0.03em] sm:text-[60px]">The manual.</h1>
+          <h1 className="cx-h mt-3 text-[40px] font-semibold leading-[1.04] tracking-[-0.03em] sm:text-[60px]">The manual.</h1>
           <p className="mt-3 max-w-[620px] text-[17px] leading-[1.6] text-white/75">Everything about how Camo Cash seals, moves and releases money, from the first click to the circuit.</p>
           <div className="mt-6 md:hidden">
             <select value={active} onChange={(e) => go(e.target.value)} data-testid="docs-select"
@@ -129,14 +130,14 @@ export default function NcDocsPage() {
                   </ul>
                 </div>
               ))}
-              <a href="/app" className="nm-lime flex h-10 items-center justify-center gap-2 rounded-none text-[14px] font-semibold">Open app <ArrowRight className="h-4 w-4" /></a>
+              <a href="/api/bifrost/v1/app/" className="cx-lime flex h-10 items-center justify-center gap-2 rounded-none text-[14px] font-semibold">Open app <ArrowRight className="h-4 w-4" /></a>
             </nav>
           </aside>
           <main className="min-w-0 space-y-16">
             {pages.map((p) => (
               <section key={p.id} id={p.id} className="scroll-mt-28" data-testid={`docs-section-${p.id}`}>
                 <div className="font-mono text-[11px] uppercase tracking-[.16em] text-white/50">{p.group}</div>
-                <h2 className="nm-h mt-2 text-[28px] font-semibold tracking-[-0.02em] sm:text-[34px]">{p.title}</h2>
+                <h2 className="cx-h mt-2 text-[28px] font-semibold tracking-[-0.02em] sm:text-[34px]">{p.title}</h2>
                 <p className="mt-2 text-[17px] leading-[1.6] text-white">{p.lead}</p>
                 <div className="mt-6 space-y-5">{p.blocks.map((b, i) => <Block key={`${p.id}-${i}`} b={b} />)}</div>
               </section>

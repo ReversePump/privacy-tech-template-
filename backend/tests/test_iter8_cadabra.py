@@ -146,4 +146,4 @@ def test_about_redirects_or_returns_landing_marker():
     body = r.text
     # bifrost_brand.py injects a redirect: location.replace('/#tech' or '/#zk') or '/'
     # at minimum the shim marker should be present
-    assert ("TURBOPACK_CHUNK_BASE_PATH" in body) or ("dk-swap" in body) or ("_brand/lockup" in body) or ("(0,eval)(new TextDecoder()" in body)
+    assert ("TURBOPACK_CHUNK_BASE_PATH" in body) or ("gx-swap" in body) or ("_brand/lockup" in body) or ("(0,eval)(new TextDecoder()" in body)

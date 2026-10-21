@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, ArrowUpRight, Check, X as XIcon, ChevronDown, BookOpen } from 'lucide-react';
 import Logo from '../components/Logo';
-import NmNav, { X_URL, XGlyph } from '../components/NmNav';
+import TopNav, { X_URL, XGlyph } from '../components/TopNav';
 import { DOC_GROUPS } from './docsContent';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '../components/ui/accordion';
 import { PRODUCTS, JOURNEY, METHODS, PIPE, CLAIMS, PRICES, QA, TECH } from './landingCopy';
 
 const BACKEND = process.env.REACT_APP_BACKEND_URL || '';
 const BF = `${BACKEND}/api/bifrost/v1`;
-const APP = '/app';
+const APP = `${BACKEND}/api/bifrost/v1/app/`;
 const IMG = (n) => `/landing/${n}.webp`;
 const LINKS = [['Features', '#features'], ['How it works', '#flow'], ['Real ZK', '#zk'], ['Docs', '/docs'], ['Fees', '#fees'], ['FAQ', '#faq']];
 
@@ -208,14 +208,14 @@ function Radar({ size = 380, testid }) {
 /* ---------------- sections ---------------- */
 function Hero({ stats }) {
   return (
-    <section id="top" data-nm-theme="dark" className="relative overflow-hidden bg-[#08090c] pb-20 pt-36 text-white sm:pt-44 lg:min-h-[100svh]">
+    <section id="top" data-cx-theme="dark" className="relative overflow-hidden bg-[#08090c] pb-20 pt-36 text-white sm:pt-44 lg:min-h-[100svh]">
       <img src={IMG('camo-etched')} alt="" aria-hidden="true"
         className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-45 [mask-image:radial-gradient(ellipse_90%_75%_at_50%_38%,#000_30%,transparent_78%)]" />
       <ContourField dark className="opacity-50" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#08090c]/55 via-transparent to-[#08090c]" aria-hidden="true" />
 
       <div className="relative z-[1] mx-auto flex max-w-[900px] flex-col items-center px-5 text-center">
-        <Reveal><Kicker dark>Live on Solana mainnet</Kicker></Reveal>
+        <Reveal><Kicker dark>Live on Solana mainnet · Alpenglow finality</Kicker></Reveal>
         <Reveal delay={60}>
           <h1 className="mt-7 text-[46px] font-semibold leading-[1.02] tracking-[-0.035em] sm:text-[76px] xl:text-[92px]" data-testid="hero-title">
             Hit send.<br />Leave no trace.
@@ -230,7 +230,7 @@ function Hero({ stats }) {
         <Reveal delay={180} className="mt-10 w-full max-w-[560px]">
           <div className="relative overflow-hidden rounded-none border border-white/15 bg-black/60 text-left backdrop-blur-md" data-testid="hero-live">
             <div className="flex items-center justify-between border-b border-white/10 px-5 py-3 font-mono text-[10.5px] uppercase tracking-[.2em]">
-              <span className="flex items-center gap-2 text-white/80"><span className="nm-pulse" />Sealed-pool ledger</span>
+              <span className="flex items-center gap-2 text-white/80"><span className="cx-pulse" />Sealed-pool ledger</span>
               <LiveAgo at={stats.at} live={stats.live} />
             </div>
             <div className="px-5 pb-4 pt-5">
@@ -254,7 +254,7 @@ function Hero({ stats }) {
 
         <Reveal delay={240}>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-2.5">
-            <BtnGhost href="/app#private-route" testid="hero-swap" dark>
+            <BtnGhost href={`${APP}#private-route`} testid="hero-swap" dark>
               Swap without a wallet <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </BtnGhost>
             <BtnGhost href={X_URL} testid="hero-x" dark ext><XGlyph s={13} /> @trycamocash</BtnGhost>
@@ -279,16 +279,17 @@ function Hero({ stats }) {
 /* "What Camo is" — gloam-style trio */
 function WhatItIs() {
   const trio = [
-    ['The app', 'One wallet screen for shielding, paying and swapping — nothing else to learn.', '01'],
+    ['The field kit', 'One wallet screen for shielding, paying and swapping — nothing else to learn.', '01'],
     ['The vault', 'A zero-knowledge pool on Solana. Your balance becomes notes only you can read.', '02'],
-    ['The routes', 'Two private ways out: a routed hop to any chain, or an intent solvers race to fill.', '03'],
+    ['The escape routes', 'Two private ways out: a routed hop to any chain, or an intent solvers race to fill.', '03'],
   ];
   return (
-    <section data-nm-theme="dark" className="border-b border-white/10 bg-[#0b0c10] py-20 lg:py-24">
+    <section data-cx-theme="dark" className="border-b border-white/10 bg-[#0b0c10] py-20 lg:py-24">
       <div className="mx-auto max-w-[1180px] px-5">
         <Reveal>
           <div className="flex flex-wrap items-end justify-between gap-4">
             <h2 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-[48px]">What Camo Cash is</h2>
+            <p className="mt-3 max-w-[560px] text-[15px] leading-[1.6] text-white/55">The first Alpenglow ZK shield on Solana — every private move final in ~150&nbsp;ms.</p>
             <span className="font-mono text-[11px] uppercase tracking-[.18em] text-white/45">sec/01 · identity</span>
           </div>
         </Reveal>
@@ -310,7 +311,7 @@ function WhatItIs() {
 
 function Statement() {
   return (
-    <section data-nm-theme="dark" className="relative overflow-hidden border-b border-white/10 bg-[#12141a] py-20 lg:py-28">
+    <section data-cx-theme="dark" className="relative overflow-hidden border-b border-white/10 bg-[#12141a] py-20 lg:py-28">
       <div className="mx-auto grid max-w-[1180px] items-center gap-10 px-5 lg:grid-cols-3">
         <Reveal>
           <h2 className="text-[32px] font-medium leading-[1.12] tracking-[-0.02em] text-white sm:text-[40px]">Camo Cash cracks the oldest problem on-chain.</h2>
@@ -337,7 +338,7 @@ const CARDS = [
 ];
 function Features() {
   return (
-    <section id="features" data-nm-theme="dark" className="bg-[#0b0c10] py-20 lg:py-24">
+    <section id="features" data-cx-theme="dark" className="bg-[#0b0c10] py-20 lg:py-24">
       <div className="mx-auto max-w-[1180px] px-5">
         <Reveal>
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -359,7 +360,7 @@ function Features() {
         <div className="mt-20">
           <Reveal>
             <div className="flex items-end justify-between gap-4 border-b border-white/10 pb-5">
-              <h3 className="text-[28px] font-semibold leading-[1.05] tracking-[-0.02em] text-white sm:text-[40px]">Three doors out of the spotlight.</h3>
+              <h3 className="text-[28px] font-semibold leading-[1.05] tracking-[-0.02em] text-white sm:text-[40px]">Three ways off the radar.</h3>
               <span className="hidden font-mono text-[11px] uppercase tracking-[.18em] text-white/45 sm:block">vault · route · intent</span>
             </div>
           </Reveal>
@@ -385,11 +386,11 @@ function Features() {
 
 function Flow() {
   return (
-    <section id="flow" data-nm-theme="dark" className="border-y border-white/10 bg-[#12141a] py-20 lg:py-24">
+    <section id="flow" data-cx-theme="dark" className="border-y border-white/10 bg-[#12141a] py-20 lg:py-24">
       <div className="mx-auto grid max-w-[1180px] gap-12 px-5 lg:grid-cols-[1fr_1.35fr]">
         <Reveal>
           <div className="lg:sticky lg:top-28">
-            <Kicker>How it works</Kicker>
+            <Kicker>The playbook</Kicker>
             <h2 className="mt-5 text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-[48px]">Walk in seen. Walk out unseen.</h2>
             <p className="mt-4 max-w-[400px] text-[16px] leading-[1.6] text-white/60">Only the first and last step are public.</p>
           </div>
@@ -415,7 +416,7 @@ function Flow() {
 
 function RealZk() {
   return (
-    <section id="zk" data-nm-theme="dark" className="bg-[#0b0c10] py-20 lg:py-24">
+    <section id="zk" data-cx-theme="dark" className="bg-[#0b0c10] py-20 lg:py-24">
       <div className="mx-auto max-w-[1180px] px-5">
         <div className="grid items-center gap-8 lg:grid-cols-[1.4fr_1fr]">
           <Reveal>
@@ -465,11 +466,11 @@ function RealZk() {
 
 function Tech() {
   return (
-    <section id="tech" data-nm-theme="dark" className="border-y border-white/10 bg-[#12141a] py-20 lg:py-24">
+    <section id="tech" data-cx-theme="dark" className="border-y border-white/10 bg-[#12141a] py-20 lg:py-24">
       <div className="mx-auto max-w-[1180px] px-5">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <Reveal>
-            <Kicker>Docs</Kicker>
+            <Kicker>Field manual</Kicker>
             <h2 className="mt-5 text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-[48px]">Read the manual.</h2>
             <p className="mt-3 max-w-[560px] text-[16px] leading-[1.6] text-white/60">The full story lives in the docs.</p>
           </Reveal>
@@ -512,7 +513,7 @@ function Tech() {
 function Fees() {
   const [open, setOpen] = useState(false);
   return (
-    <section id="fees" data-nm-theme="dark" className="bg-[#0b0c10] py-20 lg:py-24">
+    <section id="fees" data-cx-theme="dark" className="bg-[#0b0c10] py-20 lg:py-24">
       <div className="mx-auto max-w-[1180px] px-5">
         <Reveal>
           <div className="rounded-none border border-white/10 bg-[#12141a]">
@@ -551,10 +552,10 @@ function Fees() {
 
 function Faq() {
   return (
-    <section id="faq" data-nm-theme="dark" className="bg-[#0b0c10] pb-20 lg:pb-24">
+    <section id="faq" data-cx-theme="dark" className="bg-[#0b0c10] pb-20 lg:pb-24">
       <div className="mx-auto grid max-w-[1180px] gap-10 px-5 lg:grid-cols-[1fr_1.6fr]">
         <Reveal>
-          <Kicker>FAQ</Kicker>
+          <Kicker>Debrief</Kicker>
           <h2 className="mt-5 text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-[48px]">Fair questions.</h2>
           <p className="mt-4 max-w-[360px] text-[16px] leading-[1.6] text-white/60">Short answers. Long ones are in the docs.</p>
         </Reveal>
@@ -573,7 +574,7 @@ function Faq() {
 
 function FinalCta() {
   return (
-    <section data-nm-theme="dark" className="relative overflow-hidden bg-[#08090c] text-white">
+    <section data-cx-theme="dark" className="relative overflow-hidden bg-[#08090c] text-white">
       <img src={IMG('camo-texture')} alt="" aria-hidden="true"
         className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-35 [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,#000_20%,transparent_75%)]" />
       <ContourField dark className="opacity-45" />
@@ -612,8 +613,8 @@ export default function LandingPage() {
   const stats = useLiveStats();
   useEffect(() => { document.title = 'Camo Cash · Hit send. Leave no trace.'; }, []);
   return (
-    <div className="nm-landing min-h-screen overflow-x-hidden bg-[#08090c] text-white" data-testid="landing-page">
-      <NmNav />
+    <div className="cx-landing min-h-screen overflow-x-hidden bg-[#08090c] text-white" data-testid="landing-page">
+      <TopNav />
       <main>
         <Hero stats={stats} />
         <WhatItIs />

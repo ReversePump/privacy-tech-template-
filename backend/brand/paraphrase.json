@@ -112,11 +112,12 @@
   "Get started": "Set up · takes 10 seconds",
   "Your wallet, under full camo.": "Open your private vault.",
   "Spin up a Camo Cash wallet in a few seconds, or plug in the wallet you already have. Keys stay on your device, always.": "Create a Camo Cash vault in a few taps or link the Solana wallet you already use. Keys are generated and kept on this device only.",
-  "Make a Camo Cash wallet": "Create a Camo Cash vault",
-  "No extension needed · fund it directly in Camo Cash": "Nothing to install · top it up from any wallet",
+  "Make a Camo Cash wallet": "Camo Wallet",
+  "No extension needed · fund it directly in Camo Cash": "Native ZK vault · Groth16-protected Solana wallet",
   "Not found · install": "Not detected on this browser",
   "Already have a Camo Cash recovery key?": "Have a recovery key already?",
   "Restore your Camo Cash wallet": "Restore my vault",
   "First time on Camo Cash?": "New to private payments?",
-  "Take the tour": "See how it works"
+  "Take the tour": "See how it works",
+  "Longer is safer: 12 or more characters, or a few unrelated words.": "Minimum 10 characters."
 }

@@ -4,7 +4,7 @@
 export const DOC_GROUPS = [
   {
     id: 'start',
-    title: 'Start here',
+    title: 'Briefing',
     pages: [
       {
         id: 'overview',
@@ -29,14 +29,14 @@ export const DOC_GROUPS = [
           { k: 'steps', items: [
             ['Open a vault', 'Hit Connect wallet and pick Create a Camo Cash vault. Choose a password for this device. You get a recovery key once; store it offline.'],
             ['Shield', 'Go to Shield, pick a token and amount, and approve one signature from your public wallet. Your tokens become sealed notes.'],
-            ['Use it', 'Send to any null2… address, trade inside the pool, or exit. No pop-ups: a relayer submits each proof for you.'],
+            ['Use it', 'Send to any camo2… address, trade inside the pool, or exit. No pop-ups: a relayer submits each proof for you.'],
             ['Leave', 'Withdraw to a brand-new address, or use Private route / Privacy swap to land on another chain.'],
           ] },
         ],
       },
       {
         id: 'no-wallet',
-        title: 'Swapping without a vault',
+        title: 'Ghost swaps',
         lead: 'You can bridge out of Solana privately without creating anything.',
         blocks: [
           { k: 'p', t: 'Private route and Privacy swap both run on a manual-deposit model. You get a quote, place an order, and then decide whether to fund it by sending SOL or a token from any wallet you like. Placing the order itself moves nothing.' },
@@ -47,8 +47,27 @@ export const DOC_GROUPS = [
   },
   {
     id: 'concepts',
-    title: 'Concepts',
+    title: 'The craft',
     pages: [
+      {
+        id: 'alpenglow',
+        title: 'Alpenglow finality',
+        lead: 'Camo Cash is the first Alpenglow-era ZK shield on Solana — private moves that finalize in about a blink.',
+        blocks: [
+          { k: 'p', t: 'Alpenglow (SIMD-0326) is Solana\u2019s consensus upgrade, live on mainnet from epoch 1064. Its voting engine, Votor, replaces TowerBFT: validators vote directly to each other off-chain instead of writing vote transactions, and blocks finalize in roughly 150 ms. A block is final in one round when 80% of stake notarizes it, or two rounds at 60% \u2014 with tolerance for 20% adversarial plus 20% offline stake, sealed by compact BLS finalization certificates.' },
+          { k: 'kv', rows: [
+            ['Status', 'Live on Solana mainnet (epoch 1064)'],
+            ['Finality', '~150 ms fast path (100\u2013380 ms band)'],
+            ['Voting', 'Votor \u2014 off-chain, validator-to-validator'],
+            ['Safety', '20% adversarial + 20% offline stake'],
+            ['Certificates', 'Compact BLS finalization certificates'],
+          ] },
+          { k: 'p', t: 'What it means in Camo Cash: shielding, private payments, pool trades and exits confirm almost instantly, and \u201cconfirmed\u201d now means final. A private payment is un-reorgable about as fast as you can lift your finger. Rotor, the data-dissemination half, ships in a later proposal; Turbine carries blocks today.' },
+          { k: 'list', items: ['Confirmed and finalized are now the same state', 'No on-chain vote transactions \u2014 more block space for real moves', 'Fast-path finality assumes 80% responsive stake'] },
+          { k: 'link', href: 'https://solana.com/upgrades/alpenglow', t: 'Solana \u2014 Alpenglow upgrade overview' },
+          { k: 'link', href: 'https://x.com/solana_devs/status/2112892922136055937', t: '@solana_devs on X \u2014 Alpenglow announcement' },
+        ],
+      },
       {
         id: 'notes',
         title: 'Notes and the pool',
@@ -97,11 +116,11 @@ export const DOC_GROUPS = [
   },
   {
     id: 'crosschain',
-    title: 'Cross-chain',
+    title: 'Cross-chain exits',
     pages: [
       {
         id: 'private-route',
-        title: 'Private route',
+        title: 'Ghost route',
         lead: 'Multi-hop swaps out of Solana to any chain, compared side by side.',
         blocks: [
           { k: 'steps', items: [
@@ -130,7 +149,7 @@ export const DOC_GROUPS = [
       },
       {
         id: 'tracking',
-        title: 'Tracking an order',
+        title: 'Tracking a drop',
         lead: 'Every order gets a receipt ID you can look up at any time.',
         blocks: [
           { k: 'p', t: 'Open Track, paste the receipt ID and the page polls the live status every few seconds. Recent orders are remembered in this browser so you can jump back with one tap.' },
@@ -185,7 +204,7 @@ export const DOC_GROUPS = [
       },
       {
         id: 'visibility',
-        title: 'What is public',
+        title: 'What stays visible',
         lead: 'An honest map of what the chain can and cannot see.',
         blocks: [
           { k: 'visibility' },
@@ -195,11 +214,11 @@ export const DOC_GROUPS = [
   },
   {
     id: 'safety',
-    title: 'Staying safe',
+    title: 'Field safety',
     pages: [
       {
         id: 'habits',
-        title: 'Good habits',
+        title: 'Field habits',
         lead: 'The protocol hides links. Your habits decide how well.',
         blocks: [
           { k: 'list', items: [

@@ -12,7 +12,7 @@ export default function Logo({ size = 30, withWord = true, light = false }) {
         draggable="false"
       />
       {withWord && (
-        <span className={`nc-display text-[21px] font-bold tracking-[-0.04em] ${light ? 'text-white' : 'text-[#08090c]'}`}>
+        <span className={`cc-display text-[21px] font-bold tracking-[-0.04em] ${light ? 'text-white' : 'text-[#08090c]'}`}>
           Camo<span className="font-medium"> Cash</span>
         </span>
       )}
