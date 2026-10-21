@@ -158,3 +158,18 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
 - Masking: all upstream socials removed (t.me, discord, github/veil, veilit.xyz hidden); any x/twitter link that
   is not @trycamocash is rewritten to it; served app HTML has zero external links except font CDNs.
 - Backend suite green: 131 passed, 1 skipped.
+
+## Iteration 18 — Wallet sheet defect fix pass (Oct 2026, verified iteration_37.json: frontend 100%)
+- Root cause of iter34 crashes: injected JS physically MOVED React-owned .wopt nodes into the dropdown,
+  corrupting React reconciliation (appendChild contains-parent / insertBefore NotFoundError on unmount).
+  Fix: originals stay in place (inline display:none, re-asserted per tick, scoped to exclude .wext clones and
+  anything inside .wgroup); dropdown shows non-destructive clones with forwarded clicks. Zero page errors.
+- External wallets (Phantom/Solflare/Backpack) now render visibly inside "Other wallets · not ZK-native".
+- Create sheet copy finalized: label "PASSWORD FOR THIS DEVICE — MINIMUM 10 CHARACTERS" (always visible),
+  helper exactly "Unlocks on this device only. Your recovery key restores everything." (helper is split
+  across 3 text nodes upstream; standalone 'browser' node mapped to empty via paraphrase.json).
+- Create button contrast fixed (.lw-onb .btn-primary scoped white/dark). Alpenglow tagline hides when a
+  wallet is connected (no header overlap). Tagline badge moved to fixed body-level element (not in header).
+- Full flow verified: create vault (10+ char pw) -> recovery key camosk2… -> Open Camo Cash -> dashboard
+  ("Camo Cash Wallet · …") -> Receive shows camo2 address + QR. No console page errors.
+- Backend suite: 131 passed, 1 skipped (test_iter16 order-drift 409 = known upstream quote flake, passes solo).

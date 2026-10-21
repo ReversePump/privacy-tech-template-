@@ -1,0 +1,20 @@
+{
+  "summary": "Re-verified iteration 36 fixes on Camo Cash connect/wallet sheet. All 3 previously identified issues are resolved. Connect sheet renders exactly one native Camo Wallet card with Recommended badge and 'Native ZK vault · Groth16-protected Solana wallet' subtext. 'Other wallets · not ZK-native' toggle expands to show Phantom, Solflare, Backpack rows (visible, display:block) each with an Install link; no duplicate originals outside .wgroup. Create sheet shows label 'PASSWORD FOR THIS DEVICE — MINIMUM 10 CHARACTERS', helper text exactly 'Unlocks on this device only. Your recovery key restores everything.' with no stray 'browser' text node, and a clearly visible Create button (light bg rgb(244,244,245), dark text rgb(8,9,12)). Full flow: create vault with 10+ char password -> recovery key screen showing camosk2-prefixed key -> Open Camo Cash -> wallet dashboard opens cleanly. Header shows 'Camo Cash Wallet · HN7E…', Alpenglow tagline badges are hidden (offsetParent null) when connected. Receive tab displays SVG QR and camo2-prefixed address 'camo25SKtAusGmFFmPY7sTko7fHB2WpHCtycX1wHYtbjsBR3VkChgmkpDYXMU1agrUqW2cXW9uopZo1pgdAGBEz4mbpDB6psKt' with Copy address button. Zero page errors (no appendChild/insertBefore). Only 2 console errors observed: two 403 'Failed to load resource' which look like upstream indexer/relayer flakes documented out-of-scope.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "100%"},
+  "test_credentials": "none - fresh browser profile",
+  "seed_data_creation": "Created a transient Camo Wallet via UI (password MySecurePass123!) during the end-to-end flow; local-only, no backend seed required.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iteration 36 action items (dropdown clone hiding, stray 'browser' helper text, password label min-10 copy) are all verified fixed. Connect sheet, create sheet, recovery step, and dashboard+Receive flow all pass. The 'Camo Wallet' H3 on the create sheet is accepted as-is (deliberate clean branding per iter36 note). Known upstream flakes still out of scope: 409 'minimum output changed' order drift and indexer/relayer 404/403. Only 403 resource-load warnings seen in console; no JS runtime errors.",
+  "rca of the issue": "n/a - verification pass only; all previously RCA'd issues confirmed fixed in production preview."
+}
