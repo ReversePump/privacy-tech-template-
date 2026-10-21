@@ -1,0 +1,29 @@
+{
+  "summary": "Iteration 25 - frontend-only check of the mobile 'can't see loading animation' fix, plus a Send/Swap regression, on the preview. ALL PASS after one environment fix: the CRA dev server was still serving an OLD index.html (no #nc-boot, empty #root, no #f4f5ef body) even though frontend/public/index.html had changed 2 min earlier. The webpack dev server does not reload public/index.html, so I ran `sudo supervisorctl restart frontend`. After that, curl / shows <div id=\"root\"><div id=\"nc-boot\" data-testid=\"nc-boot\"...> and html,body{background:#f4f5ef}.\n\nSPLASH (/api/bifrost/v1/app/):\n- Mobile 430x900: #nc-splash was attached at 0.42s. Parent is BODY, position fixed, z 2147483000, 430x900 full-screen. Text: 'SOLANA MAINNET / Getting ready / Syncing the pool'. At 1.74s the canvas was 344x150 with 4916 colored pixels; the screenshot shows the purple->blue->green dot-matrix 'SOL'. .sp-bar i animationName = 'ncBar', and its transform moves over time (-2.7 -> 353px). The message rotated to 'Loading your notes'. Splash removed at 2.71s (about 2.3s on screen, at least MIN_MS 1900). No splash after switching tabs.\n- Desktop 1920x800: splash at 0.35s, canvas 8886 colored pixels, ncBar, full 1920x800 overlay, removed at 2.67s.\n- /app redirect: lands on the mirror, splash at 0.51s, canvas 8898 colored pixels, removed at 2.81s. No long white screen.\n- After the fade, the Welcome tour 'Skip intro' can be clicked on mobile and desktop (splash does not block clicks).\n\nLANDING /: with CDP throttling (latency 400ms, 50KB/s), #nc-boot was visible at 1.22s. Body bg rgb(244,245,239); 42 animated dots; full-height overlay with a moving gradient bar. #nc-boot detached at 11.3s once React mounted, and the landing page then rendered normally.\n\nREGRESSION (mobile, fresh vault TestPass!2026xyz each run):\n- Swap SOL->Bonk amount 1: live quote 34,016,750.04 Bonk (~$105) within 1s; CTA 'Not enough private SOL'. Amount 4: 136,109,277 Bonk. Never stuck on 'quoting'.\n- Send SOL amount 4 to 5tzF...uAi9: the CTA showed only 'Not enough private SOL' for 15s and never 'Working out the fee…'. Relayer fee 0 SOL.\n- No pageerror in any run.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Swap/Send on a fresh vault", "issues": ["The 'You pay' / Amount token starts as 'Select' (no token) and Swap receive defaults to SOL. The user must pick SOL first. Minor: consider defaulting pay to SOL."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Remember that changes to frontend/public/index.html need `sudo supervisorctl restart frontend` in preview, because the CRA dev server keeps serving the old HTML. I already restarted it this run. Production nullcash.fun needs a redeploy to get #nc-boot and the splash.",
+    "(Optional) Default the Swap/Send pay token to SOL instead of 'Select'."
+  ],
+  "critical_code_review_comments": [
+    "ensureSplash(): sizing from offsetWidth fixes the empty canvas (thousands of colored px now). Appending to body with MIN_MS 1900 and a 20s hard fallback works. The fallback guarantees removal even if main.main never appears.",
+    "The resize listener in ensureSplash is never removed after the splash is gone. It is guarded by box.isConnected, so it is harmless but leaks one listener per page load.",
+    "The #nc-boot inline loader is removed both by React replacing #root and by ensureSplash (boot.remove()). Fine."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (frontend only)", "frontend": "100%"},
+  "test_credentials": "Vault password in-browser: TestPass!2026xyz",
+  "seed_data_creation": "None (fresh in-browser vaults only)",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Selectors: splash #nc-splash / canvas / .sp-bar i. Landing boot loader [data-testid=nc-boot]. Dock Send = #nc-dock-send. Do NOT use 'text=Pay' because it matches the 'YOU PAY' label on Swap. Token pills are main button.tok; picker rows are .sheet .tok-list button.wopt with search .sheet input.inp. The first main .btn-primary can be a hidden 'Add to Chrome' button, so filter by offsetParent.",
+  "rca of the issue": "Confirmed fixed on preview. Additional finding: the preview dev server had not picked up the new index.html until the frontend was restarted."
+}

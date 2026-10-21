@@ -1,0 +1,44 @@
+{
+  "summary": "Iteration 23 - 'all swaps with wallet created?' live frontend verification on https://offer-latest-dark.preview.emergentagent.com/app. Full NullCash vault creation flow verified end-to-end: Connect wallet -> 'Create a NullCash vault' (Recommended) -> password TestPass!2026xyz x2 (REPEAT IT) -> Create -> live recovery key displayed (nullsk2ndwh2Gxweh4P8AHijMZLZSqiy3M4A2nmMgXpS2LXwvS6xLRL2 ...) + Copy + 'My recovery key is saved somewhere safe' checkbox -> Open NullCash. After vault created the header switches from 'Connect' to 'NullCash Wallet · <sol-prefix>…<suffix>' (observed 7c5p…MZ7c, 24hW…bfJ7, 8Bhs…hiev, GW2X…x6Ac on separate runs = fresh wallet each time). Private balance card shows $0.00, Vault V-<id>, NullCash Wallet <addr-short>, action buttons Deposit/Swap/Send/Receive/Withdraw, Anonymity set 89, 'Top up to begin · Send SOL or any token to your deposit address and it slides into your private balance automatically.' with 'Add funds' CTA, Tokens 'No tokens here yet'. Session persistence: after full page reload the header still shows the same NullCash Wallet (vault stays unlocked within session; no re-password prompt observed) - verified good. With vault active, ALL top tabs render cleanly and keep the vault-active header: Shield (SOL preselected, 'In wallet: 0 SOL · medium crowd', 'Fees & details · NullCash fee: 0.3% · 0 SOL', amount 0.1 accepted, CTA switches to 'Type an amount'/insufficient-balance pattern), Swap tab (private balance card, Vault V-xxxx), Send (Amount/Select/TO/Paste/Scan + 'Your private balance is empty' disabled CTA + 'NullCash fee: Free for private transfers'), Bridge ('NullCash it twice. Total privacy. BETA · powered by NEAR Intents' · YOU SEND 0 SOL / YOU RECEIVE 0 BTC on Bitcoin · BITCOIN ADDRESS field · Fees & details · 'Type an amount'), Private route (From Solana · Min $3 · SOL · To Any supported network · Select Any chain · Destination address + chain · Paste · 'Creating an order moves no funds · live on-chain quotes'; token picker modal opens with network chips Ethereum/Solana/Arbitrum/Base/BNB Chain/Polygon/Optimism/Avalanche/Bitcoin/More and ETH rows across many chains with live $2,362.87 price), Privacy swap, Track ('Track your order live status' with 'Paste your order ID' input + 'No orders yet. Create a swap to get an order ID.'), History (returns to Home-with-vault view), Chain (merkle_root present, 'commitment' + 'nullifier' terms present). Zero pageerror events, zero console error events across all tabs with vault active.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "verified_behaviours": [
+    "Vault creation UX: Connect wallet modal -> Create a NullCash vault card (button.wopt.wopt-own) -> password modal with two 'input[type=password]' fields and 'Create' CTA that stays disabled until both match -> Recovery key screen with nullsk2… string + Copy + checkbox + 'Open NullCash' CTA.",
+    "Header toggle: data-testid='nc-connect-btn' text goes from 'Connect' -> 'NullCash Wallet · <short>' once vault is open; icon changes to vault lock pill.",
+    "Session persistence across reload: F5 keeps vault open in same tab, no re-password required (consistent with 'opens NullCash on this browser only' copy).",
+    "Home: Private Balance $0.00, Vault V-xxxxxx label, truncated SOL wallet address, Deposit/Swap/Send/Receive/Withdraw actions, Anonymity set 89, 'Your notes 0 synced', 'You approve inside NullCash 0× fees covered by relayer', 'Top up to begin' banner with 'Add funds' CTA.",
+    "Shield SOL amount 0.1 accepted; fee row 'NullCash fee: 0.3% · 0 SOL' and 'In wallet: 0 SOL' feedback shown; CTA state 'Type an amount' because empty wallet - clear no-crash insufficient-balance pattern.",
+    "Send tab accepts token Select, TO address Paste/Scan, 'Your private balance is empty' disabled CTA - expected for empty vault.",
+    "Bridge tab renders with NEAR Intents 'Under the hood' tag, SOL -> BTC default pair, Bitcoin address field, Fees & details disclosure, 'Type an amount' disabled CTA.",
+    "Private route screen with vault active: From row preselected to SOL / Solana (Min $3); To row has Select / Any chain; Destination address + Destination chain fields; token picker modal opens with 10+ network chips and lists ETH rows across all supported chains with live $2,362.87 price (relayer /api/ds/tokens live).",
+    "Track screen renders with 'Paste your order ID' + Track button; History renders without errors.",
+    "Chain terminal with vault active still shows merkle_root, commitment, and nullifier terms (ZK state live).",
+    "No window pageerror and no console.error across the whole walkthrough with vault active."
+  ],
+  "flows_requiring_real_funds_to_progress_further": [
+    "Shield SOL - needs actual SOL in the NullCash Wallet deposit address before quote can be signed/settled (UI correctly stops at amount input / insufficient balance).",
+    "In-pool Swap tab - needs SOL in wallet before Jupiter quote via /api/bifrost/v1/relayer can be executed.",
+    "Send / Private pay - needs private balance >0 (CTA 'Your private balance is empty').",
+    "Bridge - needs source balance to progress past 'Type an amount'.",
+    "Private route (HoudiniSwap SOL->ETH) - the UI reaches 'Review swap' and 'Order created' modal with Solana deposit address (independently reproduced in iter21 & iter22 live); no funds move until user actually sends SOL to the deposit address.",
+    "Privacy swap (NEAR Intents SOL->USDC Ethereum) - same: order can be created with deposit address, but settlement needs real deposit.",
+    "All of the above are EXPECTED behaviour for a fresh unfunded vault, NOT bugs."
+  ],
+  "critical_code_review_comments": [
+    "The 'Create a NullCash vault' card inside the connect sheet has no data-testid. Only its parent class (.wopt.wopt-own) is reachable - consider adding data-testid='nc-connect-create-vault' on that <button> and data-testid='nc-vault-password-1'/'nc-vault-password-2' on the two password inputs plus data-testid='nc-vault-create-submit' on the Create button and data-testid='nc-vault-recovery-key' on the recovery key container + data-testid='nc-vault-open' on the final 'Open NullCash' CTA. Would eliminate the DOM-walk JS that current tests have to use.",
+    "The Private route destination token picker rows (ETH / Ethereum · Ethereum, etc.) don't expose a stable data-testid like 'dk-pick-ETH-ethereum' - selectors have to use text content which is brittle when prices or dollar amounts are concatenated. Nice-to-have for future automation.",
+    "backend/brand/dk-swap.js remains ~1667 lines (long-standing comment from prior iterations)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (frontend-only review as requested)", "frontend": "100% of review-request checks verified with vault active; zero regressions vs iter22"},
+  "test_credentials": "Vault password used in-browser only: TestPass!2026xyz. No server account.",
+  "seed_data_creation": "No live Private route or Privacy swap order was committed this iteration (focus was on vault + all-tabs-with-vault-active checks). iter21 & iter22 already created live orders b6neiCBPsoWXMMByyvRhZp / 83FWv8pHiPDp84DdjN6Ssz / 7fc11c6a-c4ff-4871-baaa-623f7dbce9db (no funds moved).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Vault flow selectors: [data-testid='nc-connect-btn'] opens the Connect sheet. Inside sheet: button.wopt.wopt-own = Create a NullCash vault card. Password modal has two input[type='password']; the 'Create' button becomes enabled only when both match. Recovery key screen shows an input/div containing a 'nullsk2…' string + Copy button + input[type='checkbox'] 'My recovery key is saved somewhere safe' + 'Open NullCash' button (disabled until checkbox). After Open NullCash the header nc-connect-btn text switches to 'NullCash Wallet · <short>'. Session persists across F5 within the same tab. For Private route token picker, after opening Select the modal has input[placeholder*='Search for a token'] - type ETH, then click a row whose text contains both 'ETH' and the chain name. Clickable rows in the picker are div/button elements with role='option' or just div[data-tok]; current scrapers may need to iterate querySelectorAll('*') and match on text, then click the deepest clickable parent. No pageerror or console.error anywhere in the flow with vault active - vault has no runtime regressions.",
+  "rca of the issue": "No issues found. All review-request live checks pass on preview with NullCash vault created and active. Flows that need real funds to progress further (actual on-chain signing/settlement) correctly surface either 'Type an amount' / 'Your private balance is empty' / 'In wallet: 0 SOL · insufficient' - no crashes, no stuck states, no page errors."
+}

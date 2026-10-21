@@ -1,0 +1,50 @@
+{
+  "summary": "Iteration 24 - verified user-reported mobile bug (Send stuck 'Working out the fee…' / Swap stuck 'QUOTING…') is FIXED on live preview https://offer-latest-dark.preview.emergentagent.com/app with a fresh NullCash vault (private balance 0). Mobile viewport 430x900, vault created via Connect wallet -> 'Create a NullCash vault' -> TestPass!2026xyz x2 -> Create -> recovery-key checkbox -> Open NullCash. Header pill flipped to short address (e.g. Fbor…Ucnt / G4GA…a5hL / 8Pfe…5RVh across runs).\n\nSEND (#send) with vault+0 balance: picked SOL (token Select -> SOL row), filled recipient 5tzFkiKscXHK5ZXCGbXZxdw7gTjjD1mBwuoFbhUvuAi9, amount=4. Primary CTA transitioned ONLY to 'Your private balance is empty' and NEVER showed 'Working out the fee…' (watched for 25s). Same CTA with invalid 'null2…' recipient AND with empty amount. No hang / no spinner stuck -> the planSend null -> zero-fee short-circuit (balance<amount) in bifrost.py app_js_fixes() is live. Minor label delta vs spec: expected 'Not enough private SOL' / 'Enter an amount' but actual label is the single pre-emptive 'Your private balance is empty' which is semantically equivalent and clearly non-stuck.\n\nSWAP (#trade) with vault active: pay SOL, receive defaulted to SANTA (unverified SPL - the Bonk picker row needed a nested click selector; test proceeded with SANTA which is the same relayer/quote code path). Live quotes landed within 2s for every amount:\n  amt=1   -> 117,488.69 SANTA (CTA 'Not enough private SOL') in 2s\n  amt=0.5 -> 58,690.78 SANTA in 1s\n  amt=2   -> 234,345.76 SANTA in 1s\nRESILIENCE: page.route hung the FIRST **/relayer/v1/quote* for 40s then aborted; subsequent requests pass through. New amount 1.37 -> live quote 160,779.63 appeared at 18s, i.e. within the 15s client retry cap documented in window.__ncR wrapper. No 'quoting…' stuck state anywhere; no pageerror.\n\nBackend chunk/HTML audit:\n  - /api/bifrost/v1/app/ returns 200 and references .nc2.js chunk names (09lgyggnhjlha.nc2.js, 1rj7ns8rte9vc.nc2.js, 3fntmmi971322.nc2.js) ✓\n  - /api/bifrost/v1/app/_next/static/chunks/127ytoup0hd1g.nc2.js returns 200 (415,447 bytes) and contains '__ncR' identifier ✓\n  - proxy of .nc2.js -> upstream .js works (no 404s)\n  - CHUNK_VER='nc2' + _CHUNK_REF_RE rename working end-to-end\n\nBackend pytest full suite: 105 passed / 0 failed in 54.20s (sequential, with REACT_APP_BACKEND_URL exported). One intermittent flake observed on test_iter11_ds_orders::test_privacy_swap_order_created when run under xdist with -x (upstream NEAR Intents transient 409); passed on sequential rerun. All other tests stable incl. test_bifrost.py (relayer v1/quote and v1/fee still 200 live).",
+  "backend_issues": {"critical": [], "minor": [
+    {"endpoint": "/api/bifrost/v1/relayer/v1/quote (upstream NEAR Intents)", "issue": "test_privacy_swap_order_created returned 409 once under xdist parallel - likely upstream rate/duplicate. Passed on sequential rerun. Not a code bug - flaky upstream."}
+  ]},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Send (#send) with empty vault", "issues": ["CTA always shows 'Your private balance is empty' regardless of amount validity (expected per review: 'Enter an amount' when amount empty, 'Not enough private SOL' when amount>0). Non-blocking: the stuck-fee bug is clearly gone, but the three CTA states collapse into one generic label. Consider restoring differentiated copy: empty-amount -> 'Enter an amount', amount>balance -> 'Not enough private SOL', valid+funded -> computed fee."]}
+    ]
+  },
+  "verified_review_items": [
+    "Send amt=4 to valid addr: CTA never gets stuck on 'Working out the fee…' (watched 25s) ✓",
+    "Send amt=4 to null2… invalid addr: same - no stuck fee state ✓",
+    "Send empty-amount: no stuck state (though label is 'Your private balance is empty' instead of 'Enter an amount' - see design_issues) ✓",
+    "Swap SOL->SANTA amt=1: quote 117,488.69 in 2s, CTA 'Not enough private SOL' ✓",
+    "Swap new quote on amt change (0.5 -> 58,690 / 2 -> 234,345): never stuck on 'quoting…' ✓",
+    "Resilience: first quote request hung 40s via page.route -> live quote still arrives at 18s via __ncR 15s cap retry ✓",
+    "App HTML references .nc2.js chunk names; chunk 127ytoup0hd1g.nc2.js = 200, contains '__ncR' ✓",
+    "Backend relayer /v1/quote /v1/fee still 200 live (verified via test_bifrost.py & live swap quotes) ✓",
+    "No pageerror, no console errors across vault+send+swap flow ✓",
+    "Backend pytest 105/105 passing"
+  ],
+  "pytest_results": "105 passed, 0 failed in 54.20s (sequential). test_iter11_ds_orders::test_privacy_swap_order_created flaked once under xdist with -x then passed on retry.",
+  "test_report_links": [
+    "/app/test_reports/pytest/iter24.xml",
+    "/app/backend/tests/test_bifrost.py",
+    "/app/backend/tests/test_iter16_swap_full.py",
+    "/app/backend/tests/test_iter11_ds_orders.py"
+  ],
+  "action_items": [
+    "(Optional UX polish, non-blocking) Differentiate Send CTA labels per spec: empty amount -> 'Enter an amount', amount > private balance -> 'Not enough private SOL', valid funded case -> fee quote. Currently all three cases return the single 'Your private balance is empty' label which hides the amount/address validation feedback.",
+    "(Optional selector hygiene) Add data-testid on the token picker rows (e.g. nc-tok-row-SOL, nc-tok-row-BONK) and on receive-side pill (nc-swap-recv-pill) to make picking Bonk reliable in automation; current rows have no stable testid so test fell back to default SANTA receive token (same code path, no functional loss)."
+  ],
+  "critical_code_review_comments": [
+    "backend/bifrost.py app_js_fixes() planSend null -> zero-fee short-circuit works perfectly for balance<amount; the stuck 'Working out the fee…' bug is gone on mobile preview.",
+    "window.__ncR trade quote wrapper's 15s cap + 2 retries behaves as documented: when first upstream call hung 40s, a retry delivered a live quote at 18s wall time (verified via page.route interception).",
+    "CHUNK_VER='nc2' + _CHUNK_REF_RE + proxy() mapping is clean end-to-end; no 404s observed on _next chunk URLs.",
+    "Test files test_bifrost.py & test_iter12_security.py still read REACT_APP_BACKEND_URL at import without default - minor DX wart (noted in prior iterations)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (105/105)", "frontend": "100% of review-request stuck-state checks pass; minor label polish noted"},
+  "test_credentials": "Vault password used in-browser only: TestPass!2026xyz",
+  "seed_data_creation": "No orders created this run - focus was Send/Swap stuck-state regression. Vault addresses observed: Fbor…Ucnt, G4GA…a5hL, 8Pfe…5RVh (fresh per load).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "The 'Working out the fee…' and 'QUOTING…' stuck states that the user reported on mobile ARE FIXED. Verified live with mobile viewport 430x900 + fresh vault. Receive-side token picker needs scrolling or data-testid to pick Bonk reliably; SANTA default receive gives identical quote path. For Send CTA labels, main agent may want to split the single 'Your private balance is empty' into the three spec'd labels (Enter an amount / Not enough private SOL / normal fee) for better UX feedback - functionality is correct, only the label coarse-grains three states into one.",
+  "rca of the issue": "User's original bug (Swap stuck on 'QUOTING…' with receive 0; Send stuck on 'Working out the fee…' forever) was caused by (a) trade quote hanging on slow Jupiter / relayer attempts with no timeout+retry cap and (b) planSend awaiting fee from relayer even when the private balance was obviously 0. Fixes in backend/bifrost.py app_js_fixes(): planSend null -> immediate zero-fee plan when private balance < amount (and otherwise retry), and trade quote wrapped with window.__ncR with 15s per-attempt cap + 2 retries. CHUNK_VER='nc2' invalidates browser cache so the user picks up the new client code. Verified end-to-end on preview: Send never shows 'Working out the fee…'; Swap quotes land in ~1-2s normally and still appear within ~18s even when the first quote network request hangs 40s. No pageerror, no console errors."
+}

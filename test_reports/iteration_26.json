@@ -1,0 +1,51 @@
+{
+  "summary": "Iteration 26 - favicons, CA chip, header crowding, no-wallet + in-wallet swaps, branding audit. Backend pytest (tests/test_iter26_brand_ds.py): all 6 favicon URLs return the NullCash mark (black centre, no purple pixels), manifest is correct, DS tokens/quotes/order/status work live, NEAR tokens/quote work. NEAR order creation returns 503 from upstream ('An active incident has unverified route impact. New orders ... paused'). That is upstream, not an app bug. Frontend: the landing and /docs CA chip works at 1920 and 390 (copy plus check icon, no overflow), but the short form wraps onto 2 lines at 390. The /app CA chip is in .top-right before X and the wallet button on every hash tab (full form >=1600, short form below). No overlap at 1920/1600/1440/1280, both with a simulated connected label and with a real in-app NullCash vault. The wallet button is capped at 240px with an ellipsis. The More menu shows the overflow tabs and navigates correctly. BUG: at viewport widths 1024-1080 every top tab collapses to an empty 26px pill with no label. Private route UI: live 3 routes, rate, ETA, limits, Order created modal with deposit address and 30 min countdown; Track shows WAITING FOR DEPOSIT plus steps. Privacy swap UI: live quote works; order creation is blocked by the upstream 503 and the UI shows the raw upstream message (no 'Use Private route' fallback). In-wallet Swap SOL->jlUSDC amount 1: live quote 98.597 jlUSDC; Relayer fee 0.001103 SOL; NullCash fee 0.3% 0.002996 SOL; minimum received shown. Send and Shield load with fee rows. No pageerrors. Branding audit (title, innerText, alt/aria/title/placeholder) on /, /docs, /app/api, /app/docs, /app/security and all /app hash tabs: 0 hits. /app/api now shows 'Intent network' and '@usenullcash' -> x.com/usenullcash.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/ds/near/orders", "issue": "Upstream returns 503 'An active incident has unverified route impact. New orders and funding guidance are conservatively paused'. The proxy passes it through. Upstream outage, not an app bug, but see the UI fallback item."},
+      {"endpoint": "POST /api/ds/orders", "issue": "Response JSON key is 'houdiniId'. Not displayed, but it is a brand name in the API payload. Consider renaming it to 'id'."},
+      {"endpoint": "GET /api/ds/tokens", "issue": "Token icon URLs are /api/bifrost/v1/_img?k=<base64>. The base64 decodes to https://api.houdiniswap.com/... so the upstream brand can be recovered trivially. Consider an opaque key or a hash."},
+      {"endpoint": "GET /api/ds/tokens", "issue": "Token name 'Jupiter Perpetuals Liquidity Provider Token' (JLP) contains 'Jupiter'. It is the real token name, so it is acceptable unless strict brand removal is wanted."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "/app desktop top tab nav (nav.side)", "issue": "At viewport widths 1024-1080px every .nav-i becomes an empty 26px pill with no visible label (Home/Shield/Swap... unreadable; only 'More' is readable). fitNav doesn't move anything to overflow because nothing overflows. RCA: the upstream mirrored CSS has a max-width:1080px rule that hides the label <span> (icon-only rail mode), while nc-theme.css (min-width:1024px block) hides the icon `nav.side .nav-i>i{display:none!important}`. Result: neither icon nor label shows. Suggested fix in nc-theme.css inside @media(min-width:1024px): `nav.side .nav-i>span:not(.dk-nw){display:inline!important}` (or show the label for 1024-1080). Then fitNav overflow handles the width.", "selector": "nav.side .nav-i", "priority": "HIGH"},
+      {"component": "Privacy swap order error", "issue": "When /api/ds/near/orders fails (503 upstream incident), the card shows the raw upstream text 'An active incident has unverified route impact...' in a red box. It shows no friendly message and no 'Use Private route' fallback button. That fallback seems to exist only for quote failures, not order-creation failures.", "selector": "[data-testid=dk-submit]", "priority": "MEDIUM"},
+      {"component": "/app/api page", "issue": "Has no CA chip (no nav-ca-chip/nc-ca-chip and no '31GY' text), but the requirement is the CA on ALL pages. /app/docs and /app/security do have nav-ca-chip. /app/api also showed a blank screen at ~2.5s after navigation in one run; the content appeared in an earlier run after 3.5s.", "selector": "[data-testid=nc-ca-chip]", "priority": "MEDIUM"},
+      {"component": "Landing/docs CaChip mobile", "issue": "At 390px the short CA '31GY…pump' wraps onto two lines (span height 36px, white-space normal). Add whitespace-nowrap to the chip/nav-ca-short span in CaChip.jsx.", "selector": "[data-testid=nav-ca-short]", "priority": "LOW"}
+    ],
+    "integration_issues": [
+      {"flow": "Private route / Privacy swap fee display", "issue": "The 'Route fee' tile shows only 'In quote'. It shows no numeric fee, although the NEAR quote returns appFeeBps 40, withdrawFee 0.000035 and refundFee 0.000094841. The order-created modal shows no fee either. The user asked to show fees.", "affected_selectors": ["[data-testid=dk-swap-card]"]}
+    ],
+    "design_issues": [
+      {"screen": "/app#private-route and #privacy-swap From box", "issues": ["The secondary line under the amount ('Solana' / '≈ $43.58' / 'SOL') is clipped at the bottom edge of the input box."]},
+      {"screen": "/app Bridge", "issues": ["Hash in the URL bar is '#veilswap' (contains 'veil'). Users see it in the address bar."]},
+      {"screen": "/app header after vault create", "issues": ["The wallet button label 'NullCash Wallet · FTuS…oDED' shows a different address from the balance card 'NullCash Wallet Bn24…JdaK'. Confirm which address is intended or label them differently."]},
+      {"screen": "/app Track result", "issues": ["Token icons fall back to letters 'S'/'U' instead of token logos."]},
+      {"screen": "/app in-wallet Swap picker", "issues": ["Searching 'USDC' ranks jlUSDC and syrupUSDC above native USDC."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_iter26_brand_ds.py", "/app/test_reports/pytest/pytest_iter26.xml"],
+  "action_items": [
+    "HIGH: Fix the empty tab pills at 1024-1080px in nc-theme.css. Show the label span (not .dk-nw) for nav.side .nav-i at min-width:1024px, because upstream max-width:1080 hides it and our CSS hides the icon.",
+    "Privacy swap: on order-creation failure (5xx/incident) show a friendly message and the 'Use Private route' fallback button instead of the raw upstream text.",
+    "Add the CA chip to /app/api.",
+    "Show numeric fees for Private route/Privacy swap (e.g. app fee 0.4% from appFeeBps, withdraw fee) instead of only 'In quote'.",
+    "CaChip.jsx: add whitespace-nowrap so '31GY…pump' doesn't wrap at 390px.",
+    "Optional brand hygiene: rename the 'houdiniId' key, make the _img?k= key opaque (it base64-decodes to api.houdiniswap.com), and rename the '#veilswap' hash for Bridge."
+  ],
+  "critical_code_review_comments": [
+    "fitNav() relies on nav.scrollWidth > clientWidth. It can't detect items that are visually broken (labels hidden by upstream CSS), so add a check that tab labels are visible, or force labels on.",
+    "dk-swap.js is ~1745 lines; consider splitting into modules (nav/header, tour, swap, splash)."
+  ],
+  "updated_files": ["/app/backend/tests/test_iter26_brand_ds.py"],
+  "success_rate": {"backend": "92% (11/12; 1 skipped because the upstream NEAR order endpoint returned 503 during an incident)", "frontend": "~85% (CA chips, header no-overlap at 1280+, More menu, private route end-to-end, track, privacy swap quote, in-wallet swap/send/shield, branding pass; failing: 1024-1080 tab labels, privacy swap order blocked upstream + missing fallback, /app/api missing CA)"},
+  "test_credentials": "No auth. In-app vault password used: TestPass!2026xyz (a fresh vault each run, local to the browser).",
+  "seed_data_creation": "Live DS orders created (no funds sent): da7qDvzCWFELqBM5aKMLZW (0.7491 SOL->USDC ETH) via the API, and 1-2 via the UI (0.3871/0.3593 SOL->USDC ETH). NEAR orders: none created (503).",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Selectors: landing chip [data-testid=nav-ca-chip|nav-ca-full|nav-ca-short|nav-ca-copied]. App: [data-testid=nc-ca-chip], header .top-right, nav.side .nav-i (.nc-ovf = overflowed), [data-testid=nc-more-btn] -> [data-testid=nc-more-menu] with items [data-testid=nc-more-chain|track|history|bridge|receive|...]. Connect: [data-testid=nc-connect-btn] -> role button 'Create a NullCash vault' -> 2 password inputs -> button 'Create' -> checkbox -> 'Open NullCash'. No-wallet: dk-pick-destination, dk-token-search (rows: locator('button, li, div').filter(has_text='USD Coin').filter(has_text='Ethereum').first), dk-amount, dk-dest, dk-refund, dk-submit (clicking creates the order directly, ~10-20s), dk-route-0..2, dk-track-input/dk-track-btn/dk-track-card. In-wallet swap: main button.tok (0=pay, 1=receive), .sheet input.inp, .sheet .tok-list button.wopt. In the browser_automation tool, avoid multi-line triple-quoted JS and str()/len() with odd args (the sandbox shadows them); use single-line JS strings. Check the 1024-1080 tab fix with tab widths > 26px.",
+  "rca of the issue": "Empty tabs at 1024-1080: the upstream app CSS (@media max-width:1080px) collapses the sidebar to icon-only by hiding the .nav-i label span. NullCash's desktop top-bar CSS (@media min-width:1024px) hides .nav-i>i icons. In the 1024-1080 overlap both are hidden, so each tab renders as a 26px empty pill (padding 0 13px). Reproduce: open /app at 1060x800 and evaluate the nav.side .nav-i widths (all 26px). Mitigation: force the label visible in the min-width:1024 block."
+}

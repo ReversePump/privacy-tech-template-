@@ -1,46 +1,27 @@
 {
-  "summary": "Tested the new email/password custodial dual-wallet (Solana + EVM/Hyperliquid) feature. Wrote 17-test pytest suite at /app/backend/tests/test_email_auth_wallets.py: 16/17 pass. Full UI happy path verified end-to-end (register -> dashboard -> wallets -> live markets -> sign out -> login -> reload persists). TWO backend bugs found: (1) CRITICAL: POST /api/wallet/trade returns 500 on unfunded account because the ValueError raised by _sol_rpc('sendTransaction', ...) in server.py:330 is not wrapped in try/except (traceback: 'Transaction simulation failed: Attempt to debit an account but found no record of a prior credit.'). All sibling trade/withdraw endpoints handle this cleanly; wallet_trade is the only one leaking a 500. (2) CRITICAL: POST /api/hl/withdraw silently fails with 'Exchange object has no attribute usd_send' — the hyperliquid-python-sdk method name is wrong at server.py:527. The outer try/except catches it so status is 400 (test passes), but the real withdraw feature can never succeed. Correct method on the current SDK is `ex.withdraw_from_bridge(amount, destination)` (gasless USDC withdraw to Arbitrum) or `ex.usd_class_transfer(amount, to_perp)` depending on intent. Security verified: no key material (encSecret / encEvmSecret / passHash / private keys) in any API response or localStorage; localStorage only holds `weft:session` token string.",
-  "backend_issues": {
-    "critical": [
-      {"endpoint": "POST /api/wallet/trade", "issue": "Returns 500 (uncaught ValueError from _sol_rpc sendTransaction) when the custodial wallet has no SOL. Wrap the final sendTransaction call in try/except and return a clean 400 like the other endpoints do. Traceback at /app/backend/server.py:330 -> _sol_rpc raises ValueError('Transaction simulation failed: Attempt to debit an account but found no record of a prior credit.') and bubbles out.", "priority": "HIGH"},
-      {"endpoint": "POST /api/hl/withdraw", "issue": "Backend code calls `ex.usd_send(amount, dest)` which does not exist on the installed hyperliquid-python-sdk Exchange class — every call fails with AttributeError 'Exchange object has no attribute usd_send'. The outer except masks it as a 400 so unit test passes, but the feature is 100% broken. Replace with the correct SDK call (likely `ex.withdraw_from_bridge(amount, destination)` for USDC off-ramp to Arbitrum).", "priority": "HIGH"}
-    ],
-    "minor": []
-  },
+  "summary": "Frontend-only testing of the new Darkinator landing page at '/' and the Launch-app flow into '/app'. All landing-page acceptance criteria pass on desktop: layout renders, nav scroll-links present and scroll to anchor, hero image loads, no forbidden brand strings (Veil / ContractWolf / $VEIL / DarkSwap) are present, live stats resolve to real numbers (Notes 508, Nullifiers 153, Shieldable 61, Chains 126), Merkle root hex chip + 'Relayer online' chip both render, all four tech tabs (zk/houdini/near/api) switch panels, all six FAQ items open, pillar CTAs have correct deep-link hrefs (/app#shield, /app#private-route, /app#privacy-swap), and all three Launch buttons navigate to /app which successfully loads the Darkinator app (dk-nav-private, dk-nav-privacy, dk-nav-track visible). Legacy /swap correctly redirects to /app#private-route. One minor UI issue on mobile 390px: horizontal page overflow (scrollWidth=514) caused by code <pre> blocks inside the Technology section expanding their flex/grid parent cards.",
+  "backend_issues": {"critical": [], "minor": []},
   "frontend_issues": {
-    "ui_bugs": [],
-    "integration_issues": [
-      {"flow": "Swap for real with 0 balance", "issue": "Because /api/wallet/trade returns 500 (plain-text 'Internal Server Error' body), the Account page toasts a generic 'failed (500)' instead of a readable error. Fixing the backend to return a 400 with an {error: 'insufficient_funds'} JSON payload will also fix the toast text automatically.", "affected_selectors": ["[data-testid='sol-trade-btn']"]}
+    "ui_bugs": [
+      {"component": "LandingPage · Tech section cards", "issue": "Mobile (390px) horizontal page overflow (document.scrollWidth=514 vs window=390). Offending nodes are the Tech panel block cards whose <pre> code snippets have overflow-x-auto, but the parent card div lacks min-w-0, so wide code lines push the grid column past the viewport. Fix: add min-w-0 to the block card (e.g., in tech-panel-<key> children className) and/or wrap the grid cells with min-w-0.", "selector": "[data-testid^=\"tech-panel-\"] .rounded-2xl.border.border-white\\/10.bg-white\\/\\[.02\\].p-6", "priority": "MEDIUM"}
     ],
-    "design_issues": [
-      {"screen": "<select data-testid='hl-lev' / 'hl-symbol' / 'sol-trade-out'>", "issues": ["Dev-time React hydration warning: '<span> cannot be a child of <option>' — this is caused by the x-component instrumentation wrapping option text in a span. Harmless in prod build but noisy in dev. Only an issue if the x-component dev-overlay is shipped to production."]}
-    ]
+    "integration_issues": [],
+    "design_issues": []
   },
-  "test_report_links": [
-    "/app/backend/tests/test_email_auth_wallets.py",
-    "/app/test_reports/pytest/email_auth_results.xml",
-    "/app/backend/tests/test_weft_relay.py"
-  ],
+  "test_report_links": [],
   "action_items": [
-    "Wrap the final `_sol_rpc('sendTransaction', ...)` in /app/backend/server.py:wallet_trade (around line 330) in try/except ValueError -> return _err('insufficient_funds', 400) (or similar readable code). The simulation failure IS the expected unfunded path and must not 500.",
-    "Fix /api/hl/withdraw in /app/backend/server.py:527 — replace `ex.usd_send(amount, dest)` with the correct method on the installed hyperliquid-python-sdk Exchange class (e.g. `ex.withdraw_from_bridge(amount, dest)` for an on-chain USDC off-ramp). Current code is dead on arrival for every call.",
-    "(Optional/nice-to-have) Make /api/wallet/trade and /api/wallet/withdraw also surface the underlying error string in the JSON body (same shape {error: ...}) so the frontend toast is informative."
+    "Fix mobile horizontal overflow in Technology section cards (add min-w-0 to the code-block card wrapper or grid cells)."
   ],
   "critical_code_review_comments": [
-    "server.py:330 wallet_trade — single uncaught ValueError path. Every other trade/withdraw endpoint already follows the try/except -> Response(400) pattern; this one slipped through.",
-    "server.py:408 _hl_exchange decrypts the hex-encoded EVM private key with `.removeprefix('0x')` — note it was stored as `evm.key.hex()` (no 0x prefix) so the removeprefix is a defensive no-op today. Fine.",
-    "server.py:412 _hl_user lazily generates an EVM wallet for pre-existing wallet-only sessions, but it writes with authType != 'email' guard above returning None first — so the lazy-upgrade branch is unreachable for wallet-signature sessions. Dead code; either widen the guard or remove the branch.",
-    "server.py:198 `_fernet = Fernet(os.environ['WALLET_ENC_KEY'].encode())` — crashes loudly on missing env (good), but there is no key rotation story. If WALLET_ENC_KEY changes, every stored encSecret/encEvmSecret becomes unrecoverable. Worth documenting.",
-    "server.py:217 _err builds JSON by string-formatting the code — fine for the current fixed-alphabet error codes but will corrupt if a code ever contains a quote. Prefer `Response(json.dumps({'error': code}), ...)`.",
-    "AuthContext.jsx:29 useEffect dependency `[token]` triggers /me/local on every token change — correct. Note session tokens never expire server-side (noted previously in iteration_5).",
-    "Account.jsx:66 fetches /api/hl/markets unconditionally even for wallet-signature (non-email) sessions where the HL panel isn't shown. Minor waste, not a bug."
+    "LandingPage.jsx useLiveStats fetches four endpoints without any abort controller — only a dead flag guards state updates. Fine for a landing page but AbortController would be cleaner.",
+    "Footer link to /app/docs and /app/security render fine via SPA catch-all, but these produce the known benign React #418 hydration warning (documented by main agent)."
   ],
-  "updated_files": ["/app/backend/tests/test_email_auth_wallets.py (new, 17 tests)"],
-  "success_rate": {"backend": "94% (16/17 — the one failure IS a real backend 500 bug, not a test bug)", "frontend": "100% of reachable surfaces (register / login / dashboard / wallets / markets / session persist / sign out all verified)"},
-  "test_credentials": "Fresh email per run (testagent_<ts>@weft.test / agentpass123). Register flow is idempotent given the uniqueness of the timestamp.",
-  "seed_data_creation": "Each run inserts one row into db.users and 2 rows into db.sessions (register token + relogin token). No cleanup — low cardinality and prefixed `testagent_`.",
-  "retest_needed": true,
-  "should_main_agent_self_test": true,
-  "context_for_next_testing_agent": "Backend suite = /app/backend/tests/test_email_auth_wallets.py (17 tests, 16 pass) + /app/backend/tests/test_weft_relay.py (16 tests, all pass). Fresh email generated per run so tests are rerunnable with no cleanup. The failing test (test_wallet_trade_unfunded_clean_error) will go green as soon as server.py:wallet_trade wraps the final sendTransaction in try/except. The frontend UI is fully functional — the only observable gap is a non-informative toast on failed real swap, which will self-heal when the backend returns a JSON error body instead of a 500. Dashboard elements: data-testid=wallets-panel, sol-address, hl-address, acct-sol-bal, acct-hl-eq, hl-symbol, sol-trade-btn, hl-trade-btn, sol-withdraw-btn, hl-withdraw-btn. Auth modal: auth-modal, auth-email, auth-password, auth-submit, auth-switch-mode, auth-tab-email, auth-tab-wallet.",
-  "rca_of_the_issue": "wallet_trade 500: the function at /app/backend/server.py:283 builds the Jupiter swap tx, byte-splice signs it, then calls `await _sol_rpc('sendTransaction', ...)` at line 330 OUTSIDE any try/except. _sol_rpc raises `ValueError(data['error']['message'])` whenever the Solana RPC returns an error (expected on unfunded accounts: 'Attempt to debit an account but found no record of a prior credit'). The exception bubbles up through FastAPI and becomes a 500 Internal Server Error. Fix: wrap lines 302–330 in try/except (or at minimum the sendTransaction call) and return `_err('insufficient_funds', 400)` or `Response(json.dumps({'error': str(e)[:200]}), status_code=400, media_type='application/json')` matching the pattern already used in /api/hl/trade and /api/hl/withdraw. hl/withdraw usd_send: the hyperliquid-python-sdk Exchange class in the pinned version does not expose a `usd_send` method; the real USDC-off-ramp is `withdraw_from_bridge(amount, destination)`. Confirmed via log 'Exchange object has no attribute usd_send' on every call."
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "95%"},
+  "test_credentials": "none required",
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Landing at '/' is fully functional with live Bifrost stats. The only outstanding issue is a mobile-viewport horizontal overflow in the Technology section caused by code <pre> blocks pushing their parent card wider than the viewport (parent lacks min-w-0). Legacy routes /swap and /shield are correctly caught by the catch-all SPA route and resolve under /app. The Darkinator app loads under /app with sidebar nav items dk-nav-private, dk-nav-privacy, dk-nav-track and takes ~10s to fully initialise.",
+  "rca of the issue": "Mobile overflow RCA: in LandingPage.jsx `Tech()` section, each block renders a `<pre class=\"overflow-x-auto …\">`. Although the <pre> itself scrolls, its ancestor `<div class=\"rounded-2xl border … p-6\">` sits inside a CSS grid cell (`grid gap-6 lg:grid-cols-2`). CSS grid cells default to `min-width: auto`, so the long non-wrapping code lines force the cell to grow, which in turn makes the page wider than the viewport on 390px. Mitigation: add `min-w-0` to the inner card div (and/or the grid container's children) so the <pre>'s own overflow-x-auto can take effect."
 }

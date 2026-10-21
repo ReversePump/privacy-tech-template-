@@ -1,22 +1,41 @@
 {
-  "summary": "Retested the Enter-to-submit bugfix on /new. All 4 scenarios passed: (1) Enter in thesis textarea fires POST /api/ai/generate/stream and renders a strategy card with start-practice-btn in ~13s with no error banner; (2) 'Draft the rules' button still works and card appears ~6s; (3) Shift+Enter inserts newline and does NOT fire a request; (4) no 'weft' text appears anywhere on the page after drafting.",
+  "summary": "Iteration 11 – re-verified swap order 400 fixes and wallet sheet UX for Cadabra. Backend pytest (test_iter11_ds_orders.py, 2/2 PASS): /api/ds/quotes GET + POST /api/ds/orders with fresh quoteId + valid EVM addressTo returns 200 with depositAddress and houdiniId; POST /api/ds/near/quote then POST /api/ds/near/orders with uuid requestId returns 200 with depositAddress. Also confirmed the GET tunnel /api/ds/_post/near/quote returns 200 with full quote JSON (bot-check fallback is wired). Frontend: Private route flow fully reproduced — SOL (dk-pick-source → dk-token-SOL) → 0.5 (dk-amount) → USDC on Ethereum (dk-pick-destination → dk-chain-eth → dk-token-USDC). Entering Solana address 9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM into dk-dest correctly disables dk-submit showing exact text 'Invalid Ethereum Mainnet address'. Replacing with 0x742d35Cc6634C0532925a3b844Bc454e4438f44e re-enables CTA ('Review swap'), click creates order id qjJyry1r57WgT8Mn3mUQpW with deposit address, no dk-error, no 400. Privacy swap flow: refund 'abc' correctly disables CTA with 'Invalid Solana refund address'; valid Solana refund produces 'Review swap' enabled. Wallet creation sheet: at desktop 1920x800 .sheet-wrap is position:fixed inset:0 display:flex align/justify:center bg rgba(4,3,8,0.62) backdrop-filter blur(14px) z-index 1000, .sheet geometry 740,218 → 440x362 (centered X and Y). Mobile 390x844: .sheet geometry 16,230 → 358x383 (16px gutters, centered Y). Close via .sheet-h .x, Escape key, and scrim click (outside the card) all dismiss .sheet-wrap on both desktop and mobile. No Veil/DarkSwap/Houdini branding visible on tested views. Note: during one privacy-swap submit attempt the browser session was interrupted by a page-level Cloudflare challenge ('Performing security verification'), not a 400 from the swap endpoint — the submission UI showed the dk-swap friendlyErr 'Connection check in progress. Please try again in a few seconds.' This is upstream edge flakiness unrelated to the fix; both the direct POST and the GET tunnel return 200 server-side (verified via pytest + curl).",
   "backend_issues": {"critical": [], "minor": []},
   "frontend_issues": {
     "ui_bugs": [],
-    "integration_issues": [],
+    "integration_issues": [
+      {"flow": "Privacy swap submit (browser only)", "issue": "Occasional Cloudflare page-level challenge interrupts the submit flow after the quote is loaded, surfacing 'Connection check in progress. Please try again in a few seconds.' instead of creating the order. Not a 400 or logic bug — the same quoteId POSTs server-side to /api/ds/near/orders return 200. dk-swap already retries POSTs via the GET tunnel on an HTML challenge; however if the entire HTML page is also challenged (full navigation), the tunnel never runs. Consider surfacing a 'retry' affordance on friendlyErr or auto-retry the submit once with a short delay.", "affected_selectors": ["[data-testid=dk-submit]"]}
+    ],
     "design_issues": []
   },
-  "test_report_links": [],
-  "action_items": [],
-  "critical_code_review_comments": [
-    "During button-click regression a transient 422 was logged in the console once (resource load error) but the stream recovered and the strategy card still rendered successfully — worth a passive check in server logs that /api/ai/generate/stream never rejects valid thesis payloads."
+  "test_report_links": [
+    "/app/backend/tests/test_iter11_ds_orders.py",
+    "/app/test_reports/pytest/iter11_results.xml"
   ],
-  "updated_files": [],
-  "success_rate": {"backend": "n/a (frontend-only test)", "frontend": "100%"},
-  "test_credentials": "not used",
-  "seed_data_creation": "none",
+  "action_items": [
+    "Consider improving dk-swap friendlyErr UX for 'challenge' errors: add visible 'Retry' button or auto-retry once after a short delay (because full-page Cloudflare challenge means the GET-tunnel fallback never gets a chance).",
+    "No functional fixes needed for the originally-reported 400 issue — pytest + browser confirm POST /api/ds/orders and /api/ds/near/orders succeed with valid addresses + fresh quoteId. dk-swap's auto re-quote on stale/claimed quote and the destOk/refundOk gating already prevent 400 from the frontend."
+  ],
+  "critical_code_review_comments": [
+    "dk-swap.js is now 1102 lines in a single file; consider splitting into api.js (req/post/tunnel), state.js, validation.js (addrOk/destOk/refundOk/EVM_CHAINS), render.js, events.js for maintainability and testability.",
+    "Line 431: order id is read as `o[['hou','diniId'].join('')]` (houdiniId) — the obfuscation of upstream field name via array-join is clever but opaque. A documented constant like `UPSTREAM_ORDER_ID = 'houdiniId'` with a comment, or server-side renaming during _scrub (/api/ds proxy already rewrites 'DarkSwap' → 'Cadabra'), would be more maintainable.",
+    "friendlyErr (line 413) only maps recipient/address errors; the 'challenge' error path throws a raw 'Connection check in progress…' string that reaches the user. Add a dedicated handler so UX is consistent and nudges the user to retry.",
+    "req() considers only responses that start with '<' as challenge HTML. If the edge ever responds with text/plain or JSON-shaped error, the branch is skipped. Treat non-JSON 403/503 as challenge too."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter11_ds_orders.py (new)"
+  ],
+  "success_rate": {
+    "backend": "100% (2/2 pytest – /api/ds/orders and /api/ds/near/orders both 200 with depositAddress)",
+    "frontend": "Private route 100% (invalid-dest disables CTA with 'Invalid Ethereum Mainnet address', valid dest → Review swap enabled → order created id qjJyry1r57WgT8Mn3mUQpW with deposit address). Privacy swap validation 100% (bad refund → 'Invalid Solana refund address' disabled, valid → Review swap enabled). Privacy swap submit-to-order was blocked once by a page-level Cloudflare challenge during the session (flaky edge, not an app bug). Wallet sheet 100% (centered + closable via X/Esc/outside-click on desktop 1920x800 and mobile 390x844)."
+  },
+  "test_credentials": "None required for the exercised flows.",
+  "seed_data_creation": "Created one real upstream Private-route order via browser (id qjJyry1r57WgT8Mn3mUQpW, SOL 0.5 → USDC Ethereum, no funds moved). Backend pytest additionally created two upstream orders (one classic, one near/1Click) with their returned depositAddresses — no funds sent.",
+  "wallet_sheet_geometry": {
+    "desktop_1920x800": {"wrap_position": "fixed", "inset": "0px", "display": "flex", "backdrop": "blur(14px)", "z": 1000, "sheet": {"x": 740, "y": 218.6, "w": 440, "h": 362.8, "centered_x": true, "centered_y": true}, "close_x": true, "close_esc": true, "close_scrim": true},
+    "mobile_390x844": {"sheet": {"x": 16, "y": 230.3, "w": 358, "h": 383.4, "gutter_lr": 16, "centered_x": true, "centered_y": true}, "close_x": true, "close_esc": true, "close_scrim": true}
+  },
   "retest_needed": false,
   "main_agent_can_self_test": true,
-  "context_for_next_testing_agent": "Bugfix for Enter-key submit on /new thesis-input is verified working. Enter triggers draft(), Shift+Enter inserts newline. Strategy card renders in 6-13s on preview env. No 'weft' leakage. Draft button regression also passes.",
-  "rca of the issue": "Original bug: textarea had no onKeyDown so Enter did nothing. Fix in New.jsx adds onKeyDown that calls draft() on Enter (without Shift). Verified via Playwright: request fired, card rendered."
+  "context_for_next_testing_agent": "Both /api/ds/orders and /api/ds/near/orders are 200 with valid payloads (pytest at /app/backend/tests/test_iter11_ds_orders.py). Private route and Privacy swap client-side validation + CTA gating all pass. Browser E2E submit-to-order on Privacy swap is flaky under the Cloudflare page-level challenge (not the swap API). If retesting the Privacy swap live submit, allow ~20s between sessions and clear the Cloudflare cookie; wall-clock E2E success is ~1 in 2 attempts in a fresh Playwright context. The core fix (destOk/refundOk gating + auto re-quote on claimed/expired quote) is working — no reproducible 400 was observed from the swap endpoints. Suggest the main agent add a 'Retry' affordance for the challenge friendlyErr if a tighter UX is desired."
 }

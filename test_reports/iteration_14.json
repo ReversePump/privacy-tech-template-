@@ -1,0 +1,25 @@
+{
+  "summary": "Frontend-only re-test of the live on-chain rail on /app. Verified rail is present on LEFT at x=0, width=340px on desktop 1920x800, with cypherpunk-styled black background (rgb(7,8,10)), monospace JetBrains Mono font, terminal-style header with traffic-light dots and prompt 'root@nullcash:~$ watch --chain', '// live tx stream' comment, stats rows (merkle root, commitments 1,076, nullifiers 279, verified tokens 49/72), and 34 tx-stream entries with [TYPE] tags and relative time. All entries are <a> elements linking to solscan.io with target=_blank. Main content remains centered right of rail; top tabs (Home, Shield, ..., Private route) not overlapped; Connect wallet visible. Tablet 1280x800: rail hidden ✓. Mobile 400x800: rail hidden ✓, dock present ✓, no horizontal overflow ✓. Private route quick regression (SOL->USDC 0.5 to 0x68b3a9f8940f418e8051ebb659e8ed278fea41f6) produced live quotes successfully (Route 1 Best 50.197 USDC, ~19 min, rate 100.394).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/app rail", "issues": ["Spec called for a blinking cursor in the terminal header; no element with cursor/blink animation detected (minor cosmetic). Stats rows and relative timestamps did not change over a 6s observation window — if they are intended to tick live, polling appears to be throttled or disabled (relative times stay the same)."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Optional: add a blinking cursor glyph (▊/_) after the 'watch --chain' header to match the described terminal aesthetic.",
+    "Optional: ensure the rail's relative timestamps / stat counters actually refresh client-side so the 'live' feel is observable."
+  ],
+  "critical_code_review_comments": [
+    "Rail content on /app is static HTML with pre-rendered relative timestamps ('13 min ago', '2 h ago'); if the goal is a live rail there should be a client-side ticker that re-computes elapsed time and/or polls new events."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped)", "frontend": "100% of requested checks passed"},
+  "seed_data_creation": "",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Rail markup: <aside class=\"rail\"> with .rail-h (terminal header incl. 3 traffic-light dots + 'root@nullcash:~$ watch --chain'), .rail-stats (merkle/commitments/nullifiers/verified tokens), .feed > a.ev (each event). Breakpoints hide rail below ~1440px. /app route gates behind a Welcome modal — click 'Skip intro' to proceed to tabs. Private route tab uses token selectors labeled 'Select'; the amount input has placeholder '0' and the destination address input has placeholder 'Your receiving address'."
+}

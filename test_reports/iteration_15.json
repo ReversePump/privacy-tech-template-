@@ -1,0 +1,22 @@
+{
+  "summary": "Frontend-only testing of NullCash #chain page relocation. Verified desktop (1920x800) has aside.rail hidden, 'Chain' tab [data-testid=dk-nav-chain] appears after History in the top nav, clicking it routes to #chain and renders [data-testid=chain-page] with terminal prompt 'root@nullcash:~$ watch --chain solana-mainnet', [data-testid=chain-live] showing '● LIVE · sync 9s' that ticks every second, [data-testid=chain-stats] with merkle_root (188c0f…bdb9fa), commitments (1,076), nullifiers (279), tokens (52/72 verified), and 51 [data-testid=chain-row] rows with SHIELD/EXIT/PRIVATE TRADE kinds, amounts with token symbols, relative times, each linking to solscan.io/tx/{sig} in a new tab. Live refresh observed: 5 new indexer network calls over 11s. Mobile (400x800) Menu sheet exposes [data-testid=nc-menu-dk-chain] tile that opens the chain page; layout stacked, 0 horizontal overflow; after visit, the menu tile shows 'ns-tile on' highlighted (green) state. Browser back/forward between #chain and other routes works; CSS hides #dk-view when leaving dk routes. Regression: Private route still renders (dk-view html 4167 bytes).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/test_reports/iteration_15.json"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "dk-swap.js file is ~1510 lines — consider splitting into modules (chain, picker, nav, intro) for maintainability. Not blocking.",
+    "chain-page element remains in DOM after leaving #chain (hidden only via `html:not(.dk-on) #dk-view{display:none}`). CH timers (setInterval chClock) are not cleared when sync() transitions away from view==='chain'; they keep ticking in the background. Minor resource leak but not user-visible."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "100%"},
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Chain page is at #chain. data-testids: dk-nav-chain (desktop nav), nc-menu-dk-chain (mobile menu tile), chain-page, chain-live, chain-stats, chain-row. Backend endpoints: /api/bifrost/v1/indexer/v1/{stats,feed,assets,health,logo/<mint>,catalog}. Refresh ~every 10s. Intro modal appears on first load — use text='Skip intro' to dismiss. On mobile, open Menu via get_by_text('Menu', exact=True).last — nav.tabbar .nav-i.filter(has_text='Menu') selector did not resolve.",
+  "rca of the issue": "no issues"
+}

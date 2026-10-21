@@ -1,39 +1,39 @@
 {
-  "summary": "Iteration 9 (pre-launch final sweep). Backend pytest 53 passed + 1 skipped (relay backtest upstream 429, expected). All 7 routes render with correct per-route title, exactly 1 h1 each, dark chrome bg rgb(7,7,8), no page-level JS errors. AI quota path verified clean: /api/relay/ai/generate returns HTTP 429 {error:'You've drafted 5 strategies today without an account...'} ; /api/relay/ai/generate/stream emits a single 'event: error' frame with same payload (HTTP 200 for SSE); /api/relay/ai/refine/stream emits 'event: error' with 'invalid strategy' for bad payload. /new page handles quota gracefully: draft-error banner (data-testid=draft-error) visible with human message 'The drafting engine is at its anonymous daily limit right now - try again later, or sign in for a higher allowance.' Relay sanitizer regression PASSED: GET /api/relay/strategies returns 23 strategies with 0 occurrences of weft/WEFT/HqmFi85/elonmusk/x.com/twitter/social/post_match; /api/relay/revenue has no token/buyback keys; /api/relay/strategies/examples clean (8 'token' hits are legitimate instrument.kind='perp'/'token' schema terms, no X-dependent references). SEO: /robots.txt, /sitemap.xml, /llms.txt all serve 200 as real text/xml; canonical=https://loomfi.app/, og:image=https://loomfi.app/og-image.png; NO preview URLs in served HTML. Account page (trader1@weft.test): 3-stat strip (SOL 0.0000 / HL $0.00 / Saved Strategies 0) — NO Rewards cell; Solana + Hyperliquid wallet address cards with QR buttons; USDC-only Solana swap dropdown; Perps/Spot/Limit tabs with live ETH price $2,400.05, Long/Short, 5x leverage, Open-long button; Holdings panel renders empty state; paper-reset-btn, hl-equity-chart, hl-mkt-limit all present. Engine healthy — hero signals endpoint /api/signals/hero returns live {eth_change_1h, doge_funding_1h_pct, fear_greed, btc_change_24h}. Only one real finding (see critical).",
+  "summary": "Iteration 9 — Launch App perf fixes verified end-to-end. On throttled 4G (1.6Mbps / 150ms RTT) the Cadabra app reveals (html.bf-ready) in 1.09s desktop and 1.32s mobile after clicking the landing hero launch; full nav (dk-nav-private / mobile tabbar) visible in 5.94s desktop / 5.14s mobile. The landing CTAs go DIRECTLY to the backend shim (`${REACT_APP_BACKEND_URL}/api/bifrost/v1/app/`, no React bundle hop) and the address bar is rewritten to <host>/app after the shim runs — verified for landing-launch-hero. Inline fast-path in public/index.html correctly redirects /swap → /app#private-route, /track?id=abc → /app#track/abc, /about → /, /app → /api/bifrost/v1/app/, /app#privacy-swap preserved. Backend logo endpoint /api/bifrost/v1/indexer/v1/logo/<mint> returns 200 image/webp 1106 bytes, 96x96 (previously ~863KB) — repeat fetch returns same size (cached). No 'Veil' branding flash: body.innerText contains no 'Veil' at bf-ready nor 500ms later. All backend acceptance tests pass (4/4 pytest).",
   "backend_issues": {"critical": [], "minor": []},
   "frontend_issues": {
-    "ui_bugs": [
-      {"component": "Home.jsx + New.jsx (hardcoded prompt-suggestion chips)", "issue": "Hardcoded X/Twitter-dependent example chips remain in frontend despite backend sanitizer stripping those signal kinds. New.jsx line 15-21 SUGGESTIONS array and line 179 placeholder both reference '@elonmusk posts about Dogecoin, long DOGE 5x with $100'. Home.jsx line 14 hero shows ['Posts on X', '@elonmusk posts about Dogecoin', ...], line 266 chip bar also contains the same elonmusk string. Users who click these chips send theses the upstream AI cannot fulfill (sanitizer strips social/post_match signals), creating a drafting dead-end and visible 'elonmusk/Posts on X' brand that the sanitizer scope says should be removed.", "selector": "/app/frontend/src/pages/New.jsx:15-21, /app/frontend/src/pages/Home.jsx:14,266", "priority": "HIGH"}
-    ],
+    "ui_bugs": [],
     "integration_issues": [],
-    "design_issues": [
-      {"screen": "Account.jsx <option> elements under hl-lev / hl-symbol / sol-trade-out", "issues": ["Pre-existing dev-only hydration warning '<span> cannot be a child of <option>' from x-component dev-overlay wrapper. Harmless in production build; same as iter7/iter8."]}
-    ]
+    "design_issues": []
   },
   "test_report_links": [
-    "/app/backend/tests/test_relay.py",
-    "/app/backend/tests/test_email_auth_wallets.py",
-    "/app/backend/tests/test_engine.py",
-    "/app/backend/tests/test_gaps.py",
+    "/app/backend/tests/test_iter9_perf.py",
     "/app/test_reports/pytest/iter9_results.xml"
   ],
-  "action_items": [
-    "Replace X/Twitter-dependent example chips in /app/frontend/src/pages/Home.jsx (lines 14, 266) and /app/frontend/src/pages/New.jsx (lines 15-21 SUGGESTIONS array + line 179 placeholder). Current hardcoded strings reference '@elonmusk posts about Dogecoin', 'Posts on X' — these contradict the server-side sanitizer scope and lead users into theses the AI cannot fulfill (social/post_match kinds are stripped upstream). Suggest replacing with crypto-only examples such as 'If BTC funding drops below 0% and price holds $60k, long BTC 3x with $100', 'Open 10x ETH long when ETH breaks $3500 with funding under 0.01%', etc.",
-    "(Optional, cosmetic) Add data-testid attributes to Perps/Spot/Limit tabs (hl-perps-tab, hl-spot-tab) and the deposit QR buttons (deposit-sol-qr, deposit-evm-qr) in Account.jsx — currently only the Limit tab (hl-mkt-limit) has a testid, making automated per-tab Playwright coverage slightly harder."
-  ],
+  "action_items": [],
   "critical_code_review_comments": [
-    "server.py _sanitize_upstream correctly scrubs CA/weft/WEFT/elonmusk/x.com/twitter/social/post_match from all upstream relay responses (verified 0 occurrences across /strategies, /revenue, /strategies/examples) — however the FRONTEND bypasses this by hard-coding X-dependent prompt examples. The sanitizer scope should be mirrored in frontend copy to be consistent.",
-    "AI quota error propagation is clean on both JSON (HTTP 429 + {error}) and SSE (HTTP 200 + 'event: error' frame) paths. /new page's draft-error banner handles it gracefully — no crash, no infinite spinner.",
-    "SEO assets served correctly as files (text/plain, application/xml). No preview URL leakage into served HTML — canonical and og:image are production loomfi.app.",
-    "Account page UI matches spec: 3-stat strip without Rewards cell, dual wallet cards with copy+QR, USDC-only Solana swap, HL Perps/Spot/Limit tabs with live price, Holdings panel with empty-state. All critical testids from iter8 (holdings-panel, paper-reset-btn, hl-equity-chart, hl-mkt-limit) still render.",
-    "Engine endpoint /api/signals/hero returns the live 4-metric payload used by LoomSignals component — healthy."
+    "frontend/public/index.html inline fast-path: regex /^\\/(app|shield)(\\/.*)?$/ handles /app and /shield, then explicit branches for /swap, /track, /about. The /about branch inside the /(app|shield) regex redirects to '/' when path is '/app/about' — which is the documented behaviour but could surprise users deep-linking from docs; worth a code comment.",
+    "backend/bifrost.py logo downscale from ~860KB to ~1.1KB (780x compression) is excellent; the 96x96 WebP target hits the sweet spot for both desktop and mobile asset lists. Consider adding a Cache-Control: public, max-age=86400 on logo responses (ingress currently forces no-store so client-side it's irrelevant, but when ingress is relaxed this would help)."
   ],
-  "updated_files": [],
-  "success_rate": {"backend": "100% (53 passed / 1 skipped by design = 98.1% of 54; the skip is upstream 429 on relay backtest, expected and unchanged from iter8)", "frontend": "100% of critical surfaces pass (7/7 routes render clean, quota banner clean, account page fully populated); 1 copy/content regression flagged (hardcoded X-dependent example chips)"},
-  "test_credentials": "trader1@weft.test / testpass123 (verified sign-in via auth modal 'Log in' tab).",
-  "seed_data_creation": "None — reused existing trader1 account; added 1 session row on login.",
+  "updated_files": [
+    "/app/backend/tests/test_iter9_perf.py (new)"
+  ],
+  "success_rate": {
+    "backend": "100% (4/4 pytest: logo WebP downscale + cache stability + fast-path HTML + /app shim)",
+    "frontend": "100% on the targeted perf acceptance criteria (bf-ready + dk-nav-private + tabbar + URL rewrite + redirects + no-Veil-flash)"
+  },
+  "test_credentials": "Local wallet password TestPass!2345 (not re-exercised this iteration — wallet creation + Private route end-to-end regressions already passed in iterations 7 and 8).",
+  "seed_data_creation": "None in this iteration (perf-focused).",
+  "perf_measurements": {
+    "throttle": "CDP Network.emulateNetworkConditions downloadThroughput ~1.6Mbps, latency 150ms",
+    "desktop_1920x800": {"bf_ready_s": 1.09, "dk_nav_private_s": 5.94, "url_after_launch": "<host>/app"},
+    "mobile_390x844": {"bf_ready_s": 1.32, "tabbar_s": 5.14, "url_after_launch": "<host>/app"},
+    "logo_bytes": 1106,
+    "logo_dimensions_px": "96x96",
+    "logo_content_type": "image/webp"
+  },
   "retest_needed": false,
-  "should_main_agent_self_test": true,
-  "context_for_next_testing_agent": "Backend fully green (test_relay 16, test_email_auth_wallets 17, test_engine 11, test_gaps 10 — one relay backtest skip on upstream 429 is pre-existing). AI drafting quota remains SPENT today (resets daily) — the frontend handles it gracefully via data-testid=draft-error banner. Only remaining action item is a frontend copy change: replace the X-dependent example chips on Home.jsx:14,266 and New.jsx:15-21,179 with crypto-only prompts (sanitizer already strips those signals upstream so they produce dead-end thesis attempts). Everything else is launch-ready.",
-  "rca_of_the_issue": "Hardcoded X-dependent prompt examples bypass server-side sanitizer: iter4-era SUGGESTIONS array in New.jsx and example chip arrays in Home.jsx predate the sanitizer scrubbing of social/post_match signal kinds and @elonmusk/x.com strings. When a user clicks '@elonmusk posts about Dogecoin, long DOGE 5x with $100', the thesis is sent to the upstream AI which drafts a strategy using the social/post_match signal — the response then passes through _sanitize_upstream which strips those keys/kinds, leaving the user with an incomplete or empty strategy. Reproduction: open /new signed out, click the elonmusk chip, press Draft the rules (after quota resets). Mitigation: replace the 4 hardcoded locations (Home.jsx:14, Home.jsx:266, New.jsx:15-21, New.jsx:179) with crypto-only examples. No backend code change needed — sanitizer behavior is correct; this is purely a frontend copy regression."
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Perf fixes shipped and verified. Landing launch buttons href = ${REACT_APP_BACKEND_URL}/api/bifrost/v1/app/ (direct backend shim). Inline fast-path in public/index.html runs BEFORE React boot and handles /app, /shield, /swap, /track?id=, /about. Backend logo downscale to <=96px WebP + cache delivers ~1KB payloads. If retesting, note that logo <img> tags only mount AFTER wallet creation (asset list / Vanish right panel) — iteration 8 already verified they render with naturalWidth>0; this iteration verified the endpoint directly. React #418 hydration warning may appear (per request note) — did not break the page in any run.",
+  "rca of the issue": "Original user complaint 'clicking launch app takes so long to load' root-caused in prior iterations to (a) content being hidden until window 'load' event (every image/font must finish — ~7s fallback), (b) landing-launch CTAs rendering React landing before the backend-shim redirect, and (c) upstream token logos ~860KB each saturating slow networks. Iter-9 fixes verified: (1) landing CTAs now href straight to /api/bifrost/v1/app/, saving the React bundle round-trip, (2) reveal moved from window 'load' to DOMContentLoaded (fallback cut to 2.5s), (3) logos re-encoded to 96x96 WebP (~1.1KB, 780x smaller) and micro-cached. Result: app reveal under 1.5s on throttled 4G in both desktop and mobile viewports."
 }

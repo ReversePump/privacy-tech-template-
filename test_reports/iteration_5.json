@@ -1,0 +1,30 @@
+{
+  "summary": "Iteration 5 — frontend-only verification of the user's mobile report for Private route + Privacy swap. MOBILE (390x844) and DESKTOP (1920x800) both verified. Mobile bottom tabbar is ONE row (Home, Shield, Trade, Swaps, Send, More) with Swaps highlighted while /#private-route and /#privacy-swap are active; measured 6 items all at top=784 (1 row). Segmented control dk-seg-private/dk-seg-privacy/dk-seg-track measured on one line (all top=96 on mobile, top=126 on desktop). Private route destination modal shows the 12 chain tiles with lowercase ids: dk-chain-All, -ethereum, -base, -arbitrum, -solana, -bsc, -polygon, -optimism, -avalanche, -bitcoin, -tron, -ton; default list leads with USDC on Ethereum/Base/Arbitrum/Solana/BSC/Polygon/Optimism/Avalanche then USDT (popularSort ordering confirmed, NOT alphabetical). Clicking dk-chain-ethereum reloads Ethereum tokens with USDC/USDT/ETH first; search 'usdt' returns 4 USDT chips + Tether rows across Ethereum/Base/Solana/BSC/Optimism/Avalanche/Tron. All 20 chainIconFor img.m elements loaded (naturalWidth=256, 0 broken). Private route order: SOL 2 -> Ethereum USDC -> dest 0x68b3…41f6 produced live quote dk-out=211.2613 USDC, 3 routes (dk-route-0..2), CTA 'Review swap' enabled. Submit opened dk-order-modal: id=pVtdEHNGf3RjfJmzdbjDPa, 'Send exactly 2 SOL', Solana deposit addr 6PYLtfEFkmopkBBUTwnq9NyTp7k9xQZwCVvagFJvwuTx, countdown 29:52. 'Track this order' navigated to #track/pVtdEHNGf3RjfJmzdbjDPa showing 'WAITING FOR DEPOSIT' + 5-step status. Privacy swap destination modal chain tiles use Title-Case ids (dk-chain-All, -Ethereum, -Base, -Arbitrum, -Solana, -BNB-Chain, -Polygon, -Optimism, -NEAR, -Zcash); default grouped by chain with Ethereum first and popular order USDC/USDT/ETH/WBTC/WETH/DAI/LINK/UNI confirmed. 48/126 img.m naturalWidth>0 at probe time (remaining still loading from upstream, no broken glyphs). Privacy swap order: SOL 5 -> Ethereum USDC -> dest 0x68b3…41f6 + refund 5tzFkiKscXHK5ZXCGbXZxdw7gTjjD1mBwuoFbhUvuAi9 produced live quote dk-out=532.9013 USDC, 'Review swap' enabled. Submit opened dk-order-modal: id=darkpricnow (valid UUIDv4), 'Deposit within 72h 29m · send on Solana only.' (Xh YYm format confirmed for long NEAR deadlines), deposit addr 4CzdzUeyfmvNXvLhFrcvG45AaNenRNwu2fjkWRxwqZez, 'Send exactly 5 SOL'. 'Track this order' -> #track/c8ab45ec-… shows PENDING DEPOSIT + 5-step status. Segmented control switch Private->Privacy preserved SOL as source and reset destination to 'Select / Any chain' as expected. Zero page JS errors across both flows (only pre-documented 404s for optional static chunks in console, filtered out).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Destination modal", "issues": ["Chain tile data-testid casing is inconsistent across the two swaps: Private route uses lowercase (dk-chain-ethereum, dk-chain-bsc, dk-chain-ton) while Privacy swap uses Title-Case with hyphens (dk-chain-Ethereum, dk-chain-BNB-Chain, dk-chain-NEAR). Not a user-visible bug but will trip automated tests that assume one convention."]},
+      {"screen": "Swap card", "issues": ["Destination-address input testid is inconsistent across the two swaps: Private route exposes dk-dest-addr; Privacy swap exposes dk-dest. Consider unifying to dk-dest-addr."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "(Low) Normalize dk-chain-* data-testid casing to lowercase on both Private route and Privacy swap destination modals.",
+    "(Low) Rename privacy-swap destination-address input testid from dk-dest to dk-dest-addr for parity with private-route."
+  ],
+  "critical_code_review_comments": [
+    "User-reported mobile wrap issue (tabbar on 2 rows / segmented control wrapping) is NOT reproducible on the current build at 390x844 — tabbar is one row (6 items, all top=784) and segmented control is one line (all top=96). Issue appears already fixed by the latest mobile CSS rules in backend/brand/dk-swap.js.",
+    "Token loading, popularSort ordering, chainIconFor icon fallback, and order creation on both /api/ds/* and /api/ds/near/* are all working end-to-end against live upstreams.",
+    "Minor: data-testid casing/naming inconsistency between the two swap views (listed in design_issues)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "not tested (skipped per request)", "frontend": "100%"},
+  "test_credentials": "None required (wallet connect not needed for order creation).",
+  "seed_data_creation": "Created 2 live upstream orders (no funds moved): Private route pVtdEHNGf3RjfJmzdbjDPa (SOL->ETH USDC), Privacy swap c8ab45ec-cca6-410f-91d5-c822488caf45 (SOL->ETH USDC via NEAR Intents).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Private route uses lowercase dk-chain-<id> (ethereum, bsc, ton, bitcoin, tron, avalanche, optimism, polygon, arbitrum, base, solana, All). Privacy swap uses Title-Case/hyphenated (Ethereum, Base, Arbitrum, Solana, BNB-Chain, Polygon, Optimism, NEAR, Zcash, All). Destination address input testid differs: dk-dest-addr (private) vs dk-dest (privacy); fall back to input[placeholder*='receiving' i] to be safe. Private route countdown is 'MM:SS'; Privacy swap long deadlines render 'Xh YYm'. Order creation only returns deposit addresses — safe to run. Live quote wait: ~10-14s. First-paint wait: 10s. Base URL: https://offer-latest-dark.preview.emergentagent.com (from REACT_APP_BACKEND_URL).",
+  "rca of the issue": "No reproducible issue. The reported mobile tabbar wrap / segmented wrap is not present on current build. Visual + measurement verification confirms single-row layout at 390x844."
+}

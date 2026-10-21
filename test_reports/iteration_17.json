@@ -1,0 +1,49 @@
+{
+  "summary": "Iteration 17 - Verified the restyled Portal-style token picker UI/UX across private-route and privacy-swap flows + source picker + mobile. Backend regression (iter16 suite) is green (7/7). All UI behaviours in the review request were confirmed on the production preview URL.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/relayer/quote (jupiter)", "issue": "Flaky upstream 429 'Too many requests' on Jupiter during the full test run (test_iter12_proxy_audit.test_relayer_quote_single). Not caused by picker changes."},
+      {"endpoint": "/api/near/orders", "issue": "Flaky 409 'minimum output changed' when the live quote expires between fetch and submit in test_iter16_swap_full.test_privacy_swap_full_flow. Known upstream race, not a regression."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "verified_behaviours": [
+    "Private route (#private-route) dk-pick-destination opens dk-token-modal with centered title 'Select token' and round close button dk-modal-close.",
+    "'Choose network' 5-col grid renders 9 Portal-ordered tiles (ethereum, solana, arbitrum, base, bnb-chain, polygon, optimism, avalanche, bitcoin) + dk-chain-more. Clicking More reveals additional tiles including dk-chain-tron and dk-chain-ton and swaps to 'Less'.",
+    "Clicking dk-chain-arbitrum filters the list to Arbitrum-only tokens (verified first 5 rows all show 'Arbitrum'), label2 switches to 'Arbitrum tokens' + 'All networks' button (dk-chain-all); clicking it resets to 'All tokens'. Toggling the selected tile again also resets.",
+    "Privacy swap (#privacy-swap) destination picker: 10 chain tiles rendered. Code renders dk-chain-more when there are >9 chains, dk-chain-all-tile otherwise - current data path has >9 chains, so More is shown (not the All tile). Expected 'All tile' is only produced for exactly 9 chains. Not a bug but call-out below.",
+    "dk-token-addr elements (98 found on initial list) have target=_blank, correct explorer href (etherscan/basescan/arbiscan/solscan/bscscan/polygonscan/optimistic.etherscan/nearblocks/tronscan/tonviewer). Clicking the address link does NOT close the modal and does NOT select the token (modal still open after click).",
+    "Pasting Solana USDC mint 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' narrows list to exactly 1 USDC row (dk-token-USDC) + its dk-token-addr child. Same for EVM USDC '0xa0b8...eb48'.",
+    "Symbol search 'USDT' returns 18 matching rows across chains.",
+    "Source picker (dk-pick-source) shows a single fixed Solana tile (dk-chain-solana) with 'on fixed' class; token list includes SOL/USDC/USDT at the top. Full list contains ~35 tokens because loader merges the popular trio with the general tokens(side,'',chain) response - this is pre-existing behaviour, not a regression.",
+    "Esc, dk-modal-close (X) and click-outside (backdrop) all close the modal.",
+    "After selecting a token, reopening the picker highlights the current row with class 'sel'.",
+    "Mobile 400x800 viewport: picker renders as bottom sheet with .dk-grab handle visible, no horizontal overflow (documentElement.scrollWidth == clientWidth), 5-col grid fits.",
+    "No console errors and no 4xx/5xx /api responses observed while interacting with the pickers."
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_iter16_swap_full.py",
+    "/app/test_reports/pytest/iter17_regression.xml"
+  ],
+  "action_items": [
+    "(Non-blocking, product decision) Review-request description says 'Privacy swap: 9 networks + an All tile (dk-chain-all-tile)'. In reality the live /api/chains for privacy-swap exposes 10+ chains, so renderPicker emits dk-chain-more instead of dk-chain-all-tile. If the design intent is strictly a 9-chain whitelist for privacy swap, trim M.allChains or always render the All tile; otherwise update the review description.",
+    "(Minor) In private route destination picker, 'near' and 'zcash' tiles are not in the first 9 and only tron/ton show after More - near/zcash don't appear because the private-route token response doesn't include them in allChains. If product wants them visible, extend learnChains or pre-seed H_CHAINS."
+  ],
+  "critical_code_review_comments": [
+    "backend/brand/dk-swap.js is ~1613 lines in a single file - above the 700-line guideline. Consider splitting (picker UI, api client, order flow) into separate modules.",
+    "renderPicker uses innerHTML with onerror='this.outerHTML=...' containing escaped quotes - works but is brittle; a one-time delegated error handler via addEventListener would be safer against future CSP tightening.",
+    "explorerUrl uses encodeURIComponent then re-decodes ':' - acceptable for TON userfriendly addresses but could be simplified."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% on iter16 regression (7/7); 78/82 across full suite with 2 flaky upstream failures + 2 pre-existing env-fixture errors unrelated to picker", "frontend": "100% of listed picker scenarios"},
+  "test_credentials": "none required",
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Picker testids: dk-pick-source, dk-pick-destination, dk-token-modal, dk-modal-close, dk-token-search, dk-chain-<slug> (slug = chainName.toLowerCase() with spaces->dashes, e.g. 'bnb-chain'), dk-chain-more, dk-chain-all (reset button inside label), dk-chain-all-tile (only when chains==9), dk-token-<SYMBOL>, dk-token-addr. Modal is closed via Esc/X/backdrop click. Private route destination needs ~2.5s wait after open for chain tiles to populate from API. Privacy swap has >9 chains and shows More tile - no dk-chain-all-tile. Flaky backend tests (jupiter 429, near min-output changed) are upstream and unrelated to picker changes."
+}

@@ -1,0 +1,40 @@
+{
+  "summary": "Iteration 18 - Verified NullCash landing redesign (nullmask-style), hamburger nav, /docs restructure, and the new collapsible 'Fees & details' toggle across landing + docs + /app (Send/Shield/Trade/Veilswap). All review-request behaviours confirmed on the preview URL with zero console or page errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "verified_behaviours": [
+    "Top bar on / contains exactly three interactive elements: nav-logo, nav-x (href=https://x.com/usenullcash, target=_blank), nav-menu. No Open-app button in the bar on 1920 desktop or 400 mobile.",
+    "No horizontal overflow at 400px wide (documentElement.scrollWidth == clientWidth == 400).",
+    "Hamburger opens nav-drawer with all 8 rows and nav-launch (/app). Hrefs verified: nav-item-live=/app, nav-item-docs=/docs, nav-item-x=https://x.com/usenullcash, nav-item-flow=/#flow, nav-item-swap=/app#private-route, nav-item-fees=/docs#fees, nav-item-privacy=/docs#visibility, nav-item-faq=/#faq. Esc closes (aria-hidden=true).",
+    "Hero renders hero-title ('Hit send. Leave no trace.'), hero-live dot-matrix counter, hero-launch, hero-swap, hero-x and hero-stats with live numbers (leaves=289, nullifiers=289, assets=73, chains=126) populated from /api/bifrost/v1/indexer/* and /api/ds/chains.",
+    "feature-card-0..4 = 5 cards; pillar-shield->/app#shield, pillar-houdini->/app#private-route, pillar-near->/app#privacy-swap.",
+    "flow-step-0..4 = 5, zk-system-0..2 = 3, zk-pipeline present, docs-open link + docs-group-* = 5 groups, tech-grid has 6 one-liners.",
+    "Landing fees-toggle starts collapsed (aria-expanded=false, parent grid-template-rows=0px, inner wrapper height=0). After click, inner wrapper animates to 350.25px and fees-table becomes visible.",
+    "FAQ accordion has 6 items (data-testid=faq-0..5). cta-launch and cta-x render with correct links.",
+    "All 9 /landing/*.webp images loaded (0 broken).",
+    "/docs page: docs-sidebar has 15 docs-link-* buttons mapping to 15 docs-section-*. Clicking docs-link-fees scrolls to #fees and updates location.hash to #fees. docs-fees-toggle starts closed (same grid-rows:0fr pattern); after click expands docs-fees-table. Deep link /docs#fees scrolls to the fees section (top offset ~2323px). Mobile 400px: docs-select is visible and sidebar hidden.",
+    "/app vault creation flow works: nc-pitch-connect -> button 'Create a NullCash vault' -> fill 2 input[type=password] with 'TestPass!2026xyz' -> Create -> checkbox -> 'Open NullCash'. Vault opens successfully.",
+    "In-app fee toggles: #send, #shield, #trade, #veilswap all show nc-fee-toggle with aria-expanded=false initially and div.sum computed display=none (height=0, offsetParent=null). Toggle one-line summary text: send='NullCash fee: Free for private transfers', shield/veilswap='NullCash fee: 0.3% · 0 SOL', trade='Relayer fee (already included): —'. Clicking toggle on #send expands .sum to 193px and aria-expanded=true.",
+    "Reset on tab change CONFIRMED: expanded Send -> navigate hash to #shield -> nc-fee-toggle aria-expanded=false and .sum display=none again.",
+    "Private route picker (dk-pick-destination) still present after vault open; previous iter 17 verified picker + quote flow comprehensively, no regression observed.",
+    "No pageerror / console error events captured on /, /docs or /app during the full session."
+  ],
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "LandingPage.jsx is 491 lines, DocsPage.jsx 155 lines, NmNav 76 lines - within guideline. The 'grid-rows-[0fr]' + overflow-hidden collapse pattern is correct and animates smoothly; just note that getBoundingClientRect on the inner <table> can mislead screenshot/testing tools - prefer measuring the overflow-hidden wrapper's offsetHeight.",
+    "backend/brand/dk-swap.js remains 1667 lines (flagged in iter 17) - still above 700-line guideline; consider splitting."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "not tested (frontend-only per request)", "frontend": "100% of listed scenarios passed"},
+  "test_credentials": "none required (vault password used in-browser: TestPass!2026xyz)",
+  "seed_data_creation": "throwaway vault created in-browser only",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "In-app Create vault flow: click [data-testid=nc-pitch-connect] -> page.locator('button', has_text='Create a NullCash vault').first.click() -> fill input[type=password] (2 of them) -> get_by_role('button', name='Create', exact=True).click() -> check input[type=checkbox] (force=True) -> get_by_role('button', name='Open NullCash').click(). Tab switching inside /app via setting window.location.hash to '#send'/'#shield'/'#trade'/'#veilswap' works and resets nc-fee-toggle to collapsed. CSS grid-rows[0fr]+overflow-hidden collapse pattern: inner <table> getBoundingClientRect still reports natural height even when visually clipped - measure the overflow-hidden wrapper offsetHeight or getComputedStyle(parent).gridTemplateRows for true state.",
+  "rca of the issue": "n/a - no issues found"
+}

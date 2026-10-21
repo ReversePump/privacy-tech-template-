@@ -1,0 +1,33 @@
+{
+  "summary": "Iteration 22 - fresh live-environment verification after workspace re-install (no code changes vs iter21). Backend pytest FULL suite incl. order + near: 105/105 passed (80 via LoadScope xdist + 25 for test_bifrost / test_iter12_security re-run with explicit REACT_APP_BACKEND_URL env). Frontend live flows against https://offer-latest-dark.preview.emergentagent.com all green: landing shows sealed notes / nullifiers / shieldable tokens, /docs 200, /app 200 with intro skippable. All 10 top tabs render: Home/Shield/Send/Swap/Bridge/Private route/Privacy swap/Track/History/Chain. Private route SOL->ETH @ 1.0421 produced 3 live routes (BEST 0.0429449 / 0.0429422 / 0.0429413 ETH, rate 0.04236451, route fee 'In quote', ETA ~11 min) and after Review swap the 'Order created' modal appeared live: order id 83FWv8pHiPDp84DdjN6Ssz, Solana deposit addr Fki7NWp7xD3EEyFdVKb9JgwYzdx3KKeEuGb9b5Xur6Kp, receiving 0x68b3a9f8940f418e8051ebb659e8ed278fea41f6, 'Deposit within 29:52 - send on Solana only'. Privacy swap SOL->USDC (Ethereum) via NEAR Intents is UP: live quote 103.5722 USDC @ rate 101.0756, BEST tag, ETA ~1 min, dest + refund fields accept the required addresses. Chain tab: merkle_root present, 'commitment' + 'nullifier' terms rendered, tagged rows [EXIT], [PRIVATE PAY], [SHIELD] all present. Swap tab renders Solana token picker (SOL present) via /api/bifrost/v1/relayer. Bridge renders (~221k bytes HTML). Track tab accepts order id into 'paste your order id' input. Health: /api/bifrost/v1/_health=200, /api/ds/tokens?side=source=200 (42KB), /api/ds/near/tokens?side=source=200 (4.5KB). Zero pageerror events across private route / privacy swap / chain / swap / bridge / track navigations.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "verified_behaviours": [
+    "Landing + /docs + /app load 200 with live pool stats wording.",
+    "All 10 app tabs render without JS errors.",
+    "Private route live: 3 quotes, Review swap -> Order created modal with real Solana deposit addr + ETA timer.",
+    "Privacy swap live NEAR Intents quote (BEST 103.5722 USDC @ 101.0756 rate).",
+    "Chain terminal live with merkle_root, commitments, nullifiers, tagged tx rows.",
+    "In-app Swap tab loads Solana token picker; Bridge tab renders.",
+    "Track input accepts order id (local history empty w/o vault session - expected).",
+    "Backend pytest 105/105 pass (full suite incl. order + near flows)."
+  ],
+  "pytest_results": "105 passed, 0 failed. 80 in iter22.xml (xdist parallel, no env filter) + 25 in iter22b.xml (test_bifrost.py + test_iter12_security.py re-run with REACT_APP_BACKEND_URL exported). 5 benign DeprecationWarnings (fastapi on_event / python-multipart) only.",
+  "test_report_links": [
+    "/app/test_reports/pytest/iter22.xml",
+    "/app/test_reports/pytest/iter22b.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "test_bifrost.py and test_iter12_security.py read REACT_APP_BACKEND_URL at module import time without a default; collection errors unless the env var is exported in the shell (frontend/.env is NOT auto-loaded for pytest). Minor DX wart - consider loading /app/frontend/.env or falling back to a hardcoded preview URL in those test files. All other test files already guard this with .rstrip('/') but hit the same issue; test_live_endpoints uses a session-scoped loader that handles it. Not blocking - re-run with env export works.",
+    "backend/brand/dk-swap.js remains ~1667 lines (long-standing)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (105/105 full suite)", "frontend": "100% of review-request live flows verified"},
+  "test_credentials": "vault password used only in-browser: TestPass!2026xyz (not required - vault flow not re-run this iteration since iter21 verified it with no code changes).",
+  "seed_data_creation": "Created one live Private route order: id 83FWv8pHiPDp84DdjN6Ssz, Solana deposit addr Fki7NWp7xD3EEyFdVKb9JgwYzdx3KKeEuGb9b5Xur6Kp, SOL -> ETH 1.0421 -> 0.04419974, receiving 0x68b3a9f8940f418e8051ebb659e8ed278fea41f6 (no funds moved).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "NEAR Intents 1click upstream is UP (SOL->USDC/Ethereum quoted 101-104 USDC per SOL this run). DS proxy stale-while-revalidate working. If you re-run pytest, be sure to export REACT_APP_BACKEND_URL=https://offer-latest-dark.preview.emergentagent.com or pytest will fail to collect test_bifrost.py & test_iter12_security.py (they read env at import time without default). Running the file in subset is fine with the env export. Private route modal selector workflow: #private-route -> fill Select -> search ETH -> pick ETH+Ethereum row -> fill input[inputmode=decimal] -> wait 8-10s for live quote -> fill receiving input -> click 'Review swap' -> 'Order created' modal appears (no second-confirm needed). Privacy swap same but destination USDC on Ethereum; the single-use quote expires after ~30-45s so set unique amount each run.",
+  "rca of the issue": "No issues found. All review-request live checks pass on preview."
+}

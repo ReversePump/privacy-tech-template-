@@ -1,0 +1,35 @@
+{
+  "summary": "Iteration 19 - Visual/contrast audit for the lime->graphite recolour across /, /docs, /app (Home/Shield/Send/Trade/Veilswap/Private route/Privacy swap/Track/History/Chain, intro tour, wallet-connect sheet, token picker) at 1920x900 desktop and 400x800 mobile. Programmatically scanned every rendered element's computed color/background/border for lime hue (60-110 deg, sat >40%, lightness 15-90%). Found 1 real lime regression on #chain (xc-bar / xc-side / xc-top using rgba(var(--veil-rgb),.14)) caused by stale --veil-rgb triplet in nc-theme.css. Fixed. Re-verified: 0 lime hits anywhere, 0 console/pageerror events. All review-request behaviours confirmed.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "verified_behaviours": [
+    "/ and /docs: 0 lime elements, 0 low-contrast text at 1920 and 400 widths.",
+    "/app pitch (nc-pitch), intro tour (nc-tour), vault-create (two password fields), recovery-key screen, confirm checkbox, 'Open NullCash' - all screens render with readable text (dark fg on light bg, light fg on dark bg). Vault opens successfully with password 'TestPass!2026xyz'.",
+    "Primary buttons [data-testid=nc-pitch-connect] and [data-testid=nc-tour-next]: computed color rgb(244,245,247) on linear-gradient(rgb(58,63,70)->rgb(35,39,44)) -> effective contrast ratio >15:1, perfectly readable. (The naive audit flagged these because background-image gradients report backgroundColor=transparent; manual verification confirms they are the graphite primary buttons specified.)",
+    "In-app tabs #send/#shield/#trade/#veilswap: nc-fee-toggle starts aria-expanded=false with correct one-line summary ('NullCash fee: Free for private transfers' / '0.3% * 0 SOL' / 'Relayer fee (already included): -'). 0 lime, 0 low-contrast text.",
+    "Token picker (dk-pick-destination on #privacy-swap): opens, selected network tile and 'All' tile use graphite scheme, 0 lime hits inside picker, 'All networks' link readable.",
+    "#private-route regression: SOL->ETH (Ethereum) amount=1 produces quote. 'Private route' tab headers and labels readable, 0 lime.",
+    "#chain terminal: BEFORE fix - 17 lime hits (rgb(111,148,0) HSL 75deg 100% 29%) on .xc-bar bg, .xc-side.xc-dca/.xc-ext borders, .xc-top borders via `rgba(var(--veil-rgb), .14)`. AFTER fix - 0 lime hits, xc-bar now rgba(61,67,74,0.14) graphite.",
+    "#track, #history, More menu: 0 lime hits, no low-contrast real text.",
+    "Mobile 400x800: landing, docs, /app all audit clean.",
+    "0 pageerror, 0 console errors across the full session (before AND after the fix)."
+  ],
+  "rca of the issue": "backend/brand/nc-theme.css line 18 declared `--veil-rgb:111,148,0; --veil-hi-rgb:86,115,0; --veil-deep-rgb:134,176,0;` which were the original olive-lime RGB triplets. When the main agent migrated --veil / --veil-hi / --veil-deep (hex named vars) to graphite (#3d434a / #2b2f33 / #59616b), it missed the companion comma-separated-triplet variables used by the bundled app CSS via `rgba(var(--veil-rgb), .14)` patterns (notably .xc-bar, .xc-side.xc-dca, .xc-ext, .xc-top on the #chain terminal). FIX applied: replaced with `--veil-rgb:61,67,74; --veil-hi-rgb:43,47,51; --veil-deep-rgb:89,97,107;` matching the new graphite palette. Backend restarted to flush the inlined theme cache. Verified: --veil-rgb computed value is now `61,67,74` and xc-bar background is rgba(61,67,74,0.14).",
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "nc-theme.css: when migrating palette tokens, grep for every variant naming (--veil, --veil-rgb, --veil-hi-rgb, --veil-deep-rgb, --nc-lime, --nc-lime-*). The triplet form is easy to miss because it is only used by bundled app CSS, not by the theme sheet itself.",
+    "backend/brand/dk-swap.js is still 1667 lines (flagged in prior iterations) and should be split."
+  ],
+  "updated_files": ["/app/backend/brand/nc-theme.css"],
+  "success_rate": {"backend": "not tested (frontend-only per request)", "frontend": "100% after 1 fix"},
+  "test_credentials": "vault password used in-browser: TestPass!2026xyz",
+  "seed_data_creation": "throwaway vault created in-browser only",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Lime audit helper: iterate document.querySelectorAll('*'), parse getComputedStyle for color/backgroundColor/borderTopColor/borderLeftColor, convert rgb->HSL, flag hue in [60,110] with sat>40% and lightness in [15,90]. Primary CTA buttons use background-image gradients so backgroundColor reports transparent - don't flag them as low-contrast without inspecting backgroundImage. Chain terminal uses `rgba(var(--veil-rgb),.14)` from a bundled chunk CSS, not from nc-theme.css directly."
+}

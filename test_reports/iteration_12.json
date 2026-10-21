@@ -1,25 +1,38 @@
 {
-  "summary": "Frontend regression + bugfix verification. All 4 scenarios PASS. (1) Enter key on /new thesis-input fires POST /api/ai/generate/stream and strategy card with start-practice-btn renders within ~45s with no error banner. (2) Clicking header Connect opens AuthModal with the email form (auth-email, auth-password, auth-submit) AND the 'Connect Phantom / Solflare' button (auth-wallet-btn) visible at the same time, no tabs — confirmed by screenshot. (3) Clicking auth-wallet-btn triggers the wallet-adapter modal (.wallet-adapter-modal visible, 'You'll need a wallet on Solana to continue') — a wallet connection attempt is clearly initiated, not silent, not an email form. (4) Email login with trader1@loom.test / testpass123 succeeds — modal closes after submit.",
+  "summary": "Iteration 12 – Full proxy audit for Cadabra as requested. Verified every indexer + relayer endpoint via /api/bifrost/v1/* matches upstream veilit.xyz and that both order flows (classic DarkSwap + NEAR intents) create real orders with deposit addresses. Backend: new pytest suite test_iter12_proxy_audit.py – 25/25 PASS (indexer parity 10 endpoints, relayer parity 6 endpoints + quote/bridge-quote/prepare/relay-400, 25-sequential-quote burst with 100% JSON bodies / zero HTML leak, no-HTML on 404, DS private-route full order flow, NEAR 1Click full order flow with retry-on-stale-quote). Frontend: Private route E2E in browser – entered SOL 0.5 → USDC Ethereum, EVM 0x68b3…41f6, CTA transitioned 'Fetching quote…' → 'Review swap' in 6s, clicked, 'Order created' modal rendered with id c8GFceMHusMupqdT7qfsct, 50.3672 USDC out, Solana deposit addr 6FKM2zH8UqXcuH5SqtwHs65oUntJu62L8ZcXvJpwQ1jz, 29:59 countdown, 'Track this order' CTA, no DarkSwap/Houdini branding leaked, no dk-error. Privacy swap E2E: SOL 5 → ETH Ethereum, same recipient, refund Solana 5tzFkiKscXHK5…vuAi9, CTA 'Review swap' enabled, click triggered Cadabra's branded 'Quick security check / Verify' modal – this is the Cloudflare page-level challenge from upstream near-intents gateway documented in iter 11, no 400 or app bug (same quoteId POSTs server-side return 200 depositAddress, verified in pytest test_ds_near_privacy_swap_full_order). Right-rail live pool stats ('What the chain sees') render with Merkle root, 1058 commitments, 278 nullifiers, 49/72 verified tokens, live private trade feed – all through proxy with no HTML leaks. GatewayStatusMiddleware correctly returns JSON 503 with x-upstream-status when upstream Jupiter 429s (observed on quote #10 of burst).",
   "backend_issues": {"critical": [], "minor": []},
   "frontend_issues": {
     "ui_bugs": [],
-    "integration_issues": [],
-    "design_issues": [
-      {"screen": "Home page (background behind auth modal)", "issues": ["Console warning: 'Encountered two children with the same key, Prices' — non-unique React keys in a Prices list. Not blocking but should be fixed."]}
-    ]
+    "integration_issues": [
+      {"flow": "Privacy swap submit (browser only)", "issue": "Upstream near-intents.network edge intermittently serves a Cloudflare page-level challenge during order creation; the app's branded 'Quick security check – Verify' modal handles it gracefully but blocks automated E2E. Same POST /api/ds/near/orders succeeds 200 with depositAddress via server (pytest). Not an app regression.", "affected_selectors": ["[data-testid=dk-submit]"]}
+    ],
+    "design_issues": []
   },
-  "test_report_links": [],
-  "action_items": [],
-  "critical_code_review_comments": [
-    "Minor: React duplicate-key warning for key 'Prices' logged on homepage render — find the list rendering 'Prices' entries and use a unique key.",
-    "AuthModal.walletSignIn relies on the string 'connect' being in the error message to decide to open the wallet-adapter modal; fragile heuristic. Consider checking for a WalletNotConnectedError / no wallet selected explicitly, or always calling setVisible(true) when no wallet is selected before signIn()."
+  "test_report_links": [
+    "/app/backend/tests/test_iter12_proxy_audit.py",
+    "/app/test_reports/pytest/iter12_results.xml"
   ],
-  "updated_files": [],
-  "success_rate": {"backend": "n/a (frontend-only)", "frontend": "100% (4/4 scenarios)"},
-  "test_credentials": "trader1@loom.test / testpass123 — works for email login",
-  "seed_data_creation": "none",
+  "action_items": [
+    "No functional fixes required for the proxy audit – 25/25 backend tests pass and both order creation flows produce real deposit addresses.",
+    "(Optional UX) Consider auto-retrying the 'Quick security check' submit after user Verify tap closes the challenge modal, instead of requiring user to re-click Review swap."
+  ],
+  "critical_code_review_comments": [
+    "backend/bifrost.py proxy() retry/backoff on upstream 429 is working – burst of 25 sequential quotes yielded 24 x 200 JSON + 1 x 503 JSON (never HTML). The 503 cleanly wraps upstream Jupiter 'Too many requests' – good.",
+    "GatewayStatusMiddleware is correctly intercepting upstream 502/504/HTML and converting to JSON 503 with x-upstream-status; verified with /api/bifrost/v1/indexer/v1/this-does-not-exist-xyz and burst test.",
+    "backend/brand/dk-swap.js is still ~1100 lines in one file; previous iter's splitting recommendation stands.",
+    "Indexer /v1/logo/<mint> returns upstream 404 for unknown mints – this is passthrough and acceptable; frontend should swallow logo 404s silently (console shows a lot of 404s during feed render – consider adding onerror handler on <img> tags).",
+    "Console shows many 429 errors during live feed polling – these are upstream rate limits on the referrals / asset-icon fetches, not proxy bugs. Consider frontend-side exponential backoff on these polling calls."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter12_proxy_audit.py (new, 25 tests)"
+  ],
+  "success_rate": {
+    "backend": "100% (25/25 pytest)",
+    "frontend": "Private route 100% E2E (order id c8GFceMHusMupqdT7qfsct created with deposit address). Privacy swap: CTA + validation 100%, live submit blocked once by upstream Cloudflare challenge (handled by branded Verify modal, documented upstream behaviour not an app bug; same flow verified 200 via pytest)."
+  },
+  "test_credentials": "None required.",
+  "seed_data_creation": "Created 1 real upstream Private-route order via browser (c8GFceMHusMupqdT7qfsct, 0.5 SOL → 50.3672 USDC on Ethereum). Pytest also created 1 classic DS order + 1 NEAR 1Click order with deposit addresses returned – no funds moved.",
   "retest_needed": false,
   "main_agent_can_self_test": true,
-  "context_for_next_testing_agent": "AuthModal is now single-view (no tabs). Email form + wallet button are visible together in both register and login modes. Wallet button opens wallet-adapter modal correctly in a browser without Phantom/Solflare. Enter-to-draft on /new still works. Email login flow confirmed working with trader1@loom.test/testpass123.",
-  "rca of the issue": "Previously the wallet option was hidden behind a tab; now AuthModal renders the email form and the 'Connect Phantom / Solflare' button together with a divider. walletSignIn() calls signIn() from AuthContext — on error it falls back to setVisible(true) which opens the @solana/wallet-adapter-react-ui modal, which was observed to render the 'You'll need a wallet on Solana to continue' prompt as expected on a wallet-less test browser."
+  "context_for_next_testing_agent": "Backend proxy for every veilit.xyz endpoint is confirmed parity with upstream (25-case pytest in test_iter12_proxy_audit.py). All order flows are 200 end to end. The only transient browser-level issue is Cloudflare's own 'Quick security check' challenge on near-intents.network submits – app handles it gracefully with the branded Verify modal, user just taps Verify once then resubmits. No HTML page leak through any proxy endpoint. GatewayStatusMiddleware properly converts upstream 429/502/504 to JSON 503. Private route live order id for traceability: c8GFceMHusMupqdT7qfsct (GET /api/ds/orders/c8GFceMHusMupqdT7qfsct returns status)."
 }

@@ -14,22 +14,7 @@ module.exports = {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)'
       },
-      fontFamily: {
-        sans: ['Chakra Petch', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        serif: ['Archivo Black', 'Chakra Petch', 'sans-serif'],
-        mono: ['Space Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
-      },
       colors: {
-        paper: 'var(--bg)',
-        surface: 'var(--surface)',
-        ink: 'var(--fg)',
-        ink2: 'var(--fg-2)',
-        ink3: 'var(--fg-3)',
-        signal: 'var(--signal)',
-        signalhover: 'var(--signal-hover)',
-        up: 'var(--up)',
-        down: 'var(--down)',
-        warn: 'var(--warn)',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {

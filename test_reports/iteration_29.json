@@ -1,0 +1,26 @@
+{
+  "summary": "Iteration 29: frontend-only retest of the 2 MEDIUM bugs from iter28, plus a light regression. All checks PASS. BRIDGE HASH (FIXED). Without a vault: clicking Bridge shows #veilswap at 0.3s and #nullswap by 0.8s, and the Bridge connect gate ('Exit privately to any chain.') renders. Reloading /app#nullswap shows the Bridge gate, the Bridge tab is on and the hash stays #nullswap (checked at 6s and 9s). With a real vault: clicking Bridge gives #nullswap by 1.5s with the Bridge swap card ('NullCash it twice. Total privacy.'). Reload at 3s, 6s and 10s, a fresh goto /app#nullswap at 9s, and the legacy /app#veilswap all show the Bridge view (not PRIVATE BALANCE), and the address bar ends at #nullswap. History: with real entries (location.hash or an anchor to #nullswap, then #home), Back shows Bridge with #nullswap and Forward shows Home with #home, both with and without a vault. Note: clicking nav tabs does not add history entries (the upstream app uses replaceState and history.length stays the same), so after tab-only navigation Back leaves the app. This is upstream behaviour, not a shim regression. CARRY-OVER (FIXED). ETH on Ethereum: Privacy swap quoted 'Total fees $0.44 (0.82%)'. Submitting returned the 503 paused message; dk-err-switch then opened Private route with 'ETH Ethereum Mainnet', the destination kept, amount 0.5, and a live quote 'Total fees $1.12 (2.11%)' with the dk-fees rows. This was the only order attempt. USDC on Ethereum (via the nav tab): carried as 'USDC Ethereum Mainnet', destination kept, 'Total fees $1.12 (2.11%)'. ETH on Base: carried as 'ETH Base', 'Total fees $0.87 (1.64%)'. Switching back to Privacy swap through dk-seg-privacy keeps the pair and the quote. REGRESSION. Nav fit at 1024 and 1440, normal and with the simulated connected label: More is visible, More right <= nav.side right < .top-right left, and labels are not clipped. /app/api goes to /docs, and backend GET /api/bifrost/v1/app/api returns 302 to /docs. The CA chip is present on /, /docs and /app. Favicons are NullCash on all three, with titles 'NullCash ...'. GET /api/bifrost/v1/_live: relay on, ok 444 -> 450 over 6s, 0 errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Privacy swap token picker (All networks, search 'USDC')", "issues": ["USDC rows show only a shortened contract address (e.g. 0xa0b...06eb48) and a tiny chain badge, with no chain name, so it is hard to tell Ethereum, Base, Arbitrum and so on apart. ETH rows do show the chain name. Consider adding the chain name to token rows."]},
+      {"screen": "Private route 'To' chip", "issues": ["The chain subtitle is cut to 'Ethereum ...'. This is minor; the full name is shown on the right ('Ethereum Mainnet')."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "No blocking items. Optional: show the chain name in Privacy swap token rows for multi-chain tokens like USDC.",
+    "Optional: if Back/Forward between tabs is wanted, the tabs would need pushState; today the upstream app uses replaceState, so tab clicks create no history entries."
+  ],
+  "critical_code_review_comments": [
+    "bifrost_brand.py: the HBon interval keeps polling every 400ms forever; this is cheap, but could be stopped once the hash is #nullswap and Bridge is on."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (frontend only; _live and app/api checked with curl and passing)", "frontend": "100%"},
+  "seed_data_creation": "One local vault was created in a browser context (password TestPass!2026xyz). One Privacy swap order attempt was made; it returned 503 (paused) and nothing was created.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Both iter28 MEDIUM bugs are verified fixed. Vault creation: click [data-testid=nc-connect-btn] (no force), then locator('button:visible', has_text='Create a NullCash vault'), then input[type=password]:visible x2, then button 'Create', then the checkbox, then 'Open NullCash'. Token picking: dk-pick-destination, then dk-chain-{ethereum|base} (visible tile), then dk-token-search, then the first visible dk-token-{SYM}. USDC rows do not include the chain name, so filter by chain tile. Nav tabs use replaceState; to test back/forward, use location.hash assignments."
+}

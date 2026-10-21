@@ -109,35 +109,6 @@ let webpackConfig = {
       '@': path.resolve(__dirname, 'src'),
     },
     configure: (webpackConfig) => {
-      const webpack = require("webpack");
-
-      // Solana web3.js / wallet-adapter node polyfills for CRA5
-      webpackConfig.resolve.fallback = {
-        ...webpackConfig.resolve.fallback,
-        crypto: require.resolve("crypto-browserify"),
-        stream: require.resolve("stream-browserify"),
-        buffer: require.resolve("buffer/"),
-        process: require.resolve("process/browser.js"),
-        assert: require.resolve("assert/"),
-        util: require.resolve("util/"),
-        url: require.resolve("url/"),
-        http: false,
-        https: false,
-        os: false,
-        path: false,
-        zlib: false,
-        fs: false,
-      };
-      webpackConfig.plugins.push(
-        new webpack.ProvidePlugin({
-          Buffer: ["buffer", "Buffer"],
-          process: "process/browser.js",
-        })
-      );
-      webpackConfig.ignoreWarnings = [
-        ...(webpackConfig.ignoreWarnings || []),
-        /Failed to parse source map/,
-      ];
 
       // Add ignored patterns to reduce watched directories
         webpackConfig.watchOptions = {

@@ -1,0 +1,23 @@
+{
+  "summary": "Iteration 2 full verification of the no-iframe Darkinator ZK Shield rebrand (Veil upstream via Bifrost v1 proxy). 16/16 backend pytest tests pass (added 4 brand-asset tests: lockup.svg, lockup-light.svg, mark.png, favicon.png — all 200 with correct image/* content-types). Frontend: navbar nav-shield and /swap method-tab-zk both navigate to /shield with address bar showing /shield (no /api/bifrost in URL). No visible iframe on /shield. document.title = 'Darkinator App'; body.innerText contains 'Darkinator' and 0 case-sensitive 'Veil' hits. Top-left lockup logo serves /api/bifrost/v1/_brand/lockup.svg. Full wallet flow works: Create a Darkinator wallet -> password+repeat TestPass!2345 -> Create -> recovery key veilsk25UZ7TudB2TXYsC7x2UnjYJn... -> checkbox + Open Darkinator -> dashboard with PRIVATE BALANCE, 'Darkinator Wallet EuYA...7CjY' header, Deposit/Trade/Send/Receive/Withdraw actions, right 'What Solana sees' panel live (Merkle root 13be13..2fa3, 496 commitments, 150 nullifiers, feed rows). Page remains responsive after Open (previous freeze bug not reproduced). Sidebar navigation works and updates URL to /shield#<view> for Trade/Send/Receive/Keys/Activity. Reloading /shield#trade keeps user in the app (URL preserved, in-app content rendered). /shield/about shows rebranded landing ('Start your fully private wallet experience' / Darkinator copy, 0 'Veil' hits), 'Open app' routes back to /shield. Theme toggle is a 3-state cycle dark -> auto -> light; on reaching light, document.documentElement[data-theme]=light, body bg turns light, and the visible lockup swaps to lockup-light.svg (visible count 1, dark lockup hidden). Home page / /swap regression OK (title 'Darkinator | Private swaps from Solana', Private + ZK tabs present).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_bifrost.py",
+    "/app/test_reports/pytest/bifrost_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Theme toggle is a 3-state cycle (dark -> auto -> light -> dark) rather than a binary moon/sun as the review request wording implied. Light mode works correctly; just worth confirming this UX decision was intentional (aria-label clearly explains the next state so acceptable).",
+    "A single 404 console error appears on /shield load (resource unknown). Non-blocking; likely a missing optional asset from upstream. Worth tracing in a follow-up but doesn't affect functionality.",
+    "Reload of /shield#trade in a fresh session (no stored wallet) correctly shows the 'Create a Darkinator wallet' screen rather than the dashboard — that's expected behaviour (no wallet to unlock). Confirmed URL/hash preserved and user stays in-app, not bounced to /shield/about."
+  ],
+  "updated_files": ["/app/backend/tests/test_bifrost.py"],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "Local Darkinator wallet password: TestPass!2345 (browser-only, no real funds).",
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Run backend tests with: `REACT_APP_BACKEND_URL=<base> pytest /app/backend/tests/test_bifrost.py -o addopts='' -v`. Brand assets tested: /api/bifrost/v1/_brand/{lockup.svg,lockup-light.svg,mark.png,favicon.png}. For frontend, always `localStorage.removeItem('bf-debug')` before testing. Theme toggle is 3-state (dark/auto/light) — click twice from default to reach light mode. 'Create a Darkinator wallet' is a <button>:has-text(...). Recovery key regex /veilsk\\S+/ (prefix intentionally kept). On /shield the browser URL is rewritten to /shield; the real upstream path is /api/bifrost/v1/app — do not assert on /api/bifrost in page.url.",
+  "rca of the issue": "n/a — all requested rebrand + no-iframe features verified working."
+}

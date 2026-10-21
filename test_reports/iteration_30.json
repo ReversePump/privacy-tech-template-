@@ -1,0 +1,28 @@
+{
+  "summary": "Iteration 30 (frontend only): icon cleanup and Confidential Intents copy. Everything passes after one fix on my side: the frontend dev server was still serving an old index.html. ICONS /app#privacy-swap: after 10s, document.head has exactly 5 icon/manifest links, all under /api/bifrost/v1/_brand/ (favicon-32.png?v=5, favicon-192.png?v=5, apple-touch-icon.png?v=5, manifest.webmanifest?v=5, favicon.png?v=5). I sampled for 3s more and saw no /app/icons/ or other non-brand links. All _brand URLs return 200 image/png. The manifest returns 'NullCash' as name and short_name with NullCash icons (favicon-512 and maskable-512 also 200). ROOT ICONS: /apple-touch-icon.png, -precomposed, -180x180, /favicon.ico (image/x-icon), /favicon-32x32.png and /android-chrome-192x192.png all return image content (not HTML). The 180px ones are byte-identical to the brand apple-touch icon. I looked at the apple-touch, favicon.ico, favicon-192 and legacy favicon-64 images: all show the black dashed-ring mark with a black centre on white. LEGACY: /api/bifrost/v1/app/icons/favicon-64.png and apple-touch-icon.png return the NullCash mark (the apple one is byte-identical to the brand file). ROOT HEAD: at first, '/' and '/docs' still served apple-touch-icon href '/brand/favicon-180.png?v=4' (same image) even though public/index.html had '/apple-touch-icon.png?v=5'. CRA had not reloaded index.html. After 'supervisorctl restart frontend', both serve '/apple-touch-icon.png?v=5'. /manifest.json name and icons are NullCash. PRIVACY SWAP COPY: at 1440 and 390, [data-testid=dk-confidential-intents] shows 'Runs in Confidential Intents' and 'Your swap settles as a shielded intent: solvers fill it without seeing who you are.' There is no overflow (scrollWidth equals clientWidth; the text fits inside the banner). The note reads 'Powered by Confidential Intents · Creating an order moves no funds · live on-chain quotes'. Private route has no banner and its note has no 'Powered by' prefix. Switching back to Privacy swap brings the banner back. REGRESSION: ETH on Base, 0.3 SOL, with the given destination and refund addresses, dk-fee-total showed 'Total fees $0.23 (0.72%)' with the fee rows. No order was created.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Privacy swap From box (1440 and 390)", "issues": ["The 'SOL' unit label under the amount '0' is cut off at the bottom edge of the From box (it reads like 'SOI'). Add a little bottom padding or reduce the line-height."]},
+      {"screen": "Mobile 390 /app", "issues": ["Footer links ('Under the hood', 'Privacy model', 'Docs', 'Fees') peek out under the fixed bottom tab bar. Minor."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "None blocking.",
+    "Optional: bump the other root index.html icon links (favicon.ico?v=4, brand/favicon-32/192?v=4) and the _brand manifest icon srcs (?v=4) to v=5 for consistency.",
+    "Optional: /manifest.json theme_color and background_color are #07060c (dark); the brand is white, so consider #ffffff to match the _brand manifest.",
+    "Optional: fix the clipped 'SOL' unit label in the From box."
+  ],
+  "critical_code_review_comments": [
+    "Changes to frontend/public/index.html do not always reach the CRA dev server without a restart; restart the frontend after editing index.html."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (frontend only; icon URLs checked with curl)", "frontend": "100%"},
+  "seed_data_creation": "None. No orders were created.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "I restarted the frontend (supervisorctl) so the dev server picks up index.html with apple-touch-icon.png?v=5. The Privacy swap banner is in backend/brand/dk-swap.js at line ~561 and the note at ~603. To get a quote: dk-pick-destination, then dk-chain-base (visible), then dk-token-search 'ETH', then dk-token-ETH, then fill dk-amount, dk-dest and dk-refund, then wait for dk-fee-total."
+}

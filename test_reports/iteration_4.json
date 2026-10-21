@@ -1,0 +1,30 @@
+{
+  "summary": "Iteration 4 — Live-functionality verification pass (NO code changes). BACKEND: 16/16 original Bifrost tests + 27/27 new /test_live_endpoints.py tests pass (43/43 total, 100%). Verified every indexer v1 endpoint (health, stats, root, feed, commitments, nullifiers, assets, flows, referrals), every relayer v1 endpoint required by the UI (health, info, quote SOL->USDC @ 0.1 SOL, fee, bridge/routes, positions), rpc getVersion / getLatestBlockhash / getBalance, websocket slotSubscribe (ack received), /api/ds (tokens source+destination with search=usdc, chains, bad-order 404), and /api/ds/near (tokens source+destination, service-status, bad-order 400). FRONTEND: Site pages / /about /docs /security /launch /compliance /privacy all load with Darkinator-branded titles and bodies > 4KB. 'What Solana sees' right panel is populated with live Merkle root 13be13…2fa3, 496 commitments, 150 nullifiers, 49/61 verified tokens, and 10+ recent feed entries linking to solscan. Full Veil-native wallet flow: Create wallet (password TestPass!2345) -> recovery key displayed -> I-have-stored checkbox -> Open Darkinator -> dashboard renders with 'Darkinator Wallet · <addr>', 'PRIVATE BALANCE 0 SOL', Vault V-xxxxxx, Deposit/Trade/Send/Receive/Withdraw buttons. All 12 sidebar views navigated and verified: Home, Shield, Trade, Private route, Privacy swap, Track order, Send, Receive, Withdraw, DarkinatorSwap, Earn, Invite, Addresses, Activity, Keys — zero 'not reachable/not connected' banners, zero spinner stalls, zero page errors. Trade view shows SOL on Jupiter liquidity ($951.7M · $3.7B 24h). DarkinatorSwap shows live NEAR Intents swap card. Earn loads 7 live positions from relayer: JupUSD 5.81%, USDC 5.75%, WSOL 3.91%, USDT 3.69%, EURC 2.54%, USDS 3.09%, USDG 5.11% with share price 1 jlJupUSD = 1.041303 JupUSD. Keys view shows Vault V-xxxxxx, Download encrypted backup, Show recovery key, Copy viewing key, Lock vault, Disconnect wallet, Remove vault. Lock/unlock cycle verified: Lock vault -> 'VAULT LOCKED / Unlock your vault' passphrase screen -> fill TestPass!2345 -> dashboard restored. Full page reload persists wallet (still prompts unlock, not lost). Injected '/#private-route' flow with SOL 2 -> Ethereum USDC -> 0x68b3a9f8940f418e8051ebb659e8ed278fea41f6 produced LIVE quote: dk-out=212.5852 USDC, 3 routes rendered (dk-route-0..2), dk-submit='Review swap' enabled. Wallet Connect modal opens cleanly with Phantom/Solflare/Backpack rows + Install badges (no extensions installed in headless browser — expected), 0 page errors on open.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_bifrost.py",
+    "/app/backend/tests/test_live_endpoints.py",
+    "/app/test_reports/pytest/bifrost_results.xml",
+    "/app/test_reports/pytest/live_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "SSR hydration mismatch: landing/site pages emit React minified error #418 (text/attr mismatch) on first paint (4 occurrences). Non-blocking — content renders — but worth suppressing because it adds noise to real production error channels. Likely cause is dynamic 'in the crowd' counter or timestamps rendered server+client with different values.",
+    "~70-80 upstream 404 console entries per page load (missing logos / optional static chunks under /api/bifrost/v1/app/_next/static/chunks/*). Pre-existing/documented in iteration 3; still noisy and should be filtered in the shim or allowlisted."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_live_endpoints.py (new — 27 live endpoint tests)"
+  ],
+  "success_rate": {"backend": "100% (43/43)", "frontend": "100%"},
+  "test_credentials": "Local browser wallet password: TestPass!2345 (new wallet per browser session, no funds).",
+  "seed_data_creation": "None in this iteration (no real orders were submitted; order creation already verified in iteration 3).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Base URL: REACT_APP_BACKEND_URL from /app/frontend/.env (https://offer-latest-dark.preview.emergentagent.com). Run: `REACT_APP_BACKEND_URL=<base> pytest /app/backend/tests/ -o addopts='' -v --tb=short`. The Create-wallet row on '/' is a <button> whose Playwright .click() may be intercepted by overlapping sibling buttons / sidebar focus; use DOM .click() instead: `page.evaluate(\"Array.from(document.querySelectorAll('button')).find(x=>/create a darkinator wallet/i.test(x.textContent)).click()\")`. Password modal has 2 inputs[type=password]; next step reveals a recovery key, requires ticking the checkbox then clicking 'Open Darkinator'. Lock button lives in Keys view: 'Lock vault'. Reload keeps the vault locked (persistent). All data-testids documented in iteration_3.json still valid.",
+  "rca of the issue": "No issues. Full live surface (backend proxy + injected swaps + Veil-native wallet) is operating correctly against production upstreams."
+}
