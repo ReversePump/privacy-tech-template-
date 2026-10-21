@@ -1,4 +1,4 @@
-// NullCash documentation: written fresh for the /docs page.
+// Camo Cash documentation: written fresh for the /docs page.
 // Structure: groups -> pages -> blocks. Block kinds: p, steps, list, code, table, note, kv.
 
 export const DOC_GROUPS = [
@@ -8,10 +8,10 @@ export const DOC_GROUPS = [
     pages: [
       {
         id: 'overview',
-        title: 'What NullCash is',
-        lead: 'NullCash gives a Solana wallet a second, sealed balance. Money goes in publicly, moves around privately, and comes out wherever you point it.',
+        title: 'What Camo Cash is',
+        lead: 'Camo Cash gives a Solana wallet a second, sealed balance. Money goes in publicly, moves around privately, and comes out wherever you point it.',
         blocks: [
-          { k: 'p', t: 'Think of it as two layers. Your normal wallet is the street-level account everyone can look at. Your NullCash vault is a back room on the same chain: the network can confirm every action in it is valid, but it cannot see who did it, how much moved, or (if you pay fees in private SOL) which token was involved.' },
+          { k: 'p', t: 'Think of it as two layers. Your normal wallet is the street-level account everyone can look at. Your Camo Cash vault is a back room on the same chain: the network can confirm every action in it is valid, but it cannot see who did it, how much moved, or (if you pay fees in private SOL) which token was involved.' },
           { k: 'kv', rows: [
             ['Chain', 'Solana mainnet'],
             ['Custody', 'Non-custodial; secrets are created and kept in your browser'],
@@ -27,7 +27,7 @@ export const DOC_GROUPS = [
         lead: 'From zero to your first private payment in about two minutes.',
         blocks: [
           { k: 'steps', items: [
-            ['Open a vault', 'Hit Connect wallet and pick Create a NullCash vault. Choose a password for this device. You get a recovery key once; store it offline.'],
+            ['Open a vault', 'Hit Connect wallet and pick Create a Camo Cash vault. Choose a password for this device. You get a recovery key once; store it offline.'],
             ['Shield', 'Go to Shield, pick a token and amount, and approve one signature from your public wallet. Your tokens become sealed notes.'],
             ['Use it', 'Send to any null2… address, trade inside the pool, or exit. No pop-ups: a relayer submits each proof for you.'],
             ['Leave', 'Withdraw to a brand-new address, or use Private route / Privacy swap to land on another chain.'],
@@ -178,7 +178,7 @@ export const DOC_GROUPS = [
       {
         id: 'fees',
         title: 'Fees',
-        lead: 'Every cost is shown before you confirm. Private sends carry no NullCash fee.',
+        lead: 'Every cost is shown before you confirm. Private sends carry no Camo Cash fee.',
         blocks: [
           { k: 'fees' },
         ],
@@ -209,7 +209,7 @@ export const DOC_GROUPS = [
             'Withdraw to a fresh address, never back to the wallet you shielded from',
             'Store the recovery key offline, away from this device',
           ] },
-          { k: 'note', t: 'No tool makes anyone 100% anonymous. NullCash removes the on-chain link; it cannot hide patterns you create yourself.' },
+          { k: 'note', t: 'No tool makes anyone 100% anonymous. Camo Cash removes the on-chain link; it cannot hide patterns you create yourself.' },
         ],
       },
     ],

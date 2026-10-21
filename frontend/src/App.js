@@ -4,7 +4,7 @@ import ShieldPage from "./pages/ShieldPage";
 import LandingPage from "./pages/LandingPage";
 import NcDocsPage from "./pages/NcDocsPage";
 
-// One single NullCash site: every URL is served by the Bifrost v1 mirror
+// One single Camo Cash site: every URL is served by the Bifrost v1 mirror
 // (wallet, shield, trade, send, private route, privacy swap, track, docs, about).
 function App() {
   return (

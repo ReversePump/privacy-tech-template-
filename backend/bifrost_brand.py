@@ -1,18 +1,18 @@
 """
-Bifrost v1 — browser shim + NullCash re-branding layer for the Veil mirror.
+Bifrost v1 — browser shim + Camo Cash re-branding layer for the Veil mirror.
 
 Veil's own client code still runs unmodified in the browser (wallet creation,
 ZK proofs, RPC, relayer, indexer). This module only:
   * injects a shim that routes every network call through /api/bifrost/v1/*
   * keeps the URL bar on pretty paths (/shield, /shield/about, /shield/docs …)
-  * swaps visible brand text / logos / colours to NullCash
+  * swaps visible brand text / logos / colours to Camo Cash
 """
 import base64
 import functools
 from pathlib import Path
 
 BRAND_DIR = Path(__file__).parent / "brand"
-BRAND_NAME = "NullCash"
+BRAND_NAME = "Camo Cash"
 
 
 def _b64(name: str) -> str:
@@ -25,10 +25,10 @@ def _b64(name: str) -> str:
 @functools.lru_cache(maxsize=4)
 def lockup_svg(light: bool = False) -> str:
     mark = _b64("mark-black-256.png" if light else "mark-white-256.png")
-    word = "#12140f" if light else "#f4f6ee"
+    word = "#08090c" if light else "#ffffff"
     return f"""<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 470 128" width="470" height="128">
 <image href="data:image/png;base64,{mark}" xlink:href="data:image/png;base64,{mark}" x="0" y="8" width="112" height="112"/>
-<text x="130" y="86" font-family="'Space Grotesk', Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="64" font-weight="700" letter-spacing="-2.5" fill="{word}">Null<tspan font-weight="500">Cash</tspan></text>
+<text x="130" y="86" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="60" font-weight="700" letter-spacing="-2.5" fill="{word}">Camo<tspan font-weight="500"> Cash</tspan></text>
 </svg>"""
 
 
@@ -94,14 +94,14 @@ var hr=history.replaceState,hp=history.pushState;
 if(!DBG.nopretty)try{hr.call(history,history.state,'',pretty(location.href));}catch(e){}
 function hpatch(f){return function(s,t,u){if(u!=null){var pu=pretty(String(u));try{VBASE=vbaseFrom(new URL(pu,location.href).pathname);}catch(e){}u=pu;}return f.call(this,s,t,u);};}
 if(!DBG.nopretty){history.pushState=hpatch(hp);history.replaceState=hpatch(hr);}
-/* address bar shows NullCash names for in-app hash routes (the app still sees its own on load) */
+/* address bar shows Camo Cash names for in-app hash routes (the app still sees its own on load) */
 try{if(/^#nullswap\b/i.test(location.hash))hr.call(history,history.state,'',location.pathname+location.search+location.hash.replace(/^#nullswap/i,'#veilswap'));}catch(e){}
 function hashBrand(){try{var h=location.hash||'';if(/veil/i.test(h))hr.call(history,history.state,'',location.pathname+location.search+h.replace(/veil/ig,'null'));}catch(e){}}
 /* before the app's own handlers run (registered first), give the app its real hash back */
 function hashUnbrand(){try{if(/^#nullswap\b/i.test(location.hash||''))hr.call(history,history.state,'',location.pathname+location.search+location.hash.replace(/^#nullswap/i,'#veilswap'));}catch(e){}}
 window.addEventListener('popstate',hashUnbrand,true);
 window.addEventListener('hashchange',hashUnbrand,true);
-/* show the NullCash name only once the Bridge view is really on screen (app has finished routing) */
+/* show the Camo Cash name only once the Bridge view is really on screen (app has finished routing) */
 function bridgeOn(){var n=document.querySelectorAll('nav.side .nav-i.on');for(var i=0;i<n.length;i++){if(/^\s*Bridge\s*$/i.test(n[i].textContent||''))return true;}return false;}
 var HBon=0;setInterval(function(){if(!/^#veilswap\b/i.test(location.hash||'')){HBon=0;return;}if(bridgeOn()){HBon++;if(HBon>=2)hashBrand();}else HBon=0;},400);
 var of=window.fetch;
@@ -167,7 +167,7 @@ var wo=window.open;window.open=function(u){if(typeof u==='string')arguments[0]=f
 document.addEventListener('click',function(e){var a=e.target&&e.target.closest&&e.target.closest('a[href]');
  if(!a)return;var h=a.getAttribute('href');if(!h||SKIP.test(h))return;var n=fx(h);if(n!==h)a.setAttribute('href',n);},true);
 
-/* ---------- NullCash branding ---------- */
+/* ---------- Camo Cash branding ---------- */
 var TXT=/veilit\.xyz|Veil|ContractWolf|Jupiter|veil-core|@veil|NEAR Intents|NEAR intents|1Click|DarkSwap|Darkswap|Dark Swap|HoudiniSwap|Houdini|Mayan|Cadabra|Darkinator|Bifrost|(^|[^$A-Za-z0-9_\/.:@-])veil(?![A-Za-z0-9_-])/;
 function rt(s){
  return s.replace(/app\.veilit\.xyz/g,location.host+'/shield')
@@ -178,7 +178,7 @@ function rt(s){
   .replace(/ContractWolf · /g,'Independent audit · ')
   .replace(/ContractWolf/g,'an independent auditor')
   .replace(/veil-core/g,BRAND.toLowerCase()+'-core')
-  .replace(/@veil[A-Za-z0-9_]*/g,'@usenullcash')
+  .replace(/@veil[A-Za-z0-9_]*/g,'@usecamocash')
   .replace(/NEAR [Ii]ntents( 1Click)?/g,'Intent network').replace(/1Click/g,'Intent')
   .replace(/HoudiniSwap|Houdini/g,'Private route').replace(/Dark ?[Ss]wap|Darkinator|Cadabra|Bifrost/g,BRAND).replace(/Mayan/g,BRAND)
   .replace(/Jupiter Lend Earn/g,'Lending vault').replace(/Jupiter/g,'Aggregator')
@@ -194,10 +194,10 @@ function brandEl(el){
  if(el.tagName==='IMG'){
   var s=el.getAttribute('src')||'';var b=bimg(s);
   if(!b&&el.closest&&el.closest('a.brand,.brand'))b=LK();
-  if(!b&&/^(veil|darkinator|nullcash)$/i.test(el.getAttribute('alt')||''))b=LK();
+  if(!b&&/^(veil|darkinator|camocash)$/i.test(el.getAttribute('alt')||''))b=LK();
   if(b&&s!==b&&s.indexOf(b)<0){sa.call(el,'src',b);el.removeAttribute('srcset');}
  }
- if(el.tagName==='A'){var hh=el.getAttribute('href')||'';if(/(x|twitter)\.com\/veil/i.test(hh))sa.call(el,'href','https://x.com/usenullcash');}
+ if(el.tagName==='A'){var hh=el.getAttribute('href')||'';if(/(x|twitter)\.com\/veil/i.test(hh))sa.call(el,'href','https://x.com/usecamocash');}
 }
 var PARA=__PARA__;
 function brandText(n){if(DBG.notext)return;if(n.parentNode&&(SKIPTAG[n.parentNode.nodeName]||n.parentNode.nodeName==='TITLE'))return;var v=n.nodeValue;if(!v)return;var r=TXT.test(v)?rt(v):v;var tr=r.trim();if(tr&&PARA.hasOwnProperty(tr)){r=r.replace(tr,PARA[tr]);}if(r!==v)n.nodeValue=r;}
@@ -243,7 +243,7 @@ setTimeout(start,2500);
 
 
 NAV_LABELS = {
-    "Home": "Home", "Shield": "Shield", "Trade": "Swap", "NullCashSwap": "Bridge",
+    "Home": "Home", "Shield": "Shield", "Trade": "Swap", "Camo CashSwap": "Bridge",
     "Send": "Send", "Receive": "Receive", "Withdraw": "Withdraw", "Earn": "Earn",
     "Invite": "Invite", "Addresses": "Addresses", "Activity": "History", "Keys": "Keys",
     "More": "More",
@@ -291,11 +291,11 @@ def head_inject(target: str, prefix: str) -> str:
 _ICON_V = "4"
 
 
-def nullcash_manifest():
+def camocash_manifest():
     b = "/api/bifrost/v1/_brand/"
     return {
-        "name": "NullCash · Private money on Solana",
-        "short_name": "NullCash",
+        "name": "Camo Cash · Private money on Solana",
+        "short_name": "Camo Cash",
         "description": "Private balances, transfers, trades and swaps on Solana.",
         "id": "/app",
         "start_url": "/app",
@@ -312,7 +312,7 @@ def nullcash_manifest():
 
 
 def brand_icon_for(path: str):
-    """Map any upstream favicon / app-icon / manifest path to a NullCash brand asset name."""
+    """Map any upstream favicon / app-icon / manifest path to a Camo Cash brand asset name."""
     p = path.lower().split("?", 1)[0]
     base = p.rsplit("/", 1)[-1]
     if base in ("manifest.webmanifest", "manifest.json", "site.webmanifest"):
@@ -360,7 +360,7 @@ def brand_asset(name: str):
         p = BRAND_DIR / name
     elif name == "manifest.webmanifest":
         import json as _json
-        return _json.dumps(nullcash_manifest()).encode(), "application/manifest+json"
+        return _json.dumps(camocash_manifest()).encode(), "application/manifest+json"
     else:
         return None
     try:

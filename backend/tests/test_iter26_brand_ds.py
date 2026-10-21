@@ -40,7 +40,7 @@ def _retry(fn, n=3, wait=4):
 @pytest.mark.parametrize("path", ["/favicon.ico", "/brand/favicon-32.png", "/brand/favicon-192.png",
                                   "/brand/favicon-180.png", "/api/bifrost/v1/app/icons/favicon-64.png",
                                   "/api/bifrost/v1/app/icons/apple-touch-icon.png"])
-def test_icon_is_nullcash(s, path):
+def test_icon_is_camocash(s, path):
     from PIL import Image
     r = s.get(BASE_URL + path, timeout=30)
     assert r.status_code == 200
@@ -58,8 +58,8 @@ def test_manifest(s):
     r = s.get(f"{BASE_URL}/api/bifrost/v1/app/manifest.webmanifest", timeout=30)
     assert r.status_code == 200
     j = r.json()
-    assert j["name"] == "NullCash · Private money on Solana"
-    assert j["short_name"] == "NullCash"
+    assert j["name"] == "Camo Cash · Private money on Solana"
+    assert j["short_name"] == "Camo Cash"
     assert all(i["src"].startswith("/api/bifrost/v1/_brand/") for i in j["icons"])
     for i in j["icons"]:
         assert s.get(BASE_URL + i["src"], timeout=30).status_code == 200

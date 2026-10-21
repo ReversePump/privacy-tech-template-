@@ -1,33 +1,33 @@
 /* ==========================================================================
-   NullCash theme (original) — light-first, lime accent, top tab navigation.
+   Camo Cash theme — gloam-style etched monochrome, light-first, top tab navigation.
    Pure presentation layer over the mirrored app; no behaviour changes.
    ========================================================================== */
 :root,html:root{
- --nc-lime:#c5ccd6;--nc-lime-2:#afb7c3;--nc-lime-3:#8c95a3;--nc-lime-ink:#14160f;
+ --nc-lime:#08090c;--nc-lime-2:#1c1f26;--nc-lime-3:#3a3f47;--nc-lime-ink:#ffffff;
  --nc-glow:0 8px 22px -8px rgba(20,22,25,.55),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -2px 0 rgba(0,0,0,.25);
- --nc-r:18px;--nc-r-lg:24px;--nc-ease:cubic-bezier(.2,.9,.25,1);--nc-spring:cubic-bezier(.34,1.56,.64,1);
+ --nc-r:10px;--nc-r-lg:14px;--nc-ease:cubic-bezier(.2,.9,.25,1);--nc-spring:cubic-bezier(.34,1.56,.64,1);
  --top:68px;
- --f-sans:'Space Grotesk',var(--font-geist-sans),"Geist",ui-sans-serif,system-ui,sans-serif;
+ --f-sans:'Inter',var(--font-geist-sans),"Geist",ui-sans-serif,system-ui,sans-serif;
 }
 /* ---------- light only ---------- */
 :root,html:root,html:root[data-theme],html:root[data-theme="dark"],html:root[data-theme="light"]{
- --ink:#f4f5ef;--ink-2:#ffffff;--ink-3:#eef0e7;--ink-4:#e4e7da;--ink-5:#d8dccb;
+ --ink:#f9f9f9;--ink-2:#ffffff;--ink-3:#f2f3f5;--ink-4:#e2e4e8;--ink-5:#e2e4e8;
  --line:rgba(22,24,27,.08);--line-2:rgba(22,24,27,.14);
- --fg:#14160f;--fg-2:rgba(20,22,15,.72);--fg-3:rgba(20,22,15,.48);
- --veil:#3d434a;--veil-hi:#2b2f33;--veil-deep:#59616b;--veil-wash:rgba(140,150,165,.16);
- --veil-rgb:61,67,74;--veil-hi-rgb:43,47,51;--veil-deep-rgb:89,97,107;
- --hero-a:#14160f;--hero-b:#2b2f33;--hero-c:#59616b;
- --tint:22,26,12;--fg-rgb:20,22,15;--shadow-rgb:40,48,20;--shadow-k:.35;
- --surf-bg-rgb:244,245,239;--surf-a-rgb:255,255,255;--surf-b-rgb:255,255,255;--surf-z-rgb:238,240,231;
- --s-raise:#ffffff;--s-low:#f7f8f3;--s-field:#f3f4ee;--s-edge:#e3e6d9;
+ --fg:#08090c;--fg-2:rgba(8,9,12,.72);--fg-3:rgba(8,9,12,.48);
+ --veil:#08090c;--veil-hi:#1c1f26;--veil-deep:#4b5563;--veil-wash:rgba(8,9,12,.08);
+ --veil-rgb:8,9,12;--veil-hi-rgb:28,31,38;--veil-deep-rgb:75,85,99;
+ --hero-a:#08090c;--hero-b:#1c1f26;--hero-c:#4b5563;
+ --tint:8,9,12;--fg-rgb:8,9,12;--shadow-rgb:8,9,12;--shadow-k:.35;
+ --surf-bg-rgb:249,249,249;--surf-a-rgb:255,255,255;--surf-b-rgb:255,255,255;--surf-z-rgb:242,243,245;
+ --s-raise:#ffffff;--s-low:#f9f9f9;--s-field:#f2f3f5;--s-edge:#e2e4e8;
  --nc-card:#ffffff;--nc-card-line:rgba(22,24,27,.07);--nc-shadow:0 1px 2px rgba(28,31,35,.04),0 10px 30px -12px rgba(28,31,35,.14);
- --nc-head:rgba(255,255,255,.82);--nc-pill:rgba(20,22,15,.05);--nc-pill-on:rgba(140,150,165,.26);
+ --nc-head:rgba(255,255,255,.82);--nc-pill:rgba(8,9,12,.05);--nc-pill-on:rgba(8,9,12,.12);
  --logo-filter:none;color-scheme:light;
 }
 html,body{background:var(--ink)!important;color:var(--fg)}
 body{font-family:var(--f-sans)!important;-webkit-font-smoothing:antialiased}
-h1,h2,h3,.hero h1,.display,.hb-amt,.big{font-family:'Space Grotesk',var(--f-sans)!important;letter-spacing:-.025em!important}
-::selection{background:rgba(160,170,184,.55);color:#14160f}
+h1,h2,h3,.hero h1,.display,.hb-amt,.big{font-family:'Inter',var(--f-sans)!important;letter-spacing:-.03em!important}
+::selection{background:rgba(8,9,12,.85);color:#ffffff}
 body::before,body::after,.shell::before,.shell::after,main.main::before{background-image:none!important}
 
 /* ---------- desktop layout: header + top tabs, content + live rail ---------- */
@@ -174,7 +174,7 @@ aside.rail{display:none!important}
 @media (min-width:1024px){nav.side{right:250px!important}}
 @media (max-width:1023px){.shell{grid-template-areas:"top" "main"!important}}
 
-/* ---------- connect button (original NullCash style) ---------- */
+/* ---------- connect button (original Camo Cash style) ---------- */
 header .wallet-btn{position:relative;height:42px!important;padding:0 18px 0 6px!important;gap:10px!important;background:#14160f!important;color:#f4f6ee!important;
  box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 8px 20px -10px rgba(20,22,15,.6)!important;font-size:14px!important;letter-spacing:-.01em}
 header .wallet-btn::before{content:"";flex:none;width:30px;height:30px;border-radius:50%;
@@ -227,7 +227,7 @@ header .wallet-btn.nc-off>span:not(.wb-dot)::after{content:"Connect wallet";font
  .card.onb>p.hint{margin-top:18px!important;text-align:center!important;max-width:none}
 }
 
-/* ---------- mobile dock (NullCash) ---------- */
+/* ---------- mobile dock (Camo Cash) ---------- */
 #nc-dock{display:none}
 @media (max-width:1023px){
  nav.tabbar{display:none!important}
@@ -315,7 +315,7 @@ html.nc-onb-open main.main>.view,html.nc-onb-open main.main,html.nc-onb-open .sh
 a.inv-promo,.inv-promo,.reveal2,.rv.pub,.rv.priv,main.main .hint,main.main span.hint,main.main .vh>p,main.main .vh p,main.main .card>p.sub,main.main .view>p.sub{display:none!important}
 main.main .mini{min-height:0!important}
 
-/* ---------- splash (NullCash particle loader) ---------- */
+/* ---------- splash (Camo Cash particle loader) ---------- */
 .vl>*:not(#nc-splash){display:none!important}
 .vl::before,.vl::after{display:none!important}
 .vl{display:flex!important;align-items:center!important;justify-content:center!important;background:#f4f5ef!important}
@@ -349,7 +349,7 @@ main.main .mini{min-height:0!important}
  aside.rail .rail-h::before{content:"";display:flex;width:44px;height:10px;flex:none;
   background:radial-gradient(circle,#ff5f56 3.5px,transparent 4px) 0 0/14px 10px no-repeat,radial-gradient(circle,#ffbd2e 3.5px,transparent 4px) 15px 0/14px 10px no-repeat,radial-gradient(circle,#27c93f 3.5px,transparent 4px) 30px 0/14px 10px no-repeat}
  aside.rail .rail-h h2{font-size:0!important;margin:0!important}
- aside.rail .rail-h h2::before{content:"root@nullcash:~$ watch --chain";font-size:12px;font-weight:500;color:#7b838e}
+ aside.rail .rail-h h2::before{content:"root@camocash:~$ watch --chain";font-size:12px;font-weight:500;color:#7b838e}
  aside.rail .rail-h h2::after{content:"_";font-size:12px;color:#c5ccd6;margin-left:2px;animation:ncBlink 1s steps(1) infinite}
  aside.rail .rail-stats{display:grid!important;grid-template-columns:1fr!important;gap:0!important;padding:10px 12px!important;margin:0 0 12px!important;border-radius:10px!important;
   background:#0e0f11!important;border:1px solid #25292e!important;box-shadow:inset 0 0 0 1px rgba(160,170,184,.04),0 0 24px -10px rgba(160,170,184,.25)!important}

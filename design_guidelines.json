@@ -1,161 +1,135 @@
 {
   "brand_identity": {
-    "name": "Loom",
-    "full_name": "Loom Finance",
-    "tagline": "AI TRADING AGENT — YOUR STRATEGY. AUTOMATICALLY EXECUTED.",
-    "sub_tagline": "ANALYZE · MONITOR · TRADE",
+    "name": "Camo Cash",
+    "short_name": "Camo",
+    "tagline": "PRIVATE MONEY ON SOLANA — SEALED TRANSFERS & ZERO-KNOWLEDGE SWAPS",
+    "sub_tagline": "SHIELD · PAY · SWAP · DISCLOSE",
+    "prohibited_names": ["NullCash", "Null Cash", "NULLCASH", "nullcash", "NCASH"],
     "social_links": {
-      "x": "https://x.com/loomfiai"
-    },
-    "logo_assets": {
-      "mark_square": "https://customer-assets-cm19k8pv.emergentagent.net/job_maker-hub-325/artifacts/b2ea6293edc307d5_IMG_1041.jpeg",
-      "banner_wide": "https://customer-assets-cm19k8pv.emergentagent.net/job_maker-hub-325/artifacts/0d60680c770b7673_IMG_1039.png"
+      "x": "https://x.com/camocash"
     }
   },
   "color_palette": {
-    "theme": "dark",
-    "base_background": "#07060d",
-    "surface_cards": "#0f0d1a",
-    "surface_elevated": "#171428",
-    "surface_glass": "rgba(15, 13, 26, 0.75)",
+    "theme": "monochrome_etched",
+    "base_dark": "#08090c",
+    "surface_dark": "#12141a",
+    "surface_dark_card": "#181a22",
+    "base_light": "#f9f9f9",
+    "surface_light": "#ffffff",
+    "surface_light_muted": "#f2f3f5",
     "borders": {
-      "subtle": "rgba(168, 85, 247, 0.15)",
-      "medium": "rgba(168, 85, 247, 0.28)",
-      "strong": "rgba(192, 132, 252, 0.45)",
-      "glow": "rgba(168, 85, 247, 0.6)"
+      "dark_subtle": "rgba(255, 255, 255, 0.12)",
+      "dark_medium": "rgba(255, 255, 255, 0.22)",
+      "light_subtle": "#e2e4e8",
+      "light_medium": "#cccccc"
     },
     "text": {
-      "primary": "#f3f0fd",
-      "secondary": "#a89ec4",
-      "muted": "#6d638c",
-      "inverse": "#07060d"
+      "dark_primary": "#ffffff",
+      "dark_secondary": "#a1a1aa",
+      "dark_muted": "#71717a",
+      "light_primary": "#08090c",
+      "light_secondary": "#4b5563",
+      "light_muted": "#6b7280"
     },
-    "purple_accent_family": {
-      "violet_primary": "#a855f7",
-      "purple_glow": "#9333ea",
-      "lavender_bright": "#c084fc",
-      "electric_neon": "#d8b4fe",
-      "deep_plum_bg": "#1e0b36",
-      "gradient_hero": "linear-gradient(135deg, #a855f7 0%, #c084fc 50%, #e879f9 100%)",
-      "gradient_dark_card": "linear-gradient(180deg, rgba(23, 20, 40, 0.9) 0%, rgba(15, 13, 26, 0.95) 100%)"
-    },
-    "semantic_financial": {
-      "long_green": "#10b981",
-      "long_green_bg": "rgba(16, 185, 129, 0.12)",
-      "short_red": "#f43f5e",
-      "short_red_bg": "rgba(244, 63, 94, 0.12)",
-      "warning_amber": "#f59e0b",
-      "warning_amber_bg": "rgba(245, 158, 11, 0.12)"
+    "buttons": {
+      "primary_bg": "#ffffff",
+      "primary_text": "#08090c",
+      "primary_hover": "#f3f4f6",
+      "secondary_bg": "#08090c",
+      "secondary_text": "#ffffff",
+      "secondary_border": "rgba(255, 255, 255, 0.2)"
     }
   },
   "typography": {
     "headings": {
-      "family": "'Chakra Petch', 'Outfit', sans-serif",
-      "h1": "text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#f3f0fd]",
-      "h2": "text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight text-[#f3f0fd]",
-      "h3": "text-xl sm:text-2xl font-semibold text-[#f3f0fd]",
-      "h4": "text-lg font-medium text-[#f3f0fd]"
+      "family": "'Inter', -apple-system, sans-serif",
+      "h1": "text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-[-0.03em] leading-[1.05]",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-[-0.02em]",
+      "h3": "text-xl sm:text-2xl font-medium tracking-tight",
+      "h4": "text-lg font-medium"
     },
     "body": {
-      "family": "'Instrument Sans', system-ui, sans-serif",
-      "regular": "text-sm md:text-base text-[#a89ec4] leading-relaxed",
-      "small": "text-xs md:text-sm text-[#6d638c]"
+      "family": "'Inter', system-ui, sans-serif",
+      "regular": "text-sm sm:text-base leading-relaxed text-[#4b5563] dark:text-[#a1a1aa]"
     },
     "monospace": {
-      "family": "'Geist Mono', 'Space Mono', monospace",
-      "usage": "Data tables, live stats ticker, contract addresses ($LOOM), timestamps, trade signals"
+      "family": "'Space Mono', 'Courier New', monospace",
+      "usage": "Pool stats counters, leaf hashes, transaction nullifiers, CA chips, code blocks"
     }
   },
   "hero_canvas_animation_spec": {
-    "type": "Converging Signal Threads (Loom Kinetic Weave)",
-    "container_id": "loom-hero-canvas",
-    "canvas_layer": "absolute inset-0 z-0 pointer-events-none opacity-80",
+    "type": "Etched Camouflage Contour Lattice (Interactive Topographic Stealth Grid)",
+    "container_id": "camo-hero-canvas",
+    "canvas_layer": "absolute inset-0 z-0 pointer-events-none opacity-40",
     "behavior": {
-      "particle_count": 48,
-      "thread_colors": ["#a855f7", "#c084fc", "#e879f9", "#818cf8"],
-      "convergence_point": "{ x: canvas.width * 0.5, y: canvas.height * 0.55 }",
-      "logic": "Multiple curved signal rays emerge from periphery with dynamic bezier tension, pulsing rhythmically towards the focal execution node, leaving glowing lavender trails before dissipating into neon micro-sparks."
+      "line_count": 32,
+      "stroke_color": "rgba(255, 255, 255, 0.18)",
+      "line_width": 1.25,
+      "logic": "Renders organic etched topographic contour lines simulating fine camouflage patterns and ZK proof waves. Gently morphs with mathematical sine sine-wave offsets and responds with subtle magnetic repulsion to cursor movement."
     },
-    "scrollytelling": "Subtle parallax lift on hero copy (-20px) on scroll, fade-in staggered grid elements for live market stats strip"
+    "scrollytelling": "Staggered reveal for headline copy, real-time ZK pool counters, and action buttons with 0.05s stagger intervals."
   },
   "scroll_animations": {
-    "pattern_1": "Staggered fade-up for markets grid cards (delay step: 0.08s, duration: 0.4s)",
-    "pattern_2": "Glowing purple border sweep trigger on viewport entry for thesis demo section",
-    "pattern_3": "Accordion smooth stretch + neon glow edge highlight on active item in FAQ"
+    "fade_in": "IntersectionObserver staggered opacity reveal with translate-y-4 lift (duration: 500ms, cubic-bezier(0.16, 1, 0.3, 1))",
+    "button_hover": "Transform scale-105 with shadow-md and background state shift (5px border radius)",
+    "card_hover": "Border color transition from light_subtle to light_medium or dark_subtle to dark_medium with 2px lift"
   },
   "component_restyle_rules": {
-    "header": {
-      "style": "sticky top-0 z-50 border-b border-[#a855f7]/20 bg-[#07060d]/85 backdrop-blur-xl",
-      "logo_display": "Flex items-center gap-2.5; img with rounded-lg border border-[#a855f7]/30 h-8 w-8 object-cover; brand text 'LOOM' in bold display font",
-      "social_button": "Link to https://x.com/loomfiai ONLY, icon: X logo, hover: text-[#c084fc] border-[#a855f7]/40"
+    "landing_page": {
+      "nav": "Sticky header with backdrop-blur-md bg-[#08090c]/85 border-b border-white/10 px-6 py-4 flex justify-between items-center",
+      "hero_section": "Editorial stark stark-monochrome styling. Etched illustration art background + live pool stats counter in dot-matrix font",
+      "cards": "Minimal white cards with 1px #ccc border, 10px rounded corners, soft ambient shadow 0 4px 12px rgba(0,0,0,0.05)",
+      "buttons": "5px border-radius minimal buttons. Primary: White background with black text. Secondary: Dark background with subtle stroke."
     },
-    "panels_cards": {
-      "background": "#0f0d1a",
-      "border": "1px solid rgba(168, 85, 247, 0.18)",
-      "shadow": "0 8px 32px -4px rgba(0, 0, 0, 0.6), 0 0 20px -4px rgba(168, 85, 247, 0.08)",
-      "hover_state": "hover:border-[#a855f7]/40 hover:shadow-[0_0_25px_rgba(168,85,247,0.2)] transition-all duration-300"
-    },
-    "buttons": {
-      "primary": "bg-gradient-to-r from-[#9333ea] to-[#a855f7] hover:from-[#a855f7] hover:to-[#c084fc] text-white font-medium rounded-full px-5 py-2.5 shadow-[0_0_20px_rgba(168,85,247,0.4)] transition-all transform hover:-translate-y-0.5",
-      "secondary": "bg-[#171428] hover:bg-[#221c3b] border border-[#a855f7]/30 text-[#f3f0fd] rounded-full px-4 py-2 transition-all",
-      "outline": "border border-[#a855f7]/40 text-[#c084fc] hover:bg-[#a855f7]/10 rounded-full px-4 py-2"
-    },
-    "tables": {
-      "header": "bg-[#171428]/60 text-[#a89ec4] uppercase font-mono text-[11px] tracking-wider border-b border-[#a855f7]/20 py-3 px-4",
-      "row_hover": "hover:bg-[#a855f7]/08 border-b border-[#a855f7]/10 transition-colors",
-      "cells": "py-3 px-4 text-sm font-mono text-[#f3f0fd]"
-    },
-    "badges_tags": {
-      "long": "bg-[#10b981]/15 text-[#34d399] border border-[#10b981]/30 font-mono text-xs px-2.5 py-0.5 rounded-full",
-      "short": "bg-[#f43f5e]/15 text-[#fb7185] border border-[#f43f5e]/30 font-mono text-xs px-2.5 py-0.5 rounded-full",
-      "token": "bg-[#a855f7]/15 text-[#c084fc] border border-[#a855f7]/30 font-mono text-xs px-2.5 py-0.5 rounded-full"
+    "mirrored_app_injection": {
+      "css_path": "/app/backend/brand/nc-theme.css",
+      "js_path": "/app/backend/brand/dk-swap.js",
+      "rules": "Apply #08090c dark mode base across all injected panels, override buttons to 5px radius, eliminate all bright purple or green accents in favor of clean high-contrast white/gray monochrome, ensure 'Camo Cash' branding is injected everywhere."
     }
-  },
-  "favicon_and_assets": {
-    "favicon_rule": "Use square logo knot symbol (https://customer-assets-cm19k8pv.emergentagent.net/job_maker-hub-325/artifacts/b2ea6293edc307d5_IMG_1041.jpeg) in public/favicon.png and public/logo.png",
-    "logo_knot": "https://customer-assets-cm19k8pv.emergentagent.net/job_maker-hub-325/artifacts/b2ea6293edc307d5_IMG_1041.jpeg",
-    "banner": "https://customer-assets-cm19k8pv.emergentagent.net/job_maker-hub-325/artifacts/0d60680c770b7673_IMG_1039.png",
-    "logo_usage_note": "Logo features silvery-lavender interwoven knot loops on deep black background. In dark theme headers & footers, place inside rounded container with 1px purple stroke to make it blend seamlessly with dark canvas."
   },
   "image_urls": [
     {
-      "url": "https://customer-assets-cm19k8pv.emergentagent.net/job_maker-hub-325/artifacts/b2ea6293edc307d5_IMG_1041.jpeg",
-      "category": "logo_mark",
-      "description": "Loom silvery lavender interwoven knot logo on black"
+      "url": "https://images.unsplash.com/photo-1768280511074-3b3effe7a139?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NDh8MHwxfHNlYXJjaHxfHxxtb25vY2hyb21lJTIwY2Ftb3VmbGFnZSUyMGxpbmUlMjBhcnQlMjBhYnN0cmFjdCUyMHRleHR1cmV8ZW58MHx8fHwxNzkyNTg0MzcyfDA&ixlib=rb-4.1.0&q=85",
+      "category": "etched_hero_art",
+      "description": "Abstract black and white fine-line etched wavy topographic pattern fitting gloam.trade visual language"
     },
     {
-      "url": "https://customer-assets-cm19k8pv.emergentagent.net/job_maker-hub-325/artifacts/0d60680c770b7673_IMG_1039.png",
-      "category": "banner_art",
-      "description": "Loom Finance banner image featuring purple sweeping light ribbons and wordmark"
+      "url": "https://images.unsplash.com/photo-1758045698048-0dca130998df?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NDh8MHwxfHNlYXJjaHw0fHxtb25vY2hyb21lJTIwY2Ftb3VmbGFnZSUyMGxpbmUlMjBhcnQlMjBhYnN0cmFjdCUyMHRleHR1cmV8ZW58MHx8fHwxNzkyNTg0MzcyfDA&ixlib=rb-4.1.0&q=85",
+      "category": "camo_texture",
+      "description": "Monochrome etched line-art swirling camouflage texture for feature cards"
     },
     {
-      "url": "https://images.unsplash.com/photo-1612161689049-5d7b9ae3dce6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA0MTJ8MHwxfHNlYXJjaHxfHxwdXJwbGUlMjBnbG93aW5nJTIwdHJhZGluZyUyMGJhY2tncm91bmQlMjBhYnN0cmFjdCUyMGNyeXB0b3xlbnwwfHx8fDE3OTI0MTQ5NjZ8MA&ixlib=rb-4.1.0&q=85",
-      "category": "card_bg_accent",
-      "description": "Dark purple geometric wall texture for feature highlights"
+      "url": "https://images.unsplash.com/photo-1645433395129-25f8c7a4b05b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NDh8MHwxfHNlYXJjaHwzfHxtb25vY2hyb21lJTIwY2Ftb3VmbGFnZSUyMGxpbmUlMjBhcnQlMjBhYnN0cmFjdCUyMHRleHR1cmV8ZW58MHx8fHwxNzkyNTg0MzcyfDA&ixlib=rb-4.1.0&q=85",
+      "category": "abstract_stealth",
+      "description": "Grayscale abstract stealth waves background for ZK security sections"
     }
   ],
   "testing_and_data_testids": {
-    "rule": "Maintain all existing data-testid attributes across Header, Footer, Hero, Strategy Cards, Dashboard Panels, and Modals",
+    "rule": "Every interactive link, button, input, accordion, and key info panel must include kebab-case data-testid attributes",
     "required_testids": [
+      "landing-page",
       "header",
       "logo-link",
-      "main-nav",
-      "header-x-link",
-      "header-account-btn",
-      "header-start-btn",
-      "footer",
-      "hero-heading",
-      "hero-subheading",
-      "strategy-card",
-      "account-dashboard"
+      "hero-title",
+      "hero-launch",
+      "hero-swap",
+      "hero-live-stats",
+      "feature-card-0",
+      "flow-step-0",
+      "zk-system-0",
+      "docs-open",
+      "fees-toggle",
+      "faq-accordion",
+      "cta-launch",
+      "landing-footer"
     ]
   },
   "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
-    "Strictly rename all occurrences of 'SwiftFi', 'Swift Fi', and 'weft.fi' references to 'LOOM' or 'Loom Finance'",
-    "Ensure ONLY X link https://x.com/loomfiai is rendered in Header, Footer, and App sections. Remove all Telegram, Discord, or other social links",
-    "Apply dark purple accent theme across all pages (Home, New Strategy, Strategies, Strategy Detail, Traders, Leaderboard, Revenue, Account)",
-    "Implement canvas converging lines animation in the Home hero section for the Loom signal effect",
-    "All interactive elements must retain or include data-testid attributes in kebab-case format",
-    "Preserve all existing business logic, AI strategy generator streaming, Solana wallet connect/auth flows, and paper trading/alerts functionality"
+    "Strictly rebrand all occurrences of 'NullCash', 'Null Cash', 'nullcash', and 'NCASH' to 'Camo Cash' or 'Camo'",
+    "Match gloam.trade visual style with stark monochrome dark (#08090c) and light (#f9f9f9) section contrast, etched fine-line contour artwork, 5px border-radius buttons, and clean 1px borders",
+    "Implement the interactive topographic etched camouflage canvas animation on the landing page hero section",
+    "Ensure all buttons feature scale hover micro-interactions and high-contrast text color states",
+    "All interactive elements MUST retain data-testid attributes for E2E testing compliance",
+    "Maintain all existing backend proxy, ZK proof generation, route swapping, and mirrored app functionality"
   ]
 }
