@@ -188,6 +188,23 @@ function LiveAgo({ at, live }) {
   );
 }
 
+/* ---------------- camo radar: square sweep + blips (new signature animation) ---------------- */
+function Radar({ size = 380, testid }) {
+  const blips = [
+    { x: '22%', y: '30%', d: 0 }, { x: '68%', y: '22%', d: 1.4 }, { x: '74%', y: '66%', d: 2.6 },
+    { x: '30%', y: '72%', d: 3.8 }, { x: '50%', y: '46%', d: 5.0 },
+  ];
+  return (
+    <div className="cm-radar mx-auto" style={{ width: size, height: size }} data-testid={testid} aria-hidden="true">
+      {[0, 1, 2, 3].map((i) => <i key={i} className="cm-radar-ring" style={{ inset: `${i * 12.5}%` }} />)}
+      <i className="cm-radar-cross-h" /><i className="cm-radar-cross-v" />
+      <i className="cm-radar-sweep" />
+      {blips.map((b, i) => <i key={`b${i}`} className="cm-radar-blip" style={{ left: b.x, top: b.y, animationDelay: `${b.d}s` }} />)}
+      <i className="cm-radar-core" />
+    </div>
+  );
+}
+
 /* ---------------- sections ---------------- */
 function Hero({ stats }) {
   return (
@@ -299,7 +316,7 @@ function Statement() {
           <h2 className="text-[32px] font-medium leading-[1.12] tracking-[-0.02em] text-white sm:text-[40px]">Camo Cash cracks the oldest problem on-chain.</h2>
           <p className="mt-5 font-mono text-[13px] uppercase leading-[1.7] tracking-[.1em] text-white/60">Private money on a public ledger, with every move proven, not just hidden.</p>
         </Reveal>
-        <Reveal delay={80}><img src={IMG('ring_portal')} alt="Coins and records falling into the Camo Cash ring" className="nm-float-slow mx-auto w-full max-w-[380px]" draggable="false" /></Reveal>
+        <Reveal delay={80}><Radar size={360} testid="statement-radar" /></Reveal>
         <Reveal delay={160} className="lg:text-right">
           <h3 className="text-[26px] font-medium leading-[1.15] text-white sm:text-[30px]">Shield once,</h3>
           <p className="mt-2 text-[17px] leading-[1.5] text-white/70">and every move after that<br className="hidden lg:block" /> happens behind the wall.</p>
@@ -332,7 +349,7 @@ function Features() {
           {CARDS.map(([img, t], i) => (
             <Reveal key={img} delay={i * 60}>
               <div className="cm-card group flex h-full min-h-[230px] flex-col rounded-none border border-white/10 bg-[#12141a] p-4" data-testid={`feature-card-${i}`}>
-                <img src={IMG(img)} alt="" className="mx-auto h-[120px] w-auto object-contain transition-transform duration-500 group-hover:-translate-y-1.5" draggable="false" />
+                <img src={IMG(img)} alt="" className="mx-auto h-[120px] w-auto object-contain" draggable="false" />
                 <p className="mt-auto pt-5 text-[15px] font-medium leading-[1.3] text-white">{t}</p>
               </div>
             </Reveal>
@@ -406,7 +423,7 @@ function RealZk() {
             <h2 className="mt-5 text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-[48px]">Hiding is easy.<br />Proving is the point.</h2>
             <p className="mt-5 max-w-[620px] text-[16px] leading-[1.6] text-white/60">Others blur the trail. Camo Cash proves every move.</p>
           </Reveal>
-          <Reveal delay={80}><img src={IMG('icon_proof')} alt="Sealed proof" className="nm-float-slow mx-auto w-[200px] lg:ml-auto lg:mr-0" draggable="false" /></Reveal>
+          <Reveal delay={80}><img src={IMG('icon_proof')} alt="Sealed proof" className="cm-drift mx-auto w-[200px] lg:ml-auto lg:mr-0" draggable="false" /></Reveal>
         </div>
 
         <div className="mt-12 overflow-hidden rounded-none border border-white/10 bg-[#12141a]">
@@ -561,7 +578,12 @@ function FinalCta() {
         className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-35 [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,#000_20%,transparent_75%)]" />
       <ContourField dark className="opacity-45" />
       <div className="relative z-[1] mx-auto grid max-w-[1180px] items-center gap-8 px-5 py-20 lg:min-h-[88svh] lg:grid-cols-2">
-        <Reveal className="order-2 lg:order-1"><img src={IMG('eye_closed')} alt="An eye zipped shut" className="nm-float-slow mx-auto w-full max-w-[480px]" draggable="false" /></Reveal>
+        <Reveal className="order-2 lg:order-1">
+          <div className="cm-scan relative mx-auto w-full max-w-[480px]">
+            <img src={IMG('eye_closed')} alt="An eye zipped shut" className="w-full" draggable="false" />
+            <i className="cm-scanline" aria-hidden="true" />
+          </div>
+        </Reveal>
         <Reveal delay={80} className="order-1 lg:order-2">
           <Kicker dark>Camo / stealth mode</Kicker>
           <h2 className="mt-6 text-[30px] font-medium leading-[1.12] tracking-[-0.02em] sm:text-[42px]">Being watched shouldn&apos;t be the price of using money.</h2>

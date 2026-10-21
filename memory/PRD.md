@@ -129,3 +129,9 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
   "sealed-pool ledger" panel: animated count-up number (real pool size), notes sealed/spent line, truncated live
   Merkle root, "+N just sealed into the crowd" delta flash on pool growth, thin sharp borders, no HUD brackets.
 - DotCounter component removed; CountUp added. Delta auto-clears after 6s. Verified live (5,577 / root renders).
+
+## Iteration 14 — All-new animation set (Oct 2026)
+- User: "animations should change not similar". Removed every carried-over float/bob (nm-float gone, 0 usages).
+- New signatures: square camo radar (concentric square rings, rotating conic sweep, staggered blips, pulsing core)
+  replaces the ring illustration in Statement; declassify scanline sweeps the final-CTA artwork; feature cards use a
+  skewed sheen sweep on hover instead of icon bobbing; ZK proof icon uses slow drift+tilt. All respect reduced-motion.
