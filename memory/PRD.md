@@ -108,3 +108,18 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
 - Verified after import: testing-agent iteration_31 (backend 60/60 audited files, frontend 100% selectors/nav/mobile/branding).
 - Full pytest suite green: 131 passed, 1 skipped. Fixed stale expectations (wasm 206 range OK, order id key 'orderId'),
   added frontend/.env dotenv fallback to live test files, mobile footer dock clearance + swap unit label line-height.
+
+## Iteration 12 — Camo Cash rebrand + gloam.trade UI + dark lock (Oct 2026)
+- Full rebrand NullCash -> Camo Cash/Camo: every surface, manifest, lockup SVG, tour, docs, boot. New engraved
+  topographic-camo mark (PIL-generated) for all favicons/marks; X = @trycamocash everywhere.
+- Key/address prefixes: recovery key camosk2, viewing key camovk1, vault address camo2 (parsers accept veil/null/camo).
+- Landing rebuilt in gloam.trade visual language (no content copied): dark etched-camo hero (/landing/camo-etched.webp),
+  animated contour-field canvas with cursor repulsion, dot-matrix live pool counter, HUD corner-bracket chips,
+  "What Camo Cash is" trio, dark final CTA over camo-texture. Inter + Space Mono.
+- DARK MODE LOCKED product-wide (landing, docs, mirrored app: upstream data-theme forced dark + nc-theme vars dark).
+- NO rounded corners: border-radius purged to 0 across nc-theme.css, dk-swap.js, landing (rounded-none); dots stay round.
+- Splash removed: boot = minimal "Privacy loading…" + pulsing dot (index.html + dk-swap ensureSplash rewritten).
+- CA chip removed (landing nav + app header ensureCA deleted). Earn/Invite/Security-review hidden (CSS brace bug fixed).
+- Copy rewritten camo/stealth: pitch "Your money, in camo.", tour, per-page SHORT/GET, paraphrase "under full camo".
+- bifrost hardening: _CHUNK_ALIAS_RE now derives from CHUNK_VER (iter32 blank-splash class of bug prevented).
+- Verified: testing-agent iteration_33 = 100% (backend 60/60, all frontend checks incl. key prefixes, mobile, branding).

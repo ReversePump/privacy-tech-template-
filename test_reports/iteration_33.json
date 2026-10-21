@@ -1,0 +1,53 @@
+{
+  "summary": "Iteration 33 — Camo Cash rebrand re-test (dark-lock, sharp corners, minimal boot splash, X trycamocash, no CA chip, nav cleanup, wallet creation key-prefix regression). Backend pytest: 60/60 green (test_iter12_proxy_audit=25, test_live_endpoints=26, test_iter27_live_brand=9). Landing (/) renders fully dark: body bg=rgb(8,9,12), every <section> bg in dark palette (#08090c/#0b0c10/#12141a) — no light surfaces. Hero title 'Hit send. Leave no trace.' + minimal landing nav (Camo Cash lockup + X icon + menu; NO CA chip). Sharp corners confirmed: border-radius=0 on hero-launch, hero-live HUD, feature-card-0, what-card-0, fees-toggle, nc-connect-btn, dk-nav-private, dk-nav-privacy. All required landing testids present (hero-title, hero-live, hero-launch, hero-swap, hero-x, hero-stats, what-card-0..2, feature-card-0..4, pillar-shield/route/intent, flow-step-0, zk-system-0..2, tech-grid, fees-toggle, faq-0, cta-launch, cta-x, landing-footer). Boot splash on /app: #nc-boot div with ONLY 'Privacy loading…' text + pulsing white dot — no CAMO particle animation, no purple/green, no vl-bar in DOM (scan returned 0 hits for #9945ff/#14f195/vl-bar/particle/purple/gradient-stop). /app nav bar renders exactly: Home / Shield / Send / Swap / Bridge / Private route / Privacy swap / Track / History / Chain / More — forbidden items Earn, Invite, 'Security review ↗' are present in DOM but NOT visible (rect 0×0, display:none via .side-audit hide rule) ✓. No CA chip in /app header. 'More' dropdown contains Receive / Withdraw / Addresses / Keys only. Pitch card headline 'Your money, in camo.' with pills (Camouflaged balance / Local history / All tools unlocked) + light 'Connect wallet' CTA all present. Welcome tour mounts (nc-tour-skip works). Dock on mobile: nc-dock-home/shield/send/swap/menu. KEY PREFIX REGRESSION — PASSED: new in-browser wallet produced recovery 'camosk22BX6c5wQcxhfzmA64cJVzcZGJBBHnwuCsUo1eum2oN4k1Z4TGD' (camosk2 ✓) and vault address 'camo22ZFTn1htvfjsz5FJRsGj648pYfdD3DbRvmhaCRh8sSmHdtnZLkbRAffEp6hmuLotWSD85cuMRMbaQCB3Kypv9p2Dmtd2b' (camo2 ✓). Mobile 375: no horizontal overflow on landing. Branding scan on visible text of / and /app: 0 occurrences of NullCash, Veil, 'out of sight', @usecamocash. ONE BUG FOUND & FIXED by testing agent: /app/frontend/src/components/NmNav.jsx had X_URL='https://x.com/usecamocash' — spec requires @trycamocash. All anchors derive from this constant so hero-x, cta-x, landing-footer X and app header dk-x-link were all wrong. Fixed in-place; re-verified: both hero-x and cta-x now resolve to https://x.com/trycamocash and /app header dk-x-link also points to trycamocash. The paraphrased copy ('Follow @trycamocash') was already correct.",
+  "backend_issues": { "critical": [], "minor": [] },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "NmNav X link constant",
+        "issue": "FIXED by testing agent. /app/frontend/src/components/NmNav.jsx exported X_URL='https://x.com/usecamocash' which propagated to hero-x, cta-x, landing-footer and the /app header X icon. Spec #5 requires https://x.com/trycamocash (@trycamocash). Dk-swap.js was already correct (@trycamocash) so the two surfaces disagreed. One-line change: X_URL='https://x.com/trycamocash'. Re-tested — all X anchors on / and /app now resolve to trycamocash.",
+        "selector": "[data-testid=\"hero-x\"], [data-testid=\"cta-x\"], [data-testid=\"dk-x-link\"]",
+        "priority": "HIGH (fixed)"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "/app DOM leaks (non-visible)",
+        "issues": [
+          "Residual 'veil' tokens still present in /app HTML as CSS variable NAMES (--veil-fg, --veil-hi, --veil-deep, --veil-wash) and in link selectors (a[href*='github.com/veil'], a[href*='@veilit.xyz']). Not user-visible — explicitly flagged as accepted residual by main agent, re-confirming it is still the case this iteration.",
+          "Three nav labels (Earn, Invite, 'Security review ↗') are rendered in the DOM but hidden via display:none / zero-size parent (.side-audit). They do not reach the user, but shipping dead markup bloats the nav HTML. Consider removing from the source template rather than hiding."
+        ]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter12_proxy_audit.py",
+    "/app/backend/tests/test_live_endpoints.py",
+    "/app/backend/tests/test_iter27_live_brand.py",
+    "/app/test_reports/pytest/iter33_results.xml"
+  ],
+  "action_items": [
+    "No further action required for @trycamocash — testing agent already fixed NmNav.jsx. Consider adding a one-line regression test (e.g. assert X_URL endswith '/trycamocash') to prevent future drift.",
+    "(Optional, non-blocking) Rename --veil-* CSS variables in /app/backend/brand/nc-theme.css + dk-swap.js to --camo-* to eliminate the ~33 raw 'veil' tokens still visible in /app HTML source. Flagged as accepted residual by main agent — leaving as-is.",
+    "(Optional) Strip Earn/Invite/'Security review' nodes from the source nav template instead of hiding via .side-audit so the DOM matches the final design."
+  ],
+  "critical_code_review_comments": [
+    "NmNav.jsx vs dk-swap.js diverged on X_URL (usecamocash vs trycamocash). Two files holding the same brand constant is a latent drift risk — consider importing the handle from a single source (e.g. a brand/constants.js module) consumed by both landing React code and the dk-swap overlay.",
+    "/app/backend/bifrost.py: CHUNK_VER forward rewrite and _CHUNK_ALIAS_RE reverse regex are still decoupled constants after iter32's one-line fix. Deriving the regex from CHUNK_VER directly would prevent recurrence of the iter32 blank-splash incident on any future version bump.",
+    "/app/backend/brand/dk-swap.js remains ~1300 lines and is the single largest file in the brand overlay — overdue for a split (splash, nav, tour, panels)."
+  ],
+  "updated_files": [
+    "/app/frontend/src/components/NmNav.jsx (X_URL: usecamocash -> trycamocash, one-line fix)"
+  ],
+  "success_rate": {
+    "backend": "100% (60/60 pytest)",
+    "frontend": "100% on dark-lock, sharp-corners, minimal boot splash, nav cleanup, pitch copy, wallet creation key-prefixes, mobile overflow, branding scan — after the one-line NmNav fix"
+  },
+  "test_credentials": "None required. Test wallet created in-browser with password 'TestPass123!' (local only).",
+  "seed_data_creation": "None. No swap orders created, no funds moved.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "X handle is now @trycamocash across BOTH NmNav.jsx (landing) and dk-swap.js (/app overlay). If a future iteration touches either file, re-check that both match. Known accepted residual: ~33 'veil' tokens remain in /app HTML as CSS var NAMES (--veil-*) — non-visible, flagged by main agent as acceptable. Hidden nav nodes (Earn/Invite/Security review) remain in DOM but display:none via .side-audit. Minimal boot splash in /app/frontend/public/index.html uses #nc-boot with 'Privacy loading…' + 8px pulsing dot — no particles. Wallet key prefixes locked: camosk2 (recovery), camo2 (vault); viewing key camovk1 not surfaced in default create/receive flow (available via More -> Keys if needed). Pytest files still require REACT_APP_BACKEND_URL exported (or pass via env). Iter32 one-line regex fix in bifrost.py (_CHUNK_ALIAS_RE) still in place and working.",
+  "rca of the issue": "RCA for @usecamocash leak: NmNav.jsx held the sole X_URL constant used by the landing React component and the /app header overlay re-reads it independently via dk-swap.js. iter32's X-handle update was applied to dk-swap.js only; NmNav.jsx was missed because it lives in /app/frontend/src and the brand overlay rewrite path never touches the React source tree. Reproduction: curl / | grep usecamocash matches 3 times (hero-x, cta-x, footer). Fix: single-line edit to X_URL. Prevention: centralise brand constants into one file (/app/brand/constants.js) imported by both NmNav.jsx and dk-swap.js so the handle cannot drift again."
+}
