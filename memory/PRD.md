@@ -145,3 +145,16 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
 ## Iteration 16 — Art blends into UI (Oct 2026)
 - All 7 etched artworks re-encoded: luminance-keyed alpha (black bg -> transparent), so line art sits directly on
   card/section surfaces with no plate seams. Final CTA eye floats on the camo texture; plate border removed.
+
+## Iteration 17 — Chain dashboard, connect sheet, Alpenglow, masking (Oct 2026)
+- Chain page: terminal look removed; professional pool-ledger dashboard (title, stat cards, table headers,
+  type chips, Alpenglow chip -> /docs#alpenglow). Chain pinned as last tab (desktop order + mobile dock slot 5).
+- Connect sheet: recommended card = "Camo Wallet / Native ZK vault · Groth16-protected Solana wallet"; other
+  wallets collapsed under "Other wallets · not ZK-native" dropdown; white-on-white contrast fixed; header Connect
+  button now white with dark text/glyph; password hint = "Minimum 10 characters."; helper paragraph trimmed.
+- Alpenglow: researched (SIMD-0326, Votor, ~150ms finality, epoch 1064); docs page added (/docs#alpenglow) with
+  links; home intro + hero kicker + "What Camo Cash is" subline mention it; header tagline on landing + app
+  (top-right, hidden <=1180px).
+- Masking: all upstream socials removed (t.me, discord, github/veil, veilit.xyz hidden); any x/twitter link that
+  is not @trycamocash is rewritten to it; served app HTML has zero external links except font CDNs.
+- Backend suite green: 131 passed, 1 skipped.
