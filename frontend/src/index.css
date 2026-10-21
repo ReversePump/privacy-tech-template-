@@ -290,7 +290,7 @@ code {
 .cm-radar-core{position:absolute;left:50%;top:50%;width:9px;height:9px;transform:translate(-50%,-50%);background:#fff;animation:cmCore 2.2s ease-in-out infinite}
 @keyframes cmCore{0%,100%{opacity:1}50%{opacity:.3}}
 /* declassify scanline over artwork */
-.cm-scan{overflow:hidden}
+.cm-scan{overflow:hidden;border:1px solid rgba(255,255,255,.15)}
 .cm-scanline{position:absolute;left:-4%;right:-4%;top:-12%;height:14%;background:linear-gradient(180deg,transparent,rgba(255,255,255,.16) 55%,rgba(255,255,255,.5) 78%,transparent);animation:cmScan 4.2s cubic-bezier(.45,0,.35,1) infinite}
 @keyframes cmScan{0%{top:-14%}62%,100%{top:108%}}
 /* slow drift (replaces old float bob) */

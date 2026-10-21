@@ -135,3 +135,9 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
 - New signatures: square camo radar (concentric square rings, rotating conic sweep, staggered blips, pulsing core)
   replaces the ring illustration in Statement; declassify scanline sweeps the final-CTA artwork; feature cards use a
   skewed sheen sweep on hover instead of icon bobbing; ZK proof icon uses slow drift+tilt. All respect reduced-motion.
+
+## Iteration 15 — All-new artwork (Oct 2026)
+- User: "no same images". All old isometric illustrations replaced with newly AI-generated (Gemini image gen via
+  Emergent key) fine-line copperplate etchings in camo-contour style: key, coin seal, bolt, splitting route, vault,
+  proof document, closed-eye final art. Forced grayscale + autocontrast, webp. Unused ring_portal/hero_vault deleted.
+  Feature cards render them as dark art plates; final CTA eye plate framed with 1px border + scanline sweep.
