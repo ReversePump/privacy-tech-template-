@@ -33,7 +33,7 @@ export default function TopNav() {
       <div className="mx-auto max-w-[1180px] overflow-hidden rounded-none border border-white/25 bg-[#08090c]/85 text-[#f9f9f9] backdrop-blur-md">
         <div className="flex h-[64px] items-center justify-between gap-3 px-3 sm:px-4">
           <a href="/" data-testid="nav-logo" className="shrink-0"><Logo light /></a>
-          <span className="cc-tag hidden font-mono text-[10.5px] uppercase tracking-[.16em] text-white/55 md:inline-block" data-testid="nav-tagline">First Alpenglow ZK shield on Solana</span>
+          <span className="cc-tag hidden font-mono text-[10.5px] uppercase tracking-[.16em] text-white/55 md:inline-block" data-testid="nav-tagline">First Alpenglow finality ZK shielded</span>
           <div className="flex min-w-0 items-center gap-2">
             <a href={X_URL} target="_blank" rel="noopener noreferrer" aria-label="Camo Cash on X" data-testid="nav-x"
               className="hidden h-10 w-10 place-items-center rounded-none border border-white/25 transition hover:-translate-y-0.5 sm:grid"><XGlyph /></a>

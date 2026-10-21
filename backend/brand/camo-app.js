@@ -1356,7 +1356,7 @@
     if (document.getElementById('cc-tagline')) return;
     var t = document.createElement('span');
     t.id = 'cc-tagline'; t.className = 'cc-tag'; t.setAttribute('data-testid', 'cc-tagline');
-    t.textContent = 'First Alpenglow ZK shield on Solana';
+    t.textContent = 'First Alpenglow finality ZK shielded';
     document.body.appendChild(t);
   }
   function fixTaglineOverlap() {

@@ -522,8 +522,8 @@ async def health():
     await asyncio.gather(
         ping("site", TARGETS["site"] + "/"),
         ping("app", TARGETS["app"] + "/"),
-        ping("indexer", TARGETS["indexer"] + "/"),
-        ping("relayer", TARGETS["relayer"] + "/"),
+        ping("indexer", TARGETS["indexer"] + "/v1/health"),
+        ping("relayer", TARGETS["relayer"] + "/v1/health"),
         ping("rpc", TARGETS["rpc"], method="POST",
              json={"jsonrpc": "2.0", "id": 1, "method": "getHealth"}),
     )

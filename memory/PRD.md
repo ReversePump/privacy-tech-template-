@@ -173,3 +173,19 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
 - Full flow verified: create vault (10+ char pw) -> recovery key camosk2… -> Open Camo Cash -> dashboard
   ("Camo Cash Wallet · …") -> Receive shows camo2 address + QR. No console page errors.
 - Backend suite: 131 passed, 1 skipped (test_iter16 order-drift 409 = known upstream quote flake, passes solo).
+
+## Iteration 19 — Real-data audit + tagline (Oct 2026)
+- Health endpoint fixed: indexer/relayer were pinged at `/` (legit 404); now ping `/v1/health` — all five
+  upstream services report honest 200s (indexer slot+leaves, relayer {"ok":true}).
+- RISK finding (deposit/withdraw same-signer) investigated against live indexer feed (100 latest items):
+  46 deposits from 14 unique accounts, 51 withdrawals to 12 unique accounts, ZERO overlap. Withdrawals are
+  signed by relayer-side accounts (repeated operator accounts, e.g. 6Lp1…), deposits by users (inherent —
+  a deposit must be authorized by the depositor's own wallet). The audit's flagged pair does not reproduce
+  in current data (8,409 USDC shield from AUqd…dWa4 vs 8,384 USDC exit to 6Lp1…Rmij — different accounts).
+- Relayer proven live through our proxy: GET /api/bifrost/v1/relayer/v1/fee?mint=So111…&amount=10000000
+  returns real quote (fee 2086956 lamports, feeAccount 5BfTBW…, inputs:2). Relayer feePayer 7BXoKHgE…
+  from /v1/info. All app relayer traffic is rewritten through the proxy (rewrite_text maps every upstream
+  host incl. relayer.veilit.xyz in JS/HTML/JSON).
+- No mocks found: landing hero stats poll indexer /v1/stats every 5s; Chain dashboard renders live merkle
+  root / sealed notes / nullifiers / feed from the same indexer via proxy.
+- Header tagline changed to "First Alpenglow finality ZK shielded" (landing TopNav + app header badge).
