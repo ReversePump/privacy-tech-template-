@@ -1,6 +1,6 @@
 {
-  "short_name": "Camo Cash",
-  "name": "Camo Cash | Private money on Solana",
+  "short_name": "Cloak Privacy",
+  "name": "Cloak Privacy | Private money on Solana",
   "icons": [
     {
       "src": "favicon.ico",
@@ -8,18 +8,18 @@
       "type": "image/x-icon"
     },
     {
-      "src": "brand/favicon-192.png",
+      "src": "brand/cloak-favicon.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "brand/favicon-512.png",
+      "src": "brand/cloak-favicon.png",
       "type": "image/png",
       "sizes": "512x512"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#07060c",
-  "background_color": "#07060c"
+  "theme_color": "#080c09",
+  "background_color": "#080c09"
 }

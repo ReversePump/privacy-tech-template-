@@ -1,135 +1,133 @@
 {
-  "brand_identity": {
-    "name": "Camo Cash",
-    "short_name": "Camo",
-    "tagline": "PRIVATE MONEY ON SOLANA — SEALED TRANSFERS & ZERO-KNOWLEDGE SWAPS",
-    "sub_tagline": "SHIELD · PAY · SWAP · DISCLOSE",
-    "prohibited_names": ["NullCash", "Null Cash", "NULLCASH", "nullcash", "NCASH"],
-    "social_links": {
-      "x": "https://x.com/camocash"
-    }
-  },
-  "color_palette": {
-    "theme": "monochrome_etched",
-    "base_dark": "#08090c",
-    "surface_dark": "#12141a",
-    "surface_dark_card": "#181a22",
-    "base_light": "#f9f9f9",
-    "surface_light": "#ffffff",
-    "surface_light_muted": "#f2f3f5",
-    "borders": {
-      "dark_subtle": "rgba(255, 255, 255, 0.12)",
-      "dark_medium": "rgba(255, 255, 255, 0.22)",
-      "light_subtle": "#e2e4e8",
-      "light_medium": "#cccccc"
-    },
-    "text": {
-      "dark_primary": "#ffffff",
-      "dark_secondary": "#a1a1aa",
-      "dark_muted": "#71717a",
-      "light_primary": "#08090c",
-      "light_secondary": "#4b5563",
-      "light_muted": "#6b7280"
-    },
-    "buttons": {
-      "primary_bg": "#ffffff",
-      "primary_text": "#08090c",
-      "primary_hover": "#f3f4f6",
-      "secondary_bg": "#08090c",
-      "secondary_text": "#ffffff",
-      "secondary_border": "rgba(255, 255, 255, 0.2)"
-    }
+  "project_name": "Cloak Privacy",
+  "rebrand_from": "Camo Cash",
+  "app_type": "landing_page",
+  "archetype": "ORGANIC & HIGH-CONTRAST EDITORIAL (Saliend-Inspired Forest Dark + Soft Mint)",
+  "colors": {
+    "bg_main": "#080c09",
+    "bg_secondary": "#0d140e",
+    "bg_card": "#111a13",
+    "bg_card_hover": "#162219",
+    "border_faint": "rgba(169, 231, 192, 0.12)",
+    "border_glow": "rgba(169, 231, 192, 0.35)",
+    "accent_mint": "#a9e7c0",
+    "accent_mint_bright": "#8ef3b3",
+    "accent_mint_dim": "#3a684b",
+    "text_primary": "#eef6f0",
+    "text_secondary": "#8fa695",
+    "text_muted": "#566b5c",
+    "accent_amber_glow": "#f0b86e",
+    "danger_red": "#ef5350"
   },
   "typography": {
-    "headings": {
-      "family": "'Inter', -apple-system, sans-serif",
-      "h1": "text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-[-0.03em] leading-[1.05]",
-      "h2": "text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-[-0.02em]",
-      "h3": "text-xl sm:text-2xl font-medium tracking-tight",
-      "h4": "text-lg font-medium"
+    "fonts": {
+      "heading": "Syne, sans-serif",
+      "body": "Plus Jakarta Sans, sans-serif",
+      "mono": "JetBrains Mono, monospace"
     },
-    "body": {
-      "family": "'Inter', system-ui, sans-serif",
-      "regular": "text-sm sm:text-base leading-relaxed text-[#4b5563] dark:text-[#a1a1aa]"
-    },
-    "monospace": {
-      "family": "'Space Mono', 'Courier New', monospace",
-      "usage": "Pool stats counters, leaf hashes, transaction nullifiers, CA chips, code blocks"
+    "google_fonts_url": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300..700;1,300..700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@500;700;800&display=swap",
+    "hierarchy": {
+      "h1": "text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05]",
+      "h2": "text-2xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.1]",
+      "h3": "text-xl sm:text-2xl font-semibold tracking-normal",
+      "eyebrow": "font-mono text-xs uppercase tracking-[0.25em] text-[#a9e7c0]",
+      "body": "text-sm sm:text-base text-[#8fa695] leading-relaxed"
     }
   },
-  "hero_canvas_animation_spec": {
-    "type": "Etched Camouflage Contour Lattice (Interactive Topographic Stealth Grid)",
-    "container_id": "camo-hero-canvas",
-    "canvas_layer": "absolute inset-0 z-0 pointer-events-none opacity-40",
-    "behavior": {
-      "line_count": 32,
-      "stroke_color": "rgba(255, 255, 255, 0.18)",
-      "line_width": 1.25,
-      "logic": "Renders organic etched topographic contour lines simulating fine camouflage patterns and ZK proof waves. Gently morphs with mathematical sine sine-wave offsets and responds with subtle magnetic repulsion to cursor movement."
-    },
-    "scrollytelling": "Staggered reveal for headline copy, real-time ZK pool counters, and action buttons with 0.05s stagger intervals."
-  },
-  "scroll_animations": {
-    "fade_in": "IntersectionObserver staggered opacity reveal with translate-y-4 lift (duration: 500ms, cubic-bezier(0.16, 1, 0.3, 1))",
-    "button_hover": "Transform scale-105 with shadow-md and background state shift (5px border radius)",
-    "card_hover": "Border color transition from light_subtle to light_medium or dark_subtle to dark_medium with 2px lift"
-  },
-  "component_restyle_rules": {
-    "landing_page": {
-      "nav": "Sticky header with backdrop-blur-md bg-[#08090c]/85 border-b border-white/10 px-6 py-4 flex justify-between items-center",
-      "hero_section": "Editorial stark stark-monochrome styling. Etched illustration art background + live pool stats counter in dot-matrix font",
-      "cards": "Minimal white cards with 1px #ccc border, 10px rounded corners, soft ambient shadow 0 4px 12px rgba(0,0,0,0.05)",
-      "buttons": "5px border-radius minimal buttons. Primary: White background with black text. Secondary: Dark background with subtle stroke."
-    },
-    "mirrored_app_injection": {
-      "css_path": "/app/backend/brand/nc-theme.css",
-      "js_path": "/app/backend/brand/dk-swap.js",
-      "rules": "Apply #08090c dark mode base across all injected panels, override buttons to 5px radius, eliminate all bright purple or green accents in favor of clean high-contrast white/gray monochrome, ensure 'Camo Cash' branding is injected everywhere."
-    }
-  },
-  "image_urls": [
-    {
-      "url": "https://images.unsplash.com/photo-1768280511074-3b3effe7a139?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NDh8MHwxfHNlYXJjaHxfHxxtb25vY2hyb21lJTIwY2Ftb3VmbGFnZSUyMGxpbmUlMjBhcnQlMjBhYnN0cmFjdCUyMHRleHR1cmV8ZW58MHx8fHwxNzkyNTg0MzcyfDA&ixlib=rb-4.1.0&q=85",
-      "category": "etched_hero_art",
-      "description": "Abstract black and white fine-line etched wavy topographic pattern fitting gloam.trade visual language"
-    },
-    {
-      "url": "https://images.unsplash.com/photo-1758045698048-0dca130998df?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NDh8MHwxfHNlYXJjaHw0fHxtb25vY2hyb21lJTIwY2Ftb3VmbGFnZSUyMGxpbmUlMjBhcnQlMjBhYnN0cmFjdCUyMHRleHR1cmV8ZW58MHx8fHwxNzkyNTg0MzcyfDA&ixlib=rb-4.1.0&q=85",
-      "category": "camo_texture",
-      "description": "Monochrome etched line-art swirling camouflage texture for feature cards"
-    },
-    {
-      "url": "https://images.unsplash.com/photo-1645433395129-25f8c7a4b05b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NDh8MHwxfHNlYXJjaHwzfHxtb25vY2hyb21lJTIwY2Ftb3VmbGFnZSUyMGxpbmUlMjBhcnQlMjBhYnN0cmFjdCUyMHRleHR1cmV8ZW58MHx8fHwxNzkyNTg0MzcyfDA&ixlib=rb-4.1.0&q=85",
-      "category": "abstract_stealth",
-      "description": "Grayscale abstract stealth waves background for ZK security sections"
-    }
-  ],
-  "testing_and_data_testids": {
-    "rule": "Every interactive link, button, input, accordion, and key info panel must include kebab-case data-testid attributes",
-    "required_testids": [
-      "landing-page",
-      "header",
-      "logo-link",
-      "hero-title",
-      "hero-launch",
-      "hero-swap",
-      "hero-live-stats",
-      "feature-card-0",
-      "flow-step-0",
-      "zk-system-0",
-      "docs-open",
-      "fees-toggle",
-      "faq-accordion",
-      "cta-launch",
-      "landing-footer"
+  "layout_structure": {
+    "sections": [
+      {
+        "id": "header",
+        "name": "Floating Glass Header",
+        "description": "Sticky backdrop-blur navigation with brand logo, live Solana mainnet status pill, doc link, and Open App CTA button.",
+        "test_ids": ["nav-logo", "nav-docs-link", "nav-app-button", "nav-status-indicator"]
+      },
+      {
+        "id": "hero",
+        "name": "Editorial Hero with Isometric ZK Cloak Wireframe",
+        "description": "Massive headline ('Disappear from the ledger.'), subheadline explaining Solana ZK shield pool, real-time stats ticker, primary action button ('Enter Privacy Pool'), and an interactive isometric SVG wireframe of a cloaked token passing through a Groth16 proof prism.",
+        "test_ids": ["hero-headline", "hero-cta-open", "hero-cta-docs", "hero-stat-total-shielded", "hero-stat-notes"]
+      },
+      {
+        "id": "live_ledger",
+        "name": "Live Anonymity Pool Stats Bar",
+        "description": "Real-time dynamic stat ticker showing total pool TVL, sealed notes count, nullifiers generated, and average proof generation time (~1.2s). Auto-updates every 5 seconds with soft mint flash animation.",
+        "test_ids": ["live-pool-strip", "stat-sealed-notes", "stat-nullifiers", "stat-alpenglow-time"]
+      },
+      {
+        "id": "how_it_works",
+        "name": "01/02/03 Numbered Protocol Flow",
+        "description": "Three sequential steps in Saliend's numbered row style: 01. Shield (Cloak tokens into zero-knowledge pool), 02. Private Move (Transact & swap via off-chain nullifiers), 03. Uncloak Anywhere (Exit to clean fresh addresses or cross-chain routes).",
+        "test_ids": ["how-it-works-step-1", "how-it-works-step-2", "how-it-works-step-3"]
+      },
+      {
+        "id": "privacy_model",
+        "name": "Groth16 & Poseidon ZK Privacy Architecture",
+        "description": "Deep-dive interactive technical grid explaining Groth16/BN254 zk-SNARK proof verification, Poseidon hash Merkle Tree depth 20, and single-use cryptographic nullifiers preventing double-spending while masking all addresses.",
+        "test_ids": ["privacy-card-groth16", "privacy-card-poseidon", "privacy-card-nullifiers"]
+      },
+      {
+        "id": "alpenglow_finality",
+        "name": "Solana Alpenglow Era 150ms Finality",
+        "description": "Dedicated feature section spotlighting Solana's new Alpenglow consensus engine integration, providing instantaneous ~150ms ZK proof submission and instant transaction finality.",
+        "test_ids": ["alpenglow-badge", "alpenglow-time-display", "alpenglow-description"]
+      },
+      {
+        "id": "fees_and_relayers",
+        "name": "Honest Fee Model & Decentralized Relayers",
+        "description": "Transparent breakdown of the 0.3% protocol fee + gas-free decentralized relayer mesh that pays target gas fees on behalf of uncloaking addresses.",
+        "test_ids": ["fees-protocol-rate", "fees-relayer-info", "fees-breakdown-card"]
+      },
+      {
+        "id": "cta_banner",
+        "name": "Final Launch Cloak Protocol Banner",
+        "description": "High-impact conversion box with ambient mint glow, 'Shield your first asset now' CTA, and quick link to developer documentation.",
+        "test_ids": ["bottom-cta-launch-app", "bottom-cta-docs"]
+      },
+      {
+        "id": "footer",
+        "name": "Quiet Architectural Footer",
+        "description": "Minimalist dark footer with version tag, Solana network indicator, system status, and links to docs, GitHub, and terms.",
+        "test_ids": ["footer-version", "footer-solana-status", "footer-links"]
+      }
     ]
   },
+  "svg_sketches": {
+    "hero_prism": {
+      "style": "Isometric 3D line-art with nested diamond polygons and glowing mint laser line",
+      "elements": "Layered isometric grid, input token arrow, Groth16 proof prism with mint border, unlinked nullifier outputs"
+    },
+    "merkle_circuit": {
+      "style": "Thin 1px stroke binary Merkle tree with glowing active path and Poseidon hash nodes",
+      "elements": "Tree nodes connected by animated dashed paths leading to root hash zero-knowledge commitment"
+    },
+    "alpenglow_speed": {
+      "style": "Concentric rings and sub-second pulse radar representing 150ms finality",
+      "elements": "Speed wave vectors with 150ms timestamp label and Solana gradient stroke"
+    }
+  },
+  "motion_and_animations": {
+    "css_keyframes": [
+      "@keyframes cloakPulse { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.03); } }",
+      "@keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(1000%); } }",
+      "@keyframes floatSlow { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-8px) rotate(1deg); } }",
+      "@keyframes liveBadgePulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(169,231,192,0.4); } 70% { box-shadow: 0 0 0 8px rgba(169,231,192,0); } }"
+    ],
+    "hover_effects": "Card borders transition from rgba(169,231,192,0.12) to rgba(169,231,192,0.4) with slight y-axis lift (-2px). Buttons have smooth backdrop pulse."
+  },
+  "component_path": "/app/frontend/src/pages/LandingPage.jsx",
+  "instructions_to_main_agent": [
+    "Ensure all copy reflects 'Cloak Privacy' and Solana ZK privacy pool branding.",
+    "Do NOT use external image URLs. Use inline SVG line-art with stroke width 1px to 1.5px and mint (#a9e7c0) accents.",
+    "Keep existing endpoints and backend proxies intact in frontend/backend integration.",
+    "Verify Google Fonts link for Syne, Plus Jakarta Sans, and JetBrains Mono is included in index.html or injected.",
+    "Include data-testid attributes on all key buttons, inputs, statistics, and links as defined in layout_structure."
+  ],
   "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
-    "Strictly rebrand all occurrences of 'NullCash', 'Null Cash', 'nullcash', and 'NCASH' to 'Camo Cash' or 'Camo'",
-    "Match gloam.trade visual style with stark monochrome dark (#08090c) and light (#f9f9f9) section contrast, etched fine-line contour artwork, 5px border-radius buttons, and clean 1px borders",
-    "Implement the interactive topographic etched camouflage canvas animation on the landing page hero section",
-    "Ensure all buttons feature scale hover micro-interactions and high-contrast text color states",
-    "All interactive elements MUST retain data-testid attributes for E2E testing compliance",
-    "Maintain all existing backend proxy, ZK proof generation, route swapping, and mirrored app functionality"
+    "Never use pure black #000000; use forest black #080c09 with green tint.",
+    "Ensure all interactive elements have data-testid attributes.",
+    "Grid children must be direct children to preserve responsive alignment.",
+    "Maintain high APCA contrast with light mint (#a9e7c0) on dark forest backgrounds.",
+    "Use generous padding (p-6, p-8, p-12) with subtle rounded corners (rounded-xl / rounded-2xl)."
   ]
 }

@@ -12,7 +12,7 @@ import functools
 from pathlib import Path
 
 BRAND_DIR = Path(__file__).parent / "brand"
-BRAND_NAME = "Camo Cash"
+BRAND_NAME = "Cloak Privacy"
 
 
 def _b64(name: str) -> str:
@@ -25,10 +25,11 @@ def _b64(name: str) -> str:
 @functools.lru_cache(maxsize=4)
 def lockup_svg(light: bool = False) -> str:
     mark = _b64("mark-black-256.png" if light else "mark-white-256.png")
-    word = "#08090c" if light else "#ffffff"
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 470 128" width="470" height="128">
+    word = "#0a1410" if light else "#eef5ef"
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 560 128" width="560" height="128">
 <image href="data:image/png;base64,{mark}" xlink:href="data:image/png;base64,{mark}" x="0" y="8" width="112" height="112"/>
-<text x="130" y="86" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="60" font-weight="700" letter-spacing="-2.5" fill="{word}">Camo<tspan font-weight="500"> Cash</tspan></text>
+<text x="130" y="80" font-family="Georgia, 'Times New Roman', serif" font-size="54" letter-spacing="0" fill="{word}">Cloak</text>
+<text x="130" y="112" font-family="'Courier New', monospace" font-size="17" letter-spacing="6" fill="{word}" opacity="0.55">PRIVACY</text>
 </svg>"""
 
 
@@ -243,10 +244,10 @@ setTimeout(start,2500);
 
 
 NAV_LABELS = {
-    "Home": "Home", "Shield": "Shield", "Trade": "Swap", "Camo CashSwap": "Bridge",
-    "Send": "Send", "Receive": "Receive", "Withdraw": "Withdraw", "Earn": "Earn",
-    "Invite": "Invite", "Addresses": "Addresses", "Activity": "History", "Keys": "Keys",
-    "More": "More",
+    "Home": "Vault", "Shield": "Cloak", "Trade": "Trade", "Cloak PrivacySwap": "Pool swap",
+    "Camo CashSwap": "Pool swap", "Send": "Pay", "Receive": "Receive", "Withdraw": "Withdraw",
+    "Earn": "Earn", "Invite": "Invite", "Addresses": "Burner addresses", "Activity": "Activity",
+    "Keys": "Key ring", "More": "More",
 }
 
 
@@ -283,26 +284,26 @@ def head_inject(target: str, prefix: str) -> str:
         f"<script>{boot}</script>"
         '<link rel="preconnect" href="https://fonts.googleapis.com">'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-        '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap">'
+        '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap">'
         + (f'<script src="{prefix}/_brand/camo-app.js" defer></script>' if target == "app" else "")
     )
 
 
-_ICON_V = "4"
+_ICON_V = "5"
 
 
 def camocash_manifest():
     b = "/api/bifrost/v1/_brand/"
     return {
-        "name": "Camo Cash · Private money on Solana",
-        "short_name": "Camo Cash",
+        "name": "Cloak Privacy · Private money on Solana",
+        "short_name": "Cloak Privacy",
         "description": "Private balances, transfers, trades and swaps on Solana.",
         "id": "/app",
         "start_url": "/app",
         "scope": "/",
         "display": "standalone",
-        "background_color": "#ffffff",
-        "theme_color": "#ffffff",
+        "background_color": "#090e0b",
+        "theme_color": "#090e0b",
         "icons": [
             {"src": f"{b}favicon-192.png?v={_ICON_V}", "sizes": "192x192", "type": "image/png", "purpose": "any"},
             {"src": f"{b}favicon-512.png?v={_ICON_V}", "sizes": "512x512", "type": "image/png", "purpose": "any"},

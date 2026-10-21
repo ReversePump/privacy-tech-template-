@@ -85,7 +85,7 @@ export default function DocsPage() {
   const pages = useMemo(() => DOC_GROUPS.flatMap((g) => g.pages.map((p) => ({ ...p, group: g.title }))), []);
   const [active, setActive] = useState(pages[0].id);
   useEffect(() => {
-    document.title = 'Camo Cash Docs';
+    document.title = 'Cloak Privacy Docs';
     const els = pages.map((p) => document.getElementById(p.id)).filter(Boolean);
     const io = new IntersectionObserver((ents) => {
       const vis = ents.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
@@ -104,9 +104,9 @@ export default function DocsPage() {
       <TopNav />
       <div className="mx-auto max-w-[1180px] px-5 pb-24 pt-28">
         <header className="border-b border-white/15 pb-8">
-          <div className="font-mono text-[11px] uppercase tracking-[.18em] text-white/60">Camo Cash · documentation</div>
+          <div className="font-mono text-[11px] uppercase tracking-[.18em] text-white/60">Cloak Privacy · documentation</div>
           <h1 className="cx-h mt-3 text-[40px] font-semibold leading-[1.04] tracking-[-0.03em] sm:text-[60px]">The manual.</h1>
-          <p className="mt-3 max-w-[620px] text-[17px] leading-[1.6] text-white/75">Everything about how Camo Cash seals, moves and releases money, from the first click to the circuit.</p>
+          <p className="mt-3 max-w-[620px] text-[17px] leading-[1.6] text-white/75">Everything about how Cloak Privacy seals, moves and releases money, from the first click to the circuit.</p>
           <div className="mt-6 md:hidden">
             <select value={active} onChange={(e) => go(e.target.value)} data-testid="docs-select"
               className="w-full rounded-none border border-[#08090c] bg-[#0b0c10] px-3 py-3 text-[15px]">
@@ -148,7 +148,7 @@ export default function DocsPage() {
       <footer className="bg-[#12141a]/10 text-white/60">
         <div className="mx-auto flex max-w-[1180px] flex-col items-center justify-between gap-3 px-5 py-8 text-[13px] sm:flex-row">
           <Logo light size={24} />
-          <span>© {new Date().getFullYear()} Camo Cash</span>
+          <span>© {new Date().getFullYear()} Cloak Privacy</span>
         </div>
       </footer>
     </div>

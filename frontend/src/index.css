@@ -301,3 +301,46 @@ code {
 .cm-card::after{content:"";position:absolute;top:0;bottom:0;left:-70%;width:45%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.09),transparent);transform:skewX(-14deg);transition:left .7s cubic-bezier(.2,.9,.25,1);pointer-events:none}
 .cm-card:hover::after{left:130%}
 @media (prefers-reduced-motion:reduce){.cm-radar-sweep,.cm-radar-blip,.cm-radar-core,.cm-scanline,.cm-drift{animation:none}}
+
+/* ---------- Cloak Privacy landing: forest & mint motion system ---------- */
+.ck-grid{
+  background:
+    repeating-linear-gradient(90deg, rgba(169,231,192,.028) 0 1px, transparent 1px 92px),
+    repeating-linear-gradient(0deg, rgba(169,231,192,.022) 0 1px, transparent 1px 92px);
+  mask-image: radial-gradient(78% 62% at 50% 0%, #000 25%, transparent 100%);
+  -webkit-mask-image: radial-gradient(78% 62% at 50% 0%, #000 25%, transparent 100%);
+}
+@keyframes ckDraw { to { stroke-dashoffset: 0; } }
+.ck-draw { stroke-dasharray: 900; stroke-dashoffset: 900; animation: ckDraw 1.6s cubic-bezier(.4,0,.2,1) forwards; }
+@keyframes ckDashMove { to { stroke-dashoffset: -48; } }
+.ck-dash { animation: ckDashMove 2.4s linear infinite; }
+@keyframes ckPulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+.ck-pulse { animation: ckPulse 2.2s ease-in-out infinite; transform-origin: center; }
+@keyframes ckRing { 0%,100% { opacity: .16; transform: scale(1); } 50% { opacity: .55; transform: scale(1.04); } }
+.ck-ring { animation: ckRing 2.8s ease-in-out infinite; transform-origin: center; }
+@keyframes ckFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.ck-float { animation: ckFloat 7s ease-in-out infinite; }
+@keyframes ckLive { 0%,100% { box-shadow: 0 0 0 0 rgba(169,231,192,.5); } 70% { box-shadow: 0 0 0 7px rgba(169,231,192,0); } }
+.ck-live { animation: ckLive 2s ease-out infinite; }
+@keyframes ckStat { from { opacity: .35; } to { opacity: 1; } }
+.ck-stat { animation: ckStat .8s ease both; }
+.ck-cta {
+  background:
+    radial-gradient(90% 160% at 50% -30%, rgba(169,231,192,.14), transparent 60%),
+    linear-gradient(180deg, #0d140e, #0a100c);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ck-draw, .ck-dash, .ck-pulse, .ck-ring, .ck-float, .ck-live { animation: none !important; }
+  .ck-draw { stroke-dashoffset: 0; }
+}
+
+/* ---------- Cloak docs: editorial type + mint accents ---------- */
+.prose h1, .prose h2, .docs-h, [data-testid="docs-page"] h1, [data-testid="docs-page"] h2 {
+  font-family: 'Instrument Serif', Georgia, serif !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.01em !important;
+}
+.cx-lime { background: linear-gradient(180deg, #c8f3d8, #a9e7c0) !important; color: #07130c !important;
+  border: 0 !important; border-radius: 999px !important; box-shadow: 0 10px 26px -12px rgba(169,231,192,.5) !important; }
+.cx-lime:hover { background: linear-gradient(180deg, #d8f7e3, #b4ecc9) !important; transform: translateY(-1px) !important; }
+[data-cx-theme=dark] .cx-lime, .cx-live .cx-lime { background: linear-gradient(180deg, #c8f3d8, #a9e7c0) !important; color: #07130c !important; }

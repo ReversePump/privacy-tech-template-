@@ -1,4 +1,4 @@
-// Fresh landing copy for Camo Cash. Nothing here is reused from earlier pages.
+// Fresh landing copy for Cloak Privacy. Nothing here is reused from earlier pages.
 
 export const PRODUCTS = [
   {
@@ -46,7 +46,7 @@ export const SEEN = [
 export const METHODS = [
   { k: 'Scrambling', line: 'Makes the data unreadable.', verdict: 'No guarantee.', zk: false },
   { k: 'Forwarding', line: 'Sends it through someone else.', verdict: 'No guarantee.', zk: false },
-  { k: 'Proving', line: 'Shows it is valid, keeps the secret.', verdict: 'Camo Cash uses all three.', zk: true },
+  { k: 'Proving', line: 'Shows it is valid, keeps the secret.', verdict: 'Cloak Privacy uses all three.', zk: true },
 ];
 
 export const PIPE = ['Your secret', 'Circuit', 'Proof', 'Verifier on Solana', 'Yes / No'];

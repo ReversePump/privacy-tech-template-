@@ -1,4 +1,4 @@
-/* Camo Cash in-app swaps: Private route, Privacy swap, Track (design-only reference: square-card swap UI)
+/* Cloak Privacy in-app swaps: Private route, Privacy swap, Track (design-only reference: square-card swap UI)
    Live data via /api/ds. */
 (function () {
   if (window.__dkSwap) return;
@@ -289,7 +289,7 @@
     ".gx-recent code{margin-left:auto;font-family:var(--f-mono,monospace);font-size:11px;color:var(--gx-mut);max-width:38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
     "@media (max-width:520px){.gx-tok{width:122px}#gx-view{padding:4px 0 150px}.gx-card{padding:14px 12px 18px;border-radius:0}"
     + ".gx-seg{width:100%}.gx-seg button{flex:1;justify-content:center;padding:8px 6px;font-size:13px;gap:5px}.gx-seg button svg{display:none}}",
-    /* ---- token picker: Portal-style arrangement (Camo Cash light) ---- */
+    /* ---- token picker: Portal-style arrangement (Cloak Privacy light) ---- */
     ".gx-pk{width:min(480px,calc(100% - 24px));padding:14px 20px 0;max-height:calc(100vh - 40px);overflow:hidden}",
     ".gx-pk .gx-grab{width:44px;height:5px;border-radius:0;background:var(--gx-line2);margin:0 auto 6px;display:none}",
     ".gx-pk .gx-mh{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;margin:4px 0 16px}",
@@ -445,7 +445,7 @@
     var pct = cost != null && usdIn > 0 ? cost / usdIn * 100 : null;
     var total = cost != null ? usd(cost) + ' (' + pct.toFixed(2) + '%)' : '—';
     if (near) {
-      if (sel.appFeeBps != null) rows.push(['Camo Cash fee (' + (sel.appFeeBps / 100).toFixed(2) + '%)', fmt(amt * sel.appFeeBps / 10000) + ' ' + sIn + (S.send && S.send.price ? ' · ' + usd(amt * sel.appFeeBps / 10000 * S.send.price) : '')]);
+      if (sel.appFeeBps != null) rows.push(['Cloak Privacy fee (' + (sel.appFeeBps / 100).toFixed(2) + '%)', fmt(amt * sel.appFeeBps / 10000) + ' ' + sIn + (S.send && S.send.price ? ' · ' + usd(amt * sel.appFeeBps / 10000 * S.send.price) : '')]);
       if (sel.withdrawFee != null) rows.push(['Network fee (' + ((S.recv && S.recv.chainName) || 'destination') + ')', fmt(sel.withdrawFee) + ' ' + sOut + (sel.pOut ? ' · ' + usd(sel.withdrawFee * sel.pOut) : '')]);
       if (sel.minOut != null) rows.push(['Minimum received', fmt(sel.minOut) + ' ' + sOut]);
       if (sel.refundFee != null) rows.push(['Refund fee (only if it fails)', fmt(sel.refundFee) + ' ' + sIn]);
@@ -997,7 +997,7 @@
     if (o.feeRows && o.feeRows.length) h += '<div class="gx-fees gx-fees-m" data-testid="gx-order-fees"><div class="gx-fees-h"><span>Total fees</span><b>' + esc(o.feeTotal || '—') + '</b></div>' + o.feeRows.map(function (r) { return '<div><span>' + esc(r[0]) + '</span><b>' + esc(r[1]) + '</b></div>'; }).join('') + '</div>';
     h += '<div class="gx-cf"><div class="k">Receiving address</div><div class="v"><code>' + esc(o.addressTo || '') + '</code></div></div>';
     h += '<button class="gx-cta" data-act="trackorder" data-id="' + esc(o.id) + '" data-testid="gx-order-track">Track this order</button>';
-    h += '<div class="gx-note">Live order via Camo Cash. Only deposit from your own Solana wallet.</div></div>';
+    h += '<div class="gx-note">Live order via Cloak Privacy. Only deposit from your own Solana wallet.</div></div>';
     m.innerHTML = h;
     clearInterval(orderTimer);
     if (o.expires) {
@@ -1135,7 +1135,7 @@
     }).join('');
     function stat(k, v, s, t) { return '<div class="ch-stat"><span>' + k + '</span><b' + (t ? ' title="' + esc(t) + '"' : '') + '>' + v + '</b>' + (s ? '<small>' + s + '</small>' : '') + '</div>'; }
     return '<div class="ch-page" data-testid="chain-page">' +
-      '<div class="ch-top"><div><h2>Chain</h2><p>Live pool ledger \u00b7 Solana mainnet</p></div>' +
+      '<div class="ch-top"><div><h2>Ledger</h2><p>Live pool record \u00b7 Solana mainnet</p></div>' +
       '<div class="ch-top-r"><a class="ch-alp" href="/docs#alpenglow" data-testid="chain-alpenglow">Alpenglow \u00b7 epoch 1064 \u2197</a>' +
       '<span class="ch-live ' + (live ? 'on' : 'off') + '" data-testid="chain-live"><i></i>' + (live ? 'Live \u00b7 sync <b class="ch-next">4s</b>' : (CH.err ? 'Reconnecting' : 'Connecting')) + '</span></div></div>' +
       '<div class="ch-stats" data-testid="chain-stats">' +
@@ -1226,7 +1226,7 @@
     { k: 'private', label: 'Private route', hash: 'private-route', icon: IC.route, nw: true },
     { k: 'privacy', label: 'Privacy swap', hash: 'privacy-swap', icon: IC.shield, nw: true },
     { k: 'track', label: 'Track', hash: 'track', icon: IC.track },
-    { k: 'chain', label: 'Chain', hash: 'chain', icon: IC.track }
+    { k: 'chain', label: 'Ledger', hash: 'chain', icon: IC.track }
   ];
   function ensure() {
     injectCSS();
@@ -1243,7 +1243,7 @@
       var compact = nav.classList.contains('tabbar');
       var btns = Array.prototype.slice.call(nav.querySelectorAll('.nav-i'));
       if (!btns.length) return;
-      var anchor = btns.find(function (b) { return /(Camo Cash)Swap|^Bridge$|Bridge out|^Swap$/.test(b.textContent.trim()); }) ||
+      var anchor = btns.find(function (b) { return /(Cloak Privacy)Swap|^Bridge$|Bridge out|^Swap$/.test(b.textContent.trim()); }) ||
                    btns.find(function (b) { return /Trade/.test(b.textContent); }) || btns[btns.length - 1];
       var frag = document.createDocumentFragment();
       (compact ? [{ k: 'any', label: 'Swaps', hash: 'private-route', icon: IC.route }] : NAV_ITEMS).forEach(function (it) {
@@ -1279,10 +1279,10 @@
   }, 400);
 
   // visual-only ordering of the sidebar / bottom bar (CSS order; React keeps its DOM untouched)
-  var SIDE_ORDER = ['home|overview', 'shield|vanish', 'send|pay', 'swap|trade', 'bridge|bridge out|camocashswap',
-    'dk:private', 'dk:privacy', 'dk:track', 'history|activity', 'dk:chain', 'nc:more',
-    'receive|request', 'withdraw|cash out', 'earn|yield', 'addresses|burner addresses', 'invite|referrals', 'keys|vault & keys'];
-  var TAB_ORDER = ['home|overview', 'dk:any', 'shield|vanish', 'swap|trade', 'send|pay', 'more'];
+  var SIDE_ORDER = ['vault|home|overview', 'cloak|shield|vanish', 'pay|send', 'trade|swap', 'bridge|bridge out|pool swap',
+    'dk:private', 'dk:privacy', 'dk:track', 'activity|history', 'dk:chain', 'nc:more',
+    'receive|request', 'withdraw|cash out', 'earn|yield', 'addresses|burner addresses', 'invite|referrals', 'keys|vault & keys|key ring'];
+  var TAB_ORDER = ['vault|home|overview', 'dk:any', 'cloak|shield|vanish', 'trade|swap', 'pay|send', 'more'];
   function orderNav() {
     [['nav.side', SIDE_ORDER], ['nav.tabbar', TAB_ORDER]].forEach(function (cfg) {
       var nav = document.querySelector(cfg[0]); if (!nav) return;
@@ -1296,27 +1296,28 @@
   }
 
   // ---- per-tab explainers (users always know what a tab does) ----
-  var X_URL = 'https://x.com/trycamocash';
-  var INTRO = {
-    'dk:private': ['Private route · no wallet needed', 'Swap from Solana to any chain without connecting a wallet. Camo Cash compares several multi-hop routes, you pick one and send a single deposit to a one-time address; the route converts and delivers to your destination address. Nothing links your Solana wallet to the receiving address beyond the route itself.', ['No wallet connection', 'Multi-hop routing', 'One deposit']],
+    var INTRO = {
+    'dk:private': ['Private route · no wallet needed', 'Swap from Solana to any chain without connecting a wallet. Cloak Privacy compares several multi-hop routes, you pick one and send a single deposit to a one-time address; the route converts and delivers to your destination address. Nothing links your Solana wallet to the receiving address beyond the route itself.', ['No wallet connection', 'Multi-hop routing', 'One deposit']],
     'dk:privacy': ['Privacy swap · no wallet needed', 'Intent-based confidential swap. You state what you want (send X, receive at least Y on chain Z); a competitive solver network fills it and settlement runs through confidential processing. Refunds return to your Solana refund address if the intent is not filled.', ['Solver competition', 'Confidential settlement', 'Auto refund']],
     'dk:track': ['Track order', 'Paste an order ID to see its live status, from waiting for deposit through confirmation, exchange and delivery. Orders created on this device are listed below.', ['Live status', 'Local order list']],
-    'home': ['Home', 'Your camouflaged balance, recent activity and quick actions. Everything here is decrypted locally from your notes; on-chain it is just another shape in the crowd. The first Alpenglow-era ZK shield on Solana: every move finalizes in ~150 ms.', ['Local decryption', 'Notes', 'Alpenglow finality', 'No tracking']],
-    'shield': ['Shield · ZK shielded deposit', 'Yes, this is real zero-knowledge. Shield moves public tokens from a Solana wallet into the shielded pool: the program stores a Poseidon commitment to (token, amount, owner key, blinding) as a leaf in a 2^26 Merkle tree. From then on the funds are notes only you can open. Every later spend is a Groth16 proof (BN254) that the note exists in the tree and that you hold its key, checked on-chain without revealing which note.', ['Groth16 / BN254', 'Poseidon Merkle tree', 'Nullifiers block double-spends']],
-    'swap': ['Swap · private trade inside the pool', 'Trade one shielded token for another without leaving the pool. A proof spends your input note, the program routes the trade through on-chain liquidity and writes the output as a new note. Outside observers see a pool trade happen, not who made it or how big it was.', ['Proof-bound terms', 'Relayer pays gas', 'Output lands as a note']],
+    'home': ['Vault', 'Your cloaked balance, recent activity and quick actions. Everything here is decrypted locally from your notes; on-chain it is just another shape in the crowd. Alpenglow-era finality: every move settles in about 150 ms.', ['Local decryption', 'Notes', 'Alpenglow finality', 'No tracking']],
+    'shield': ['Cloak · ZK-shielded deposit', 'Yes, this is real zero-knowledge. Cloaking moves public tokens from a Solana wallet into the shielded pool: the program stores a Poseidon commitment to (token, amount, owner key, blinding) as a leaf in a 2^26 Merkle tree. From then on the funds are notes only you can open. Every later spend is a Groth16 proof (BN254) that the note exists in the tree and that you hold its key, checked on-chain without revealing which note.', ['Groth16 / BN254', 'Poseidon Merkle tree', 'Nullifiers block double-spends']],
+    'swap': ['Trade · private swap inside the pool', 'Trade one shielded token for another without leaving the pool. A proof spends your input note, the program routes the trade through on-chain liquidity and writes the output as a new note. Outside observers see a pool trade happen, not who made it or how big it was.', ['Proof-bound terms', 'Relayer pays gas', 'Output lands as a note']],
     'bridge': ['Bridge', 'Exit the shielded pool directly to another network. The proof binds the destination chain, address and minimum output, so a relayer cannot change where funds go.', ['Bound destination', 'Cross-chain exit', 'Relayer submitted']],
-    'send': ['Send · private transfer', 'Send to any Camo Cash address. Your note is spent by proof and a new note is encrypted to the recipient’s viewing key. On-chain: one nullifier and two new commitments. No sender, recipient or amount is revealed.', ['Encrypted to recipient', '0 public amounts', 'No wallet signature']],
-    'receive': ['Receive privately', 'Share your Camo Cash address or a payment link. Incoming notes are found by scanning with your viewing key locally; the address itself never appears on-chain.', ['Viewing key scan', 'Shareable address', 'Unlinkable receipts']],
+    'send': ['Pay · private transfer', 'Pay any Cloak Privacy address. Your note is spent by proof and a new note is encrypted to the recipient’s viewing key. On-chain: one nullifier and two new commitments. No sender, recipient or amount is revealed.', ['Encrypted to recipient', '0 public amounts', 'No wallet signature']],
+    'receive': ['Receive privately', 'Share your Cloak Privacy address or a payment link. Incoming notes are found by scanning with your viewing key locally; the address itself never appears on-chain.', ['Viewing key scan', 'Shareable address', 'Unlinkable receipts']],
     'withdraw': ['Withdraw to Solana', 'Turn notes back into public tokens at any Solana address, ideally a fresh burner one. The amount and destination become public at exit, but the proof does not link them to the deposit that funded them.', ['Public exit', 'Use a burner address', 'Unlinkable to deposit']],
     'earn': ['Earn while shielded', 'Lend shielded balances into allow-listed on-chain vaults from inside the pool. Positions are held by the program and accounted to your notes, so your wallet never appears as the depositor.', ['Allow-listed vaults', 'Position as notes', 'Withdraw any time']],
-    'history': ['History', 'Your own decrypted activity log. Only your device can read it; the chain only ever sees nullifiers and commitments.', ['Local only', 'Decrypted with your keys']],
+    'history': ['Activity', 'Your own decrypted activity log. Only your device can read it; the chain only ever sees nullifiers and commitments.', ['Local only', 'Decrypted with your keys']],
     'addresses': ['Burner addresses', 'One-time Solana addresses derived from your vault, used once for a cash out or a payment so exits do not cluster on one public address.', ['Derived from vault', 'Single use', 'Breaks clustering']],
     'invite': ['Invite', 'Invite friends with your personal link and track rewards earned from their activity.', ['Personal link', 'Rewards']],
-    'keys': ['Keys & vault', 'Your spending key, viewing key and recovery key, all derived from one 32-byte root encrypted on this device (PBKDF2 · AES-GCM). Back up the recovery key offline; nobody can reset it.', ['Never leaves device', 'Recovery key', 'Viewing key export']]
+    'keys': ['Key ring & vault', 'Your spending key, viewing key and recovery key, all derived from one 32-byte root encrypted on this device (PBKDF2 · AES-GCM). Back up the recovery key offline; nobody can reset it.', ['Never leaves device', 'Recovery key', 'Viewing key export']],
+    'dk:chain': ['Ledger · live pool record', 'Every cloak and exit, the current Merkle root, sealed notes and spent nullifiers — streamed live from Solana mainnet. Watch the crowd you blend into grow in real time.', ['Live feed', 'Merkle root', 'Nullifiers']]
   };
   function activeLabel() {
     var on = document.querySelector('nav.side .nav-i.on:not(.gx-nav)') || document.querySelector('nav.tabbar .nav-i.on:not(.gx-nav)');
-    return on ? (on.textContent || '').trim().toLowerCase() : '';
+    var lbl = on ? (on.textContent || '').trim().toLowerCase() : '';
+    return L2K[lbl] || lbl;
   }
   function introHTML(k) {
     var it = INTRO[k]; if (!it) return '';
@@ -1330,7 +1331,7 @@
     var el = document.getElementById('gx-intro');
     var on = document.documentElement.classList.contains('gx-on');
     var r = on ? parse() : null;
-    var k = on ? (r ? (r.view === 'track' ? 'dk:track' : (r.method === 'privacy' ? 'dk:privacy' : 'dk:private')) : null) : activeLabel();
+    var k = on ? (r ? (r.view === 'track' ? 'dk:track' : (r.view === 'chain' ? 'dk:chain' : (r.method === 'privacy' ? 'dk:privacy' : 'dk:private'))) : null) : activeLabel();
     if (!k || !INTRO[k]) { if (el) el.style.display = 'none'; lastIntro = null; return; }
     if (!el || el.parentNode !== main) {
       el = document.createElement('div'); el.id = 'gx-intro'; el.setAttribute('data-testid', 'gx-intro');
@@ -1340,51 +1341,28 @@
     el.style.display = '';
     if (lastIntro !== k) { el.innerHTML = introHTML(k); el.setAttribute('data-tab', k); lastIntro = k; }
   }
-  function ensureX() {
-    var tr = document.querySelector('header .top-right');
-    if (tr && !tr.querySelector('.gx-x')) {
-      var a = document.createElement('a');
-      a.className = 'gx-x'; a.href = X_URL; a.target = '_blank'; a.rel = 'noopener noreferrer';
-      a.setAttribute('aria-label', 'Camo Cash on X'); a.setAttribute('data-testid', 'gx-x-link');
-      a.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>';
-      tr.insertBefore(a, tr.firstChild);
-    }
-  }
-  /* ---- Camo Cash: header tagline — First Alpenglow ZK shield on Solana ---- */
+  function ensureX() { var x = document.querySelector('.gx-x'); if (x) x.remove(); }
   function ensureTagline() {
     if (!document.querySelector('main.main')) return;
     if (document.getElementById('cc-tagline')) return;
     var t = document.createElement('span');
     t.id = 'cc-tagline'; t.className = 'cc-tag'; t.setAttribute('data-testid', 'cc-tagline');
     var s = document.createElement('span');
-    s.textContent = 'First Alpenglow finality ZK shielded';
-    var ca = document.createElement('button');
-    ca.type = 'button'; ca.className = 'cc-ca'; ca.setAttribute('data-testid', 'app-ca');
-    ca.title = 'Copy $CAMO contract address';
-    var caTxt = function () { return window.innerWidth < 640 ? '9DMUQb\u2026pump' : '$CAMO 9DMUQb\u2026pump'; };
-    ca.textContent = caTxt();
-    ca.addEventListener('click', function () {
-      try { navigator.clipboard.writeText('9DMUQbHWth5TtdSPZ1pRPsLTxsfYfM97n7K6x1MLpump'); } catch (e) {}
-      ca.textContent = 'CA copied';
-      setTimeout(function () { ca.textContent = caTxt(); }, 1300);
-    });
-    window.__ccCaTxt = function () { if (ca.textContent !== 'CA copied') ca.textContent = caTxt(); };
-    t.appendChild(s); t.appendChild(ca);
+    s.textContent = 'Alpenglow finality \u00b7 ZK shielded';
+    t.appendChild(s);
     document.body.appendChild(t);
   }
   function fixTaglineOverlap() {
     var t = document.getElementById('cc-tagline'); if (!t) return;
-    if (window.__ccCaTxt) window.__ccCaTxt();
     var wb = document.querySelector('header .wallet-btn');
     var w = wb ? Math.round(wb.getBoundingClientRect().width) : 190;
     var right = w + 34;
     if (t.style.right !== right + 'px') t.style.right = right + 'px';
-    var s = t.querySelector('span');
     var connected = wb && /\u00b7/.test(wb.textContent || '');
     var show = connected ? 'none' : '';
-    if (s && s.style.display !== show) s.style.display = show;
+    if (t.style.display !== show) t.style.display = show;
   }
-  /* ---- Camo Cash: keep desktop top tabs clear of the header controls ---- */
+  /* ---- Cloak Privacy: keep desktop top tabs clear of the header controls ---- */
   var OVF_ORDER = ['chain', 'history', 'bridge', 'track', 'send', 'privacy swap', 'shield', 'private route', 'swap'];
   function navKey(b) {
     var t = '';
@@ -1436,9 +1414,9 @@
     nav.classList.toggle('cc-tight', over());
     if (now.length !== was.length && document.getElementById('cc-more-pop')) closeMore();
   }
-  /* ---- Camo Cash: top-tab "More" menu (desktop) ---- */
-  var MORE_OVF = { 'chain': 'Live pool ledger', 'history': 'Your local activity', 'bridge': 'Move funds across chains', 'track': 'Follow a swap order live',
-    'send': 'Pay anyone privately', 'privacy swap': 'No wallet · shielded cross-chain', 'shield': 'Move tokens into the pool', 'private route': 'No wallet · best-rate cross-chain', 'swap': 'Trade inside the pool' };
+  /* ---- Cloak Privacy: top-tab "More" menu (desktop) ---- */
+  var MORE_OVF = { 'chain': 'Live pool ledger', 'activity': 'Your local activity', 'history': 'Your local activity', 'bridge': 'Move funds across chains', 'track': 'Follow a swap order live',
+    'pay': 'Pay anyone privately', 'send': 'Pay anyone privately', 'privacy swap': 'No wallet · shielded cross-chain', 'cloak': 'Move tokens into the pool', 'shield': 'Move tokens into the pool', 'private route': 'No wallet · best-rate cross-chain', 'trade': 'Trade inside the pool', 'swap': 'Trade inside the pool', 'pool swap': 'Trade inside the pool' };
   var MORE = { 'receive': 'Get paid to a private address', 'withdraw': 'Exit to any Solana address',
     'addresses': 'One-time burner addresses', 'keys': 'Vault, viewing & recovery keys' };
   var MORE_ICO = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
@@ -1497,13 +1475,13 @@
     mb.classList.toggle('on', anyOn || !!nav.querySelector('.nav-i.cc-ovf.on'));
   }
 
-  /* ---- Camo Cash: welcome tour (first visit) ---- */
-  var TOUR_KEY = 'cc-tour-v1';
+  /* ---- Cloak Privacy: welcome tour (first visit) ---- */
+  var TOUR_KEY = 'cc-tour-v2';
   var TOUR = [
-    ['Welcome to Camo Cash', 'Private money on Solana.', 'Shield your tokens into a zero-knowledge pool — your balance puts on camo and melts into the crowd.', 'mark'],
-    ['Shield, send, swap', 'Every move under cover.', 'Pay anyone, trade tokens and earn yield with proofs instead of public transfers. Nobody sees who, what or how much.', '<path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/>'],
+    ['Welcome to Cloak Privacy', 'Private money on Solana.', 'Shield your tokens into a zero-knowledge pool — your balance vanishes into the crowd.', 'mark'],
+    ['Cloak, pay, trade', 'Every move off the record.', 'Pay anyone, trade tokens and earn yield with proofs instead of public transfers. Nobody sees who, what or how much.', '<path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/>'],
     ['No wallet? No problem', 'Private route & Privacy swap.', 'One deposit to a burn-after-use address moves value to any chain. Track every order live.', '<path d="M7 7h11l-3-3M17 17H6l3 3"/>'],
-    ['Your keys, your device', 'Nothing to reset, nothing to leak.', 'Keys are forged and encrypted on this device alone. Guard your recovery key — you alone hold the pattern.', '<circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.2-8.2M16 7l2 2M14 9l2 2"/>']
+    ['Your keys, your device', 'Nothing to reset, nothing to leak.', 'Keys are forged and encrypted on this device alone. Guard your recovery key — nobody can reset it for you.', '<circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.2-8.2M16 7l2 2M14 9l2 2"/>']
   ];
   function showTour(force) {
     try { if (!force && localStorage.getItem(TOUR_KEY)) return; } catch (e) {}
@@ -1529,16 +1507,16 @@
   }
   window.__ncTour = function () { showTour(true); };
 
-  /* ---- Camo Cash: footer ---- */
+  /* ---- Cloak Privacy: footer ---- */
   function ensureFoot() {
     var main = document.querySelector('main.main'); if (!main) return;
     var f = document.getElementById('cc-foot');
     if (f && f.parentNode === main && main.lastElementChild === f) return;
     if (!f) {
       f = document.createElement('footer'); f.id = 'cc-foot'; f.setAttribute('data-testid', 'cc-footer');
-      f.innerHTML = '<span>© ' + new Date().getFullYear() + ' Camo Cash</span><nav>' +
+      f.innerHTML = '<span>© ' + new Date().getFullYear() + ' Cloak Privacy</span><nav>' +
         '<a href="/#flow">How it works</a><a href="/#zk">Privacy model</a><a href="/docs">Docs</a><a href="/#fees">Fees</a>' +
-        '<a href="#" data-cc-tour="1">Take the tour</a><a href="' + X_URL + '" target="_blank" rel="noopener noreferrer">X</a></nav>';
+        '<a href="#" data-cc-tour="1">Take the tour</a></nav>';
       f.querySelector('[data-cc-tour]').addEventListener('click', function (e) { e.preventDefault(); showTour(true); });
     }
     main.appendChild(f);
@@ -1550,7 +1528,7 @@
     if (off !== wb.classList.contains('cc-off')) wb.classList.toggle('cc-off', off);
     if (wb.getAttribute('data-testid') !== 'cc-connect-btn') wb.setAttribute('data-testid', 'cc-connect-btn');
   }
-  /* ---- Camo Cash: mobile dock + Menu sheet ---- */
+  /* ---- Cloak Privacy: mobile dock + Menu sheet ---- */
   var DI = {
     wallet: '<rect x="3" y="6" width="18" height="14" rx="3"/><path d="M16 13h2"/><path d="M3 10h18"/><path d="M7 6V5a2 2 0 0 1 2-2h8"/>',
     hide: '<path d="M3 3l18 18"/><path d="M10.6 5.1A10 10 0 0 1 12 5c5 0 9 4.5 10 7a13 13 0 0 1-3 4.2M6.3 6.3A13 13 0 0 0 2 12c1 2.5 5 7 10 7a9.6 9.6 0 0 0 4.4-1.1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
@@ -1576,26 +1554,28 @@
     out: '<path d="M7 17 17 7M8 7h9v9"/>', chev: '<path d="m9 6 6 6-6 6"/>'
   };
   var DOCK = [
-    { k: 'home', label: 'Wallet', ico: 'wallet' }, { k: 'shield', label: 'Hide', ico: 'hide' },
-    { k: 'send', label: 'Pay', ico: 'pay' }, { k: 'swap', label: 'Trade', ico: 'trade' },
-    { k: 'dk:chain', label: 'Chain', ico: 'term' }, { k: 'menu', label: 'Menu', ico: 'menu' }
+    { k: 'swap', label: 'Trade', ico: 'trade' }, { k: 'shield', label: 'Cloak', ico: 'hide' },
+    { k: 'home', label: 'Vault', ico: 'wallet' }, { k: 'send', label: 'Pay', ico: 'pay' },
+    { k: 'dk:chain', label: 'Ledger', ico: 'book' }, { k: 'menu', label: 'More', ico: 'menu' }
   ];
   var TILES = [
-    { k: 'bridge', label: 'Bridge', ico: 'bridge' }, { k: 'dk:private-route', label: 'Private route', ico: 'route' },
-    { k: 'dk:privacy-swap', label: 'Privacy swap', ico: 'lock' }, { k: 'dk:track', label: 'Track', ico: 'track' },
-    { k: 'history', label: 'History', ico: 'clock' }, { k: 'dk:chain', label: 'Chain', ico: 'term' },
-    { k: 'receive', label: 'Receive', ico: 'inbox' },
-    { k: 'withdraw', label: 'Withdraw', ico: 'exit' }, { k: 'addresses', label: 'Addresses', ico: 'pin' },
-    { k: 'keys', label: 'Keys', ico: 'key' }
+    { k: 'receive', label: 'Receive', ico: 'inbox' }, { k: 'withdraw', label: 'Withdraw', ico: 'exit' },
+    { k: 'dk:private-route', label: 'Private route', ico: 'route' }, { k: 'dk:privacy-swap', label: 'Privacy swap', ico: 'lock' },
+    { k: 'bridge', label: 'Bridge', ico: 'bridge' }, { k: 'dk:track', label: 'Track order', ico: 'track' },
+    { k: 'dk:chain', label: 'Ledger', ico: 'book' }, { k: 'history', label: 'Activity', ico: 'clock' },
+    { k: 'addresses', label: 'Burner addresses', ico: 'pin' }, { k: 'keys', label: 'Key ring', ico: 'key' }
   ];
   var LEARN = [
-    { label: 'How Camo Cash works', ico: 'spark', act: 'tour' }, { label: 'Privacy model', ico: 'eye', href: '/#zk' },
+    { label: 'How Cloak Privacy works', ico: 'spark', act: 'tour' }, { label: 'Privacy model', ico: 'eye', href: '/#zk' },
     { label: 'Fees', ico: 'coin', href: '/#fees' }, { label: 'Docs', ico: 'book', href: '/docs', ext: true }
   ];
   function dsv(n, w) { return '<svg viewBox="0 0 24 24" width="' + (w || 22) + '" height="' + (w || 22) + '" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + DI[n] + '</svg>'; }
+  var K2L = { home: 'vault', shield: 'cloak', swap: 'trade', send: 'pay', history: 'activity', keys: 'key ring', addresses: 'burner addresses' };
+  var L2K = { vault: 'home', cloak: 'shield', trade: 'swap', pay: 'send', activity: 'history', 'key ring': 'keys', 'burner addresses': 'addresses' };
   function nativeNav(k) {
+    var want = (K2L[k] || k).toLowerCase();
     var btns = document.querySelectorAll('nav.side .nav-i:not(.gx-nav)');
-    for (var i = 0; i < btns.length; i++) if ((btns[i].textContent || '').trim().toLowerCase() === k) return btns[i];
+    for (var i = 0; i < btns.length; i++) { var t = (btns[i].textContent || '').trim().toLowerCase(); if (t === want || t === k) return btns[i]; }
     return null;
   }
   function openFeature(k) {
@@ -1608,7 +1588,8 @@
     var r = document.documentElement.classList.contains('gx-on') ? parse() : null;
     if (r) return r.view === 'track' ? 'dk:track' : r.view === 'chain' ? 'dk:chain' : (r.method === 'privacy' ? 'dk:privacy-swap' : 'dk:private-route');
     var on = document.querySelector('nav.side .nav-i.on:not(.gx-nav)');
-    return on ? (on.textContent || '').trim().toLowerCase() : 'home';
+    var lbl = on ? (on.textContent || '').trim().toLowerCase() : 'home';
+    return L2K[lbl] || lbl;
   }
   function closeSheet() {
     var s = document.getElementById('cc-sheet'); if (!s) return;
@@ -1625,7 +1606,7 @@
         return '<button class="ns-tile' + (cur === t.k ? ' on' : '') + '" style="animation-delay:' + (i * 22) + 'ms" data-k="' + t.k + '" data-testid="cc-menu-' + t.k.replace(/[^a-z]+/g, '-') + '"><i>' + dsv(t.ico, 20) + '</i><span>' + t.label + '</span></button>';
       }).join('') + '</div><div class="ns-sec">Learn</div><div class="ns-list">' + LEARN.map(function (l, i) {
         return (l.href ? '<a href="' + l.href + '"' : '<button data-act="' + l.act + '"') + ' class="ns-row" data-testid="cc-learn-' + i + '"><i>' + dsv(l.ico, 18) + '</i><span>' + l.label + '</span><em>' + dsv(l.ext ? 'out' : 'chev', 16) + '</em>' + (l.href ? '</a>' : '</button>');
-      }).join('') + '</div><div class="ns-foot"><span>© ' + new Date().getFullYear() + ' Camo Cash</span><a href="' + X_URL + '" target="_blank" rel="noopener noreferrer">X</a><a href="/">Home page</a></div></div></div>';
+      }).join('') + '</div><div class="ns-foot"><span>© ' + new Date().getFullYear() + ' Cloak Privacy</span><a href="/docs">Docs</a><a href="/">Home page</a></div></div></div>';
     s.addEventListener('click', function (e) {
       if (e.target === s || e.target.closest('.ns-x')) { closeSheet(); return; }
       var t = e.target.closest('.ns-tile'); if (t) { openFeature(t.getAttribute('data-k')); return; }
@@ -1657,17 +1638,17 @@
     });
   }
 
-  /* ---- Camo Cash: explain first, connect last ---- */
+  /* ---- Cloak Privacy: explain first, connect last ---- */
   var SHORT = {
-    home: ['Wallet', 'Your money, in camo.'], shield: ['Hide', 'Pull your tokens under cover.'],
-    send: ['Pay', 'Deliver value. Leave no tracks.'], swap: ['Trade', 'Swap under cover.'],
+    home: ['Vault', 'Your money, off the books.'], shield: ['Cloak', 'Wrap your tokens in zero knowledge.'],
+    send: ['Pay', 'Deliver value. Leave no trace.'], swap: ['Trade', 'Swap inside the dark pool.'],
     bridge: ['Bridge', 'Slip out to any chain.'], receive: ['Receive', 'Get paid off the radar.'],
     withdraw: ['Withdraw', 'Cash out, no fingerprints.'], earn: ['Earn', 'Yield under cover.'],
     history: ['History', 'For your eyes only.'], addresses: ['Addresses', 'Burn-after-use exits.'],
     invite: ['Invite', 'Recruit and earn.'], keys: ['Keys', 'Your keys, your command.']
   };
   var GET = {
-    home: ['Camouflaged balance', 'Local history', 'All tools unlocked'], shield: ['Sealed notes', 'Hidden amounts', 'Unlinked wallet'],
+    home: ['Cloaked balance', 'Local activity', 'All tools unlocked'], shield: ['Sealed notes', 'Hidden amounts', 'Unlinked wallet'],
     send: ['Hidden sender', 'Hidden amount', 'Gas covered'], swap: ['Private trades', 'New notes out', 'No public trail'],
     bridge: ['Any network', 'Proof-locked', 'No signature'], receive: ['Private address', 'QR code', 'Auto-detected'],
     withdraw: ['Any address', 'Burner ready', 'Gas covered'], earn: ['Vetted vaults', 'Private positions', 'Exit anytime'],
@@ -1723,7 +1704,7 @@
     p.querySelector('.np-cta').addEventListener('click', openOnb);
   }
 
-  /* ---- Camo Cash: wallet sheet — Camo Wallet first, non-native wallets under a dropdown ---- */
+  /* ---- Cloak Privacy: wallet sheet — Cloak Wallet first, non-native wallets under a dropdown ---- */
   var EXT_WALLETS = [
     ['Phantom', 'The popular Solana wallet', 'https://phantom.com'],
     ['Solflare', 'Solana wallet, web and mobile', 'https://solflare.com'],
@@ -1783,7 +1764,7 @@
     } catch (e) {}
   }
 
-  /* ---- Camo Cash boot loader: square radar sweep + cycling field actions ---- */
+  /* ---- Cloak Privacy boot loader: square radar sweep + cycling field actions ---- */
   function ensureSplash() {
     if (window.__ncSplashDone || document.getElementById('cc-splash')) return;
     var vl = document.querySelector('.vl');
@@ -1793,9 +1774,9 @@
     var shownAt = performance.now(), MIN_MS = 1500, leaving = false;
     box.innerHTML = '<div class="sp-card sp-mini">'
       + '<div class="sp-radar"><i class="sp-r2"></i><i class="sp-r3"></i><i class="sp-sweep"></i><i class="sp-core"></i></div>'
-      + '<b id="sp-act" class="in">Sweeping the field&hellip;</b></div>';
+      + '<b id="sp-act" class="in">Drawing the cloak&hellip;</b></div>';
     document.body.appendChild(box);
-    var acts = ['Sweeping the field\u2026', 'Forging keys\u2026', 'Sealing notes\u2026', 'Syncing the pool\u2026', 'Cloaking tracks\u2026', 'Going dark\u2026'];
+    var acts = ['Drawing the cloak\u2026', 'Forging keys\u2026', 'Sealing notes\u2026', 'Syncing the pool\u2026', 'Scrambling traces\u2026', 'Going dark\u2026'];
     var ai = 0, act = box.querySelector('#sp-act');
     var at = setInterval(function () {
       ai = (ai + 1) % acts.length;

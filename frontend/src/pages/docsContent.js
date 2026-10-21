@@ -1,4 +1,4 @@
-// Camo Cash documentation: written fresh for the /docs page.
+// Cloak Privacy documentation: written fresh for the /docs page.
 // Structure: groups -> pages -> blocks. Block kinds: p, steps, list, code, table, note, kv.
 
 export const DOC_GROUPS = [
@@ -8,10 +8,10 @@ export const DOC_GROUPS = [
     pages: [
       {
         id: 'overview',
-        title: 'What Camo Cash is',
-        lead: 'Camo Cash gives a Solana wallet a second, sealed balance. Money goes in publicly, moves around privately, and comes out wherever you point it.',
+        title: 'What Cloak Privacy is',
+        lead: 'Cloak Privacy gives a Solana wallet a second, sealed balance. Money goes in publicly, moves around privately, and comes out wherever you point it.',
         blocks: [
-          { k: 'p', t: 'Think of it as two layers. Your normal wallet is the street-level account everyone can look at. Your Camo Cash vault is a back room on the same chain: the network can confirm every action in it is valid, but it cannot see who did it, how much moved, or (if you pay fees in private SOL) which token was involved.' },
+          { k: 'p', t: 'Think of it as two layers. Your normal wallet is the street-level account everyone can look at. Your Cloak Privacy vault is a back room on the same chain: the network can confirm every action in it is valid, but it cannot see who did it, how much moved, or (if you pay fees in private SOL) which token was involved.' },
           { k: 'kv', rows: [
             ['Chain', 'Solana mainnet'],
             ['Custody', 'Non-custodial; secrets are created and kept in your browser'],
@@ -27,9 +27,9 @@ export const DOC_GROUPS = [
         lead: 'From zero to your first private payment in about two minutes.',
         blocks: [
           { k: 'steps', items: [
-            ['Open a vault', 'Hit Connect wallet and pick Create a Camo Cash vault. Choose a password for this device. You get a recovery key once; store it offline.'],
+            ['Open a vault', 'Hit Connect wallet and pick Create a Cloak Privacy vault. Choose a password for this device. You get a recovery key once; store it offline.'],
             ['Shield', 'Go to Shield, pick a token and amount, and approve one signature from your public wallet. Your tokens become sealed notes.'],
-            ['Use it', 'Send to any camo2… address, trade inside the pool, or exit. No pop-ups: a relayer submits each proof for you.'],
+            ['Use it', 'Send to any cloak2… address, trade inside the pool, or exit. No pop-ups: a relayer submits each proof for you.'],
             ['Leave', 'Withdraw to a brand-new address, or use Private route / Privacy swap to land on another chain.'],
           ] },
         ],
@@ -52,7 +52,7 @@ export const DOC_GROUPS = [
       {
         id: 'alpenglow',
         title: 'Alpenglow finality',
-        lead: 'Camo Cash is the first Alpenglow-era ZK shield on Solana — private moves that finalize in about a blink.',
+        lead: 'Cloak Privacy is the first Alpenglow-era ZK shield on Solana — private moves that finalize in about a blink.',
         blocks: [
           { k: 'p', t: 'Alpenglow (SIMD-0326) is Solana\u2019s consensus upgrade, live on mainnet from epoch 1064. Its voting engine, Votor, replaces TowerBFT: validators vote directly to each other off-chain instead of writing vote transactions, and blocks finalize in roughly 150 ms. A block is final in one round when 80% of stake notarizes it, or two rounds at 60% \u2014 with tolerance for 20% adversarial plus 20% offline stake, sealed by compact BLS finalization certificates.' },
           { k: 'kv', rows: [
@@ -62,7 +62,7 @@ export const DOC_GROUPS = [
             ['Safety', '20% adversarial + 20% offline stake'],
             ['Certificates', 'Compact BLS finalization certificates'],
           ] },
-          { k: 'p', t: 'What it means in Camo Cash: shielding, private payments, pool trades and exits confirm almost instantly, and \u201cconfirmed\u201d now means final. A private payment is un-reorgable about as fast as you can lift your finger. Rotor, the data-dissemination half, ships in a later proposal; Turbine carries blocks today.' },
+          { k: 'p', t: 'What it means in Cloak Privacy: shielding, private payments, pool trades and exits confirm almost instantly, and \u201cconfirmed\u201d now means final. A private payment is un-reorgable about as fast as you can lift your finger. Rotor, the data-dissemination half, ships in a later proposal; Turbine carries blocks today.' },
           { k: 'list', items: ['Confirmed and finalized are now the same state', 'No on-chain vote transactions \u2014 more block space for real moves', 'Fast-path finality assumes 80% responsive stake'] },
           { k: 'link', href: 'https://solana.com/upgrades/alpenglow', t: 'Solana \u2014 Alpenglow upgrade overview' },
           { k: 'link', href: 'https://x.com/solana_devs/status/2112892922136055937', t: '@solana_devs on X \u2014 Alpenglow announcement' },
@@ -197,7 +197,7 @@ export const DOC_GROUPS = [
       {
         id: 'fees',
         title: 'Fees',
-        lead: 'Every cost is shown before you confirm. Private sends carry no Camo Cash fee.',
+        lead: 'Every cost is shown before you confirm. Private sends carry no Cloak Privacy fee.',
         blocks: [
           { k: 'fees' },
         ],
@@ -228,7 +228,7 @@ export const DOC_GROUPS = [
             'Withdraw to a fresh address, never back to the wallet you shielded from',
             'Store the recovery key offline, away from this device',
           ] },
-          { k: 'note', t: 'No tool makes anyone 100% anonymous. Camo Cash removes the on-chain link; it cannot hide patterns you create yourself.' },
+          { k: 'note', t: 'No tool makes anyone 100% anonymous. Cloak Privacy removes the on-chain link; it cannot hide patterns you create yourself.' },
         ],
       },
     ],

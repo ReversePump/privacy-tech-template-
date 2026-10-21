@@ -49,7 +49,7 @@ def test_app_html_no_leaks():
         assert c == 0, f"Found '{term}' {c} times (case-insensitive) in /app HTML"
     # Title should be Cadabra App
     m = re.search(r"<title>([^<]+)</title>", body)
-    assert m and "Camo Cash" in m.group(1), f"title: {m.group(1) if m else None}"
+    assert m and "Cloak Privacy" in m.group(1), f"title: {m.group(1) if m else None}"
     # Jupiter should not be visible as a brand name in HTML head/body text
     # (allow references inside base64 blobs — just check the title/meta regions)
     head = body[: body.lower().find("</head>")] if "</head>" in body.lower() else body[:5000]

@@ -346,29 +346,29 @@ def strip_project_token_json(text: str) -> str:
 
 
 def null_prefix_js(text: str) -> str:
-    """Show Camo Cash prefixes (nullsk2…, nullvk1…, null2…) for keys/addresses.
+    """Show Cloak Privacy prefixes (nullsk2…, nullvk1…, null2…) for keys/addresses.
     Same length as the upstream prefixes so all slicing/decoding stays intact;
     checksum domain strings ("veil/recovery", "veil/address") are untouched, and
     parsers accept BOTH prefixes so older keys/addresses keep working."""
     if "veil" not in text:
         return text
     # generators
-    text = text.replace('"veilsk2"+', '"camosk2"+').replace('"veilvk1"+', '"camovk1"+').replace('"veil2"+', '"camo2"+')
-    # parsers: normalise camo-prefixed input back to the upstream prefix before decoding
+    text = text.replace('"veilsk2"+', '"cloaksk2"+').replace('"veilvk1"+', '"cloakvk1"+').replace('"veil2"+', '"cloak2"+')
+    # parsers: normalise cloak/camo-prefixed input back to the upstream prefix before decoding
     text = re.sub(r'function\((\w)\)\{try\{let (\w)=\1\.startsWith\("veil2"\)',
-                  r'function(\1){try{\1=String(\1).replace(/^camo(?=[12])/,"veil");let \2=\1.startsWith("veil2")', text)
+                  r'function(\1){try{\1=String(\1).replace(/^(?:cloak|camo)(?=[12])/,"veil");let \2=\1.startsWith("veil2")', text)
     text = re.sub(r'let (\w)=(\w)\.trim\(\)\.replace\(/\\s\+/g,""\);try\{if\(\1\.startsWith\("veilsk2"\)',
-                  r'let \1=\2.trim().replace(/\\s+/g,"").replace(/^camo(?=sk[12])/,"veil");try{if(\1.startsWith("veilsk2")', text)
+                  r'let \1=\2.trim().replace(/\\s+/g,"").replace(/^(?:cloak|camo)(?=sk[12])/,"veil");try{if(\1.startsWith("veilsk2")', text)
     # validators / extractors
-    text = text.replace(r'/^\s*veilsk[12]/', r'/^\s*(?:veil|null|camo)sk[12]/')
-    text = text.replace('/^veil[12]/', '/^(?:veil|null|camo)[12]/')
-    text = text.replace('/veil[12][1-9A-HJ-NP-Za-km-z]', '/(?:veil|null|camo)[12][1-9A-HJ-NP-Za-km-z]')
+    text = text.replace(r'/^\s*veilsk[12]/', r'/^\s*(?:veil|null|camo|cloak)sk[12]/')
+    text = text.replace('/^veil[12]/', '/^(?:veil|null|camo|cloak)[12]/')
+    text = text.replace('/veil[12][1-9A-HJ-NP-Za-km-z]', '/(?:veil|null|camo|cloak)[12][1-9A-HJ-NP-Za-km-z]')
     # human-readable hints / placeholders
-    text = re.sub(r'veil(sk[12]|vk1|[12])…', r'camo\1…', text)
-    text = text.replace('starts with veilsk2', 'starts with camosk2')
+    text = re.sub(r'veil(sk[12]|vk1|[12])…', r'cloak\1…', text)
+    text = text.replace('starts with veilsk2', 'starts with cloaksk2')
     return text
 
-CHUNK_VER = "camo1"
+CHUNK_VER = "cloak2"
 _CHUNK_REF_RE = re.compile(r'(static/chunks/[A-Za-z0-9_-]+)\.js(?![A-Za-z0-9_.])')
 _CHUNK_ALIAS_RE = re.compile(r'\.nc\d+\.js$|' + re.escape('.' + CHUNK_VER + '.js') + r'$')
 _NC_RETRY = ("(window.__ncR||(window.__ncR=function(f,n,d){return Promise.race([Promise.resolve().then(f),"
@@ -431,8 +431,8 @@ def rewrite_text(text: str, target: str, origin: str, ctype: str) -> str:
             text = text.replace("'veil-theme'", "'cb-theme'").replace('"veil-theme"', '"cb-theme"')
             if "text/html" in ctype:
                 text = text.replace(f"{p}/veil-mark.webp", f"{PREFIX}/_brand/mark.png")
-                text = text.replace("Pulling the veil over", "Pulling the camocash over")
-                text = re.sub(r"(?<![A-Za-z$])Veil(?![A-Za-z])", "Camo Cash", text)
+                text = text.replace("Pulling the veil over", "Pulling the cloak over")
+                text = re.sub(r"(?<![A-Za-z$])Veil(?![A-Za-z])", "Cloak Privacy", text)
                 # document-relative urls (page URL is shown as /shield/... so resolve them here)
                 text = re.sub(r'((?:\s)(?:src|poster|srcset)=["\'])(?![/#?"\']|[a-zA-Z][a-zA-Z0-9+.-]*:)',
                               rf"\1{p}/", text)
@@ -881,7 +881,7 @@ _IMG_URL_RE = re.compile(r'https://(?:api\.houdiniswap\.com|cdn\.jsdelivr\.net|r
 
 def _img_stream(n: int) -> bytes:
     import hashlib
-    seed = (os.environ.get("IMG_RELAY_SALT") or "camocash-img").encode()
+    seed = (os.environ.get("IMG_RELAY_SALT") or "cloak-img").encode()
     out, i = b"", 0
     while len(out) < n:
         out += hashlib.sha256(seed + i.to_bytes(4, "big")).digest()

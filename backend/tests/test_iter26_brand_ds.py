@@ -40,15 +40,15 @@ def _retry(fn, n=3, wait=4):
 @pytest.mark.parametrize("path", ["/favicon.ico", "/brand/favicon-32.png", "/brand/favicon-192.png",
                                   "/brand/favicon-180.png", "/api/bifrost/v1/app/icons/favicon-64.png",
                                   "/api/bifrost/v1/app/icons/apple-touch-icon.png"])
-def test_icon_is_camocash(s, path):
+def test_icon_is_cloak(s, path):
     from PIL import Image
     r = s.get(BASE_URL + path, timeout=30)
     assert r.status_code == 200
     im = Image.open(io.BytesIO(r.content)).convert("RGBA")
     w, h = im.size
-    px = im.getpixel((w // 2, h // 2))   # solid black centre
+    px = im.getpixel((w // 2, h // 2))   # mint core dot of the cloak glyph
     corner = im.getpixel((1, 1))
-    assert px[0] < 60 and px[1] < 60 and px[2] < 60, f"centre not black {px}"
+    assert 120 < px[0] < 210 and px[1] > 190 and 150 < px[2] < 230, f"centre not mint {px}"
     # no purple (ghost icon) pixels
     purple = sum(1 for p in im.getdata() if p[3] > 128 and p[2] > 150 and p[0] > 90 and p[1] < 90)
     assert purple < 5, f"purple pixels {purple}, corner {corner}"
@@ -58,8 +58,8 @@ def test_manifest(s):
     r = s.get(f"{BASE_URL}/api/bifrost/v1/app/manifest.webmanifest", timeout=30)
     assert r.status_code == 200
     j = r.json()
-    assert j["name"] == "Camo Cash · Private money on Solana"
-    assert j["short_name"] == "Camo Cash"
+    assert j["name"] == "Cloak Privacy · Private money on Solana"
+    assert j["short_name"] == "Cloak Privacy"
     assert all(i["src"].startswith("/api/bifrost/v1/_brand/") for i in j["icons"])
     for i in j["icons"]:
         assert s.get(BASE_URL + i["src"], timeout=30).status_code == 200
