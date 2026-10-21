@@ -207,3 +207,12 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
   "9DMUQb…pump" below 640px. fitNavNow accounts for badge width so nav tabs never slide under it.
 - Mobile app header compacting: brand clipped to 112px, connect button slimmed, badge font 9px —
   verified geometry: brand(124) < chip(147..232) < connect(252), no overlap at 375px.
+
+## Iteration 22 — Menu contrast fix + full-page contrast sweep (Oct 2026)
+- Mobile Menu sheet (cc-sheet .ns-tile): labels were white-on-white (inherited light color on #f6f7f1
+  tiles). Fixed: tile text #12141a, active tile gets dark outline + dark text (was #fff on #f4f4f5),
+  ns-row:active no longer flashes white bg under light text.
+- More menu copy: "Live pool terminal" -> "Live pool ledger" (terminal wording fully gone).
+- Sweep verified by screenshot at 375px and 1366px: Wallet, Hide, Pay, Swap, Chain, Private route,
+  Privacy swap, Track, Menu sheet, More dropdown — all text readable, headers (tagline + $CAMO CA chip +
+  Connect) coexist without overlap.

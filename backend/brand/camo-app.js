@@ -1437,7 +1437,7 @@
     if (now.length !== was.length && document.getElementById('cc-more-pop')) closeMore();
   }
   /* ---- Camo Cash: top-tab "More" menu (desktop) ---- */
-  var MORE_OVF = { 'chain': 'Live pool terminal', 'history': 'Your local activity', 'bridge': 'Move funds across chains', 'track': 'Follow a swap order live',
+  var MORE_OVF = { 'chain': 'Live pool ledger', 'history': 'Your local activity', 'bridge': 'Move funds across chains', 'track': 'Follow a swap order live',
     'send': 'Pay anyone privately', 'privacy swap': 'No wallet · shielded cross-chain', 'shield': 'Move tokens into the pool', 'private route': 'No wallet · best-rate cross-chain', 'swap': 'Trade inside the pool' };
   var MORE = { 'receive': 'Get paid to a private address', 'withdraw': 'Exit to any Solana address',
     'addresses': 'One-time burner addresses', 'keys': 'Vault, viewing & recovery keys' };
