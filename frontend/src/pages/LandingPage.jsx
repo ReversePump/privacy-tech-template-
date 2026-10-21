@@ -14,7 +14,7 @@ const LINKS = [['Features', '#features'], ['How it works', '#flow'], ['Real ZK',
 
 /* ---------------- data ---------------- */
 function useLiveStats() {
-  const [s, setS] = useState({ leaves: null, nullifiers: null, assets: null, at: 0, live: false });
+  const [s, setS] = useState({ leaves: null, nullifiers: null, assets: null, root: null, delta: 0, at: 0, live: false });
   useEffect(() => {
     let dead = false;
     const j = (u) => fetch(u, { cache: 'no-store' })
@@ -22,7 +22,11 @@ function useLiveStats() {
     const stats = () => {
       if (document.hidden) return;
       j(`${BF}/indexer/v1/stats`)
-        .then((d) => !dead && setS((p) => ({ ...p, leaves: d.leaves, nullifiers: d.nullifiers, at: Date.now(), live: true })))
+        .then((d) => !dead && setS((p) => {
+          const delta = (p.leaves != null && d.leaves > p.leaves) ? d.leaves - p.leaves : 0;
+          if (delta) setTimeout(() => { if (!dead) setS((q) => ({ ...q, delta: 0 })); }, 6000);
+          return { ...p, delta, leaves: d.leaves, nullifiers: d.nullifiers, root: d.root, at: Date.now(), live: true };
+        }))
         .catch(() => !dead && setS((p) => ({ ...p, live: false })));
     };
     const assets = () => {
@@ -154,53 +158,23 @@ function ContourField({ dark = true, className = '' }) {
 }
 
 /* ---------------- dot-matrix live counter (canvas) ---------------- */
-function DotCounter({ value, label }) {
-  const ref = useRef(null);
+/* ---------------- animated count-up (gloam-minimal) ---------------- */
+function CountUp({ value }) {
+  const [disp, setDisp] = useState(0);
+  const prev = useRef(0);
   useEffect(() => {
-    const cv = ref.current; if (!cv) return undefined;
-    const ctx = cv.getContext('2d');
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    let raf = 0; let t0 = 0; let visible = true;
-    const W = cv.clientWidth; const H = cv.clientHeight;
-    cv.width = W * dpr; cv.height = H * dpr; ctx.scale(dpr, dpr);
-    const off = document.createElement('canvas'); off.width = W; off.height = H;
-    const o = off.getContext('2d');
-    o.fillStyle = '#fff'; o.textBaseline = 'middle'; o.textAlign = 'left';
-    o.font = `700 ${Math.round(H * 0.82)}px "Space Mono", monospace`;
-    o.fillText(value, 4, H / 2 + 2);
-    const data = o.getImageData(0, 0, W, H).data;
-    const step = 5; const dots = [];
-    for (let y = step / 2; y < H; y += step) {
-      for (let x = step / 2; x < W; x += step) {
-        const on = data[((y | 0) * W + (x | 0)) * 4 + 3] > 120;
-        dots.push({ x, y, on, p: Math.random() * 6.28, s: 0.5 + Math.random() });
-      }
-    }
-    const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible && !raf) raf = requestAnimationFrame(draw); }, { threshold: 0 });
-    io.observe(cv);
-    function draw(ts) {
-      raf = 0; if (!visible) return;
-      if (!t0) t0 = ts;
-      const t = (ts - t0) / 1000;
-      ctx.clearRect(0, 0, W, H);
-      for (let i = 0; i < dots.length; i += 1) {
-        const d = dots[i];
-        if (d.on) {
-          const a = 0.75 + 0.25 * Math.sin(t * 2 + d.p);
-          ctx.fillStyle = `rgba(255,255,255,${a})`;
-          ctx.beginPath(); ctx.arc(d.x, d.y, 1.85, 0, 6.283); ctx.fill();
-        } else {
-          const a = 0.06 + 0.1 * Math.max(0, Math.sin(t * d.s + d.p + d.x * 0.02));
-          ctx.fillStyle = `rgba(255,255,255,${a})`;
-          ctx.fillRect(d.x - 0.8, d.y - 0.8, 1.6, 1.6);
-        }
-      }
-      raf = requestAnimationFrame(draw);
-    }
-    raf = requestAnimationFrame(draw);
-    return () => { cancelAnimationFrame(raf); io.disconnect(); };
+    if (value === null || value === undefined) return undefined;
+    const from = prev.current; const to = Number(value); prev.current = to;
+    let raf; const t0 = performance.now();
+    const step = (ts) => {
+      const k = Math.min(1, (ts - t0) / 900); const e = 1 - Math.pow(1 - k, 3);
+      setDisp(Math.round(from + (to - from) * e));
+      if (k < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
   }, [value]);
-  return <canvas ref={ref} aria-label={`${label}: ${value}`} className="block h-[74px] w-full" />;
+  return <span data-testid="hero-leaves">{value === null || value === undefined ? '—' : disp.toLocaleString()}</span>;
 }
 
 function LiveAgo({ at, live }) {
@@ -237,15 +211,25 @@ function Hero({ stats }) {
         </Reveal>
 
         <Reveal delay={180} className="mt-10 w-full max-w-[560px]">
-          <div className="cm-hud relative overflow-hidden rounded-none border border-white/15 bg-[#08090c]/70 text-left backdrop-blur-md" data-testid="hero-live">
-            <i className="cm-corner tl" /><i className="cm-corner tr" /><i className="cm-corner bl" /><i className="cm-corner br" />
-            <div className="flex items-center justify-between px-4 pt-3 font-mono text-[11px] uppercase tracking-[.18em]">
-              <span className="flex items-center gap-2 text-white/75"><span className="nm-pulse" />Sealed notes in the pool</span>
+          <div className="relative overflow-hidden rounded-none border border-white/15 bg-black/60 text-left backdrop-blur-md" data-testid="hero-live">
+            <div className="flex items-center justify-between border-b border-white/10 px-5 py-3 font-mono text-[10.5px] uppercase tracking-[.2em]">
+              <span className="flex items-center gap-2 text-white/80"><span className="nm-pulse" />Sealed-pool ledger</span>
               <LiveAgo at={stats.at} live={stats.live} />
             </div>
-            <div className="px-3"><DotCounter value={fmt(stats.leaves)} label="Sealed notes" /></div>
-            <div className="flex items-center justify-between gap-3 px-4 pb-4">
-              <span className="text-[12px] leading-[1.4] text-white/50">Every dot is a commitment.<br />None of them has a name.</span>
+            <div className="px-5 pb-4 pt-5">
+              <div className="text-[60px] font-semibold leading-none tracking-[-0.045em] sm:text-[72px]"><CountUp value={stats.leaves} /></div>
+              <div className="mt-3 font-mono text-[11px] uppercase tracking-[.14em] text-white/45">
+                notes sealed · {fmt(stats.nullifiers)} spent
+              </div>
+              <div className="mt-1.5 truncate font-mono text-[11px] tracking-[.05em] text-white/30">
+                merkle root {stats.root ? `${stats.root.slice(0, 12)}…${stats.root.slice(-6)}` : '—'}
+              </div>
+              <div className={`mt-4 h-5 font-mono text-[11.5px] uppercase tracking-[.14em] transition-opacity duration-500 ${stats.delta ? 'text-white opacity-100' : 'opacity-0'}`} data-testid="hero-delta">
+                +{stats.delta} just sealed into the crowd
+              </div>
+            </div>
+            <div className="flex items-center justify-between gap-3 border-t border-white/10 px-5 py-3.5">
+              <span className="text-[12px] leading-[1.45] text-white/50">Every entry is a commitment.<br />None of them has a name.</span>
               <BtnPrimary href={APP} testid="hero-launch" dark big={false}>Open app</BtnPrimary>
             </div>
           </div>

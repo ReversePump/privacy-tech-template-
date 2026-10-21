@@ -123,3 +123,9 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
 - Copy rewritten camo/stealth: pitch "Your money, in camo.", tour, per-page SHORT/GET, paraphrase "under full camo".
 - bifrost hardening: _CHUNK_ALIAS_RE now derives from CHUNK_VER (iter32 blank-splash class of bug prevented).
 - Verified: testing-agent iteration_33 = 100% (backend 60/60, all frontend checks incl. key prefixes, mobile, branding).
+
+## Iteration 13 — Hero counter redesigned (Oct 2026)
+- User flagged the dot-matrix counter card as unchanged from the old design. Replaced with a gloam-minimal
+  "sealed-pool ledger" panel: animated count-up number (real pool size), notes sealed/spent line, truncated live
+  Merkle root, "+N just sealed into the crowd" delta flash on pool growth, thin sharp borders, no HUD brackets.
+- DotCounter component removed; CountUp added. Delta auto-clears after 6s. Verified live (5,577 / root renders).
