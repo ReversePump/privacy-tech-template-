@@ -206,7 +206,7 @@ code {
   mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 85%);
 }
 
-/* ---------- Camo Cash landing (original) ---------- */
+/* ---------- Cloak Privacy landing (original) ---------- */
 .cc-landing{font-family:'Space Grotesk','Inter',system-ui,sans-serif}
 .cc-display{font-family:'Space Grotesk','Inter',system-ui,sans-serif}
 .cc-lime-btn{background:linear-gradient(180deg,#3a3f46,#23272c);color:#f4f5f7!important;box-shadow:0 8px 24px -8px rgba(20,22,25,.55),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -2px 0 rgba(0,0,0,.08);transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .25s}
@@ -225,7 +225,7 @@ code {
 .cc-rise{animation:ncRiseL .45s cubic-bezier(.2,.9,.25,1) both}
 @media (prefers-reduced-motion:reduce){.cc-ring,.cc-spin-slow,.cc-float,.cc-chip,.cc-pulse{animation:none}}
 
-/* ---- Camo Cash landing (gloam-style etched monochrome) ---- */
+/* ---- Cloak Privacy landing (gloam-style etched monochrome) ---- */
 .cx-landing{font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
 .cx-landing .cx-h{font-family:'Inter',system-ui,-apple-system,sans-serif;letter-spacing:-.03em}
 .cx-landing .font-mono{font-family:'Space Mono',ui-monospace,monospace}
@@ -251,7 +251,7 @@ code {
 .cx-btnline{transition:transform .22s cubic-bezier(.2,.9,.25,1),background .2s,color .2s,border-color .2s}
 .cx-btnline:hover{transform:scale(1.05)}
 
-/* ---- Camo Cash · gloam-style controls + military-stealth HUD bits ---- */
+/* ---- Cloak Privacy · gloam-style controls + military-stealth HUD bits ---- */
 .cm-kicker{position:relative;display:inline-flex;align-items:center;gap:8px;padding:7px 12px;font-family:'Space Mono',ui-monospace,monospace;font-size:11px;text-transform:uppercase;letter-spacing:.2em;color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.04)}
 .cm-dot{width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 0 0 rgba(128,128,128,.5);animation:nmPulse 1.8s infinite}
 .cm-corner{position:absolute;width:8px;height:8px;border:0 solid currentColor;opacity:.75}
@@ -278,7 +278,7 @@ code {
 .cx-bl.o2{opacity:0}
 .cx-bl.o3{transform:translateY(-7.5px) rotate(-45deg)}
 
-/* ---- Camo radar (square stealth sweep) ---- */
+/* ---- cloak radar (square stealth sweep) ---- */
 .cm-radar{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.02)}
 .cm-radar-ring{position:absolute;border:1px solid rgba(255,255,255,.12)}
 .cm-radar-cross-h{position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(255,255,255,.08)}

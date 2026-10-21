@@ -177,7 +177,7 @@ aside.rail{display:none!important}
 @media (min-width:1024px){nav.side{right:250px!important}}
 @media (max-width:1023px){.shell{grid-template-areas:"top" "main"!important}}
 
-/* ---------- connect button (original Camo Cash style) ---------- */
+/* ---------- connect button (original Cloak Privacy style) ---------- */
 header .wallet-btn{position:relative;height:42px!important;padding:0 18px 0 6px!important;gap:10px!important;background:#f4f4f5!important;color:#08090c!important;
  box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 8px 20px -10px rgba(244,244,245,.6)!important;font-size:14px!important;letter-spacing:-.01em}
 header .wallet-btn::before{content:"";flex:none;width:30px;height:30px;border-radius:0;
@@ -240,7 +240,7 @@ header .wallet-btn.cc-off>span:not(.wb-dot)::after{content:"Connect wallet";font
  .card.onb>p.hint{margin-top:18px!important;text-align:center!important;max-width:none}
 }
 
-/* ---------- mobile dock (Camo Cash) ---------- */
+/* ---------- mobile dock (Cloak Privacy) ---------- */
 #cc-dock{display:none}
 @media (max-width:1023px){
  nav.tabbar{display:none!important}
@@ -466,7 +466,7 @@ aside.rail{display:none!important}
 @media (min-width:901px){.ch-row{grid-template-columns:120px minmax(170px,1fr) 150px 210px 64px}}
 
 /* dock: 6 slots */
-#cc-dock{grid-template-columns:repeat(6,1fr)!important}
+#cc-dock{grid-template-columns:repeat(7,1fr)!important;padding:6px 4px!important}
 
 /* ---------- header: never crowded (dynamic overflow into More) + CA chip ---------- */
 @media (min-width:1024px){
@@ -671,3 +671,27 @@ main.main .view{animation:cloakView .5s var(--cc-ease) both}
 .hb-total.hb-zero::after{content:"0.00";visibility:visible;position:absolute;left:0;top:0;font-style:italic;color:#f2f9f3}
 /* ---- tagline steps aside earlier on tight desktops ---- */
 @media (max-width:1280px){.cc-tag{display:none}}
+
+/* ---- ledger source chip ---- */
+.ch-src{font-family:var(--f-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+ padding:5px 10px;border-radius:999px;border:1px solid rgba(169,231,192,.3);color:#a9e7c0;background:rgba(169,231,192,.07)}
+
+/* ---- splash: hood mark materializing ---- */
+#cc-splash .sp-hood{position:relative;width:96px;height:96px;display:flex;align-items:center;justify-content:center}
+#cc-splash .sp-hood img{width:76px;height:76px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(169,231,192,.35));
+ animation:spHood 2.6s cubic-bezier(.2,.9,.25,1) both}
+#cc-splash .sp-halo{position:absolute;inset:0;border:1.5px solid rgba(169,231,192,.4);border-radius:50%;
+ animation:spHalo 2.4s ease-out infinite}
+#cc-splash .sp-halo2{animation-delay:1.2s}
+@keyframes spHood{0%{opacity:0;transform:scale(.6) rotate(-14deg);filter:blur(10px)}60%{opacity:1;filter:blur(0)}100%{opacity:1;transform:none;filter:drop-shadow(0 0 18px rgba(169,231,192,.35))}}
+@keyframes spHalo{0%{transform:scale(.55);opacity:.8}100%{transform:scale(1.5);opacity:0}}
+@media (prefers-reduced-motion:reduce){#cc-splash .sp-hood img,#cc-splash .sp-halo{animation:none}}
+
+/* ---- 7-item dock compaction ---- */
+#cc-dock button{min-width:0!important}
+#cc-dock button span{font-size:9px!important;letter-spacing:.02em!important}
+#cc-dock button i{width:19px!important;height:19px!important}
+
+/* active dock icon: mint chip, not white square */
+#cc-dock button.on i{background:rgba(169,231,192,.16)!important;color:#a9e7c0!important;border-radius:10px}
+#cc-dock button{padding:5px 0 4px!important}

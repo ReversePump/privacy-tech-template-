@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List
 import uuid
 from bifrost import router as bifrost_router, close_client as bifrost_close, opaque_image_urls, warm_logos, live_relay
+from chain_native import router as chain_router
 from datetime import datetime, timezone
 
 
@@ -270,6 +271,25 @@ async def _start_warm():
     asyncio.create_task(warm_logos())
     asyncio.create_task(live_relay())
     asyncio.create_task(_mirror_warm())
+    asyncio.create_task(_chain_warm_loop())
+
+
+async def _chain_warm_loop():
+    """Keep the native chain caches hot so the Ledger page never hits a cold RPC."""
+    from chain_native import stats_native, feed_native, assets_native, cache_put
+    await asyncio.sleep(3)
+    while True:
+        try:
+            d = await asyncio.wait_for(stats_native(), 20)
+            cache_put("stats", d, 15)
+            cache_put("stats_last", d, 3600)
+            ev = await asyncio.wait_for(feed_native(60), 45)
+            cache_put("feed", ev, 25)
+            cache_put("feed_last", ev, 3600)
+            await assets_native()
+        except Exception:
+            pass
+        await asyncio.sleep(30)
 
 
 async def _mirror_warm():
@@ -304,8 +324,8 @@ def _scrub(body: bytes) -> bytes:
     except Exception:
         return body
     t = opaque_image_urls(t)
-    t = t.replace("DarkSwap", "Camo Cash").replace("darkswap.app", "camocash")
-    t = t.replace('"houdiniId"', '"orderId"').replace("HoudiniSwap", "Camo Cash").replace("houdiniswap", "camocash")
+    t = t.replace("DarkSwap", "Camo Cash").replace("darkswap.app", "cloakprivacy")
+    t = t.replace('"houdiniId"', '"orderId"').replace("HoudiniSwap", "Camo Cash").replace("houdiniswap", "cloakprivacy")
     return t.encode("utf-8")
 
 
@@ -329,6 +349,7 @@ async def ds_proxy_post(path: str, request: Request):
 # Include the router in the main app
 app.include_router(api_router)
 app.include_router(bifrost_router)
+app.include_router(chain_router)
 
 class GatewayStatusMiddleware:
     """The public ingress replaces any 502/504 body with its own HTML error page,

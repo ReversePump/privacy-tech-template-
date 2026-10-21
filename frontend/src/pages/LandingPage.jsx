@@ -399,6 +399,7 @@ export default function LandingPage() {
             <a href="/docs" className="transition hover:text-white">Docs</a>
             <a href="/#fees" className="transition hover:text-white">Fees</a>
             <a href={APP_URL} className="transition hover:text-white">Open app</a>
+            <a href="https://x.com/cloakprvt" target="_blank" rel="noopener noreferrer" data-testid="footer-x" className="transition hover:text-white">X</a>
           </nav>
         </div>
         <div className="border-t border-[#a9e7c0]/8">

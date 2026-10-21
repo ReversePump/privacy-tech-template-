@@ -56,7 +56,7 @@ def test_live_ok_increases(s):
     assert j2["ok"] > j1["ok"]
 
 
-# ---- Favicon still Camo Cash ----
+# ---- Favicon still Cloak Privacy ----
 def test_favicon(s):
     r = s.get(f"{BASE_URL}/favicon.ico", timeout=20)
     assert r.status_code == 200

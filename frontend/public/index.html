@@ -24,10 +24,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#080c09" />
         <meta name="description" content="Cloak Privacy — private money on Solana. A zero-knowledge shielded pool plus private cross-chain routes: pay, trade and exit with nothing on the public record." />
-        <link rel="icon" href="%PUBLIC_URL%/favicon.ico?v=5" sizes="any" />
-        <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/brand/cloak-favicon.png?v=5" />
-        <link rel="icon" type="image/png" sizes="192x192" href="%PUBLIC_URL%/brand/cloak-favicon.png?v=5" />
-        <link rel="apple-touch-icon" href="%PUBLIC_URL%/brand/cloak-favicon.png?v=5" />
+        <link rel="icon" href="%PUBLIC_URL%/favicon.ico?v=6" sizes="any" />
+        <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/brand/cloak-favicon.png?v=6" />
+        <link rel="icon" type="image/png" sizes="192x192" href="%PUBLIC_URL%/brand/cloak-favicon.png?v=6" />
+        <link rel="apple-touch-icon" href="%PUBLIC_URL%/brand/cloak-favicon.png?v=6" />
         <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -48,24 +48,19 @@
         <style>
           html,body{background:#080c09;margin:0}
           #cc-boot{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;background:#080c09;z-index:2147483000;font-family:'Instrument Sans',system-ui,-apple-system,sans-serif;animation:ncbF .3s ease both}
-          #cc-boot .c{display:flex;flex-direction:column;align-items:center;gap:24px}
-          #cc-boot .r{position:relative;width:84px;height:84px;overflow:hidden}
-          #cc-boot .r i{position:absolute;display:block}
-          #cc-boot .d1,#cc-boot .d2,#cc-boot .d3{left:50%;top:50%;transform:translate(-50%,-50%) rotate(45deg);border:1.5px solid rgba(169,231,192,.55)}
-          #cc-boot .d1{width:60px;height:60px;animation:ncbD1 2.8s ease-in-out infinite}
-          #cc-boot .d2{width:38px;height:38px;border-color:rgba(169,231,192,.35);animation:ncbD2 2.8s ease-in-out infinite}
-          #cc-boot .d3{width:18px;height:18px;border-color:rgba(169,231,192,.25);animation:ncbD3 2.8s ease-in-out infinite}
-          #cc-boot .cr{left:50%;top:50%;width:7px;height:7px;transform:translate(-50%,-50%);border-radius:50%;background:#a9e7c0;animation:ncbP 1.6s ease-in-out infinite}
+          #cc-boot .c{display:flex;flex-direction:column;align-items:center;gap:26px}
+          #cc-boot .hood{position:relative;width:110px;height:110px;display:flex;align-items:center;justify-content:center}
+          #cc-boot .hood img{width:88px;height:88px;object-fit:contain;filter:drop-shadow(0 0 22px rgba(169,231,192,.35));animation:ncbHood 2.6s cubic-bezier(.2,.9,.25,1) both}
+          #cc-boot .hood i{position:absolute;inset:0;border:1.5px solid rgba(169,231,192,.4);border-radius:50%;animation:ncbHalo 2.4s ease-out infinite}
+          #cc-boot .hood i:nth-child(3){animation-delay:1.2s}
           #cc-boot b{font:500 12px/1.2 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.22em;text-transform:uppercase;color:rgba(169,231,192,.75);animation:ncbA .45s cubic-bezier(.2,.9,.25,1) both}
-          @keyframes ncbD1{0%,100%{transform:translate(-50%,-50%) rotate(45deg) scale(1)}50%{transform:translate(-50%,-50%) rotate(225deg) scale(.86)}}
-          @keyframes ncbD2{0%,100%{transform:translate(-50%,-50%) rotate(45deg) scale(1)}50%{transform:translate(-50%,-50%) rotate(-135deg) scale(1.1)}}
-          @keyframes ncbD3{0%,100%{transform:translate(-50%,-50%) rotate(45deg)}50%{transform:translate(-50%,-50%) rotate(405deg)}}
+          @keyframes ncbHood{0%{opacity:0;transform:scale(.6) rotate(-14deg);filter:blur(12px)}60%{opacity:1;filter:blur(0)}100%{opacity:1;transform:none;filter:drop-shadow(0 0 22px rgba(169,231,192,.35))}}
+          @keyframes ncbHalo{0%{transform:scale(.55);opacity:.8}100%{transform:scale(1.5);opacity:0}}
           @keyframes ncbA{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
           @keyframes ncbF{from{opacity:0}to{opacity:1}}
-          @keyframes ncbP{0%,100%{opacity:1}50%{opacity:.3}}
-          @media (prefers-reduced-motion:reduce){#cc-boot .r i{animation:none}}
+          @media (prefers-reduced-motion:reduce){#cc-boot .hood img,#cc-boot .hood i{animation:none}}
         </style>
-        <div id="root"><div id="cc-boot" data-testid="cc-boot" role="status" aria-label="Loading Cloak Privacy"><div class="c"><div class="r"><i class="d1"></i><i class="d2"></i><i class="d3"></i><i class="cr"></i></div><b id="cc-boot-act">Drawing the cloak&hellip;</b></div></div></div>
+        <div id="root"><div id="cc-boot" data-testid="cc-boot" role="status" aria-label="Loading Cloak Privacy"><div class="c"><div class="hood"><img src="%PUBLIC_URL%/brand/cloak-mark.png?v=6" alt="" /><i></i><i></i></div><b id="cc-boot-act">Drawing the cloak&hellip;</b></div></div></div>
         <script>
           (function(){var a=['Drawing the cloak…','Forging keys…','Sealing notes…','Syncing the pool…','Scrambling traces…','Going dark…'],i=0,el=document.getElementById('cc-boot-act');
           if(el)setInterval(function(){i=(i+1)%a.length;el.style.animation='none';void el.offsetWidth;el.style.animation='';el.textContent=a[i];},1300);})();

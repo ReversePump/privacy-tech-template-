@@ -1084,8 +1084,14 @@
 
   /* ---------------- Chain: live on-chain terminal page ---------------- */
   var CH = { stats: null, feed: [], assets: {}, err: null, at: 0, seen: {}, fresh: {}, timer: null, clock: null, first: true };
-  var BFI = '/api/bifrost/v1/indexer/v1/';
-  function chJ(p) { return fetch(BFI + p, { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }); }
+  var BFI = '/api/chain/';
+  var BFI_BACKUP = '/api/bifrost/v1/indexer/v1/';
+  function chJ(p) {
+    return fetch(BFI + p, { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .catch(function (e) {
+        return fetch(BFI_BACKUP + p, { cache: 'no-store' }).then(function (r) { if (!r.ok) throw e; return r.json(); });
+      });
+  }
   function chLoad() {
     var a = Object.keys(CH.assets).length ? Promise.resolve(null) : chJ('assets').then(function (d) { (d.assets || []).forEach(function (x) { CH.assets[x.mint] = x; }); CH.nAssets = (d.assets || []).length; CH.nVer = (d.assets || []).filter(function (x) { return x.verified; }).length; });
     return Promise.all([chJ('stats'), chJ('feed?limit=60'), a]).then(function (res) {
@@ -1131,18 +1137,19 @@
       var amt = chAmt(f);
       return '<a class="ch-row ' + k[1] + (CH.fresh[f.sig] ? ' new' : '') + '" style="animation-delay:' + Math.min(i, 20) * 25 + 'ms" href="https://solscan.io/tx/' + encodeURIComponent(f.sig) + '" target="_blank" rel="noopener noreferrer" data-testid="chain-row">' +
         '<span class="ch-k">' + k[0] + '</span><span class="ch-who">' + who + '</span><span class="ch-amt">' + (amt ? esc(amt) : '<i class="ch-redact">\u2588\u2588\u2588</i>') + '</span>' +
-        '<span class="ch-meta">' + (f.nullifiers || 0) + ' nullifiers \u00b7 ' + (f.commitments || 0) + ' notes \u00b7 <i>' + esc(chShort(f.sig, 5)) + '</i></span><span class="ch-t" data-ts="' + f.ts + '">' + chAgo(f.ts) + '</span></a>';
+        '<span class="ch-meta">' + (f.nullifiers != null ? (f.nullifiers + ' nullifiers \u00b7 ' + (f.commitments || 0) + ' notes \u00b7 ') : '') + '<i>' + esc(chShort(f.sig, 5)) + '</i></span><span class="ch-t" data-ts="' + (f.ts || f.at) + '">' + chAgo(f.ts || f.at) + '</span></a>';
     }).join('');
     function stat(k, v, s, t) { return '<div class="ch-stat"><span>' + k + '</span><b' + (t ? ' title="' + esc(t) + '"' : '') + '>' + v + '</b>' + (s ? '<small>' + s + '</small>' : '') + '</div>'; }
     return '<div class="ch-page" data-testid="chain-page">' +
       '<div class="ch-top"><div><h2>Ledger</h2><p>Live pool record \u00b7 Solana mainnet</p></div>' +
       '<div class="ch-top-r"><a class="ch-alp" href="/docs#alpenglow" data-testid="chain-alpenglow">Alpenglow \u00b7 epoch 1064 \u2197</a>' +
+      '<span class="ch-src" data-testid="chain-source">SOLANA MAINNET</span>' +
       '<span class="ch-live ' + (live ? 'on' : 'off') + '" data-testid="chain-live"><i></i>' + (live ? 'Live \u00b7 sync <b class="ch-next">4s</b>' : (CH.err ? 'Reconnecting' : 'Connecting')) + '</span></div></div>' +
       '<div class="ch-stats" data-testid="chain-stats">' +
         stat('Merkle root', st.root ? esc(chShort(st.root, 6)) : '\u2026', null, st.root) +
         stat('Sealed notes', st.leaves != null ? Number(st.leaves).toLocaleString() : '\u2026', 'commitments in the pool') +
         stat('Nullifiers', st.nullifiers != null ? Number(st.nullifiers).toLocaleString() : '\u2026', 'notes already spent') +
-        stat('Tokens', CH.nAssets ? CH.nVer + '<i>/' + CH.nAssets + '</i>' : '\u2026', 'verified in pool') +
+        stat('Tokens', CH.nAssets ? String(CH.nAssets) : '\u2026', 'assets in the pool') +
       '</div>' +
       '<div class="ch-feed-h"><span>Latest activity</span><span class="ch-mix">shield <b>' + cnt.deposit + '</b> \u00b7 trade <b>' + cnt.swap + '</b> \u00b7 exit <b>' + cnt.withdraw + '</b></span></div>' +
       '<div class="ch-feed">' + head + (rows || '<div class="ch-empty">' + (CH.err ? 'Feed unavailable \u2014 retrying\u2026' : 'Loading activity\u2026') + '</div>') + '</div>' +
@@ -1341,7 +1348,17 @@
     el.style.display = '';
     if (lastIntro !== k) { el.innerHTML = introHTML(k); el.setAttribute('data-tab', k); lastIntro = k; }
   }
-  function ensureX() { var x = document.querySelector('.gx-x'); if (x) x.remove(); }
+  var X_URL = 'https://x.com/cloakprvt';
+  function ensureX() {
+    var tr = document.querySelector('header .top-right');
+    if (tr && !tr.querySelector('.gx-x')) {
+      var a = document.createElement('a');
+      a.className = 'gx-x'; a.href = X_URL; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      a.setAttribute('aria-label', 'Cloak Privacy on X'); a.setAttribute('data-testid', 'gx-x-link');
+      a.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>';
+      tr.insertBefore(a, tr.firstChild);
+    }
+  }
   function ensureTagline() {
     if (!document.querySelector('main.main')) return;
     if (document.getElementById('cc-tagline')) return;
@@ -1516,7 +1533,7 @@
       f = document.createElement('footer'); f.id = 'cc-foot'; f.setAttribute('data-testid', 'cc-footer');
       f.innerHTML = '<span>© ' + new Date().getFullYear() + ' Cloak Privacy</span><nav>' +
         '<a href="/#flow">How it works</a><a href="/#zk">Privacy model</a><a href="/docs">Docs</a><a href="/#fees">Fees</a>' +
-        '<a href="#" data-cc-tour="1">Take the tour</a></nav>';
+        '<a href="#" data-cc-tour="1">Take the tour</a><a href="' + X_URL + '" target="_blank" rel="noopener noreferrer">X</a></nav>';
       f.querySelector('[data-cc-tour]').addEventListener('click', function (e) { e.preventDefault(); showTour(true); });
     }
     main.appendChild(f);
@@ -1554,9 +1571,10 @@
     out: '<path d="M7 17 17 7M8 7h9v9"/>', chev: '<path d="m9 6 6 6-6 6"/>'
   };
   var DOCK = [
-    { k: 'swap', label: 'Trade', ico: 'trade' }, { k: 'shield', label: 'Cloak', ico: 'hide' },
-    { k: 'home', label: 'Vault', ico: 'wallet' }, { k: 'send', label: 'Pay', ico: 'pay' },
-    { k: 'dk:chain', label: 'Ledger', ico: 'book' }, { k: 'menu', label: 'More', ico: 'menu' }
+    { k: 'home', label: 'Vault', ico: 'wallet' }, { k: 'shield', label: 'Cloak', ico: 'hide' },
+    { k: 'swap', label: 'Trade', ico: 'trade' }, { k: 'dk:privacy-swap', label: 'Priv swap', ico: 'lock' },
+    { k: 'send', label: 'Pay', ico: 'pay' }, { k: 'dk:chain', label: 'Ledger', ico: 'book' },
+    { k: 'menu', label: 'More', ico: 'menu' }
   ];
   var TILES = [
     { k: 'receive', label: 'Receive', ico: 'inbox' }, { k: 'withdraw', label: 'Withdraw', ico: 'exit' },
@@ -1606,7 +1624,7 @@
         return '<button class="ns-tile' + (cur === t.k ? ' on' : '') + '" style="animation-delay:' + (i * 22) + 'ms" data-k="' + t.k + '" data-testid="cc-menu-' + t.k.replace(/[^a-z]+/g, '-') + '"><i>' + dsv(t.ico, 20) + '</i><span>' + t.label + '</span></button>';
       }).join('') + '</div><div class="ns-sec">Learn</div><div class="ns-list">' + LEARN.map(function (l, i) {
         return (l.href ? '<a href="' + l.href + '"' : '<button data-act="' + l.act + '"') + ' class="ns-row" data-testid="cc-learn-' + i + '"><i>' + dsv(l.ico, 18) + '</i><span>' + l.label + '</span><em>' + dsv(l.ext ? 'out' : 'chev', 16) + '</em>' + (l.href ? '</a>' : '</button>');
-      }).join('') + '</div><div class="ns-foot"><span>© ' + new Date().getFullYear() + ' Cloak Privacy</span><a href="/docs">Docs</a><a href="/">Home page</a></div></div></div>';
+      }).join('') + '</div><div class="ns-foot"><span>© ' + new Date().getFullYear() + ' Cloak Privacy</span><a href="' + X_URL + '" target="_blank" rel="noopener noreferrer">X</a><a href="/docs">Docs</a><a href="/">Home page</a></div></div></div>';
     s.addEventListener('click', function (e) {
       if (e.target === s || e.target.closest('.ns-x')) { closeSheet(); return; }
       var t = e.target.closest('.ns-tile'); if (t) { openFeature(t.getAttribute('data-k')); return; }
@@ -1773,7 +1791,7 @@
     var box = document.createElement('div'); box.id = 'cc-splash'; box.setAttribute('data-testid', 'cc-splash');
     var shownAt = performance.now(), MIN_MS = 1500, leaving = false;
     box.innerHTML = '<div class="sp-card sp-mini">'
-      + '<div class="sp-radar"><i class="sp-r2"></i><i class="sp-r3"></i><i class="sp-sweep"></i><i class="sp-core"></i></div>'
+      + '<div class="sp-hood"><img src="/api/bifrost/v1/_brand/mark-white-256.png" alt="Cloak Privacy" draggable="false" /><i class="sp-halo"></i><i class="sp-halo sp-halo2"></i></div>'
       + '<b id="sp-act" class="in">Drawing the cloak&hellip;</b></div>';
     document.body.appendChild(box);
     var acts = ['Drawing the cloak\u2026', 'Forging keys\u2026', 'Sealing notes\u2026', 'Syncing the pool\u2026', 'Scrambling traces\u2026', 'Going dark\u2026'];

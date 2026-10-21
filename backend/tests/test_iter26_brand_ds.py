@@ -46,9 +46,13 @@ def test_icon_is_cloak(s, path):
     assert r.status_code == 200
     im = Image.open(io.BytesIO(r.content)).convert("RGBA")
     w, h = im.size
-    px = im.getpixel((w // 2, h // 2))   # mint core dot of the cloak glyph
+    px = im.getpixel((w // 2, h // 2))
     corner = im.getpixel((1, 1))
-    assert 120 < px[0] < 210 and px[1] > 190 and 150 < px[2] < 230, f"centre not mint {px}"
+    # hood glyph: bright hood pixels over a near-black face/background
+    bright = sum(1 for y in range(0, h, 2) for x in range(0, w, 2)
+                 if sum(im.getpixel((x, y))[:3]) > 500)
+    assert bright > 2, f"no hood highlight pixels found (centre {px}, corner {corner})"
+    assert corner[0] < 60 and corner[1] < 60 and corner[2] < 60, f"corner not dark {corner}"
     # no purple (ghost icon) pixels
     purple = sum(1 for p in im.getdata() if p[3] > 128 and p[2] > 150 and p[0] > 90 and p[1] < 90)
     assert purple < 5, f"purple pixels {purple}, corner {corner}"

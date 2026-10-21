@@ -354,7 +354,7 @@ def null_prefix_js(text: str) -> str:
         return text
     # generators
     text = text.replace('"veilsk2"+', '"cloaksk2"+').replace('"veilvk1"+', '"cloakvk1"+').replace('"veil2"+', '"cloak2"+')
-    # parsers: normalise cloak/camo-prefixed input back to the upstream prefix before decoding
+    # parsers: normalise cloak/cloak-prefixed input back to the upstream prefix before decoding
     text = re.sub(r'function\((\w)\)\{try\{let (\w)=\1\.startsWith\("veil2"\)',
                   r'function(\1){try{\1=String(\1).replace(/^(?:cloak|camo)(?=[12])/,"veil");let \2=\1.startsWith("veil2")', text)
     text = re.sub(r'let (\w)=(\w)\.trim\(\)\.replace\(/\\s\+/g,""\);try\{if\(\1\.startsWith\("veilsk2"\)',
