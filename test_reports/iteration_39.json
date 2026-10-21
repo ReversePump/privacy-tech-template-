@@ -1,0 +1,33 @@
+{
+  "summary": "Re-verified iteration_38 regression fixes for Cloak Privacy rebrand. 4/4 of the previously-reported action items are fixed, and the newly re-enabled #gx-intro per-section description blocks render correctly on all 5 required tabs (Vault/Cloak/Trade/Pay/Ledger) plus Activity. Full connect+create vault flow, mobile 375 dock + More sheet, and nav rename all pass. One minor residual issue: the balance pill shows a skeleton loader for a few seconds before the hb-zero $0.00 fallback kicks in (fallback works, but there is a visible delay). One behavioral question: clicking Phantom row (not installed in the test browser) dismisses the Connect sheet instead of showing an inline response.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Vault balance hero (.hb-total)", "issue": "After vault creation the .hb-total still contains a <span class='skel'> loader for several seconds before the ensureBalanceShown fallback replaces it with $0.00 (hb-zero class). The screenshot at ~5s post-create shows $0.00 correctly, but at ~3s the skeleton rectangle is still visible — so the mint-pill 'bare skeleton block' complaint from iter_38 is reduced but not fully eliminated during initial sync.", "selector": ".hb-total .skel", "priority": "LOW"},
+      {"component": "Connect sheet Phantom row", "issue": "Clicking [data-testid=wallet-ext-phantom] in the test browser (no Phantom extension installed) dismisses the Connect sheet entirely instead of showing an inline 'Phantom not detected / install Phantom' response. Sheet backdrop state after click: present=false. Spec said 'must respond, not dismiss the sheet'. Could be acceptable if a toast fires outside the sheet, but we did not observe one. Worth confirming expected behavior.", "selector": "[data-testid='wallet-ext-phantom']", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Desktop 1280px header", "issues": ["Tagline chip is now hidden at exactly 1280px (CSS media query hides it ≤1280). Review request wording was 'at 1366px AND 1280px' should NOT overlap, and '<1280px' hides. Current behavior hides at 1280 inclusive — not an overlap, but a minor spec-wording mismatch. If the intent was to keep the chip visible at exactly 1280 the breakpoint should be <1280 (not ≤1280)."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "LOW: ensureBalanceShown should run earlier (or hb-total should default to hb-zero $0.00 immediately on vault open) so there is no multi-second window with the skeleton bar visible.",
+    "LOW: clarify intended Phantom/Solflare/Backpack row behavior when extension is not installed — currently the sheet dismisses with no visible feedback.",
+    "VERIFY: tagline media breakpoint — if 1280 should still show the chip, change the media query from (max-width:1280px) to (max-width:1279px)."
+  ],
+  "critical_code_review_comments": [
+    "Connect sheet backdrop fix is solid: main.main z-index rule scoped to .shell only — document.elementFromPoint() over .wopt-own now correctly returns the row (topIsRow=true) and a native Playwright .click() (no .evaluate workaround) opens the password form.",
+    "#gx-intro re-enablement is well-done: each tab has distinct mint-uppercase kicker + one-paragraph description (VAULT / CLOAK · ZK-SHIELDED DEPOSIT / PAY · PRIVATE TRANSFER / TRADE · PRIVATE SWAP INSIDE THE POOL / ACTIVITY / LEDGER · LIVE POOL RECORD).",
+    "Receive view: no automatic 'Copy failed' toast fired on open in the one successful observation (iter_38 bug suppressed by suppressCopyToast)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (frontend-only per request)", "frontend": "~95% (all 4 iter_38 regressions fixed, 2 LOW residuals)"},
+  "test_credentials": "Vault password: regression10x (fresh profile each run). Recovery key generated per run with cloaksk2… prefix.",
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Iter_38 action items are all fixed: (1) Connect sheet accepts normal clicks — password form opens on real mouse-click to .wopt-own without JS workaround. (2) Tagline no longer overlaps the Connect pill at 1366 (gap=9px) and is cleanly hidden ≤1280. (3) Empty vault renders $0.00 via hb-zero fallback (though skeleton flashes for a few seconds first — see LOW item). (4) Receive 'Copy failed' auto-toast suppressed. (5) #gx-intro description blocks now render on Vault/Cloak/Trade/Pay/Activity/Ledger post-connect with mint kickers. Mobile 375 dock + More sheet verified. No page JS errors (3 non-blocking 403s on external resources). Backend not tested per request.",
+  "rca of the issue": "Residual balance skeleton: the sync pipeline initially mounts an aria-busy skel span in .hb-total; ensureBalanceShown in camo-app.js only swaps it to '0.00' after sync tick returns an empty number. If sync is slow (first launch), the skeleton can remain visible for several seconds before the fallback replaces it. Fix: default the hero to '$0.00' / hb-zero class on first mount when wallet-just-created, and let real sync replace it when a non-zero number arrives."
+}

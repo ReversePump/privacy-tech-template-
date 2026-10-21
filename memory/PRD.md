@@ -216,3 +216,27 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
 - Sweep verified by screenshot at 375px and 1366px: Wallet, Hide, Pay, Swap, Chain, Private route,
   Privacy swap, Track, Menu sheet, More dropdown — all text readable, headers (tagline + $CAMO CA chip +
   Connect) coexist without overlap.
+
+## Iteration 23 — CLOAK PRIVACY full rebrand (Oct 2026, verified iteration_38+39, frontend ~95-100%)
+- TOTAL rebrand Camo Cash -> Cloak Privacy. $CAMO CA chip removed everywhere. X/Twitter links removed
+  (old handle was camo-branded; restore when user provides a Cloak X handle).
+- New design system (saliend.catdoes.app-inspired): forest-black #080c09, soft mint #a9e7c0, Instrument
+  Serif display + Instrument Sans body + IBM Plex Mono, rounded pills (was sharp military), editorial layout.
+- Landing rebuilt: "Disappear from the public ledger." hero, isometric line-art SVG sketches (stroke-draw
+  animations), live pool stats strip (real indexer data, 5s poll), 01/02/03 flow, Groth16/Poseidon/Nullifiers
+  cards, Alpenglow section (links solana_devs post), fees table, FAQ, quiet footer. /app/design_guidelines.json.
+- App mirror: nav renamed (Home→Vault, Shield→Cloak, Swap→Trade, Send→Pay, History→Activity, Chain→Ledger,
+  Keys→Key ring, Addresses→Burner addresses, (Cloak Privacy)Swap→Pool swap) via NAV_LABELS + paraphrase +
+  K2L/L2K translation maps in camo-app.js. Dock + menu rearranged, menu tiles now DARK with mint icons.
+  Per-section description blocks (#gx-intro) re-enabled with Cloak styling on every tab.
+- Balance page new UI: editorial hero (serif italic total, mint glow, Vault chip, pill actions), stat minis.
+  Empty-vault fallback renders 0.00 if sync ends numberless.
+- Address/key prefixes: cloak2… / cloaksk2… / cloakvk1… (bifrost.py rewrite, CHUNK_VER=cloak2; parsers accept
+  cloak+camo+legacy). Recovery key verified cloaksk2, receive address cloak2.
+- New brand marks generated (PIL line-art nested-diamond glyph) for all favicon/mark sizes, both backends
+  and frontend/public/brand. Manifest + lockup SVG rebranded.
+- Fixed en route: Connect sheet backdrop click-swallow (main.main z-index trap → scoped to .shell),
+  tagline/Connect overlap (gap + hide ≤1280px), auto 'Copy failed' toast suppressed, tests updated for
+  new icons/brand (suite 131 passed, 1 skipped).
+- KNOWN GOTCHA: camo-theme.css is baked into page HTML by head_inject (lru_cache) — ALWAYS restart backend
+  after editing brand css/paraphrase, and verify served payload contains the change.
