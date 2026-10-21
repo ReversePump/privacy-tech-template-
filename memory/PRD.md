@@ -240,3 +240,25 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
   new icons/brand (suite 131 passed, 1 skipped).
 - KNOWN GOTCHA: camo-theme.css is baked into page HTML by head_inject (lru_cache) — ALWAYS restart backend
   after editing brand css/paraphrase, and verify served payload contains the change.
+
+## Iteration 24 — Native chain data + hood logo + dock + loading (Oct 2026, verified iteration_40, ~98-100%)
+- NATIVE LEDGER: new backend module chain_native.py reads the pool program directly from Solana mainnet RPC
+  (SOLANA_RPC_URL in backend/.env, default api.mainnet-beta.solana.com). Reverse-engineered on-chain layout:
+  program FmsMbXrQXr1mARn45Cm52sdrwAWHDxqF8473t6woq9DP; state acct 6TcNbDsyjQNpw3VQdrq7X5nuVbWki4FHw8vHGyyAzmfu
+  (leaves u64@8, root_idx u64@16, root ring base 856); nullifier disc 381239af45cabd46; asset disc
+  3970f7a6f7408c17 (141B: mint@8, vault@40, decimals@80, flags@82). Feed = getSignaturesForAddress + batched
+  getTransaction, classified via vault token/lamport deltas (deposit->depositor wallet, withdraw->fresh token
+  account; amounts net of 0.3% fee — matches indexer exactly, cross-verified per-slot).
+- Endpoints /api/chain/stats|feed|assets|health. Fallback chain (invisible): sanity checks raise -> stale mem
+  cache -> upstream indexer relay server-side -> client-side chJ falls back to the bifrost indexer path.
+  Startup _chain_warm_loop keeps caches hot (30s). No user-facing relay/upstream wording — Ledger chip reads
+  SOLANA MAINNET; 'relayer' removed from all user-facing copy (gas covered for you etc).
+- Shim fx() fixed: same-origin '/api/' paths NOT under the mirror prefix pass through untouched (was
+  double-prefixing /api/chain/* -> 404).
+- New hood logo (user-supplied) processed to all sizes/variants, transparent + solid favicons, bolder small
+  favicons; old camo PNGs + landing art deleted; code sweep renamed camo-app.js->cloak-app.js,
+  camo-theme.css->cloak-theme.css; only functional legacy prefix regexes retain 'camo' (input compat).
+- X links -> https://x.com/cloakprvt (app header/footer/sheet + landing header/footer).
+- New loading screens: hood mark + expanding halo rings (index.html boot + in-app splash).
+- Mobile dock = 7 items: Vault, Cloak, Trade, Priv swap, Pay, Ledger, More (active icon mint chip fixed).
+- Backend suite: 131 passed, 1 skipped.

@@ -246,7 +246,7 @@ setTimeout(start,2500);
 
 NAV_LABELS = {
     "Home": "Vault", "Shield": "Cloak", "Trade": "Trade", "Cloak PrivacySwap": "Pool swap",
-    "Cloak PrivacySwap": "Pool swap", "Send": "Pay", "Receive": "Receive", "Withdraw": "Withdraw",
+    "Send": "Pay", "Receive": "Receive", "Withdraw": "Withdraw",
     "Earn": "Earn", "Invite": "Invite", "Addresses": "Burner addresses", "Activity": "Activity",
     "Keys": "Key ring", "More": "More",
 }

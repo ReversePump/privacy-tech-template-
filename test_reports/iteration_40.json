@@ -1,0 +1,32 @@
+{
+  "summary": "Full regression for latest Cloak Privacy batch: hood logo, X handle (cloakprvt), native Solana RPC Ledger with fallbacks, 7-item mobile dock, loading screens, rebrand sweep, and vault creation e2e. All critical acceptance criteria PASS. Backend /api/chain/{health,stats,feed} endpoints return source=native with real Solana mainnet data (leaves=6758, nullifiers=1733, assets=85, slot=459769033, root=22c4c3…7b660a, rpc=api.mainnet-beta.solana.com, response ~74ms). Frontend Ledger tab renders stats + classified feed (CLOAK wallet→pool / EXIT pool→fresh) with human times (2m ago) and correct decimal amounts (0.997 USDC, 1.003 USDC); chip reads 'SOLANA MAINNET'; no 'relay'/'upstream' wording anywhere on Ledger. Mobile 375px dock shows exactly the 7 items (Vault / Cloak / Trade / Priv swap / Pay / Ledger / More) all navigable; More sheet opens 10 dark tiles (Receive, Withdraw, Private route, Privacy swap, Bridge, Track order, Ledger, Activity, Burner addresses, Key ring). Hood mark present in app header, boot/intro splash, and landing header (/brand/cloak-mark.png?v=1). All X links (header .gx-x, landing [data-testid=nav-x], footer [data-testid=footer-x]) point to https://x.com/cloakprvt. Vault e2e works: Connect → Cloak Wallet → regression10x → cloaksk2… recovery → dashboard with 'PRIVATE BALANCE' hero, no console page errors.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Vault dashboard hero (.hb-total)", "issue": "Empty mint balance pill still shows a skeleton rectangle on fresh vault open rather than an immediate $0.00. Same residual as iter_39 — ensureBalanceShown fallback eventually replaces it but there's a visible multi-second window with a bare mint block that reads as a loading glitch.", "selector": ".hb-total .skel", "priority": "LOW"},
+      {"component": "Vault dashboard stat card", "issue": "The 'YOU APPROVE INSIDE CLOAK PRIVACY' card contains the sublabel text 'fees covered by relayer' which is user-facing copy that includes the word 'relayer'. The review request stated 'No user-facing text may mention relay/upstream'. This is on the Vault tab (not Ledger — Ledger chip correctly reads SOLANA MAINNET). Flagging in case the no-relay rule was meant globally. If the intent was Ledger-only, this is a non-issue.", "selector": ".cc-vault-stat (card with text 'fees covered by relayer')", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "LOW/VERIFY: decide whether 'fees covered by relayer' sublabel on the Vault stat card should be rewritten (e.g. 'fees covered for you' or 'gasless'). The no-relay rule in the request may have been Ledger-scoped only.",
+    "LOW (carryover from iter_39): default hero balance to $0.00 / hb-zero on first vault open so skeleton doesn't flash."
+  ],
+  "critical_code_review_comments": [
+    "Native chain reader works end-to-end: /api/chain/health returns ok=true with ~74ms RPC, /api/chain/stats and /api/chain/feed return source=native with real on-chain values. Fallback is invisible to the UI as required (chip stays 'SOLANA MAINNET', no 'relay' wording on Ledger).",
+    "Dock testids are consistent with the spec: cc-dock-home/shield/swap/privacy-swap/send/chain/menu — all 7 present and clickable at 375px; Priv swap routes to #privacy-swap; Vault icon is a mint wallet glyph (not a white square).",
+    "X link coverage is complete: app header .gx-x/nav-x, app footer, More sheet foot, landing [data-testid=nav-x], and landing [data-testid=footer-x] all → https://x.com/cloakprvt.",
+    "No visible 'Camo'/'Veil'/'$CAMO'/'upstream' strings anywhere scanned (landing hero, app home, Ledger, More sheet, Priv swap, dashboard).",
+    "Boot/intro splash shows the hood mark with halo as spec; cloaksk2… prefix retained for recovery keys."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (3/3 chain endpoints verified live)", "frontend": "~98% (all critical acceptance criteria pass; 2 LOW residuals)"},
+  "test_credentials": "Vault password: regression10x (fresh profile). Recovery key cloaksk2dT79t4yvM5xRZns9EFjevQ… generated on run.",
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Latest batch (hood logo + cloakprvt X + native Ledger + 7-item dock + loading screens) is landed and passing. Backend chain_native endpoints are live against api.mainnet-beta.solana.com. The two residuals are both LOW: (1) 'fees covered by relayer' sublabel in Vault stat card — verify if no-relay rule applies globally or Ledger-only; (2) the empty-vault balance skeleton flash from iter_39 is still present. No new regressions found.",
+  "rca of the issue": "n/a — no blocking issues this iteration."
+}

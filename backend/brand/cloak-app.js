@@ -1309,8 +1309,8 @@
     'dk:track': ['Track order', 'Paste an order ID to see its live status, from waiting for deposit through confirmation, exchange and delivery. Orders created on this device are listed below.', ['Live status', 'Local order list']],
     'home': ['Vault', 'Your cloaked balance, recent activity and quick actions. Everything here is decrypted locally from your notes; on-chain it is just another shape in the crowd. Alpenglow-era finality: every move settles in about 150 ms.', ['Local decryption', 'Notes', 'Alpenglow finality', 'No tracking']],
     'shield': ['Cloak · ZK-shielded deposit', 'Yes, this is real zero-knowledge. Cloaking moves public tokens from a Solana wallet into the shielded pool: the program stores a Poseidon commitment to (token, amount, owner key, blinding) as a leaf in a 2^26 Merkle tree. From then on the funds are notes only you can open. Every later spend is a Groth16 proof (BN254) that the note exists in the tree and that you hold its key, checked on-chain without revealing which note.', ['Groth16 / BN254', 'Poseidon Merkle tree', 'Nullifiers block double-spends']],
-    'swap': ['Trade · private swap inside the pool', 'Trade one shielded token for another without leaving the pool. A proof spends your input note, the program routes the trade through on-chain liquidity and writes the output as a new note. Outside observers see a pool trade happen, not who made it or how big it was.', ['Proof-bound terms', 'Relayer pays gas', 'Output lands as a note']],
-    'bridge': ['Bridge', 'Exit the shielded pool directly to another network. The proof binds the destination chain, address and minimum output, so a relayer cannot change where funds go.', ['Bound destination', 'Cross-chain exit', 'Relayer submitted']],
+    'swap': ['Trade · private swap inside the pool', 'Trade one shielded token for another without leaving the pool. A proof spends your input note, the program routes the trade through on-chain liquidity and writes the output as a new note. Outside observers see a pool trade happen, not who made it or how big it was.', ['Proof-bound terms', 'Gas covered for you', 'Output lands as a note']],
+    'bridge': ['Bridge', 'Exit the shielded pool directly to another network. The proof binds the destination chain, address and minimum output, so nobody can change where funds go.', ['Bound destination', 'Cross-chain exit', 'Submitted for you']],
     'send': ['Pay · private transfer', 'Pay any Cloak Privacy address. Your note is spent by proof and a new note is encrypted to the recipient’s viewing key. On-chain: one nullifier and two new commitments. No sender, recipient or amount is revealed.', ['Encrypted to recipient', '0 public amounts', 'No wallet signature']],
     'receive': ['Receive privately', 'Share your Cloak Privacy address or a payment link. Incoming notes are found by scanning with your viewing key locally; the address itself never appears on-chain.', ['Viewing key scan', 'Shareable address', 'Unlinkable receipts']],
     'withdraw': ['Withdraw to Solana', 'Turn notes back into public tokens at any Solana address, ideally a fresh burner one. The amount and destination become public at exit, but the proof does not link them to the deposit that funded them.', ['Public exit', 'Use a burner address', 'Unlinkable to deposit']],
@@ -1874,7 +1874,7 @@
     var syncing = /syncing/i.test(document.body.innerText || '');
     if (syncing) { hbZeroAt = 0; hb.classList.remove('hb-zero'); return; }
     if (!hbZeroAt) hbZeroAt = Date.now();
-    if (Date.now() - hbZeroAt > 4000) hb.classList.add('hb-zero');
+    if (Date.now() - hbZeroAt > 1200) hb.classList.add('hb-zero');
   }
   function suppressCopyToast() {
     var ts = document.querySelectorAll('div,span');
