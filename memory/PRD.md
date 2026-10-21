@@ -141,3 +141,7 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
   Emergent key) fine-line copperplate etchings in camo-contour style: key, coin seal, bolt, splitting route, vault,
   proof document, closed-eye final art. Forced grayscale + autocontrast, webp. Unused ring_portal/hero_vault deleted.
   Feature cards render them as dark art plates; final CTA eye plate framed with 1px border + scanline sweep.
+
+## Iteration 16 — Art blends into UI (Oct 2026)
+- All 7 etched artworks re-encoded: luminance-keyed alpha (black bg -> transparent), so line art sits directly on
+  card/section surfaces with no plate seams. Final CTA eye floats on the camo texture; plate border removed.
