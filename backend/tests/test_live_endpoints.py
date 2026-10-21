@@ -15,6 +15,10 @@ import pytest
 import requests
 import websockets
 
+if not os.environ.get("REACT_APP_BACKEND_URL"):
+    from dotenv import load_dotenv
+    load_dotenv("/app/frontend/.env")
+
 BASE_URL = os.environ.get("REACT_APP_BACKEND_URL").rstrip("/")
 BIFROST = f"{BASE_URL}/api/bifrost/v1"
 DS = f"{BASE_URL}/api/ds"

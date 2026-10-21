@@ -56,8 +56,8 @@ def test_private_route_order_created(sess):
     assert o.status_code == 200, f"orders returned {o.status_code}: {o.text}"
     data = o.json()
     assert data.get("depositAddress"), data
-    # order id key is 'houdiniId' upstream
-    assert data.get("houdiniId") or data.get("id"), data
+    # order id key is 'orderId' after the rename (upstream used 'houdiniId')
+    assert data.get("orderId") or data.get("houdiniId") or data.get("id"), data
 
 
 # ---------- Privacy swap (near / 1Click) ----------

@@ -14,6 +14,10 @@ import requests
 
 sys.path.insert(0, "/app/backend")
 
+if not os.environ.get("REACT_APP_BACKEND_URL"):
+    from dotenv import load_dotenv
+    load_dotenv("/app/frontend/.env")
+
 BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "").rstrip("/")
 assert BASE_URL, "REACT_APP_BACKEND_URL required"
 

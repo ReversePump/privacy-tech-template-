@@ -243,6 +243,7 @@ header .wallet-btn.nc-off>span:not(.wb-dot)::after{content:"Connect wallet";font
  #nc-dock button.open i{background:var(--nc-lime);color:#1a2200}
  main.main{padding-bottom:120px!important}
  #dk-view{padding-bottom:110px!important}
+ #nc-foot{padding-bottom:110px}
 }
 /* ---------- Menu sheet ---------- */
 #nc-sheet{position:fixed;inset:0;z-index:2147481000;display:flex;align-items:flex-end;justify-content:center;background:rgba(18,19,21,.38);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);animation:ncFade .22s ease both}

@@ -6,6 +6,10 @@ import requests
 import websockets
 import asyncio
 
+if not os.environ.get("REACT_APP_BACKEND_URL"):
+    from dotenv import load_dotenv
+    load_dotenv("/app/frontend/.env")
+
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL').rstrip('/')
 BIFROST = f"{BASE_URL}/api/bifrost/v1"
 
@@ -137,7 +141,7 @@ def test_unknown_target(session):
 # ---------- wasm circuits binary ----------
 def test_circuits_wasm(session):
     r = session.get(f"{BIFROST}/app/circuits/transaction.wasm", timeout=120)
-    assert r.status_code == 200
+    assert r.status_code in (200, 206)
     ct = r.headers.get("content-type", "")
     assert "wasm" in ct or "octet-stream" in ct
     assert len(r.content) > 500_000  # a few hundred KB at minimum

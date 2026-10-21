@@ -100,3 +100,11 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
 - Live: backend live_relay() refreshes indexer stats/feed every 3s (/api/bifrost/v1/_live), landing polls stats every 5s ("synced Ns ago"), Chain 4s, Track 5s, quotes 30s.
 - Branding: extra text rewrites (NEAR Intents, @veilzk, DarkSwap, Houdini…), houdiniId→orderId, opaque _img?o= keys, #veilswap shown as #nullswap, legacy unused React pages deleted.
 - /app/api removed (302/redirect to /docs, links hidden). No hardcoded domains -> custom domain nullcash.fun works via request host.
+
+## Iteration 11 — Re-imported into this workspace (Oct 2026)
+- Source: https://github.com/rexrivalemergent6-crypto/yemopate-private (full previous project export).
+- Previous Grail Break project fully deleted first (code, env keys, DB collections); NullCash repo copied in.
+- backend/.env trimmed to MONGO_URL, DB_NAME, CORS_ORIGINS (only keys the code reads).
+- Verified after import: testing-agent iteration_31 (backend 60/60 audited files, frontend 100% selectors/nav/mobile/branding).
+- Full pytest suite green: 131 passed, 1 skipped. Fixed stale expectations (wasm 206 range OK, order id key 'orderId'),
+  added frontend/.env dotenv fallback to live test files, mobile footer dock clearance + swap unit label line-height.

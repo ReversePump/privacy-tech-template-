@@ -8,6 +8,10 @@ import random
 import pytest
 import requests
 
+if not os.environ.get("REACT_APP_BACKEND_URL"):
+    from dotenv import load_dotenv
+    load_dotenv("/app/frontend/.env")
+
 BASE_URL = os.environ.get("REACT_APP_BACKEND_URL").rstrip("/")
 DS = f"{BASE_URL}/api/ds"
 EVM = "0x68b3a9f8940f418e8051ebb659e8ed278fea41f6"

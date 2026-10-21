@@ -1,0 +1,32 @@
+{
+  "summary": "Iteration 31 - Full re-verification after fresh repo import into this environment. Backend: 60/60 pytest passing across test_iter12_proxy_audit.py (25), test_live_endpoints.py (26), test_iter27_live_brand.py (9). /api/bifrost/v1/_health returns 200 with app/site/rpc 200 (indexer/relayer upstream passthrough 404 is expected for root GET - the /v1/health subpaths return 200). /api/ds/chains returns full live chain list (ARC, Solana, Ethereum, BSC, Bitcoin, Tron, Litecoin, Monero, Arbitrum, Base, ...). Frontend landing (/): renders 'Hit send. Leave no trace.' hero, live sealed-notes counter animating (observed 5,340 -> 5,348 live), 'Swap without a wallet' and 'Open app' CTAs visible and point to /app. CA chip present with full address 31GYUbJW5vjF1o7VM5SGP9Emj5WDBHb1cdcR8BM6pump and X link visible. /app: welcome tour mounts with nc-tour-next and nc-tour-skip, skip works, nav shows Home/Shield/Send/Swap/Bridge/Private route/Privacy swap/Track/History/Chain, dk-nav-private, dk-nav-privacy, dk-nav-track all visible. nc-connect-btn mounted. Privacy swap panel opens with dk-pick-destination, dk-amount, dk-dest, dk-refund, dk-submit. Track panel renders empty-state. Mobile 375px: both / and /app have scrollWidth == clientWidth (no horizontal overflow); bottom tab dock (Wallet/Hide/Pay/Swap/Menu) renders. Branding: zero occurrences of Grail Break, Loom, Weft, DarkSwap, Cadabra in either page HTML; 'NullCash' present on both. Did NOT create any new swap orders - stopped at UI/selector verification per instructions.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Mobile 390 /app", "issues": ["Footer links peek under fixed bottom tab bar (carried over from iter 30, not blocking)."]},
+      {"screen": "Privacy swap From box", "issues": ["'SOL' unit label under amount is slightly clipped (carried over from iter 30, not blocking)."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter12_proxy_audit.py",
+    "/app/backend/tests/test_live_endpoints.py",
+    "/app/backend/tests/test_iter27_live_brand.py",
+    "/app/test_reports/pytest/iter31_results.xml"
+  ],
+  "action_items": [
+    "Review request referenced data-testid='nc-ca-chip' for the landing CA chip, but the actual testid in LandingPage.jsx is 'nav-ca-chip' (also nav-ca-full/nav-ca-short). Non-blocking - element is present and visible - but main agent may want to add an alias 'nc-ca-chip' for consistency with the nc-* naming used elsewhere (nc-tour-next, nc-connect-btn)."
+  ],
+  "critical_code_review_comments": [
+    "test_live_endpoints.py and test_iter27_live_brand.py read REACT_APP_BACKEND_URL from the shell env, not from /app/frontend/.env; they fail to collect under plain pytest. Not a product bug but future test agents must `export REACT_APP_BACKEND_URL=...` before running these two files. Consider having them load /app/frontend/.env via python-dotenv.",
+    "backend/brand/dk-swap.js is still ~1100 lines (iter 12 note still stands)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (60/60 pytest)", "frontend": "100% on selectors, nav, mobile overflow, branding"},
+  "test_credentials": "None required (wallet is in-browser only).",
+  "seed_data_creation": "No orders created.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Fresh import verified intact. All proxy routes work against upstream (veilit.xyz, near-intents). Known upstream flakiness: near-intents.network occasionally serves Cloudflare 'Quick security check' challenge during real Privacy swap order creation - app has a branded Verify modal to handle it (documented iter 11/12). Landing CA chip testid is nav-ca-chip (not nc-ca-chip). Pytest files test_live_endpoints.py and test_iter27_live_brand.py need REACT_APP_BACKEND_URL exported in shell before running."
+}
