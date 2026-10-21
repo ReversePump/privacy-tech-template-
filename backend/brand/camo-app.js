@@ -1356,7 +1356,7 @@
     var t = document.getElementById('cc-tagline'); if (!t) return;
     var wb = document.querySelector('header .wallet-btn');
     var w = wb ? Math.round(wb.getBoundingClientRect().width) : 190;
-    var right = w + 34;
+    var right = w + 52;
     if (t.style.right !== right + 'px') t.style.right = right + 'px';
     var connected = wb && /\u00b7/.test(wb.textContent || '');
     var show = connected ? 'none' : '';
@@ -1849,7 +1849,24 @@
   })();
   document.addEventListener('input', function () { setTimeout(ensureFees, 120); }, true);
   window.addEventListener('hashchange', function () { Array.prototype.forEach.call(document.querySelectorAll('.cc-fee-tog'), function (b) { b.setAttribute('data-open', '0'); }); ensureFees(); });
-  function tick() { orderNav(); ensureX(); ensureTagline(); fixTaglineOverlap(); syncIntro(); ensureMore(); fitNav(); ensureFoot(); ensureWalletBtn(); ensureDock(); ensurePitch(); ensureSplash(); ensureFees(); ensureWalletGroup(); hideExtWalletOriginals(); }
+  var hbZeroAt = 0;
+  function ensureBalanceShown() {
+    var hb = document.querySelector('.hb-total'); if (!hb) return;
+    if (/\d/.test(hb.textContent || '')) { hb.classList.remove('hb-zero'); hbZeroAt = 0; return; }
+    var syncing = /syncing/i.test(document.body.innerText || '');
+    if (syncing) { hbZeroAt = 0; hb.classList.remove('hb-zero'); return; }
+    if (!hbZeroAt) hbZeroAt = Date.now();
+    if (Date.now() - hbZeroAt > 4000) hb.classList.add('hb-zero');
+  }
+  function suppressCopyToast() {
+    var ts = document.querySelectorAll('div,span');
+    for (var i = ts.length - 1; i >= 0; i--) {
+      var e = ts[i];
+      if (e.children.length > 2) continue;
+      if (/^Copy failed/i.test((e.textContent || '').trim()) && (e.textContent || '').length < 90) { try { (e.closest('[class*=toast],[class*=Toast],[role=status]') || e).remove(); } catch (err) {} }
+    }
+  }
+  function tick() { ensureBalanceShown(); suppressCopyToast(); orderNav(); ensureX(); ensureTagline(); fixTaglineOverlap(); syncIntro(); ensureMore(); fitNav(); ensureFoot(); ensureWalletBtn(); ensureDock(); ensurePitch(); ensureSplash(); ensureFees(); ensureWalletGroup(); hideExtWalletOriginals(); }
   setTimeout(function () { if (document.querySelector('main.main')) showTour(false); }, 1400);
   function boot() { ensure(); sync(); tick(); setInterval(tick, 700); document.addEventListener('click', function () { setTimeout(tick, 60); }, true); window.addEventListener('hashchange', function () { setTimeout(tick, 60); }); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

@@ -1,0 +1,37 @@
+{
+  "summary": "Frontend-only full-rebrand regression (Camo Cash -> Cloak Privacy). Landing page, Docs page, mirrored app at /api/bifrost/v1/app/, connect+vault creation flow, mobile 375px dock + More sheet, Receive view, and Ledger view all verified against the Cloak Privacy spec. Branding is fully applied: no visible 'Camo'/'$CAMO' text, no CA chip, no X/Twitter social (only the single intentional Alpenglow link to x.com/solana_devs). Recovery key uses the cloaksk2… prefix, addresses use the cloak2… prefix. Nav rename maps work (Vault, Cloak, Pay, Trade, Pool swap, Activity, Ledger, Burner addresses, Key ring, More). Mobile dock keys unchanged (cc-dock-home/shield/send/swap/chain/menu) and the More sheet is DARK (bg rgb(19,26,18)) with mint icon chips. One real UX bug found around the Connect sheet backdrop intercepting clicks.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Connect sheet (#cc-onb-bg backdrop)", "issue": "The backdrop div (data-testid='cc-connect-backdrop', z-index 2147480000, pointer-events:auto) sits ON TOP of the wallet rows at the center of the sheet. elementFromPoint over the Cloak Wallet (.wopt-own) button returns the backdrop DIV, so a normal click on the mint Cloak Wallet row is swallowed by the backdrop and the sheet simply closes without opening the password form. Playwright had to .evaluate(\"document.querySelector('.wopt-own').click()\") to proceed. Same effect blocks wallet-other-toggle, wallet-ext-phantom/solflare/backpack. This is reproducible 100% at desktop 1366x900.", "selector": "#cc-onb-bg / [data-testid='cc-connect-backdrop']", "priority": "HIGH"},
+      {"component": "Top header (desktop 1366px)", "issue": "The ALPENGLOW FINALITY · ZK SHIELDED tagline chip visually overlaps the top-right 'Connect wallet' pill (tagline chip right-edge ~1157px, Connect pill left-edge ~1158px, both at y≈30-55). On the pre-connect screens the Connect pill is painted ON TOP of the chip, making the right end of the tagline unreadable. After vault creation the chip becomes 'Cloak Privacy Wallet · AW…' and the overlap mostly resolves because the right pill is wider, but the ALPENGLOW chip is still crowded against it.", "selector": "[data-testid='cc-tagline'] + [data-testid='cc-connect-btn']", "priority": "MEDIUM"},
+      {"component": "Vault dashboard hero balance card", "issue": "Under the 'PRIVATE BALANCE' label there is a visually prominent empty mint rounded rectangle where the big serif total is supposed to live. For a fresh/empty vault no number is rendered — just an empty mint block — which reads as a loading/skeleton glitch rather than a balance of 0. Suggest rendering '0.00' or hiding the mint pill until a balance exists.", "selector": ".cc-balance-hero (big-balance slot)", "priority": "MEDIUM"},
+      {"component": "Receive view", "issue": "A toast 'Copy failed: open Receive to copy it by hand' appeared on first paint of the Receive view even though the user never clicked Copy. Likely an auto-copy attempt failing because document is not focused. Minor polish item.", "selector": ".cc-toast", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Mobile 375px More sheet", "issues": ["Looks good — dark forest tiles (rgb(19,26,18)), mint icons, labels readable (color rgb(233,242,234))."]},
+      {"screen": "Landing page", "issues": ["Clean, matches spec: 'Disappear from the public ledger.' hero, Groth16 proof sketch, LIVE ON SOLANA MAINNET strip with real polled numbers (6,434 sealed, 1,671 nullifiers, 83 tokens, ~150ms), Alpenglow section, no Camo text, no X link except the single intended Alpenglow one."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "FIX HIGH: lower the z-index of #cc-onb-bg (data-testid cc-connect-backdrop) so the wallet rows inside the Connect sheet are above it, OR give the sheet content its own higher stacking context. Right now a real-user click on 'Cloak Wallet' / 'Other wallets' / Phantom/Solflare/Backpack lands on the backdrop and dismisses the sheet instead of opening the vault-create flow.",
+    "FIX MEDIUM: resolve the tagline chip ↔ Connect wallet pill overlap on desktop (≥1280px). Either shrink the chip, add min-margin, or hide the chip on narrower desktops.",
+    "FIX MEDIUM: on the vault hero card, render a real '0.00 USD' (or similar) for an empty wallet instead of leaving the mint balance pill visually empty — currently reads as a broken skeleton.",
+    "LOW: suppress the 'Copy failed' toast that fires automatically on first paint of Receive."
+  ],
+  "critical_code_review_comments": [
+    "Connect sheet uses an insanely high z-index (2147480000) with pointer-events:auto on the backdrop — any content layered inside needs an equal/higher stacking context or the sheet is purely decorative to the mouse.",
+    "The nav rename via K2L/L2K paraphrase maps works, but the mapping leaves a few duplicate items in the top bar at desktop (e.g. 'Burner addresses' and 'Key ring' sit at the top row AND inside the More sheet on mobile) — fine functionally, but worth deduping for consistency.",
+    "Rebrand coverage is thorough: no user-visible 'Camo' / '$CAMO' / CA chip anywhere in landing, /docs, or the app shell. Recovery key prefix is cloaksk2… and addresses are cloak2…, matching CHUNK_VER cloak2."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (not tested per request)", "frontend": "85%"},
+  "test_credentials": "Vault password used: regression10x (fresh profile each run). Recovery key generated per run (verified cloaksk2 prefix).",
+  "seed_data_creation": "none",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Backend not in scope. Frontend rebrand regression PASSED for: Landing, /docs, app shell, nav renames (desktop + mobile dock + More sheet), vault creation + cloaksk2 recovery, Receive cloak2 QR, Ledger live pool view, no Camo text, no CA chip, no stray X/Twitter links. BLOCKING-ish UI bug: the Connect sheet backdrop (#cc-onb-bg, data-testid cc-connect-backdrop) intercepts pointer events over the wallet rows at 1366x900 — real users may not be able to click Cloak Wallet / Phantom / Solflare / Backpack with a normal mouse. Reproducible via elementFromPoint() over .wopt-own returning the backdrop div. Playwright workaround: await page.evaluate(\"document.querySelector('.wopt-own').click()\"). Also note tagline/Connect overlap on desktop and empty balance pill on fresh vault.",
+  "rca of the issue": "Connect sheet click-swallow: /app/backend/brand/camo-app.js (or the connect-sheet renderer) renders a full-screen backdrop with id=cc-onb-bg at z-index 2147480000 and pointer-events:auto, but the wallet list (.wlist / .wopt-own buttons) sits inside the same stacking context without its own z-index or isolation. document.elementFromPoint() at the center of the Cloak Wallet button returns the backdrop DIV, so the click handler on the backdrop (which closes the sheet) fires before the button's click. Fix: either (a) give the inner sheet container `position:relative; z-index: calc(backdrop + 1); isolation:isolate`, or (b) switch the backdrop's pointer-events to `none` on its inner safe-zone and keep it only on the outer dim area, or (c) stop the backdrop from closing the sheet on clicks that originated inside .wlist."
+}

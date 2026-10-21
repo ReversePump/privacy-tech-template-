@@ -291,7 +291,12 @@ header .wallet-btn.cc-off>span:not(.wb-dot)::after{content:"Connect wallet";font
 @media (min-width:1024px){#cc-sheet{align-items:center}#cc-sheet .ns-panel{border-radius:0}}
 
 /* ---------- sleek: no long explainers ---------- */
-#gx-intro{display:none!important}
+#gx-intro{max-width:760px;margin:0 auto 20px!important;padding:18px 22px;border-radius:18px;border:1px solid rgba(190,230,205,.12)!important;background:linear-gradient(180deg,rgba(190,230,205,.04),transparent 60%),#10160f!important;color:rgba(233,242,234,.68)!important}
+#gx-intro .gx-intro-k{font-family:var(--f-mono);letter-spacing:.22em;text-transform:uppercase;font-size:11px;color:#7fb894;margin-bottom:8px}
+#gx-intro p{font-size:13.5px;line-height:1.65;margin:0}
+#gx-intro .gx-intro-t span{border-radius:999px!important;background:rgba(169,231,192,.08)!important;color:#a9e7c0!important;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em}
+#gx-intro .gx-intro-nw a{color:#a9e7c0}
+html.cc-gated #gx-intro{display:none!important}
 body:has(.sheet-wrap) #cc-dock,body:has(#cc-sheet) #cc-dock,html.cc-onb-open #cc-dock{display:none!important}
 
 /* ---------- explain first, connect last ---------- */
@@ -505,7 +510,7 @@ header .top-right .btn,header .wallet-btn,header .gx-x,header .theme-btn{border-
 .card.onb .btn-primary:disabled{opacity:.55}
 .card.onb .wopt.wext{background:#12141a!important;border:1px solid var(--line-2)!important}
 .card.onb .wopt.wext:hover{border-color:rgba(244,244,245,.3)!important}
-@media (max-width:1180px){.cc-tag>span{display:none}}
+@media (max-width:1180px){.cc-tag{display:none}}
 /* hide upstream wallet rows visually (cloned into our dropdown; nodes stay in place for React) */
 .card.onb.wg-has-ext>.wopt:not(.wopt-own){display:none!important}
 .card.onb .wopt.wext .wg-go{margin-left:auto;font-size:12px;font-weight:600;color:rgba(244,244,245,.55)}
@@ -538,7 +543,7 @@ body::after{
  mask-image:radial-gradient(80% 70% at 50% 0%,#000 30%,transparent 100%);
  -webkit-mask-image:radial-gradient(80% 70% at 50% 0%,#000 30%,transparent 100%);
 }
-.shell,main.main,header.top{position:relative;z-index:1}
+.shell{position:relative;z-index:1}
 
 /* ---- header: floating glass bar ---- */
 @media (min-width:1024px){
@@ -659,3 +664,10 @@ main.main .view{animation:cloakView .5s var(--cc-ease) both}
 #cc-sheet .ns-x{border-radius:12px!important;background:rgba(169,231,192,.1)!important;color:#a9e7c0!important}
 #cc-sheet .ns-tile{border-radius:16px!important}
 #cc-sheet .ns-h b{font-family:var(--f-disp)!important;font-style:italic;font-weight:400!important;font-size:26px!important}
+
+/* ---- empty balance: show 0.00 instead of a bare skeleton pill ---- */
+.hb-total.hb-zero .skel,.hb-total.hb-zero *{visibility:hidden!important}
+.hb-total.hb-zero{position:relative;min-height:1em}
+.hb-total.hb-zero::after{content:"0.00";visibility:visible;position:absolute;left:0;top:0;font-style:italic;color:#f2f9f3}
+/* ---- tagline steps aside earlier on tight desktops ---- */
+@media (max-width:1280px){.cc-tag{display:none}}
