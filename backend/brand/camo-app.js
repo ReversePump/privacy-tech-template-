@@ -1727,6 +1727,12 @@
     el.querySelector('span span').textContent = sub;
     return el;
   }
+  function hideExtWalletOriginals() {
+    var card = document.querySelector('.card.onb.wg-has-ext'); if (!card) return;
+    Array.prototype.forEach.call(card.querySelectorAll('.wopt:not(.wopt-own)'), function (o) {
+      if (o.style.display !== 'none') o.style.setProperty('display', 'none', 'important');
+    });
+  }
   function ensureWalletGroup() {
     var card = document.querySelector('.card.onb'); if (!card) return;
     if (card.querySelector('.wgroup')) return;
@@ -1740,6 +1746,7 @@
     if (rest.length) {
       card.classList.add('wg-has-ext');
       rest.forEach(function (o) { try { list.appendChild(woptClone(o)); } catch (e) {} });
+      hideExtWalletOriginals();
     } else {
       list.innerHTML = EXT_WALLETS.map(function (w) {
         return '<a class="wopt wext" href="' + w[2] + '" target="_blank" rel="noopener noreferrer" data-testid="wallet-ext-' + w[0].toLowerCase() + '">' +
@@ -1840,7 +1847,7 @@
   })();
   document.addEventListener('input', function () { setTimeout(ensureFees, 120); }, true);
   window.addEventListener('hashchange', function () { Array.prototype.forEach.call(document.querySelectorAll('.cc-fee-tog'), function (b) { b.setAttribute('data-open', '0'); }); ensureFees(); });
-  function tick() { orderNav(); ensureX(); ensureTagline(); fixTaglineOverlap(); syncIntro(); ensureMore(); fitNav(); ensureFoot(); ensureWalletBtn(); ensureDock(); ensurePitch(); ensureSplash(); ensureFees(); ensureWalletGroup(); }
+  function tick() { orderNav(); ensureX(); ensureTagline(); fixTaglineOverlap(); syncIntro(); ensureMore(); fitNav(); ensureFoot(); ensureWalletBtn(); ensureDock(); ensurePitch(); ensureSplash(); ensureFees(); ensureWalletGroup(); hideExtWalletOriginals(); }
   setTimeout(function () { if (document.querySelector('main.main')) showTour(false); }, 1400);
   function boot() { ensure(); sync(); tick(); setInterval(tick, 700); document.addEventListener('click', function () { setTimeout(tick, 60); }, true); window.addEventListener('hashchange', function () { setTimeout(tick, 60); }); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
