@@ -370,7 +370,7 @@ def null_prefix_js(text: str) -> str:
 
 CHUNK_VER = "camo1"
 _CHUNK_REF_RE = re.compile(r'(static/chunks/[A-Za-z0-9_-]+)\.js(?![A-Za-z0-9_.])')
-_CHUNK_ALIAS_RE = re.compile(r'\.nc\d+\.js$')
+_CHUNK_ALIAS_RE = re.compile(r'\.(?:nc|camo)\d+\.js$')
 _NC_RETRY = ("(window.__ncR||(window.__ncR=function(f,n,d){return Promise.race([Promise.resolve().then(f),"
              "new Promise(function(z){setTimeout(function(){z(null)},15000)})]).catch(function(){return null})"
              ".then(function(r){return r==null&&n>0?new Promise(function(z){setTimeout(z,d)})"

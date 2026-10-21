@@ -1,0 +1,62 @@
+{
+  "summary": "Iteration 32 — Full re-test of Camo Cash rebrand (landing, docs, wallet, key prefixes) per review request. Backend pytest green: 60/60 across test_iter12_proxy_audit.py (25), test_live_endpoints.py (26), test_iter27_live_brand.py (9) with REACT_APP_BACKEND_URL loaded from /app/frontend/.env. Landing (/) in Gloam monochrome style: 'Hit send. Leave no trace.' hero renders, canvas#camo-hero-canvas mounted (2 copies — one visible, one offscreen is fine), hero-live counter animates every ~1s ('synced 2s ago'→'synced 0s ago'), all required testids present (hero-live, hero-stats, hero-swap, hero-x, hero-launch, cta-launch, landing-footer, fees-toggle, pillar-shield/route/intent, feature-card-0..4, 3 zk-system rows). Fees toggle expands fee table (Shield/Pay/Trade/Cash out/Route/Intent rows). Branding scan on /: 0 occurrences of NullCash, Null Cash, Veil, DarkSwap, Cadabra. /docs: title='Camo Cash Docs', h1='The manual.', 0 banned-brand hits, no horizontal overflow at 1920 or 375. /app at 375 mobile: no horizontal overflow. KEY PREFIX CHECK (critical) — PASSED: new in-browser wallet creation produced recovery key 'camosk2Pr2NqoRZcQJU3Eh71oYq8DbC9UsRzCtm5bx8BRi1qUdzXaPDP' (starts with camosk2 ✓) and vault address 'camo25tBXguWamUQnkQrshipBBvEjrQcNa34HRpcvTcZkaCeJ49AAUc4hhgGa6JuVL8qvC2Sy9tLT5wbtxVAGuvisjFVVuxV6M' (starts with camo2 ✓) shown on Receive screen with QR. Viewing-key (camovk1) prefix not exercised because UI did not surface it in the create/receive flow — backend rewrite for camovk1 is in bifrost.py so it will apply when upstream shows the viewing key. /app nav shows Home/Shield/Swap/Private route/Privacy swap/Track/Chain/Send/Bridge/History/More with dk-nav-private (1), dk-nav-privacy (1), dk-nav-track (1), nc-connect-btn (1). Tour testid nc-tour-skip works. Did NOT create any live swap orders.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Bifrost proxy chunk reverse-alias regex",
+        "issue": "FIXED by test agent. _CHUNK_ALIAS_RE in /app/backend/bifrost.py only matched '\\.nc\\d+\\.js$' but forward rewrite (CHUNK_VER='camo1') emits '.camo1.js'. Result: 7+ Next.js chunk requests under /api/bifrost/v1/app/_next/static/chunks/*.camo1.js returned 404 and /app was stuck on 'Getting ready / Warming up proofs' splash forever. Fix: widened regex to '\\.(?:nc|camo)\\d+\\.js$'. After fix all chunks 200, wallet UI boots, wallet creation works, key prefixes verified.",
+        "selector": "/app",
+        "priority": "CRITICAL (fixed)"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "/app boot splash (dk-swap.js vl-* loader)",
+        "issues": [
+          "CAMO particle text is monochrome white (good), but the progress bar (.vl-bar > i) uses a purple→cyan gradient and the subtext 'Warming up proofs' / 'Loading your notes' renders in purple. Task required 'CAMO monochrome particle splash (no purple/green)'. Suggest switching the bar fill and subtext color to the Gloam ink/mute tokens (#08090c / #4b5563) to match the rest of the rebrand."
+        ]
+      },
+      {
+        "screen": "/app HTML internals",
+        "issues": [
+          "HTML on /app still contains ~33 raw 'veil' occurrences in CSS custom-property NAMES (--veil-fg, --veil-hi, --veil-deep, --veil-wash) and link-match selectors (a[href*='github.com/veil'], a[href*='@veilit.xyz']). Not user-visible text, but a brand leak in dev-tools / View Source. Consider renaming CSS vars to --cm-* / --camo-* in /app/backend/brand/nc-theme.css and dk-swap.js."
+        ]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter12_proxy_audit.py",
+    "/app/backend/tests/test_live_endpoints.py",
+    "/app/backend/tests/test_iter27_live_brand.py",
+    "/app/test_reports/pytest/iter32_results.xml"
+  ],
+  "action_items": [
+    "Confirm the one-line fix in /app/backend/bifrost.py (line 373): _CHUNK_ALIAS_RE now '\\.(?:nc|camo)\\d+\\.js$'. Previously only 'nc' prefix was accepted, so any CHUNK_VER bump beyond 'nc*' would break /app silently. Keep both prefixes to retain backwards-compat with cached HTML.",
+    "Repaint the /app boot splash to monochrome: replace the purple→cyan .vl-bar gradient and purple subtext color with the Gloam ink/mute palette so the splash matches the landing rebrand.",
+    "Rename --veil-* CSS variables and the a[href*='veil']/[href*='veilit.xyz'] selectors in /app/backend/brand/nc-theme.css and dk-swap.js to --camo-*/[href*='camo'] to eliminate the ~33 raw 'veil' tokens still present in /app HTML.",
+    "Optional: expose the camovk1 viewing key somewhere in the UI (Settings → Keys / Backup) so users can verify / export it. Currently create-wallet only reveals the camosk2 recovery key."
+  ],
+  "critical_code_review_comments": [
+    "bifrost.py: forward chunk rewrite (CHUNK_VER) and reverse alias (_CHUNK_ALIAS_RE) are decoupled constants — any future bump of CHUNK_VER will silently 404 all chunks unless the reverse regex is updated. Consider deriving the regex from CHUNK_VER directly (e.g. re.compile(rf'\\.{re.escape(CHUNK_VER)}\\.js$|\\.nc\\d+\\.js$')) so they can never drift again.",
+    "/app/backend/brand/dk-swap.js is still ~1100 lines (carried over from iter 12/31) — remains the single biggest file in the brand overlay and would benefit from a split.",
+    "test_live_endpoints.py and test_iter27_live_brand.py still require REACT_APP_BACKEND_URL exported in the shell before pytest; they don't auto-load /app/frontend/.env. Non-blocking but worth adding python-dotenv load."
+  ],
+  "updated_files": [
+    "/app/backend/bifrost.py (one-line regex widen on line 373 to unblock /app chunks)"
+  ],
+  "success_rate": {
+    "backend": "100% (60/60 pytest)",
+    "frontend": "100% on all required testids, key-prefix check, branding scan, mobile overflow — after the one-line bifrost fix"
+  },
+  "test_credentials": "None required. Test wallet created in-browser with password 'TestPass123!' (local only, discarded).",
+  "seed_data_creation": "None. No swap orders created, no funds moved. Test wallet lives only in the Playwright browser session.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Key prefix rewrite is live and working: new wallets emit camosk2 (recovery key) and camo2 (vault address). Viewing-key camovk1 was NOT surfaced in the create/receive UI — if a future test needs to confirm it, look in a settings/export surface (not shown in default flow). Known residual brand leaks on /app: (a) ~33 '--veil-*' CSS variable name occurrences in HTML (non-visible, in CSS text), (b) /app boot splash still uses a purple/cyan progress bar + purple subtext (CAMO particles themselves are monochrome). Both logged as design_issues. CRITICAL regression caught & fixed this iteration: _CHUNK_ALIAS_RE regex drift broke all /app chunks — re-check this on any future CHUNK_VER bump. Pytest files test_live_endpoints.py and test_iter27_live_brand.py still require `export REACT_APP_BACKEND_URL=...` before running.",
+  "rca of the issue": "RCA for /app blank-splash bug: bifrost.py introduced CHUNK_VER='camo1' and rewrites outgoing HTML/JS chunk refs via _CHUNK_REF_RE to '*.camo1.js'. On the inbound side the proxy strips the version suffix before fetching upstream using _CHUNK_ALIAS_RE, but that regex was still hardcoded to '\\.nc\\d+\\.js$' from the previous 'nc1' versioning scheme. Mismatch → every chunk request 404 → Next.js hydration never starts → UI frozen on vl-* splash. Reproduction: GET /api/bifrost/v1/app/_next/static/chunks/<hash>.camo1.js returns 404. Fix: changed line 373 to _CHUNK_ALIAS_RE = re.compile(r'\\.(?:nc|camo)\\d+\\.js$'). After supervisorctl restart backend, the same URL returns 200 and the wallet UI boots end-to-end."
+}

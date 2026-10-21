@@ -46,24 +46,15 @@
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <style>
-          html,body{background:#f9f9f9;margin:0}
-          #nc-boot{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;background:#f9f9f9;z-index:2147483000;font-family:"Space Grotesk",Inter,system-ui,-apple-system,sans-serif;animation:ncbF .3s ease both}
-          #nc-boot .c{width:min(560px,100%);box-sizing:border-box;border-radius:30px;background:radial-gradient(120% 90% at 50% 0%,#1d1a2b 0%,#0f0f14 60%);border:1px solid rgba(153,69,255,.25);box-shadow:0 30px 80px -30px rgba(60,20,120,.6),0 0 0 6px rgba(20,241,149,.06);padding:22px 24px 24px;overflow:hidden}
-          #nc-boot .t{display:flex;align-items:center;gap:10px;font:700 12px/1 inherit;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.72)}
-          #nc-boot .t i{width:9px;height:9px;border-radius:50%;background:#19fb9b;box-shadow:0 0 12px #19fb9b;animation:ncbP 1.8s ease-in-out infinite}
-          #nc-boot .g{display:grid;grid-template-columns:repeat(14,1fr);gap:9px;padding:34px 6px 30px}
-          #nc-boot .g s{display:block;aspect-ratio:1;border-radius:50%;background:linear-gradient(90deg,#9945ff,#568cff,#19fb9b);background-size:1400% 100%;opacity:.25;animation:ncbD 1.6s ease-in-out infinite}
-          #nc-boot b{display:block;font-size:22px;line-height:1.1;letter-spacing:-.02em;color:#fff}
-          #nc-boot .m{display:block;margin-top:6px;font-size:14px;font-weight:500;color:#b9a3ff}
-          #nc-boot .bar{margin-top:14px;height:5px;border-radius:9px;background:rgba(255,255,255,.08);overflow:hidden}
-          #nc-boot .bar i{display:block;height:100%;width:40%;border-radius:9px;background:linear-gradient(90deg,#9945ff,#568cff,#19fb9b);animation:ncbB 1.6s ease-in-out infinite}
+          html,body{background:#08090c;margin:0}
+          #nc-boot{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;background:#08090c;z-index:2147483000;font-family:Inter,system-ui,-apple-system,sans-serif;animation:ncbF .3s ease both}
+          #nc-boot .c{display:flex;align-items:center;gap:12px}
+          #nc-boot .t i{display:block;width:8px;height:8px;border-radius:50%;background:#f4f4f5;animation:ncbP 1.6s ease-in-out infinite}
+          #nc-boot b{font-size:15px;font-weight:500;letter-spacing:.02em;color:rgba(244,244,245,.85)}
           @keyframes ncbF{from{opacity:0}to{opacity:1}}
-          @keyframes ncbP{0%,100%{opacity:1}50%{opacity:.35}}
-          @keyframes ncbD{0%,100%{opacity:.18;transform:scale(.7)}50%{opacity:1;transform:scale(1)}}
-          @keyframes ncbB{0%{transform:translateX(-100%)}100%{transform:translateX(260%)}}
-          @media (max-width:520px){#nc-boot b{font-size:19px}#nc-boot .g{gap:6px;padding:24px 2px 22px}}
+          @keyframes ncbP{0%,100%{opacity:1}50%{opacity:.3}}
         </style>
-        <div id="root"><div id="nc-boot" data-testid="nc-boot" role="status" aria-label="Loading Camo Cash"><div class="c"><div class="t"><i></i><span>Solana mainnet</span></div><div class="g" id="nc-boot-g"></div><b>Getting ready</b><span class="m">Loading Camo Cash</span><div class="bar"><i></i></div></div></div></div>
+        <div id="root"><div id="nc-boot" data-testid="nc-boot" role="status" aria-label="Loading Camo Cash"><div class="c"><span class="t"><i></i></span><b>Privacy loading&hellip;</b></div></div></div>
         <script>
           (function(){var g=document.getElementById('nc-boot-g');if(!g)return;var h='';for(var r=0;r<3;r++)for(var c=0;c<14;c++){var k=c/13;h+='<s style="background-position:'+(k*100)+'% 0;animation-delay:'+((c*0.07+r*0.12).toFixed(2))+'s"></s>';}g.innerHTML=h;})();
         </script>

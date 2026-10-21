@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowRight, BookOpen, Radio, Workflow, Receipt, ShieldCheck, HelpCircle, Repeat } from 'lucide-react';
 import Logo from './Logo';
-import CaChip from './CaChip';
 
 export const X_URL = 'https://x.com/usecamocash';
 
@@ -21,7 +20,7 @@ const ITEMS = [
 ];
 
 export default function NmNav() {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(true);
   const [open, setOpen] = useState(false);
   useEffect(() => {
     const f = () => {
@@ -42,15 +41,14 @@ export default function NmNav() {
   const line = d ? 'border-[#f9f9f9]/40' : 'border-[#08090c]/70';
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-6">
-      <div className={`mx-auto max-w-[1180px] overflow-hidden rounded-[10px] border backdrop-blur-md transition-colors duration-500 ${line} ${d ? 'bg-[#08090c]/80 text-[#f9f9f9]' : 'bg-[#f9f9f9]/90 text-[#08090c]'}`}>
+      <div className={`mx-auto max-w-[1180px] overflow-hidden rounded-none border backdrop-blur-md transition-colors duration-500 ${line} ${d ? 'bg-[#08090c]/80 text-[#f9f9f9]' : 'bg-[#f9f9f9]/90 text-[#08090c]'}`}>
         <div className="flex h-[64px] items-center justify-between gap-3 px-3 sm:px-4">
           <a href="/" data-testid="nav-logo" className="shrink-0"><Logo light={d} /></a>
           <div className="flex min-w-0 items-center gap-2">
-            <CaChip line={line} />
             <a href={X_URL} target="_blank" rel="noopener noreferrer" aria-label="Camo Cash on X" data-testid="nav-x"
-              className={`hidden h-10 w-10 place-items-center rounded-[5px] border transition hover:-translate-y-0.5 sm:grid ${line}`}><XGlyph /></a>
+              className={`hidden h-10 w-10 place-items-center rounded-none border transition hover:-translate-y-0.5 sm:grid ${line}`}><XGlyph /></a>
             <button type="button" onClick={() => setOpen((v) => !v)} aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open} data-testid="nav-menu"
-              className={`nm-burger relative grid h-10 w-10 place-items-center rounded-[5px] border ${line}`}>
+              className={`nm-burger relative grid h-10 w-10 place-items-center rounded-none border ${line}`}>
               <span className={`nm-bl ${open ? 'o1' : ''}`} /><span className={`nm-bl ${open ? 'o2' : ''}`} /><span className={`nm-bl ${open ? 'o3' : ''}`} />
             </button>
           </div>
@@ -68,7 +66,7 @@ export default function NmNav() {
               </a>
             ))}
             <div className="border-t border-[#08090c]/70 p-3">
-              <a href="/app" data-testid="nav-launch" className="nm-lime flex h-12 items-center justify-center gap-2 rounded-[5px] text-[15px] font-semibold text-[#08090c]">Open app <ArrowRight className="h-4 w-4" /></a>
+              <a href="/app" data-testid="nav-launch" className="nm-lime flex h-12 items-center justify-center gap-2 rounded-none text-[15px] font-semibold text-[#08090c]">Open app <ArrowRight className="h-4 w-4" /></a>
             </div>
           </nav>
         </div>

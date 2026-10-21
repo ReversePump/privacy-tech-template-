@@ -237,7 +237,7 @@ function Hero({ stats }) {
         </Reveal>
 
         <Reveal delay={180} className="mt-10 w-full max-w-[560px]">
-          <div className="cm-hud relative overflow-hidden rounded-[10px] border border-white/15 bg-[#08090c]/70 text-left backdrop-blur-md" data-testid="hero-live">
+          <div className="cm-hud relative overflow-hidden rounded-none border border-white/15 bg-[#08090c]/70 text-left backdrop-blur-md" data-testid="hero-live">
             <i className="cm-corner tl" /><i className="cm-corner tr" /><i className="cm-corner bl" /><i className="cm-corner br" />
             <div className="flex items-center justify-between px-4 pt-3 font-mono text-[11px] uppercase tracking-[.18em]">
               <span className="flex items-center gap-2 text-white/75"><span className="nm-pulse" />Sealed notes in the pool</span>
@@ -256,14 +256,14 @@ function Hero({ stats }) {
             <BtnGhost href="/app#private-route" testid="hero-swap" dark>
               Swap without a wallet <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </BtnGhost>
-            <BtnGhost href={X_URL} testid="hero-x" dark ext><XGlyph s={13} /> @usecamocash</BtnGhost>
+            <BtnGhost href={X_URL} testid="hero-x" dark ext><XGlyph s={13} /> @trycamocash</BtnGhost>
           </div>
         </Reveal>
 
         <Reveal delay={300} className="mt-10 w-full">
           <dl className="mx-auto grid max-w-[640px] grid-cols-3 gap-2" data-testid="hero-stats">
             {[['Spent nullifiers', fmt(stats.nullifiers)], ['Shieldable tokens', fmt(stats.assets)], ['Swap to', 'Any chain']].map(([k, v]) => (
-              <div key={k} className="rounded-[5px] border border-white/12 bg-white/[.03] px-3 py-3 backdrop-blur-sm">
+              <div key={k} className="rounded-none border border-white/12 bg-[#12141a]/[.04] px-3 py-3 backdrop-blur-sm">
                 <dt className="font-mono text-[10px] uppercase tracking-[.14em] text-white/50">{k}</dt>
                 <dd className="mt-1 text-[20px] font-semibold tracking-[-0.02em]">{v}</dd>
               </div>
@@ -283,21 +283,21 @@ function WhatItIs() {
     ['The routes', 'Two private ways out: a routed hop to any chain, or an intent solvers race to fill.', '03'],
   ];
   return (
-    <section data-nm-theme="light" className="border-b border-[#e2e4e8] bg-[#f9f9f9] py-20 lg:py-24">
+    <section data-nm-theme="dark" className="border-b border-white/10 bg-[#0b0c10] py-20 lg:py-24">
       <div className="mx-auto max-w-[1180px] px-5">
         <Reveal>
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <h2 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-[#08090c] sm:text-[48px]">What Camo Cash is</h2>
-            <span className="font-mono text-[11px] uppercase tracking-[.18em] text-[#08090c]/45">sec/01 · identity</span>
+            <h2 className="text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-[48px]">What Camo Cash is</h2>
+            <span className="font-mono text-[11px] uppercase tracking-[.18em] text-white/45">sec/01 · identity</span>
           </div>
         </Reveal>
         <div className="mt-10 grid gap-3 md:grid-cols-3">
           {trio.map(([t, d, n], i) => (
             <Reveal key={t} delay={i * 60}>
-              <div className="cm-card group relative h-full rounded-[10px] border border-[#e2e4e8] bg-white p-6" data-testid={`what-card-${i}`}>
-                <span className="font-mono text-[12px] text-[#08090c]/40">{n}</span>
-                <h3 className="mt-3 text-[22px] font-semibold tracking-[-0.02em] text-[#08090c]">{t}</h3>
-                <p className="mt-2.5 text-[15px] leading-[1.6] text-[#08090c]/65">{d}</p>
+              <div className="cm-card group relative h-full rounded-none border border-white/10 bg-[#12141a] p-6" data-testid={`what-card-${i}`}>
+                <span className="font-mono text-[12px] text-white/40">{n}</span>
+                <h3 className="mt-3 text-[22px] font-semibold tracking-[-0.02em] text-white">{t}</h3>
+                <p className="mt-2.5 text-[15px] leading-[1.6] text-white/65">{d}</p>
               </div>
             </Reveal>
           ))}
@@ -309,18 +309,18 @@ function WhatItIs() {
 
 function Statement() {
   return (
-    <section data-nm-theme="light" className="relative overflow-hidden border-b border-[#e2e4e8] bg-white py-20 lg:py-28">
+    <section data-nm-theme="dark" className="relative overflow-hidden border-b border-white/10 bg-[#12141a] py-20 lg:py-28">
       <div className="mx-auto grid max-w-[1180px] items-center gap-10 px-5 lg:grid-cols-3">
         <Reveal>
-          <h2 className="text-[32px] font-medium leading-[1.12] tracking-[-0.02em] text-[#08090c] sm:text-[40px]">Camo Cash cracks the oldest problem on-chain.</h2>
-          <p className="mt-5 font-mono text-[13px] uppercase leading-[1.7] tracking-[.1em] text-[#08090c]/60">Private money on a public ledger, with every move proven, not just hidden.</p>
+          <h2 className="text-[32px] font-medium leading-[1.12] tracking-[-0.02em] text-white sm:text-[40px]">Camo Cash cracks the oldest problem on-chain.</h2>
+          <p className="mt-5 font-mono text-[13px] uppercase leading-[1.7] tracking-[.1em] text-white/60">Private money on a public ledger, with every move proven, not just hidden.</p>
         </Reveal>
         <Reveal delay={80}><img src={IMG('ring_portal')} alt="Coins and records falling into the Camo Cash ring" className="nm-float-slow mx-auto w-full max-w-[380px]" draggable="false" /></Reveal>
         <Reveal delay={160} className="lg:text-right">
-          <h3 className="text-[26px] font-medium leading-[1.15] text-[#08090c] sm:text-[30px]">Shield once,</h3>
-          <p className="mt-2 text-[17px] leading-[1.5] text-[#08090c]/70">and every move after that<br className="hidden lg:block" /> happens behind the wall.</p>
-          <h3 className="mt-8 text-[26px] font-medium leading-[1.15] text-[#08090c] sm:text-[30px]">Same wallet, zero hoops,</h3>
-          <p className="mt-2 text-[17px] leading-[1.5] text-[#08090c]/70">your usual flow,<br className="hidden lg:block" /> just off the record.</p>
+          <h3 className="text-[26px] font-medium leading-[1.15] text-white sm:text-[30px]">Shield once,</h3>
+          <p className="mt-2 text-[17px] leading-[1.5] text-white/70">and every move after that<br className="hidden lg:block" /> happens behind the wall.</p>
+          <h3 className="mt-8 text-[26px] font-medium leading-[1.15] text-white sm:text-[30px]">Same wallet, zero hoops,</h3>
+          <p className="mt-2 text-[17px] leading-[1.5] text-white/70">your usual flow,<br className="hidden lg:block" /> just off the record.</p>
         </Reveal>
       </div>
     </section>
@@ -336,20 +336,20 @@ const CARDS = [
 ];
 function Features() {
   return (
-    <section id="features" data-nm-theme="light" className="bg-[#f9f9f9] py-20 lg:py-24">
+    <section id="features" data-nm-theme="dark" className="bg-[#0b0c10] py-20 lg:py-24">
       <div className="mx-auto max-w-[1180px] px-5">
         <Reveal>
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <h2 className="max-w-[640px] text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-[#08090c] sm:text-[48px]">Your ledger was an open book. Close it.</h2>
-            <span className="font-mono text-[11px] uppercase tracking-[.18em] text-[#08090c]/45">sec/02 · capabilities</span>
+            <h2 className="max-w-[640px] text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-[48px]">Your ledger was an open book. Close it.</h2>
+            <span className="font-mono text-[11px] uppercase tracking-[.18em] text-white/45">sec/02 · capabilities</span>
           </div>
         </Reveal>
         <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {CARDS.map(([img, t], i) => (
             <Reveal key={img} delay={i * 60}>
-              <div className="cm-card group flex h-full min-h-[230px] flex-col rounded-[10px] border border-[#e2e4e8] bg-white p-4" data-testid={`feature-card-${i}`}>
+              <div className="cm-card group flex h-full min-h-[230px] flex-col rounded-none border border-white/10 bg-[#12141a] p-4" data-testid={`feature-card-${i}`}>
                 <img src={IMG(img)} alt="" className="mx-auto h-[120px] w-auto object-contain transition-transform duration-500 group-hover:-translate-y-1.5" draggable="false" />
-                <p className="mt-auto pt-5 text-[15px] font-medium leading-[1.3] text-[#08090c]">{t}</p>
+                <p className="mt-auto pt-5 text-[15px] font-medium leading-[1.3] text-white">{t}</p>
               </div>
             </Reveal>
           ))}
@@ -357,21 +357,21 @@ function Features() {
 
         <div className="mt-20">
           <Reveal>
-            <div className="flex items-end justify-between gap-4 border-b border-[#e2e4e8] pb-5">
-              <h3 className="text-[28px] font-semibold leading-[1.05] tracking-[-0.02em] text-[#08090c] sm:text-[40px]">Three doors out of the spotlight.</h3>
-              <span className="hidden font-mono text-[11px] uppercase tracking-[.18em] text-[#08090c]/45 sm:block">vault · route · intent</span>
+            <div className="flex items-end justify-between gap-4 border-b border-white/10 pb-5">
+              <h3 className="text-[28px] font-semibold leading-[1.05] tracking-[-0.02em] text-white sm:text-[40px]">Three doors out of the spotlight.</h3>
+              <span className="hidden font-mono text-[11px] uppercase tracking-[.18em] text-white/45 sm:block">vault · route · intent</span>
             </div>
           </Reveal>
           {PRODUCTS.map((p, i) => (
             <Reveal key={p.key} delay={i * 60}>
               <a href={p.href} data-testid={`pillar-${p.key}`}
-                className="group grid gap-5 border-b border-[#e2e4e8] py-8 transition-colors duration-300 hover:bg-white md:grid-cols-[90px_1.1fr_1.4fr_auto] md:items-start">
-                <span className="font-mono text-[40px] font-bold leading-none text-[#08090c]/15 transition-colors duration-300 group-hover:text-[#08090c]">0{i + 1}</span>
+                className="group grid gap-5 border-b border-white/10 py-8 transition-colors duration-300 hover:bg-[#12141a] md:grid-cols-[90px_1.1fr_1.4fr_auto] md:items-start">
+                <span className="font-mono text-[40px] font-bold leading-none text-white/15 transition-colors duration-300 group-hover:text-white">0{i + 1}</span>
                 <span>
-                  <span className="inline-block rounded-[5px] border border-[#08090c]/25 px-2 py-0.5 font-mono text-[11px] uppercase tracking-[.14em] text-[#08090c]/70">{p.tag}</span>
-                  <span className="mt-3 block text-[24px] font-semibold leading-[1.1] tracking-[-0.02em] text-[#08090c] sm:text-[28px]">{p.title}</span>
+                  <span className="inline-block rounded-none border border-white/25 px-2 py-0.5 font-mono text-[11px] uppercase tracking-[.14em] text-white/70">{p.tag}</span>
+                  <span className="mt-3 block text-[24px] font-semibold leading-[1.1] tracking-[-0.02em] text-white sm:text-[28px]">{p.title}</span>
                 </span>
-                <span className="block text-[16px] leading-[1.55] text-[#08090c]/65 md:pt-9">{p.body}</span>
+                <span className="block text-[16px] leading-[1.55] text-white/65 md:pt-9">{p.body}</span>
                 <span className="cm-btn-ghost inline-flex items-center gap-2 self-center whitespace-nowrap">{p.cta}<ArrowUpRight className="h-4 w-4" /></span>
               </a>
             </Reveal>
@@ -384,25 +384,25 @@ function Features() {
 
 function Flow() {
   return (
-    <section id="flow" data-nm-theme="light" className="border-y border-[#e2e4e8] bg-white py-20 lg:py-24">
+    <section id="flow" data-nm-theme="dark" className="border-y border-white/10 bg-[#12141a] py-20 lg:py-24">
       <div className="mx-auto grid max-w-[1180px] gap-12 px-5 lg:grid-cols-[1fr_1.35fr]">
         <Reveal>
           <div className="lg:sticky lg:top-28">
             <Kicker>How it works</Kicker>
-            <h2 className="mt-5 text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-[#08090c] sm:text-[48px]">Walk in seen. Walk out unseen.</h2>
-            <p className="mt-4 max-w-[400px] text-[16px] leading-[1.6] text-[#08090c]/60">Only the first and last step are public.</p>
+            <h2 className="mt-5 text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-[48px]">Walk in seen. Walk out unseen.</h2>
+            <p className="mt-4 max-w-[400px] text-[16px] leading-[1.6] text-white/60">Only the first and last step are public.</p>
           </div>
         </Reveal>
-        <ol className="relative space-y-3 border-l-2 border-dashed border-[#08090c]/25 pl-6">
+        <ol className="relative space-y-3 border-l-2 border-dashed border-white/25 pl-6">
           {JOURNEY.map((s, i) => (
             <Reveal key={s.t} delay={i * 60}>
-              <li className={`relative rounded-[10px] p-5 ${s.tone === 'dark' ? 'bg-[#08090c] text-white' : 'border border-[#e2e4e8] bg-[#f9f9f9]'}`} data-testid={`flow-step-${i}`}>
-                <span className={`absolute -left-[37px] top-5 grid h-6 w-6 place-items-center rounded-full border-2 border-[#08090c] font-mono text-[11px] font-bold ${s.tone === 'dark' ? 'bg-white text-[#08090c]' : 'bg-white text-[#08090c]'}`}>{i + 1}</span>
+              <li className={`relative rounded-none p-5 ${s.tone === 'dark' ? 'bg-white text-[#08090c]' : 'border border-white/10 bg-[#12141a]'}`} data-testid={`flow-step-${i}`}>
+                <span className={`absolute -left-[37px] top-5 grid h-6 w-6 place-items-center rounded-none border-2 border-white/40 font-mono text-[11px] font-bold ${s.tone === 'dark' ? 'bg-[#12141a] text-white' : 'bg-[#12141a] text-white'}`}>{i + 1}</span>
                 <span className="flex items-center justify-between gap-3">
                   <span className="text-[19px] font-semibold tracking-[-0.01em]">{s.t}</span>
-                  <span className={`font-mono text-[10px] uppercase tracking-[.14em] ${s.tone === 'dark' ? 'text-white/60' : 'text-[#08090c]/50'}`}>{s.tone === 'dark' ? 'off the record' : 'on the record'}</span>
+                  <span className={`font-mono text-[10px] uppercase tracking-[.14em] ${s.tone === 'dark' ? 'text-[#08090c]/55' : 'text-white/50'}`}>{s.tone === 'dark' ? 'off the record' : 'on the record'}</span>
                 </span>
-                <p className={`mt-2 text-[14.5px] leading-[1.6] ${s.tone === 'dark' ? 'text-white/70' : 'text-[#08090c]/65'}`}>{s.d}</p>
+                <p className={`mt-2 text-[14.5px] leading-[1.6] ${s.tone === 'dark' ? 'text-[#08090c]/65' : 'text-white/65'}`}>{s.d}</p>
               </li>
             </Reveal>
           ))}
@@ -414,42 +414,42 @@ function Flow() {
 
 function RealZk() {
   return (
-    <section id="zk" data-nm-theme="light" className="bg-[#f9f9f9] py-20 lg:py-24">
+    <section id="zk" data-nm-theme="dark" className="bg-[#0b0c10] py-20 lg:py-24">
       <div className="mx-auto max-w-[1180px] px-5">
         <div className="grid items-center gap-8 lg:grid-cols-[1.4fr_1fr]">
           <Reveal>
             <Kicker>Real zero-knowledge</Kicker>
-            <h2 className="mt-5 text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-[#08090c] sm:text-[48px]">Hiding is easy.<br />Proving is the point.</h2>
-            <p className="mt-5 max-w-[620px] text-[16px] leading-[1.6] text-[#08090c]/60">Others blur the trail. Camo Cash proves every move.</p>
+            <h2 className="mt-5 text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-[48px]">Hiding is easy.<br />Proving is the point.</h2>
+            <p className="mt-5 max-w-[620px] text-[16px] leading-[1.6] text-white/60">Others blur the trail. Camo Cash proves every move.</p>
           </Reveal>
           <Reveal delay={80}><img src={IMG('icon_proof')} alt="Sealed proof" className="nm-float-slow mx-auto w-[200px] lg:ml-auto lg:mr-0" draggable="false" /></Reveal>
         </div>
 
-        <div className="mt-12 overflow-hidden rounded-[10px] border border-[#e2e4e8] bg-white">
+        <div className="mt-12 overflow-hidden rounded-none border border-white/10 bg-[#12141a]">
           {METHODS.map((z, i) => (
-            <div key={z.k} className={`grid gap-2 px-5 py-5 sm:grid-cols-[200px_1fr_auto] sm:items-center ${i ? 'border-t border-[#e2e4e8]' : ''} ${z.zk ? 'bg-[#08090c] text-white' : ''}`} data-testid={`zk-system-${i}`}>
+            <div key={z.k} className={`grid gap-2 px-5 py-5 sm:grid-cols-[200px_1fr_auto] sm:items-center ${i ? 'border-t border-white/10' : ''} ${z.zk ? 'bg-white text-[#08090c]' : ''}`} data-testid={`zk-system-${i}`}>
               <span className="text-[19px] font-semibold tracking-[-0.01em]">{z.k}</span>
-              <span className={`text-[14.5px] leading-[1.5] ${z.zk ? 'text-white/80' : 'text-[#08090c]/65'}`}><b className="font-semibold">{z.line}</b> {z.verdict}</span>
-              <span className={`inline-flex w-fit items-center gap-1.5 rounded-[5px] px-2.5 py-1 font-mono text-[11px] uppercase tracking-[.12em] ${z.zk ? 'bg-white text-[#08090c]' : 'border border-[#e2e4e8] text-[#08090c]/55'}`}>{z.zk ? <><Check className="h-3.5 w-3.5" />proof</> : <><XIcon className="h-3.5 w-3.5" />no proof</>}</span>
+              <span className={`text-[14.5px] leading-[1.5] ${z.zk ? 'text-[#08090c]/75' : 'text-white/65'}`}><b className="font-semibold">{z.line}</b> {z.verdict}</span>
+              <span className={`inline-flex w-fit items-center gap-1.5 rounded-none px-2.5 py-1 font-mono text-[11px] uppercase tracking-[.12em] ${z.zk ? 'bg-[#12141a] text-white' : 'border border-white/10 text-white/55'}`}>{z.zk ? <><Check className="h-3.5 w-3.5" />proof</> : <><XIcon className="h-3.5 w-3.5" />no proof</>}</span>
             </div>
           ))}
         </div>
 
         <div className="mt-8 grid gap-4 lg:grid-cols-2">
           <Reveal>
-            <div className="h-full rounded-[10px] border border-[#e2e4e8] bg-white p-6">
-              <div className="font-mono text-[11px] uppercase tracking-[.16em] text-[#08090c]/45">Life of a proof</div>
+            <div className="h-full rounded-none border border-white/10 bg-[#12141a] p-6">
+              <div className="font-mono text-[11px] uppercase tracking-[.16em] text-white/45">Life of a proof</div>
               <ol className="mt-4 space-y-2" data-testid="zk-pipeline">
                 {PIPE.map((s, i) => (
-                  <li key={s} className="flex items-center gap-3 font-mono text-[13px] text-[#08090c]">
-                    <span className={`grid h-7 w-7 place-items-center rounded-[5px] text-[12px] ${i === 2 ? 'bg-[#08090c] text-white' : 'border border-[#e2e4e8]'}`}>{i + 1}</span>{s}
+                  <li key={s} className="flex items-center gap-3 font-mono text-[13px] text-white">
+                    <span className={`grid h-7 w-7 place-items-center rounded-none text-[12px] ${i === 2 ? 'bg-white text-[#08090c]' : 'border border-white/10'}`}>{i + 1}</span>{s}
                   </li>
                 ))}
               </ol>
             </div>
           </Reveal>
           <Reveal delay={60}>
-            <div className="h-full rounded-[10px] bg-[#08090c] p-6 text-white">
+            <div className="h-full rounded-none border border-white/10 bg-[#12141a] p-6 text-white">
               <div className="font-mono text-[11px] uppercase tracking-[.16em] text-white/50">What a proof swears to</div>
               <ul className="mt-4 space-y-3">
                 {CLAIMS.map((x) => <li key={x} className="flex gap-3 text-[15px] font-medium leading-[1.45]"><Check className="mt-0.5 h-4 w-4 shrink-0" />{x}</li>)}
@@ -464,25 +464,25 @@ function RealZk() {
 
 function Tech() {
   return (
-    <section id="tech" data-nm-theme="light" className="border-y border-[#e2e4e8] bg-white py-20 lg:py-24">
+    <section id="tech" data-nm-theme="dark" className="border-y border-white/10 bg-[#12141a] py-20 lg:py-24">
       <div className="mx-auto max-w-[1180px] px-5">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <Reveal>
             <Kicker>Docs</Kicker>
-            <h2 className="mt-5 text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-[#08090c] sm:text-[48px]">Read the manual.</h2>
-            <p className="mt-3 max-w-[560px] text-[16px] leading-[1.6] text-[#08090c]/60">The full story lives in the docs.</p>
+            <h2 className="mt-5 text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-[48px]">Read the manual.</h2>
+            <p className="mt-3 max-w-[560px] text-[16px] leading-[1.6] text-white/60">The full story lives in the docs.</p>
           </Reveal>
           <BtnPrimary href="/docs" testid="docs-open"><BookOpen className="h-4 w-4" />Open the docs</BtnPrimary>
         </div>
         <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {DOC_GROUPS.map((g, i) => (
             <Reveal key={g.id} delay={i * 60}>
-              <div className="cm-card flex h-full flex-col rounded-[10px] border border-[#e2e4e8] bg-[#f9f9f9] p-5" data-testid={`docs-group-${g.id}`}>
-                <span className="font-mono text-[12px] text-[#08090c]/40">0{i + 1}</span>
-                <h3 className="mt-2 text-[19px] font-semibold tracking-[-0.01em] text-[#08090c]">{g.title}</h3>
+              <div className="cm-card flex h-full flex-col rounded-none border border-white/10 bg-[#0b0c10] p-5" data-testid={`docs-group-${g.id}`}>
+                <span className="font-mono text-[12px] text-white/40">0{i + 1}</span>
+                <h3 className="mt-2 text-[19px] font-semibold tracking-[-0.01em] text-white">{g.title}</h3>
                 <ul className="mt-4 space-y-1.5">
                   {g.pages.map((p) => (
-                    <li key={p.id}><a href={`/docs#${p.id}`} className="group inline-flex items-center gap-1.5 text-[14px] text-[#08090c]/65 hover:text-[#08090c]">{p.title}<ArrowUpRight className="h-3.5 w-3.5 opacity-0 transition-opacity group-hover:opacity-100" /></a></li>
+                    <li key={p.id}><a href={`/docs#${p.id}`} className="group inline-flex items-center gap-1.5 text-[14px] text-white/65 hover:text-white">{p.title}<ArrowUpRight className="h-3.5 w-3.5 opacity-0 transition-opacity group-hover:opacity-100" /></a></li>
                   ))}
                 </ul>
               </div>
@@ -492,12 +492,12 @@ function Tech() {
 
         <Reveal>
           <div className="mt-14" id="privacy">
-            <h3 className="text-[24px] font-semibold tracking-[-0.02em] text-[#08090c] sm:text-[30px]">The tech, in one line each.</h3>
-            <div className="mt-5 grid gap-px overflow-hidden rounded-[10px] border border-[#e2e4e8] bg-[#e2e4e8] sm:grid-cols-2 lg:grid-cols-3" data-testid="tech-grid">
+            <h3 className="text-[24px] font-semibold tracking-[-0.02em] text-white sm:text-[30px]">The tech, in one line each.</h3>
+            <div className="mt-5 grid gap-px overflow-hidden rounded-none border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-3" data-testid="tech-grid">
               {TECH.map(([k, v]) => (
-                <div key={k} className="group bg-white p-5 transition-colors duration-300 hover:bg-[#08090c]">
-                  <div className="font-mono text-[13px] font-bold text-[#08090c] transition-colors group-hover:text-white">{k}</div>
-                  <div className="mt-2 text-[14.5px] leading-[1.5] text-[#08090c]/65 transition-colors group-hover:text-white/70">{v}</div>
+                <div key={k} className="group bg-[#12141a] p-5 transition-colors duration-300 hover:bg-[#181a22]">
+                  <div className="font-mono text-[13px] font-bold text-white transition-colors">{k}</div>
+                  <div className="mt-2 text-[14.5px] leading-[1.5] text-white/65 transition-colors group-hover:text-white/85">{v}</div>
                 </div>
               ))}
             </div>
@@ -511,30 +511,30 @@ function Tech() {
 function Fees() {
   const [open, setOpen] = useState(false);
   return (
-    <section id="fees" data-nm-theme="light" className="bg-[#f9f9f9] py-20 lg:py-24">
+    <section id="fees" data-nm-theme="dark" className="bg-[#0b0c10] py-20 lg:py-24">
       <div className="mx-auto max-w-[1180px] px-5">
         <Reveal>
-          <div className="rounded-[10px] border border-[#e2e4e8] bg-white">
+          <div className="rounded-none border border-white/10 bg-[#12141a]">
             <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} data-testid="fees-toggle"
               className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left sm:px-7">
               <span>
-                <span className="block text-[22px] font-semibold tracking-[-0.02em] text-[#08090c] sm:text-[28px]">Fees</span>
-                <span className="mt-1 block text-[14px] text-[#08090c]/60">Private sends are free. Everything else is shown before you confirm.</span>
+                <span className="block text-[22px] font-semibold tracking-[-0.02em] text-white sm:text-[28px]">Fees</span>
+                <span className="mt-1 block text-[14px] text-white/60">Private sends are free. Everything else is shown before you confirm.</span>
               </span>
-              <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-[5px] border border-[#08090c] transition-all duration-300 ${open ? 'rotate-180 bg-[#08090c] text-white' : ''}`}><ChevronDown className="h-5 w-5" /></span>
+              <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-none border border-white/40 transition-all duration-300 ${open ? 'rotate-180 bg-white text-[#08090c]' : ''}`}><ChevronDown className="h-5 w-5" /></span>
             </button>
             <div className={`grid transition-all duration-500 ease-[cubic-bezier(.16,1,.3,1)] ${open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
               <div className="overflow-hidden">
                 <div className="overflow-x-auto px-5 pb-6 sm:px-7">
                   <table className="w-full min-w-[560px] text-left text-[14px]" data-testid="fees-table">
-                    <thead><tr className="border-b border-[#e2e4e8] text-[#08090c]/50">
+                    <thead><tr className="border-b border-white/10 text-white/50">
                       <th className="py-3 pr-4 font-medium">Action</th><th className="py-3 pr-4 font-medium">Protocol fee</th><th className="py-3 font-medium">Network cost</th>
                     </tr></thead>
                     <tbody>{PRICES.map((f) => (
-                      <tr key={f[0]} className="border-b border-[#e2e4e8] last:border-0">
-                        <td className="py-3 pr-4 font-semibold text-[#08090c]">{f[0]}</td>
-                        <td className="py-3 pr-4 text-[#08090c]">{f[1]}</td>
-                        <td className="py-3 text-[#08090c]/60">{f[2]}</td>
+                      <tr key={f[0]} className="border-b border-white/10 last:border-0">
+                        <td className="py-3 pr-4 font-semibold text-white">{f[0]}</td>
+                        <td className="py-3 pr-4 text-white">{f[1]}</td>
+                        <td className="py-3 text-white/60">{f[2]}</td>
                       </tr>
                     ))}</tbody>
                   </table>
@@ -550,18 +550,18 @@ function Fees() {
 
 function Faq() {
   return (
-    <section id="faq" data-nm-theme="light" className="bg-[#f9f9f9] pb-20 lg:pb-24">
+    <section id="faq" data-nm-theme="dark" className="bg-[#0b0c10] pb-20 lg:pb-24">
       <div className="mx-auto grid max-w-[1180px] gap-10 px-5 lg:grid-cols-[1fr_1.6fr]">
         <Reveal>
           <Kicker>FAQ</Kicker>
-          <h2 className="mt-5 text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-[#08090c] sm:text-[48px]">Fair questions.</h2>
-          <p className="mt-4 max-w-[360px] text-[16px] leading-[1.6] text-[#08090c]/60">Short answers. Long ones are in the docs.</p>
+          <h2 className="mt-5 text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-[48px]">Fair questions.</h2>
+          <p className="mt-4 max-w-[360px] text-[16px] leading-[1.6] text-white/60">Short answers. Long ones are in the docs.</p>
         </Reveal>
         <Accordion type="single" collapsible className="space-y-2">
           {QA.map(([q, a], i) => (
-            <AccordionItem key={q} value={`f${i}`} className="rounded-[10px] border border-[#e2e4e8] bg-white px-5 data-[state=open]:bg-[#f2f3f5]" data-testid={`faq-${i}`}>
-              <AccordionTrigger className="py-4 text-left text-[15.5px] font-semibold text-[#08090c] hover:no-underline">{q}</AccordionTrigger>
-              <AccordionContent className="pb-4 text-[14.5px] leading-[1.65] text-[#08090c]/65">{a}</AccordionContent>
+            <AccordionItem key={q} value={`f${i}`} className="rounded-none border border-white/10 bg-[#12141a] px-5 data-[state=open]:bg-white/[.05]" data-testid={`faq-${i}`}>
+              <AccordionTrigger className="py-4 text-left text-[15.5px] font-semibold text-white hover:no-underline">{q}</AccordionTrigger>
+              <AccordionContent className="pb-4 text-[14.5px] leading-[1.65] text-white/65">{a}</AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
@@ -584,7 +584,7 @@ function FinalCta() {
           <p className="mt-6 text-[16px] leading-[1.65] text-white/70 sm:text-[19px]">Privacy isn&apos;t hiding. It&apos;s choosing who gets to look.</p>
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
             <BtnPrimary href={APP} testid="cta-launch" dark>Open the app</BtnPrimary>
-            <BtnGhost href={X_URL} testid="cta-x" dark ext className="h-12 justify-center"><XGlyph /> Follow @usecamocash</BtnGhost>
+            <BtnGhost href={X_URL} testid="cta-x" dark ext className="h-12 justify-center"><XGlyph /> Follow @trycamocash</BtnGhost>
           </div>
         </Reveal>
       </div>
@@ -606,7 +606,7 @@ export default function LandingPage() {
   const stats = useLiveStats();
   useEffect(() => { document.title = 'Camo Cash · Hit send. Leave no trace.'; }, []);
   return (
-    <div className="nm-landing min-h-screen overflow-x-hidden bg-[#f9f9f9] text-[#08090c]" data-testid="landing-page">
+    <div className="nm-landing min-h-screen overflow-x-hidden bg-[#08090c] text-white" data-testid="landing-page">
       <NmNav />
       <main>
         <Hero stats={stats} />

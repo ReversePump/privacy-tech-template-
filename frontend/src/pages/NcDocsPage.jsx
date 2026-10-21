@@ -8,19 +8,19 @@ import { SEEN, PRICES } from './landingCopy';
 function FeesBox() {
   const [open, setOpen] = useState(false);
   return (
-    <div className="rounded-[10px] border border-[#08090c]/70">
+    <div className="rounded-none border border-white/15">
       <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} data-testid="docs-fees-toggle"
         className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left">
-        <span className="text-[15px] font-semibold text-[#08090c]">Fee breakdown <span className="font-normal text-[#08090c]/60">· tap to {open ? 'hide' : 'show'}</span></span>
+        <span className="text-[15px] font-semibold text-white">Fee breakdown <span className="font-normal text-white/60">· tap to {open ? 'hide' : 'show'}</span></span>
         <ChevronDown className={`h-5 w-5 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />
       </button>
       <div className={`grid transition-all duration-500 ${open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="overflow-hidden">
           <div className="overflow-x-auto px-4 pb-4">
             <table className="w-full min-w-[520px] text-left text-[14px]" data-testid="docs-fees-table">
-              <thead><tr className="border-b border-[#08090c]/30 text-[#08090c]/60"><th className="py-2.5 pr-3 font-medium">Action</th><th className="py-2.5 pr-3 font-medium">Protocol fee</th><th className="py-2.5 font-medium">Network cost</th></tr></thead>
+              <thead><tr className="border-b border-white/10 text-white/60"><th className="py-2.5 pr-3 font-medium">Action</th><th className="py-2.5 pr-3 font-medium">Protocol fee</th><th className="py-2.5 font-medium">Network cost</th></tr></thead>
               <tbody>{PRICES.map((f) => (
-                <tr key={f[0]} className="border-b border-[#08090c]/10 last:border-0"><td className="py-2.5 pr-3 font-semibold">{f[0]}</td><td className="py-2.5 pr-3">{f[1]}</td><td className="py-2.5 text-[#08090c]/70">{f[2]}</td></tr>
+                <tr key={f[0]} className="border-b border-white/10 last:border-0"><td className="py-2.5 pr-3 font-semibold">{f[0]}</td><td className="py-2.5 pr-3">{f[1]}</td><td className="py-2.5 text-white/70">{f[2]}</td></tr>
               ))}</tbody>
             </table>
           </div>
@@ -32,46 +32,46 @@ function FeesBox() {
 
 function Block({ b }) {
   switch (b.k) {
-    case 'p': return <p className="text-[15.5px] leading-[1.75] text-[#08090c]/80">{b.t}</p>;
+    case 'p': return <p className="text-[15.5px] leading-[1.75] text-white/80">{b.t}</p>;
     case 'list': return (
       <ul className="space-y-2">{b.items.map((x) => (
-        <li key={x} className="flex gap-3 text-[15px] leading-[1.6] text-[#08090c]/85"><span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-[2px] bg-[#08090c]" />{x}</li>
+        <li key={x} className="flex gap-3 text-[15px] leading-[1.6] text-white/85"><span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-none bg-[#08090c]" />{x}</li>
       ))}</ul>
     );
     case 'steps': return (
       <ol className="space-y-3">{b.items.map(([h, t], i) => (
-        <li key={h} className="flex gap-4 rounded-[10px] border border-[#08090c]/25 bg-[#e2e2e2] p-4">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[9px] bg-[#08090c] font-mono text-[14px] font-bold text-[#d4d4d8]">{i + 1}</span>
-          <span><span className="block text-[15.5px] font-semibold text-[#08090c]">{h}</span><span className="mt-1 block text-[14.5px] leading-[1.6] text-[#08090c]/75">{t}</span></span>
+        <li key={h} className="flex gap-4 rounded-none border border-white/10 bg-[#12141a] p-4">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-none bg-[#12141a] font-mono text-[14px] font-bold text-[#08090c]">{i + 1}</span>
+          <span><span className="block text-[15.5px] font-semibold text-white">{h}</span><span className="mt-1 block text-[14.5px] leading-[1.6] text-white/75">{t}</span></span>
         </li>
       ))}</ol>
     );
-    case 'code': return <pre className="overflow-x-auto rounded-[10px] bg-[#08090c] p-4 font-mono text-[12.5px] leading-[1.7] text-[#d4d4d8]">{b.t}</pre>;
+    case 'code': return <pre className="overflow-x-auto rounded-none bg-[#0b0c10] border border-white/10 p-4 font-mono text-[12.5px] leading-[1.7] text-white/80">{b.t}</pre>;
     case 'note': return (
-      <div className="flex gap-3 rounded-[10px] border-l-4 border-[#d4d4d8] bg-[#08090c] p-4 text-[14.5px] leading-[1.6] text-[#f9f9f9]"><Info className="mt-0.5 h-4 w-4 shrink-0 text-[#d4d4d8]" />{b.t}</div>
+      <div className="flex gap-3 rounded-none border-l-4 border-white/40 bg-[#12141a] p-4 text-[14.5px] leading-[1.6] text-white/85"><Info className="mt-0.5 h-4 w-4 shrink-0 text-white/80" />{b.t}</div>
     );
     case 'kv': return (
-      <dl className="divide-y divide-[#08090c]/15 rounded-[10px] border border-[#08090c]/40">{b.rows.map(([k, v]) => (
-        <div key={k} className="grid gap-1 px-4 py-3 sm:grid-cols-[180px_1fr]"><dt className="text-[13px] font-semibold uppercase tracking-[.06em] text-[#08090c]/60">{k}</dt><dd className="text-[14.5px] text-[#08090c]">{v}</dd></div>
+      <dl className="divide-y divide-white/10 rounded-none border border-white/15">{b.rows.map(([k, v]) => (
+        <div key={k} className="grid gap-1 px-4 py-3 sm:grid-cols-[180px_1fr]"><dt className="text-[13px] font-semibold uppercase tracking-[.06em] text-white/60">{k}</dt><dd className="text-[14.5px] text-white">{v}</dd></div>
       ))}</dl>
     );
     case 'table': return (
-      <div className="overflow-x-auto rounded-[10px] border border-[#08090c]/50">
+      <div className="overflow-x-auto rounded-none border border-white/15">
         <table className="w-full min-w-[560px] text-left text-[14px]">
-          <thead><tr className="bg-[#08090c] text-[#f9f9f9]">{b.cols.map((c) => <th key={c} className="px-4 py-2.5 font-medium">{c}</th>)}</tr></thead>
+          <thead><tr className="bg-[#12141a]/10 text-white">{b.cols.map((c) => <th key={c} className="px-4 py-2.5 font-medium">{c}</th>)}</tr></thead>
           <tbody>{b.rows.map((r) => (
-            <tr key={r[0]} className="border-t border-[#08090c]/12"><td className="whitespace-nowrap px-4 py-2.5 font-mono text-[12.5px]">{r[0]}</td><td className="px-4 py-2.5 text-[#08090c]/75">{r[1]}</td></tr>
+            <tr key={r[0]} className="border-t border-white/10"><td className="whitespace-nowrap px-4 py-2.5 font-mono text-[12.5px]">{r[0]}</td><td className="px-4 py-2.5 text-white/75">{r[1]}</td></tr>
           ))}</tbody>
         </table>
       </div>
     );
     case 'fees': return <FeesBox />;
     case 'visibility': return (
-      <div className="overflow-x-auto rounded-[10px] border border-[#08090c]/50" data-testid="docs-visibility">
+      <div className="overflow-x-auto rounded-none border border-white/15" data-testid="docs-visibility">
         <table className="w-full min-w-[600px] text-left text-[14px]">
-          <thead><tr className="bg-[#08090c] text-[#f9f9f9]"><th className="px-4 py-2.5 font-medium">Action</th><th className="px-4 py-2.5 font-medium"><span className="inline-flex items-center gap-1.5"><Eye className="h-4 w-4" />Chain sees</span></th><th className="px-4 py-2.5 font-medium"><span className="inline-flex items-center gap-1.5 text-[#d4d4d8]"><EyeOff className="h-4 w-4" />Stays sealed</span></th></tr></thead>
+          <thead><tr className="bg-[#12141a]/10 text-white"><th className="px-4 py-2.5 font-medium">Action</th><th className="px-4 py-2.5 font-medium"><span className="inline-flex items-center gap-1.5"><Eye className="h-4 w-4" />Chain sees</span></th><th className="px-4 py-2.5 font-medium"><span className="inline-flex items-center gap-1.5 text-white/80"><EyeOff className="h-4 w-4" />Stays sealed</span></th></tr></thead>
           <tbody>{SEEN.map((v) => (
-            <tr key={v.a} className="border-t border-[#08090c]/12"><td className="px-4 py-2.5 font-semibold">{v.a}</td><td className="px-4 py-2.5 text-[#08090c]/70">{v.out}</td><td className="px-4 py-2.5">{v.inn}</td></tr>
+            <tr key={v.a} className="border-t border-white/10"><td className="px-4 py-2.5 font-semibold">{v.a}</td><td className="px-4 py-2.5 text-white/70">{v.out}</td><td className="px-4 py-2.5">{v.inn}</td></tr>
           ))}</tbody>
         </table>
       </div>
@@ -99,16 +99,16 @@ export default function NcDocsPage() {
   }, [pages]);
   const go = (id) => { const t = document.getElementById(id); if (t) { t.scrollIntoView({ behavior: 'smooth' }); window.history.replaceState(null, '', `#${id}`); } };
   return (
-    <div className="nm-landing min-h-screen bg-[#f9f9f9] text-[#08090c]" data-testid="docs-page">
+    <div className="nm-landing min-h-screen bg-[#0b0c10] text-white" data-testid="docs-page">
       <NmNav />
       <div className="mx-auto max-w-[1180px] px-5 pb-24 pt-28">
-        <header className="border-b border-[#08090c]/40 pb-8">
-          <div className="font-mono text-[11px] uppercase tracking-[.18em] text-[#08090c]/60">Camo Cash · documentation</div>
+        <header className="border-b border-white/15 pb-8">
+          <div className="font-mono text-[11px] uppercase tracking-[.18em] text-white/60">Camo Cash · documentation</div>
           <h1 className="nm-h mt-3 text-[40px] font-semibold leading-[1.04] tracking-[-0.03em] sm:text-[60px]">The manual.</h1>
-          <p className="mt-3 max-w-[620px] text-[17px] leading-[1.6] text-[#08090c]/75">Everything about how Camo Cash seals, moves and releases money, from the first click to the circuit.</p>
+          <p className="mt-3 max-w-[620px] text-[17px] leading-[1.6] text-white/75">Everything about how Camo Cash seals, moves and releases money, from the first click to the circuit.</p>
           <div className="mt-6 md:hidden">
             <select value={active} onChange={(e) => go(e.target.value)} data-testid="docs-select"
-              className="w-full rounded-[5px] border border-[#08090c] bg-[#f9f9f9] px-3 py-3 text-[15px]">
+              className="w-full rounded-none border border-[#08090c] bg-[#0b0c10] px-3 py-3 text-[15px]">
               {DOC_GROUPS.map((g) => <optgroup key={g.id} label={g.title}>{g.pages.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}</optgroup>)}
             </select>
           </div>
@@ -118,33 +118,33 @@ export default function NcDocsPage() {
             <nav className="sticky top-28 space-y-6" data-testid="docs-sidebar">
               {DOC_GROUPS.map((g) => (
                 <div key={g.id}>
-                  <div className="font-mono text-[11px] uppercase tracking-[.16em] text-[#08090c]/55">{g.title}</div>
-                  <ul className="mt-2 space-y-0.5 border-l border-[#08090c]/25">
+                  <div className="font-mono text-[11px] uppercase tracking-[.16em] text-white/55">{g.title}</div>
+                  <ul className="mt-2 space-y-0.5 border-l border-white/10">
                     {g.pages.map((p) => (
                       <li key={p.id}>
                         <button type="button" onClick={() => go(p.id)} data-testid={`docs-link-${p.id}`}
-                          className={`-ml-px block w-full border-l-2 py-1.5 pl-3 text-left text-[14.5px] transition-colors ${active === p.id ? 'border-[#08090c] font-semibold text-[#08090c]' : 'border-transparent text-[#08090c]/65 hover:text-[#08090c]'}`}>{p.title}</button>
+                          className={`-ml-px block w-full border-l-2 py-1.5 pl-3 text-left text-[14.5px] transition-colors ${active === p.id ? 'border-[#08090c] font-semibold text-white' : 'border-transparent text-white/65 hover:text-white'}`}>{p.title}</button>
                       </li>
                     ))}
                   </ul>
                 </div>
               ))}
-              <a href="/app" className="nm-lime flex h-10 items-center justify-center gap-2 rounded-[5px] text-[14px] font-semibold">Open app <ArrowRight className="h-4 w-4" /></a>
+              <a href="/app" className="nm-lime flex h-10 items-center justify-center gap-2 rounded-none text-[14px] font-semibold">Open app <ArrowRight className="h-4 w-4" /></a>
             </nav>
           </aside>
           <main className="min-w-0 space-y-16">
             {pages.map((p) => (
               <section key={p.id} id={p.id} className="scroll-mt-28" data-testid={`docs-section-${p.id}`}>
-                <div className="font-mono text-[11px] uppercase tracking-[.16em] text-[#08090c]/50">{p.group}</div>
+                <div className="font-mono text-[11px] uppercase tracking-[.16em] text-white/50">{p.group}</div>
                 <h2 className="nm-h mt-2 text-[28px] font-semibold tracking-[-0.02em] sm:text-[34px]">{p.title}</h2>
-                <p className="mt-2 text-[17px] leading-[1.6] text-[#08090c]">{p.lead}</p>
+                <p className="mt-2 text-[17px] leading-[1.6] text-white">{p.lead}</p>
                 <div className="mt-6 space-y-5">{p.blocks.map((b, i) => <Block key={`${p.id}-${i}`} b={b} />)}</div>
               </section>
             ))}
           </main>
         </div>
       </div>
-      <footer className="bg-[#08090c] text-[#f9f9f9]/60">
+      <footer className="bg-[#12141a]/10 text-white/60">
         <div className="mx-auto flex max-w-[1180px] flex-col items-center justify-between gap-3 px-5 py-8 text-[13px] sm:flex-row">
           <Logo light size={24} />
           <span>© {new Date().getFullYear()} Camo Cash</span>
