@@ -189,3 +189,12 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
 - No mocks found: landing hero stats poll indexer /v1/stats every 5s; Chain dashboard renders live merkle
   root / sealed notes / nullifiers / feed from the same indexer via proxy.
 - Header tagline changed to "First Alpenglow finality ZK shielded" (landing TopNav + app header badge).
+
+## Iteration 20 — $CAMO CA in headers (Oct 2026)
+- CA chip added to landing header (TopNav.jsx CaChip, also inside mobile drawer) and app header badge
+  (camo-app.js ensureTagline): "$CAMO CA · 9DMUQb…pump", click copies full mint
+  9DMUQbHWth5TtdSPZ1pRPsLTxsfYfM97n7K6x1MLpump and flashes "CA copied". data-testids: nav-ca,
+  nav-ca-drawer, app-ca. Chip hides with the tagline when a wallet is connected.
+- No other brand token surfaced: upstream project token mint stays stubbed/hidden (PROJECT_TOKEN_STUB,
+  HIDDEN_MINTS); served app HTML scan shows zero upstream mint/symbol leaks. Other tokens appear only
+  inside swap token selectors, which is required functionality.

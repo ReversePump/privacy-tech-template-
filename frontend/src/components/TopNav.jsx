@@ -3,7 +3,24 @@ import { ArrowRight, BookOpen, Radio, Workflow, Receipt, ShieldCheck, HelpCircle
 import Logo from './Logo';
 
 export const X_URL = 'https://x.com/trycamocash';
+export const CAMO_CA = '9DMUQbHWth5TtdSPZ1pRPsLTxsfYfM97n7K6x1MLpump';
 export const APP_URL = `${process.env.REACT_APP_BACKEND_URL || ''}/api/bifrost/v1/app/`;
+
+export const CaChip = ({ className = '', testId = 'nav-ca' }) => {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    try { navigator.clipboard.writeText(CAMO_CA); } catch (e) { /* clipboard unavailable */ }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1300);
+  };
+  return (
+    <button type="button" onClick={copy} data-testid={testId} title={`Copy contract: ${CAMO_CA}`}
+      className={`cursor-copy items-center gap-1.5 rounded-none border border-white/25 px-2.5 py-1.5 font-mono text-[10.5px] uppercase tracking-[.12em] text-white/80 transition hover:border-white/60 hover:text-white ${copied ? 'border-white/70 text-white' : ''} ${className}`}>
+      <span className="font-semibold text-white">$CAMO</span>
+      <span>{copied ? 'CA copied' : 'CA · 9DMUQb…pump'}</span>
+    </button>
+  );
+};
 
 export const XGlyph = ({ s = 15 }) => (
   <svg viewBox="0 0 24 24" width={s} height={s} fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
@@ -34,6 +51,7 @@ export default function TopNav() {
         <div className="flex h-[64px] items-center justify-between gap-3 px-3 sm:px-4">
           <a href="/" data-testid="nav-logo" className="shrink-0"><Logo light /></a>
           <span className="cc-tag hidden font-mono text-[10.5px] uppercase tracking-[.16em] text-white/55 md:inline-block" data-testid="nav-tagline">First Alpenglow finality ZK shielded</span>
+          <CaChip className="hidden md:inline-flex" />
           <div className="flex min-w-0 items-center gap-2">
             <a href={X_URL} target="_blank" rel="noopener noreferrer" aria-label="Camo Cash on X" data-testid="nav-x"
               className="hidden h-10 w-10 place-items-center rounded-none border border-white/25 transition hover:-translate-y-0.5 sm:grid"><XGlyph /></a>
@@ -55,6 +73,10 @@ export default function TopNav() {
                 <ArrowRight className="h-4 w-4 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
               </a>
             ))}
+            <div className="flex items-center justify-between gap-3 border-t border-white/12 px-4 py-3">
+              <span className="font-mono text-[10px] uppercase tracking-[.14em] text-white/45">$CAMO contract</span>
+              <CaChip className="inline-flex" testId="nav-ca-drawer" />
+            </div>
             <div className="border-t border-white/12 p-3">
               <a href={APP_URL} data-testid="nav-launch" className="flex h-12 items-center justify-center gap-2 rounded-none bg-white text-[15px] font-semibold text-[#08090c] transition-transform duration-200 hover:scale-[1.02]">Open app <ArrowRight className="h-4 w-4" /></a>
             </div>

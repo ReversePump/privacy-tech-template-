@@ -1356,7 +1356,18 @@
     if (document.getElementById('cc-tagline')) return;
     var t = document.createElement('span');
     t.id = 'cc-tagline'; t.className = 'cc-tag'; t.setAttribute('data-testid', 'cc-tagline');
-    t.textContent = 'First Alpenglow finality ZK shielded';
+    var s = document.createElement('span');
+    s.textContent = 'First Alpenglow finality ZK shielded';
+    var ca = document.createElement('button');
+    ca.type = 'button'; ca.className = 'cc-ca'; ca.setAttribute('data-testid', 'app-ca');
+    ca.title = 'Copy $CAMO contract address';
+    ca.textContent = '$CAMO 9DMUQb\u2026pump';
+    ca.addEventListener('click', function () {
+      try { navigator.clipboard.writeText('9DMUQbHWth5TtdSPZ1pRPsLTxsfYfM97n7K6x1MLpump'); } catch (e) {}
+      ca.textContent = 'CA copied';
+      setTimeout(function () { ca.textContent = '$CAMO 9DMUQb\u2026pump'; }, 1300);
+    });
+    t.appendChild(s); t.appendChild(ca);
     document.body.appendChild(t);
   }
   function fixTaglineOverlap() {

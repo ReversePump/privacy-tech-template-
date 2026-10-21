@@ -493,7 +493,9 @@ header.site-top .cc-ca-site{margin-right:10px}
 /* sharp edges: header controls */
 header .top-right .btn,header .wallet-btn,header .gx-x,header .theme-btn{border-radius:0!important}
 /* header tagline */
-.cc-tag{position:fixed;top:17px;right:206px;z-index:40;padding:6px 10px;border:1px solid rgba(255,255,255,.18);background:rgba(8,9,12,.6);backdrop-filter:blur(8px);font-family:'Space Mono',ui-monospace,monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,244,245,.6);white-space:nowrap}
+.cc-tag{position:fixed;top:17px;right:206px;z-index:40;display:flex;align-items:center;gap:9px;padding:6px 10px;border:1px solid rgba(255,255,255,.18);background:rgba(8,9,12,.6);backdrop-filter:blur(8px);font-family:'Space Mono',ui-monospace,monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(244,244,245,.6);white-space:nowrap}
+.cc-ca{background:none;border:0;border-left:1px solid rgba(255,255,255,.18);padding:0 0 0 9px;font:inherit;letter-spacing:.08em;color:rgba(244,244,245,.92);cursor:copy}
+.cc-ca:hover{color:#fff}
 .card.onb .btn-primary,.card.onb button.btn-primary{background:#f4f4f5!important;color:#08090c!important;background-image:none!important}
 .card.onb .btn-primary:disabled{opacity:.55}
 .card.onb .wopt.wext{background:#12141a!important;border:1px solid var(--line-2)!important}
