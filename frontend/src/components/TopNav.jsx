@@ -15,7 +15,7 @@ export const CaChip = ({ className = '', testId = 'nav-ca' }) => {
   };
   return (
     <button type="button" onClick={copy} data-testid={testId} title={`Copy contract: ${CAMO_CA}`}
-      className={`cursor-copy items-center gap-1.5 rounded-none border border-white/25 px-2.5 py-1.5 font-mono text-[10.5px] uppercase tracking-[.12em] text-white/80 transition hover:border-white/60 hover:text-white ${copied ? 'border-white/70 text-white' : ''} ${className}`}>
+      className={`inline-flex shrink-0 cursor-copy items-center gap-1.5 whitespace-nowrap rounded-none border border-white/25 px-2 py-1 font-mono text-[9.5px] uppercase tracking-[.1em] text-white/80 transition hover:border-white/60 hover:text-white sm:px-2.5 sm:py-1.5 sm:text-[10.5px] sm:tracking-[.12em] ${copied ? 'border-white/70 text-white' : ''} ${className}`}>
       <span className="font-semibold text-white">$CAMO</span>
       <span>{copied ? 'CA copied' : 'CA · 9DMUQb…pump'}</span>
     </button>
@@ -51,7 +51,7 @@ export default function TopNav() {
         <div className="flex h-[64px] items-center justify-between gap-3 px-3 sm:px-4">
           <a href="/" data-testid="nav-logo" className="shrink-0"><Logo light /></a>
           <span className="cc-tag hidden font-mono text-[10.5px] uppercase tracking-[.16em] text-white/55 md:inline-block" data-testid="nav-tagline">First Alpenglow finality ZK shielded</span>
-          <CaChip className="hidden md:inline-flex" />
+          <CaChip />
           <div className="flex min-w-0 items-center gap-2">
             <a href={X_URL} target="_blank" rel="noopener noreferrer" aria-label="Camo Cash on X" data-testid="nav-x"
               className="hidden h-10 w-10 place-items-center rounded-none border border-white/25 transition hover:-translate-y-0.5 sm:grid"><XGlyph /></a>

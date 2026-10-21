@@ -198,3 +198,12 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
 - No other brand token surfaced: upstream project token mint stays stubbed/hidden (PROJECT_TOKEN_STUB,
   HIDDEN_MINTS); served app HTML scan shows zero upstream mint/symbol leaks. Other tokens appear only
   inside swap token selectors, which is required functionality.
+
+## Iteration 21 — CA chip at top of every page incl. mobile (Oct 2026)
+- Landing/docs (TopNav): CaChip now visible at all widths (was md+ only); compact on mobile, no wrap.
+- App mirror: tagline badge restructured — CA chip stays visible on all widths; only the tagline text hides
+  <=1180px. fixTaglineOverlap now repositions the badge dynamically (right = wallet button width + 34) and
+  only hides the tagline span when connected, so the CA chip is always on top. Chip text shortens to
+  "9DMUQb…pump" below 640px. fitNavNow accounts for badge width so nav tabs never slide under it.
+- Mobile app header compacting: brand clipped to 112px, connect button slimmed, badge font 9px —
+  verified geometry: brand(124) < chip(147..232) < connect(252), no overlap at 375px.

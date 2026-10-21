@@ -1361,21 +1361,28 @@
     var ca = document.createElement('button');
     ca.type = 'button'; ca.className = 'cc-ca'; ca.setAttribute('data-testid', 'app-ca');
     ca.title = 'Copy $CAMO contract address';
-    ca.textContent = '$CAMO 9DMUQb\u2026pump';
+    var caTxt = function () { return window.innerWidth < 640 ? '9DMUQb\u2026pump' : '$CAMO 9DMUQb\u2026pump'; };
+    ca.textContent = caTxt();
     ca.addEventListener('click', function () {
       try { navigator.clipboard.writeText('9DMUQbHWth5TtdSPZ1pRPsLTxsfYfM97n7K6x1MLpump'); } catch (e) {}
       ca.textContent = 'CA copied';
-      setTimeout(function () { ca.textContent = '$CAMO 9DMUQb\u2026pump'; }, 1300);
+      setTimeout(function () { ca.textContent = caTxt(); }, 1300);
     });
+    window.__ccCaTxt = function () { if (ca.textContent !== 'CA copied') ca.textContent = caTxt(); };
     t.appendChild(s); t.appendChild(ca);
     document.body.appendChild(t);
   }
   function fixTaglineOverlap() {
     var t = document.getElementById('cc-tagline'); if (!t) return;
+    if (window.__ccCaTxt) window.__ccCaTxt();
     var wb = document.querySelector('header .wallet-btn');
+    var w = wb ? Math.round(wb.getBoundingClientRect().width) : 190;
+    var right = w + 34;
+    if (t.style.right !== right + 'px') t.style.right = right + 'px';
+    var s = t.querySelector('span');
     var connected = wb && /\u00b7/.test(wb.textContent || '');
     var show = connected ? 'none' : '';
-    if (t.style.display !== show) t.style.display = show;
+    if (s && s.style.display !== show) s.style.display = show;
   }
   /* ---- Camo Cash: keep desktop top tabs clear of the header controls ---- */
   var OVF_ORDER = ['chain', 'history', 'bridge', 'track', 'send', 'privacy swap', 'shield', 'private route', 'swap'];
@@ -1405,7 +1412,9 @@
     }
     var brand = document.querySelector('header .brand');
     var left = brand ? Math.round(brand.getBoundingClientRect().right + 24) : 160;
-    var right = Math.max(0, Math.round(window.innerWidth - tr.getBoundingClientRect().left + 16));
+    var tag = document.getElementById('cc-tagline');
+    var tagW = tag && getComputedStyle(tag).display !== 'none' ? Math.round(tag.getBoundingClientRect().width) + 26 : 0;
+    var right = Math.max(0, Math.round(window.innerWidth - tr.getBoundingClientRect().left + 16 + tagW));
     if (nav.style.getPropertyValue('right') !== right + 'px') nav.style.setProperty('right', right + 'px', 'important');
     if (nav.style.getPropertyValue('left') !== left + 'px') nav.style.setProperty('left', left + 'px', 'important');
     var byKey = {};

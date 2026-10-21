@@ -500,10 +500,17 @@ header .top-right .btn,header .wallet-btn,header .gx-x,header .theme-btn{border-
 .card.onb .btn-primary:disabled{opacity:.55}
 .card.onb .wopt.wext{background:#12141a!important;border:1px solid var(--line-2)!important}
 .card.onb .wopt.wext:hover{border-color:rgba(244,244,245,.3)!important}
-@media (max-width:1180px){.cc-tag{display:none}}
+@media (max-width:1180px){.cc-tag>span{display:none}}
 /* hide upstream wallet rows visually (cloned into our dropdown; nodes stay in place for React) */
 .card.onb.wg-has-ext>.wopt:not(.wopt-own){display:none!important}
 .card.onb .wopt.wext .wg-go{margin-left:auto;font-size:12px;font-weight:600;color:rgba(244,244,245,.55)}
 /* create-vault sheet primary action: light button, dark text */
 .lw-onb .btn-primary,.lw-onb .btn.btn-primary{background:#f4f4f5!important;background-image:none!important;color:#08090c!important}
 .lw-onb .btn-primary:disabled{opacity:.5}
+/* mobile header: brand, CA chip and connect button must coexist */
+@media (max-width:640px){
+  header.top .brand{max-width:112px;overflow:hidden}
+  header.top .wallet-btn{padding:6px 10px!important;font-size:12px!important;gap:6px!important}
+  .cc-tag{top:13px;font-size:9px;letter-spacing:.08em;padding:4px 7px;gap:6px}
+  .cc-ca{padding-left:6px}
+}
