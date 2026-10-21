@@ -1,0 +1,32 @@
+{
+  "summary": "Frontend re-verification of iter35 fixes (password sheet min-length label, dropdown dedupe, helper text, Create title). Connect sheet now shows only Camo Wallet + collapsed 'Other wallets · not ZK-native' toggle with no visible originals outside the dropdown. However, when the dropdown is expanded, NO wallet rows (Phantom/Solflare/Backpack) are rendered — the clones INSIDE the dropdown are also being hidden with 'display:none !important', so the user cannot pick an external wallet. Create sheet shows the min-length label correctly and Create button is light/dark text. Full Camo Wallet create flow works end-to-end (password → recovery key starting with camosk2 → Open Camo Cash). Minor copy deviations found: helper text has extra word 'browser' and sheet title still reads 'Camo Wallet' (not 'Create your Camo Wallet').",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "ConnectSheet / Other wallets dropdown", "issue": "After expanding 'Other wallets · not ZK-native', zero wallet rows become visible. Both the original 'a.wopt' (outside dropdown) AND the clone 'a.wopt.wext' (inside .wgroup .wgroup-list) carry inline 'display: none !important'. The idempotent hideExtWalletOriginals tick is also hiding the dropdown clones, so Phantom/Solflare/Backpack are unreachable from the UI. dropdown's .wgroup-list has height=12px because its three children are all display:none. Verified at desktop 1280x1200 and mobile 390x844.", "selector": "a.wopt.wext (display:none !important) inside .wgroup.open .wgroup-list", "priority": "HIGH"},
+      {"component": "Create sheet helper line", "issue": "Helper reads 'Unlocks on this device browser only. Your recovery key restores everything.' — contains extra word 'browser'. Brief required exactly 'Unlocks on this device only. Your recovery key restores everything.'", "selector": ".card.onb helper paragraph", "priority": "MEDIUM"},
+      {"component": "Create sheet title", "issue": "Sheet H3 title renders as 'Camo Wallet' (same on password step and recovery-key step). Brief required 'Create your Camo Wallet' at least on the password step.", "selector": "h3 inside .card.onb", "priority": "LOW"}
+    ],
+    "integration_issues": [
+      {"flow": "Connect → external wallet", "issue": "Users cannot select Phantom/Solflare/Backpack because dropdown contents are all display:none. Only Camo Wallet is reachable.", "affected_selectors": ["a.wopt.wext", ".wgroup.open .wgroup-list"]}
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Scope the idempotent 'hideExtWalletOriginals' re-assertion to ONLY the originals outside the dropdown. The current implementation is applying 'display: none !important' to every a.wopt including the clones under .wgroup .wgroup-list, so the dropdown is effectively empty when open. Target the originals with a specific selector (e.g., :not(.wext) or :not(.wgroup *)) and leave the clones untouched.",
+    "Fix helper text: remove the stray word 'browser' so it reads exactly 'Unlocks on this device only. Your recovery key restores everything.'",
+    "Update create-sheet H3 to 'Create your Camo Wallet' on the password step (currently 'Camo Wallet')."
+  ],
+  "critical_code_review_comments": [
+    "Using a MutationObserver / tick-based re-assertion of inline 'display:none !important' is fragile. Prefer a single CSS rule scoped by class/attribute (e.g., a.wopt:not(.wext){display:none}) over per-tick DOM mutation.",
+    "Clones that forward clicks should be tagged with a stable attribute (data-ext-wallet-clone) and the hider should early-return on them."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "60%"},
+  "seed_data_creation": "Created an in-browser Camo Wallet (password hunter2testxx) during end-to-end flow test — ephemeral, local-only.",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Three outstanding issues after iter36: (1) HIGH — dropdown clones inside .wgroup .wgroup-list are being hidden by the same idempotent hider that hides the originals, so no external wallet is choosable. Inspect with: document.querySelectorAll('a.wopt').forEach(e=>console.log(e.className, e.getAttribute('style'))). (2) MEDIUM — helper copy has extra 'browser' word. (3) LOW — Create sheet title. Camo Wallet native flow (password → recovery key camosk2… → Open Camo Cash) works without crashes or page errors; no console errors observed.",
+  "rca of the issue": "The hideExtWalletOriginals tick selects all elements that represent Phantom/Solflare/Backpack and inlines 'display:none !important' on each on every animation frame. The clones that were injected inside .wgroup .wgroup-list share the same wallet identifier (and class 'wopt'), so they also get hidden. Fix: constrain the selector to '.wlist > a.wopt:not(.wext)' (originals only), or add a guard 'if (el.closest(\".wgroup-list\")) return;' before setting display:none."
+}

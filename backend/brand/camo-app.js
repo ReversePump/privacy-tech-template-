@@ -1729,7 +1729,8 @@
   }
   function hideExtWalletOriginals() {
     var card = document.querySelector('.card.onb.wg-has-ext'); if (!card) return;
-    Array.prototype.forEach.call(card.querySelectorAll('.wopt:not(.wopt-own)'), function (o) {
+    Array.prototype.forEach.call(card.querySelectorAll('.wopt:not(.wopt-own):not(.wext)'), function (o) {
+      if (o.closest('.wgroup')) return;
       if (o.style.display !== 'none') o.style.setProperty('display', 'none', 'important');
     });
   }
