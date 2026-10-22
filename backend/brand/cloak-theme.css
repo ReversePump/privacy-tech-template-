@@ -703,3 +703,24 @@ main.main .view{animation:cloakView .5s var(--cc-ease) both}
 /* ---- top-up card: just the button ---- */
 .cc-topup p,.cc-topup .sub,.cc-topup .desc{display:none!important}
 .cc-topup{border-style:solid!important;border-color:var(--line)!important;background:var(--cc-card)!important}
+
+/* ---- square layout pass (no rounded boxes) ---- */
+#cc-pitch,.np-ico,#cc-pitch .np-cta,#cc-pitch .np-get span{border-radius:4px!important}
+.card,.panel,.box,[class*="card"]{border-radius:6px!important}
+.btn,button.btn,a.btn,button[class*="btn"],.wallet-btn,.btn-primary,.cc-connect-btn{border-radius:6px!important}
+.chip,.chip.priv,.ch-live,.ch-alp,.ch-src,.cc-tag{border-radius:6px!important}
+#cc-sheet .ns-tile,#cc-sheet .ns-panel,#cc-sheet .ns-tile i{border-radius:6px!important}
+#cc-dock{border-radius:8px!important}
+#cc-dock button.on i{border-radius:4px!important}
+#cc-more-pop{border-radius:6px!important}
+.card.onb,.lw-onb,#cc-tour .nt-card{border-radius:6px!important}
+.hero-bal{border-radius:6px!important}
+.mini{border-radius:6px!important}
+input,textarea,select,[class*="field"],[class*="input"]{border-radius:6px!important}
+#gx-intro{border-radius:6px!important}
+#gx-intro .gx-intro-t span{border-radius:4px!important}
+.np-sentence{margin:18px 0 6px;color:var(--fg-2);font-size:14px;letter-spacing:.01em}
+
+/* ---- wallet row icon: hood must read on any chip ---- */
+.wopt-own img{background:#0c120e!important;border-radius:6px!important}
+#cc-splash .sp-hood img{content:url('/api/bifrost/v1/_brand/mark.png')}

@@ -1716,7 +1716,7 @@
     var it = SHORT[k], get = GET[k] || GET.home;
     p.setAttribute('data-tab', k);
     p.innerHTML = '<i class="np-ico">' + dsv(PITCH_ICO[k] || 'wallet', 28) + '</i><span class="np-k">' + esc(it[0]) + '</span><h2>' + esc(it[1]) + '</h2>' +
-      '<div class="np-get">' + get.map(function (g, i) { return '<span style="animation-delay:' + (120 + i * 70) + 'ms">' + dsv('chev', 14).replace('m9 6 6 6-6 6', 'M5 12l5 5 9-10') + esc(g) + '</span>'; }).join('') + '</div>' +
+      '<p class="np-sentence">' + esc(get.join(' \u00b7 ')) + '.</p>' +
       '<button class="np-cta" data-testid="cc-pitch-connect">Connect wallet</button>' +
       '<a class="np-alt" href="#private-route" data-testid="cc-pitch-private">No wallet? Swap instantly →</a>';
     p.querySelector('.np-cta').addEventListener('click', openOnb);
@@ -1757,6 +1757,8 @@
     var card = document.querySelector('.card.onb'); if (!card) return;
     if (card.querySelector('.wgroup')) return;
     var own = card.querySelector('.wopt-own'); if (!own) return;
+    var ownImg = own.querySelector('img');
+    if (ownImg && ownImg.src.indexOf('favicon-192') === -1) { ownImg.src = '/api/bifrost/v1/_brand/favicon-192.png'; ownImg.style.background = '#0c120e'; ownImg.style.borderRadius = '6px'; }
     var rest = Array.prototype.slice.call(card.querySelectorAll('.wopt:not(.wopt-own)'));
     var g = document.createElement('div'); g.className = 'wgroup';
     var t = document.createElement('button'); t.type = 'button'; t.className = 'wgroup-t';

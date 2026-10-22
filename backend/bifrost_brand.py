@@ -358,7 +358,8 @@ def brand_asset(name: str):
         except Exception:
             return None
     elif name in ("favicon-32.png", "favicon-64.png", "favicon-192.png", "favicon-512.png",
-                  "apple-touch-icon.png", "maskable-512.png"):
+                  "apple-touch-icon.png", "maskable-512.png",
+                  "mark-white-256.png", "mark-black-256.png", "mark-512.png", "mark-256.png"):
         p = BRAND_DIR / name
     elif name == "manifest.webmanifest":
         import json as _json
