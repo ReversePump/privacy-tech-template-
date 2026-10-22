@@ -355,3 +355,29 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
 - Actual domain connection is a platform action by the user: Deployments → Publish/Republish → Manage
   Publishes → Domain tab → Auto-link (email code) or manual A records 162.159.142.117 / 172.66.2.113 +
   CNAME www. SSL automatic via Cloudflare. Relayed to user verbatim from support_agent.
+
+## Iteration 32 — Trade 520 raw-HTML error fix + proxy recheck + domain readiness (Oct 2026)
+- User report: pressing Trade and quoting SOL->USDC on the live site dumped a raw Cloudflare 520 page
+  ("emergentagent.host | 520: Web server is returning an unknown error") as text into the quote panel.
+- Root cause: that HTML is served by the platform edge when the deployed backend is briefly unavailable
+  (user tested while background deployments were restarting the backend). The app then renders response
+  text. The repo github.com/rexrivalemergent6-crypto/yemopate-private is only an older snapshot of this
+  same backend (same TARGETS, no extra RPC logic) — used as reference only, nothing taken from it.
+- Diagnosis in preview: full RPC matrix through the proxy — getHealth/getSlot/getLatestBlockhash/getBalance/
+  getAccountInfo/getMultipleAccounts/getTokenAccountsByOwner/getSignaturesForAddress all 200; getBlockTime
+  is -32601 "not available on this RPC" from the upstream node (the app tolerates it; quotes compute).
+  All RPC already flows through the upstream proxy (FETCH_TARGET empty) — per user instruction nothing was
+  rerouted, no own RPC added.
+- Fix (cloak-app.js scrubBits): a TreeWalker scan replaces any dumped error-page markup text
+  (DOCTYPE/cf-error/520-524) inside the app with "Quote service is restarting — wait a few seconds and try
+  again." Verified live by injecting a fake 520 node: it was replaced within one tick. Works on live too
+  because it acts on rendered text regardless of the error's origin.
+- Verified Trade quote SOL->USDC on PC 1366px and mobile 375px: 1 SOL -> ~103.85 USDC, fee line renders,
+  correct "Not enough private SOL" for empty vault, no HTML dump, mobile dock intact (7 items).
+- Domain readiness for cloakprivacy.app: no hardcoded hosts anywhere (only the intentional aria-label
+  rewrite), CORS *, all API paths relative — nothing to change; works when the domain is linked.
+- Proxy recheck: _health all 200 (app/indexer/relayer/rpc/site); relayer info, indexer stats/feed,
+  chain native stats+feed all live.
+- Suite: 126 passed. 3 remaining failures are all privacy-swap ORDER CREATION tests blocked by the NEAR
+  Intents provider's ongoing incident (503 "new orders conservatively paused") — quotes work, private-route
+  orders work, Trade works; provider-side pause, recovers on its own.

@@ -1887,6 +1887,14 @@
     }
   }
   function scrubBits() {
+    // Never let a raw platform error page (520 HTML etc.) render as text inside the app
+    var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    var tn, bad = [];
+    while ((tn = w.nextNode())) {
+      if (/<!DOCTYPE html|cf-error-details|Web server is returning an unknown error|Error code 52\d/i.test(tn.textContent || '') && (tn.textContent || '').length > 120) bad.push(tn);
+      if (bad.length > 4) break;
+    }
+    bad.forEach(function (n) { n.textContent = 'Quote service is restarting — wait a few seconds and try again.'; });
     var els = document.querySelectorAll('main div, main section, main aside, header div');
     for (var i = 0; i < els.length; i++) {
       var el = els[i], t = (el.textContent || '');
