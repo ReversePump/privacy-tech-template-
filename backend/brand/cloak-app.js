@@ -1902,7 +1902,52 @@
       }
     }
   }
-  function tick() { ensureBalanceShown(); suppressCopyToast(); scrubBits(); orderNav(); ensureX(); ensureTagline(); fixTaglineOverlap(); syncIntro(); ensureMore(); fitNav(); ensureFoot(); ensureWalletBtn(); ensureDock(); ensurePitch(); ensureSplash(); ensureFees(); ensureWalletGroup(); hideExtWalletOriginals(); }
+  /* ---- Add funds sheet: minimal copy, square buttons, Find deposit ---- */
+  function findDeposit(addr, btn) {
+    btn.disabled = true; btn.textContent = 'Scanning\u2026';
+    fetch('/api/bifrost/v1/rpc', { method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'getSignaturesForAddress', params: [addr, { limit: 5 }] }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        var n = (j && j.result && j.result.length) || 0;
+        btn.textContent = n ? n + ' transfer' + (n > 1 ? 's' : '') + ' found \u2014 shielding is automatic' : 'Nothing yet \u2014 keep this sheet open';
+        setTimeout(function () { btn.disabled = false; btn.textContent = 'Find'; }, 7000);
+      })
+      .catch(function () { btn.disabled = false; btn.textContent = 'Find'; });
+  }
+  function polishAddFunds() {
+    var m = document.querySelector('.sheet .lw-add');
+    if (!m) return;
+    Array.prototype.forEach.call(m.querySelectorAll('p'), function (p) {
+      var t = p.textContent || '';
+      if (t.indexOf('to this address') !== -1 && t.indexOf('private balance') !== -1) {
+        if (p.dataset.ccMin !== '1') { p.textContent = 'Send SOL or any token on Solana to this address. It shields into your private balance automatically.'; p.dataset.ccMin = '1'; }
+      } else if (t.indexOf('deposits here are public') !== -1 || t.indexOf('Like any Solana address') !== -1) {
+        if (p.dataset.ccMin !== '1') { p.textContent = 'Deposits are visible on-chain. Shielded funds are not.'; p.dataset.ccMin = '1'; }
+      } else if (t.indexOf('Opens Phantom') !== -1 || t.indexOf('wallet app with this address') !== -1) {
+        if (p.dataset.ccMin !== '1') { p.textContent = 'Opens your Solana wallet app.'; p.dataset.ccMin = '1'; }
+      }
+    });
+    Array.prototype.forEach.call(m.querySelectorAll('.sum .r'), function (r) {
+      var kids = r.children; if (kids.length < 2) return;
+      var k = (kids[0].textContent || '').trim(), v = kids[kids.length - 1];
+      if (k === 'Fees' && v.textContent !== '0.3% of the amount') v.textContent = '0.3% of the amount';
+      if (k === 'Shielded' && v.textContent !== 'Automatic while unlocked') v.textContent = 'Automatic while unlocked';
+    });
+    var copy = m.querySelector('button.btn-primary');
+    if (copy && !m.querySelector('.cc-find-btn')) {
+      var b = document.createElement('button');
+      b.className = 'btn btn-block cc-find-btn';
+      b.setAttribute('data-testid', 'cc-find-deposit');
+      b.type = 'button'; b.textContent = 'Find';
+      b.addEventListener('click', function () {
+        var a = (m.querySelector('.lw-key') || {}).textContent || '';
+        if (a.trim()) findDeposit(a.trim(), b);
+      });
+      copy.parentNode.insertBefore(b, copy.nextSibling);
+    }
+  }
+  function tick() { ensureBalanceShown(); suppressCopyToast(); scrubBits(); polishAddFunds(); orderNav(); ensureX(); ensureTagline(); fixTaglineOverlap(); syncIntro(); ensureMore(); fitNav(); ensureFoot(); ensureWalletBtn(); ensureDock(); ensurePitch(); ensureSplash(); ensureFees(); ensureWalletGroup(); hideExtWalletOriginals(); }
   setTimeout(function () { if (document.querySelector('main.main')) showTour(false); }, 1400);
   function boot() { ensure(); sync(); tick(); setInterval(tick, 700); document.addEventListener('click', function () { setTimeout(tick, 60); }, true); window.addEventListener('hashchange', function () { setTimeout(tick, 60); }); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

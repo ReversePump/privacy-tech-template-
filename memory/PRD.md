@@ -329,3 +329,20 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
 - Verified: brand suite 12 passed; full backend suite 131 passed, 1 skipped; landing + app screenshots show
   new copy live (tour, vault intro, fees table, CTA, footer, tab title). Docs relayer mentions intentionally
   kept — they document the protocol's real trust model.
+
+## Iteration 30 — Add funds sheet: minimal copy, square buttons, Find button (Oct 2026)
+- User request (with screenshot): minimal text, zero color change, square buttons, add a Find button; don't break anything.
+- cloak-app.js: new polishAddFunds() in tick() — trims the sheet to one line ("Send SOL or any token on
+  Solana to this address. It shields into your private balance automatically."), footer line becomes
+  "Deposits are visible on-chain. Shielded funds are not.", wallet-app caption -> "Opens your Solana wallet
+  app.", Fees row -> "0.3% of the amount" (relayer mention removed), Shielded row -> "Automatic while unlocked".
+- New Find button (data-testid cc-find-deposit) inserted after Copy address: real on-chain scan of the
+  deposit address via POST /api/bifrost/v1/rpc getSignaturesForAddress; states: Scanning… -> "N transfers
+  found — shielding is automatic" / "Nothing yet — keep this sheet open" -> resets to Find.
+- cloak-theme.css: .sheet .lw-add buttons/a[btn] forced border-radius 4px !important (colors untouched).
+- Verified live (430px mobile viewport): modal shows minimal copy, Copy+Find radii 4px, Find clicked on a
+  fresh vault returned the real "Nothing yet" answer. JS node --check OK.
+- Suite: 129/131 pass. Two intent-order tests (test_ds_near_privacy_swap_full_order,
+  test_privacy_swap_full_flow) currently blocked by an UPSTREAM incident: near/orders returns
+  503 "active incident … new orders conservatively paused" (external, transient; same code passed this
+  morning; private-route order test passed in between). Not caused by this change (diff is brand JS/CSS only).

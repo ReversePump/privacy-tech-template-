@@ -724,3 +724,15 @@ input,textarea,select,[class*="field"],[class*="input"]{border-radius:6px!import
 /* ---- wallet row icon: hood must read on any chip ---- */
 .wopt-own img{background:#0c120e!important;border-radius:6px!important}
 #cc-splash .sp-hood img{content:url('/api/bifrost/v1/_brand/mark.png')}
+
+/* ---- Add funds sheet: square buttons, colors untouched ---- */
+.sheet .lw-add .btn,
+.sheet .lw-add button[class*="btn"],
+.sheet .lw-add a[class*="btn"],
+.sheet .lw-add a[href*="phantom"],
+.sheet .lw-add a[href*="solflare"] {
+  border-radius: 4px !important;
+}
+.sheet .lw-add .cc-find-btn {
+  margin-top: 10px;
+}
