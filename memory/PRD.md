@@ -381,3 +381,22 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
 - Suite: 126 passed. 3 remaining failures are all privacy-swap ORDER CREATION tests blocked by the NEAR
   Intents provider's ongoing incident (503 "new orders conservatively paused") — quotes work, private-route
   orders work, Trade works; provider-side pause, recovers on its own.
+
+## Iteration 33 — Multi-token Ledger + full feature-parity sweep (Oct 2026)
+- User: "every feature that upstream veil has" + do the suggested next actions.
+- Multi-token feed: discovered the pool's vault PDA scheme — vault = find_program_address([b"vault", mint],
+  pool program); verified against both stored vaults (USDC 3SvD9…, SOL CtoJv… exact matches). New
+  census_assets() derives all 85 vaults natively (no getProgramAccounts — upstream node does not offer it;
+  earlier 403 mystery solved: upstream answers only browser-like clients AND lacks getProgramAccounts).
+  chain_native httpx client now sends browser UA + origin/referer like the proxy does. census runs inside
+  reconcile_aux (startup + 30min). All 85 vaults now stored in Mongo chain_cache.
+- feed_native: per-vault signature scan parallelized (semaphore 12, limit 6/vault), tx fetch cap 40→90 so
+  non-Transact sigs (fee sweeps etc.) don't crowd out real cloak/exit events. Feed is activity-driven: shows
+  every token that actually moves (currently SOL/USDC/HgTG… natively).
+- Feature-parity sweep (PC 1366px, connected vault): Vault, Cloak, Trade, Flow DCA, Private route,
+  Privacy swap, Track, Ledger, Pay, Pool swap, Burner addresses, Activity, Key ring, Earn, Invite, Receive,
+  Withdraw — all 17 render with live content, zero page errors, zero raw-HTML dumps. Private route/Privacy
+  swap/Track/Receive/Withdraw/Earn/Invite live in the desktop More menu / mobile More sheet (by design).
+- Privacy-swap order creation still provider-paused (NEAR Intents incident) — rechecked, quotes work,
+  orders 503 "new orders conservatively paused". Everything else green: suite 127 passed, 2 skipped.
+- solders==0.29.0 added to requirements.txt.

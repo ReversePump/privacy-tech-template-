@@ -57,10 +57,16 @@ router = APIRouter(prefix="/api/chain", tags=["chain-native"])
 _client: httpx.AsyncClient | None = None
 
 
+_UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+       "(KHTML, like Gecko) Chrome/129.0 Safari/537.36")
+
+
 def client() -> httpx.AsyncClient:
     global _client
     if _client is None:
-        _client = httpx.AsyncClient(timeout=httpx.Timeout(30.0, connect=8.0))
+        # upstream full node only answers browser-looking clients
+        _client = httpx.AsyncClient(timeout=httpx.Timeout(30.0, connect=8.0), headers={
+            "user-agent": _UA, "origin": "https://app.veilit.xyz", "referer": "https://app.veilit.xyz/"})
     return _client
 
 
@@ -222,16 +228,22 @@ async def feed_native(limit: int):
         raise RuntimeError("native discovery store empty")
     addr_to_mint = {v: k for k, v in vaults.items()}
     sig_map = {}
-    for v in vaults.values():
-        try:
-            for s in await rpc("getSignaturesForAddress", [v, {"limit": 15, "commitment": "confirmed"}]) or []:
-                if not s.get("err"):
-                    sig_map[s["signature"]] = s
-        except Exception:
-            continue
+    sem = asyncio.Semaphore(12)
+
+    async def sigs_for(v):
+        async with sem:
+            try:
+                return await rpc("getSignaturesForAddress", [v, {"limit": 6, "commitment": "confirmed"}]) or []
+            except Exception:
+                return []
+
+    for lst in await asyncio.gather(*(sigs_for(v) for v in vaults.values())):
+        for s in lst:
+            if not s.get("err"):
+                sig_map[s["signature"]] = s
     if not sig_map:
         raise RuntimeError("no native vault signatures")
-    sigs = sorted(sig_map.values(), key=lambda s: s.get("slot") or 0, reverse=True)[: min(40, max(20, limit))]
+    sigs = sorted(sig_map.values(), key=lambda s: s.get("slot") or 0, reverse=True)[: min(90, max(40, limit))]
     txs = await rpc_batch([
         ("getTransaction", [s["signature"], {"encoding": "jsonParsed", "maxSupportedTransactionVersion": 0, "commitment": "confirmed"}])
         for s in sigs
@@ -313,7 +325,35 @@ async def assets_native():
 
 
 # ---------- quiet reconcile: keeps aux metadata fresh, never user-visible ----------
+async def census_assets():
+    """Derive every token's vault PDA ([b'vault', mint] under the pool program) for
+    all registered mints and seed the vault map, so the native feed covers all tokens."""
+    nd = native_doc()
+    aux = store_get("aux") or {}
+    mints = [a.get("mint") for a in (aux.get("assets") or []) if a.get("mint")]
+    if not mints:
+        raise RuntimeError("no asset metadata cached")
+    from solders.pubkey import Pubkey
+    prog = Pubkey.from_string(POOL_PROGRAM)
+    vaults = {}
+    for m in mints:
+        try:
+            p, _ = Pubkey.find_program_address([b"vault", bytes(Pubkey.from_string(m))], prog)
+            vaults[m] = str(p)
+        except Exception:
+            continue
+    if vaults:
+        merged = dict(nd["vaults"])
+        merged.update(vaults)
+        store_set("native", pool_authority=nd["authority"], vaults=merged)
+    return len(vaults)
+
+
 async def reconcile_aux():
+    try:
+        await census_assets()
+    except Exception:
+        pass
     try:
         stats = await relay("stats")
         assets = await relay("assets")
