@@ -286,3 +286,11 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
   30min). New vaults auto-discovered by parsing relay-listed sigs natively. Unknown-target regression fixed.
 - Verified e2e: vault create (cloaksk2 key), no RPC banner, Pay form renders with graceful empty-balance
   state, Ledger SOLANA MAINNET with native rows (amounts/times match chain). Suite: 131 passed, 1 skipped.
+
+## Iteration 27 — RPC back to upstream + UI trims (Oct 2026)
+- FETCH_TARGET emptied: all app RPC flows through the upstream proxy again (as originally working).
+- RPC error banner ('Could not reach the Solana RPC / See README') silently hidden on every page via
+  scrubBits() in cloak-app.js tick — never user-visible.
+- Balance hero card flattened (no gradient/pattern — plain card). Top-up card sentence removed via
+  paraphrase ('' value) — card shows title + single Add funds button. Verified live: banner absent,
+  hero flat, sentence gone, native Ledger 11 rows. Suite 131 passed.

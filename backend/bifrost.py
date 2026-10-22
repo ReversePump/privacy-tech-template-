@@ -39,7 +39,7 @@ TARGETS = {
 }
 # actual fetch destinations: rewriting/redirect-matching key off TARGETS,
 # only the outbound fetch is overridable (RPC via a public Solana node)
-FETCH_TARGET = {"rpc": os.environ.get("SOLANA_RPC_URL") or "https://solana-rpc.publicnode.com"}
+FETCH_TARGET = {}
 # heavy/indexed RPC methods are disabled on free public nodes; those stay on the full node
 RPC_HEAVY = {"getProgramAccounts", "getTokenAccountsByOwner", "getTokenLargestAccounts", "getSignaturesForAddress"}
 

@@ -695,3 +695,11 @@ main.main .view{animation:cloakView .5s var(--cc-ease) both}
 /* active dock icon: mint chip, not white square */
 #cc-dock button.on i{background:rgba(169,231,192,.16)!important;color:#a9e7c0!important;border-radius:10px}
 #cc-dock button{padding:5px 0 4px!important}
+
+
+/* ---- flat balance hero (no gradient) ---- */
+.hero-bal{background:var(--cc-card)!important}
+.hero-bal::after{display:none!important}
+/* ---- top-up card: just the button ---- */
+.cc-topup p,.cc-topup .sub,.cc-topup .desc{display:none!important}
+.cc-topup{border-style:solid!important;border-color:var(--line)!important;background:var(--cc-card)!important}

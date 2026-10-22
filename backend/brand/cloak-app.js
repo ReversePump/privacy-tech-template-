@@ -1884,7 +1884,23 @@
       if (/^Copy failed/i.test((e.textContent || '').trim()) && (e.textContent || '').length < 90) { try { (e.closest('[class*=toast],[class*=Toast],[role=status]') || e).remove(); } catch (err) {} }
     }
   }
-  function tick() { ensureBalanceShown(); suppressCopyToast(); orderNav(); ensureX(); ensureTagline(); fixTaglineOverlap(); syncIntro(); ensureMore(); fitNav(); ensureFoot(); ensureWalletBtn(); ensureDock(); ensurePitch(); ensureSplash(); ensureFees(); ensureWalletGroup(); hideExtWalletOriginals(); }
+  function scrubBits() {
+    var els = document.querySelectorAll('main div, main section, main aside, header div');
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i], t = (el.textContent || '');
+      if (!el.dataset.ccHid && t.indexOf('Could not reach the Solana RPC') !== -1 && t.length < 500) {
+        var c = el;
+        while (c.parentElement && c.parentElement.tagName !== 'MAIN' && (c.parentElement.textContent || '').length < 600) c = c.parentElement;
+        c.style.display = 'none'; el.dataset.ccHid = '1';
+      }
+      if (!el.dataset.ccTop && t.indexOf('Top up to begin') !== -1 && t.length < 300) {
+        var card = el;
+        while (card.parentElement && card.parentElement.tagName !== 'MAIN' && !/card/.test(card.className || '')) card = card.parentElement;
+        card.classList.add('cc-topup'); el.dataset.ccTop = '1';
+      }
+    }
+  }
+  function tick() { ensureBalanceShown(); suppressCopyToast(); scrubBits(); orderNav(); ensureX(); ensureTagline(); fixTaglineOverlap(); syncIntro(); ensureMore(); fitNav(); ensureFoot(); ensureWalletBtn(); ensureDock(); ensurePitch(); ensureSplash(); ensureFees(); ensureWalletGroup(); hideExtWalletOriginals(); }
   setTimeout(function () { if (document.querySelector('main.main')) showTour(false); }, 1400);
   function boot() { ensure(); sync(); tick(); setInterval(tick, 700); document.addEventListener('click', function () { setTimeout(tick, 60); }, true); window.addEventListener('hashchange', function () { setTimeout(tick, 60); }); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
