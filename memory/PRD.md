@@ -294,3 +294,16 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
 - Balance hero card flattened (no gradient/pattern — plain card). Top-up card sentence removed via
   paraphrase ('' value) — card shows title + single Add funds button. Verified live: banner absent,
   hero flat, sentence gone, native Ledger 11 rows. Suite 131 passed.
+
+## Iteration 28 — Final system verification + logo/activity fixes (Oct 2026, iteration_42 ~97-100%)
+- Brand asset allowlist fixed: mark-white-256.png etc. were 404 (loading splash + tour icon blank) — now served.
+- Cloak Wallet row icon forced to solid hood favicon (white-on-transparent hood was invisible on light chip).
+- Tick chips on connect cards replaced with one sentence (user request); square-corner pass applied to
+  app cards/buttons/pills/chips/tiles (radius 4-6px).
+- Docs crash fixed: trust-model section was inserted as a group with blocks instead of pages[] —
+  restructured; /docs verified rendering (body 13k chars, Trust model plainly section live).
+- iteration_42 verified everything: vault e2e (cloaksk2 recovery key), Pay/Cloak/Trade/Privacy swap/
+  Private route/Track/Receive/Withdraw/Keys/Addresses/Activity all render with graceful empty states,
+  Ledger native (SOLANA MAINNET chip, 8,093 sealed notes, 1,994 nullifiers, real USDC rows), hood logo
+  everywhere, X -> cloakprvt, no Camo/Veil text, no console page errors, mobile dock + More sheet full.
+  Private-route quote-to-order needs the To-token dropdown (recommended: data-testid for stable testing).
