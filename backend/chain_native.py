@@ -23,7 +23,7 @@ import base58
 import httpx
 from fastapi import APIRouter, Query
 
-RPC_URL = os.environ.get("SOLANA_RPC_URL") or "https://api.mainnet-beta.solana.com"
+RPC_URL = os.environ.get("SOLANA_RPC_URL") or "https://solana-rpc.publicnode.com"
 UPSTREAM_INDEXER = "https://indexer.veilit.xyz"
 
 POOL_PROGRAM = "FmsMbXrQXr1mARn45Cm52sdrwAWHDxqF8473t6woq9DP"

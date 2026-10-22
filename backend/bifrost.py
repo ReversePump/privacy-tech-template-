@@ -35,7 +35,7 @@ TARGETS = {
     "app": "https://app.veilit.xyz",
     "indexer": "https://indexer.veilit.xyz",
     "relayer": "https://relayer.veilit.xyz",
-    "rpc": "https://rpc.veilit.xyz",
+    "rpc": os.environ.get("SOLANA_RPC_URL") or "https://solana-rpc.publicnode.com",
 }
 # order matters: subdomains before apex
 HOST_ORDER = ["app", "indexer", "relayer", "rpc", "site"]

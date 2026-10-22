@@ -262,3 +262,15 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
 - New loading screens: hood mark + expanding halo rings (index.html boot + in-app splash).
 - Mobile dock = 7 items: Vault, Cloak, Trade, Priv swap, Pay, Ledger, More (active icon mint chip fixed).
 - Backend suite: 131 passed, 1 skipped.
+
+## Iteration 25 — RPC native + copy honesty pass (Oct 2026)
+- App RPC traffic now targets SOLANA_RPC_URL (default https://solana-rpc.publicnode.com — api.mainnet-beta
+  blocks datacenter IPs) via the existing proxy route; verified getHealth/getSlot OK through
+  /api/bifrost/v1/rpc. chain_native.py uses the same env var.
+- Copy rectified per external audit: hero sub now says "sender and receiver stay masked, and your balance
+  stays yours alone" (edge amounts are public by design); "no relays of trust" -> "No mixers, no custodians";
+  docs trust-model wording -> "What the math guarantees:"; meta description softened.
+- New docs section 'Trust model, plainly' (id: trust): what proofs guarantee, what operators can see
+  (edge amounts/timing, bound exit destinations, request metadata), single-wallet upgrade authority
+  disclosed with an Explorer link to program FmsMbXrQXr1mARn45Cm52sdrwAWHDxqF8473t6woq9DP, and
+  user hygiene advice (fresh addresses, round amounts, spread timing).

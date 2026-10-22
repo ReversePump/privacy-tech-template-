@@ -115,6 +115,19 @@ export const DOC_GROUPS = [
     ],
   },
   {
+    id: 'trust',
+    title: 'Trust model',
+    lead: 'The honest list — what the math covers, and what it does not.',
+    blocks: [
+      { k: 'h2', t: 'Trust model, plainly' },
+      { k: 'p', t: 'What the math guarantees: the recipient, amount and fee are bound into each proof, so nobody — including the services that submit or index transactions — can redirect your funds. A tampered proof simply fails on-chain.' },
+      { k: 'p', t: 'What infrastructure operators can see: the exact amount and time of each deposit and exit (those edges are public on Solana), the destination each exit is bound to, and request-level metadata (such as timing and IP) when your browser talks to proof and data services. They cannot see your notes, your keys, or which deposit funded which later move.' },
+      { k: 'p', t: 'The pool program is currently upgradeable by a single operator wallet rather than a multisig. That is a real trust assumption: treat it like any young protocol, size your positions accordingly, and check the authority yourself before trusting size to it.' },
+      { k: 'list', items: ['Edge amounts and timing are public — spread them out', 'Exit to fresh addresses, not ones linked to you', 'Round or common amounts blend in better than odd ones', 'Verify the program and its authority on-chain any time'] },
+      { k: 'link', href: 'https://explorer.solana.com/address/FmsMbXrQXr1mARn45Cm52sdrwAWHDxqF8473t6woq9DP', t: 'Pool program on Solana Explorer' },
+    ],
+  },
+  {
     id: 'crosschain',
     title: 'Cross-chain exits',
     pages: [

@@ -194,7 +194,7 @@ export default function LandingPage() {
             <Reveal delay={180}>
               <p className="mt-6 max-w-[520px] text-[15px] leading-relaxed text-[#8fa695] sm:text-[17px]">
                 Cloak Privacy seals your tokens inside a shared zero-knowledge pool on Solana.
-                Pay, trade and exit anywhere — amounts, addresses and history stay yours alone.
+                Pay, trade and exit anywhere — sender and receiver stay masked, and your balance stays yours alone.
               </p>
             </Reveal>
             <Reveal delay={260}>
@@ -275,7 +275,7 @@ export default function LandingPage() {
               Proven, not <em className="text-[#a9e7c0]">promised.</em>
             </h2>
             <p className="mt-5 max-w-[420px] text-[14.5px] leading-relaxed text-[#8fa695]">
-              No mixers, no relays of trust. Cloak Privacy is arithmetic: your browser proves a note exists
+              No mixers, no custodians. Cloak Privacy is arithmetic: your browser proves a note exists
               and that you hold its key. Solana verifies the proof. Nothing else is ever revealed.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-2 text-[11px] text-[#7fb894]" style={mono} data-testid="zk-pipeline">
@@ -370,7 +370,7 @@ export default function LandingPage() {
               The crowd is waiting. <em className="text-[#a9e7c0]">Blend in.</em>
             </h2>
             <p className="mx-auto mt-5 max-w-[460px] text-[14.5px] text-[#8fa695]">
-              Open the vault, cloak your first tokens, and move like nobody is watching — because provably, nobody is.
+              Open the vault, cloak your first tokens, and move like nobody is watching.
             </p>
             <div className="mt-9 flex flex-wrap items-center justify-center gap-3.5">
               <a href={APP_URL} data-testid="bottom-cta-launch-app"
