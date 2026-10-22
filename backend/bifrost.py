@@ -35,8 +35,17 @@ TARGETS = {
     "app": "https://app.veilit.xyz",
     "indexer": "https://indexer.veilit.xyz",
     "relayer": "https://relayer.veilit.xyz",
-    "rpc": os.environ.get("SOLANA_RPC_URL") or "https://solana-rpc.publicnode.com",
+    "rpc": "https://rpc.veilit.xyz",
 }
+# actual fetch destinations: rewriting/redirect-matching key off TARGETS,
+# only the outbound fetch is overridable (RPC via a public Solana node)
+FETCH_TARGET = {"rpc": os.environ.get("SOLANA_RPC_URL") or "https://solana-rpc.publicnode.com"}
+# heavy/indexed RPC methods are disabled on free public nodes; those stay on the full node
+RPC_HEAVY = {"getProgramAccounts", "getTokenAccountsByOwner", "getTokenLargestAccounts", "getSignaturesForAddress"}
+
+
+def fetch_target(t: str) -> str:
+    return FETCH_TARGET.get(t, TARGETS.get(t))
 # order matters: subdomains before apex
 HOST_ORDER = ["app", "indexer", "relayer", "rpc", "site"]
 
@@ -368,7 +377,7 @@ def null_prefix_js(text: str) -> str:
     text = text.replace('starts with veilsk2', 'starts with cloaksk2')
     return text
 
-CHUNK_VER = "cloak2"
+CHUNK_VER = "cloak3"
 _CHUNK_REF_RE = re.compile(r'(static/chunks/[A-Za-z0-9_-]+)\.js(?![A-Za-z0-9_.])')
 _CHUNK_ALIAS_RE = re.compile(r'\.nc\d+\.js$|' + re.escape('.' + CHUNK_VER + '.js') + r'$')
 _NC_RETRY = ("(window.__ncR||(window.__ncR=function(f,n,d){return Promise.race([Promise.resolve().then(f),"
@@ -524,7 +533,7 @@ async def health():
         ping("app", TARGETS["app"] + "/"),
         ping("indexer", TARGETS["indexer"] + "/v1/health"),
         ping("relayer", TARGETS["relayer"] + "/v1/health"),
-        ping("rpc", TARGETS["rpc"], method="POST",
+        ping("rpc", fetch_target("rpc"), method="POST",
              json={"jsonrpc": "2.0", "id": 1, "method": "getHealth"}),
     )
     return out
@@ -562,7 +571,7 @@ async def proxy(target: str, path: str, request: Request):
             return JSONResponse({"error": "not found"}, status_code=404)
         return Response(asset[0], media_type=asset[1],
                         headers={"cache-control": "no-cache"})
-    upstream = TARGETS.get(target)
+    upstream = fetch_target(target)
     if not upstream:
         return JSONResponse({"error": "unknown bifrost target", "targets": list(TARGETS)},
                             status_code=404)
@@ -610,6 +619,18 @@ async def proxy(target: str, path: str, request: Request):
     fwd["accept-encoding"] = "gzip, deflate"
 
     body = await request.body() if method not in ("GET", "HEAD") else None
+
+    if target == "rpc" and body:
+        try:
+            payload = json.loads(body)
+            calls = payload if isinstance(payload, list) else [payload]
+            methods = {str(c.get("method", "")) for c in calls if isinstance(c, dict)}
+            if methods & RPC_HEAVY:
+                url = f"{TARGETS['rpc']}/{path}"
+                if request.url.query:
+                    url += "?" + request.url.query
+        except Exception:
+            pass
 
     ckey = url
     use_cache = _cacheable(target, path, method)
@@ -833,7 +854,7 @@ async def ws_proxy_root(ws: WebSocket, target: str):
 
 @router.websocket("/{target}/{path:path}")
 async def ws_proxy(ws: WebSocket, target: str, path: str):
-    upstream = TARGETS.get(target)
+    upstream = fetch_target(target)
     if not upstream:
         await ws.close(code=4404)
         return

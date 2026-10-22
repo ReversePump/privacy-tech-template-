@@ -274,3 +274,15 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
   (edge amounts/timing, bound exit destinations, request metadata), single-wallet upgrade authority
   disclosed with an Explorer link to program FmsMbXrQXr1mARn45Cm52sdrwAWHDxqF8473t6woq9DP, and
   user hygiene advice (fresh addresses, round amounts, spread timing).
+
+## Iteration 26 — RPC decloak + native Ledger hardened (Oct 2026, iteration_41 fixes verified)
+- RPC routing: bifrost keeps upstream hosts as rewrite keys (TARGETS) but fetches via FETCH_TARGET override;
+  light JSON-RPC methods -> SOLANA_RPC_URL (publicnode), heavy/indexed methods (getProgramAccounts,
+  getTokenAccountsByOwner, getSignaturesForAddress) -> full node. Browser never calls upstream RPC directly;
+  the 'not fully connected' banner is gone and the Connect modal race it caused is fixed.
+- chain_native v2: discovery store in Mongo (pool authority A8Qjyh…, vault map). Feed = sigs from vault
+  accounts (full node) + txs parsed natively (public node; batch with per-call fallback). Stats leaves/root/
+  slot native from the state account; nullifiers/asset metadata reconciled quietly into Mongo (aux doc,
+  30min). New vaults auto-discovered by parsing relay-listed sigs natively. Unknown-target regression fixed.
+- Verified e2e: vault create (cloaksk2 key), no RPC banner, Pay form renders with graceful empty-balance
+  state, Ledger SOLANA MAINNET with native rows (amounts/times match chain). Suite: 131 passed, 1 skipped.

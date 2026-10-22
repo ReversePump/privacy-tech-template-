@@ -276,19 +276,33 @@ async def _start_warm():
 
 async def _chain_warm_loop():
     """Keep the native chain caches hot so the Ledger page never hits a cold RPC."""
-    from chain_native import stats_native, feed_native, assets_native, cache_put
+    from chain_native import stats_native, feed_native, assets_native, reconcile_aux, cache_put
+    import time as _time
     await asyncio.sleep(3)
+    last_aux = 0.0
     while True:
         try:
             d = await asyncio.wait_for(stats_native(), 20)
             cache_put("stats", d, 15)
             cache_put("stats_last", d, 3600)
-            ev = await asyncio.wait_for(feed_native(60), 45)
+        except Exception:
+            pass
+        try:
+            ev = await asyncio.wait_for(feed_native(60), 60)
             cache_put("feed", ev, 25)
             cache_put("feed_last", ev, 3600)
+        except Exception:
+            pass
+        try:
             await assets_native()
         except Exception:
             pass
+        if _time.time() - last_aux > 1800:
+            try:
+                await reconcile_aux()
+            except Exception:
+                pass
+            last_aux = _time.time()
         await asyncio.sleep(30)
 
 

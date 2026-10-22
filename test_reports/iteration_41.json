@@ -1,0 +1,40 @@
+{
+  "summary": "Regression after rebrand + Pay-flow sweep. Backend health and dock/nav structure are good; however two significant frontend regressions block the Pay-flow test: (1) a user-facing error banner 'Cloak Privacy is not fully connected · Could not reach the Solana RPC' is now visible on EVERY tab (Vault, Pay, Cloak, Trade, Priv swap, Ledger). Browser console confirms the frontend is hitting rpc.veilit.xyz directly (CORS blocked + wss handshake 403) instead of routing through the backend proxy /api/chain/* which is healthy (ok:true, 18ms). (2) Clicking 'Connect wallet' intermittently fails to open the wallet chooser modal — it worked once on desktop 1366 (showed Cloak Wallet · Recommended + Other wallets accordion) but failed on 3 subsequent attempts on both desktop and mobile 390. On mobile the modal never appeared across 4 attempts. Because of this the vault/password/recovery/dashboard/Pay-send-form flow could not be completed; the Pay dock in no-vault state only shows the marketing panel ('PAY – Deliver value. Leave no trace. Hidden sender / Hidden amount / Gas covered – Connect wallet'), which is expected. Dock testids (7) all present on mobile, top nav + More overflow present on desktop, X link visible, hood logo present. Backend /api/chain/health returns ok:true (publicnode, 18ms, slot ~459.9M), /api/chain/feed returns real native rows (deposit/withdraw with sig, slot, ts, mint, amount, nullifiers, commitments). /api/chain/stats currently returns source='upstream-relay' instead of 'native' even though health shows native.ok=true — minor fallback bug.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/chain/stats", "issue": "Returns source='upstream-relay' while /api/chain/health shows native.ok=true. iter_40 recorded source='native'. Likely a logic/ordering regression in chain_native.py stats aggregator — native fetch not being preferred when both work."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Global connection banner", "issue": "Yellow/orange banner 'Cloak Privacy is not fully connected · Could not reach the Solana RPC · See README → \"Connections you need to make\".' is shown on every tab. Browser console shows repeated CORS failures on https://rpc.veilit.xyz/ fetch and wss://rpc.veilit.xyz/ WebSocket 403 handshakes. The frontend is calling the external RPC directly from the browser instead of going through the backend proxy (/api/chain/* which is healthy). This is a user-visible error state that contradicts the backend being fine.", "selector": ".cc-conn-banner / text='not fully connected'", "priority": "HIGH"},
+      {"component": "Connect wallet modal (both desktop & mobile)", "issue": "Clicking the top-right 'Connect wallet' or the center 'Connect wallet' button fails to render the chooser modal in ~3 of 4 attempts on desktop 1366 and consistently fails on mobile 390. When it does open (observed once on desktop) it shows the correct Cloak Wallet / Recommended card + Other wallets accordion. This blocks vault creation and therefore blocks all post-vault flows (Pay form with recipient+amount, Cloak deposit form, Trade swap, Receive/Withdraw, Burner addresses, Key ring, dashboard $0.00 verification).", "selector": "button:has-text('Connect wallet')", "priority": "CRITICAL"},
+      {"component": "Pay (no-vault state)", "issue": "Could not verify the actual send form (recipient address input + amount + token selector + 'Insufficient balance' graceful message) because vault creation is blocked (see above). Current no-vault Pay screen shows only the marketing panel + 'Connect wallet' button, which is the expected pre-connect state.", "selector": "[data-testid='cc-dock-send']", "priority": "HIGH"}
+    ],
+    "integration_issues": [
+      {"flow": "Frontend ↔ Solana RPC", "issue": "Frontend hits rpc.veilit.xyz directly from the browser (CORS + WSS handshake 403). Should route through backend /api/chain/* which is healthy.", "affected_selectors": [".cc-conn-banner"]}
+    ],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/test_bifrost.py", "/app/backend/tests/test_live_endpoints.py"],
+  "action_items": [
+    "CRITICAL: Fix the Connect wallet modal regression — the chooser does not open reliably on either breakpoint. Suspected: button handler racing with the RPC-error state or the 'not fully connected' banner intercepting pointer events / unmounting the modal root. Verify z-index of the banner and the useEffect that may auto-close the modal on connection error.",
+    "HIGH: Remove or hide the 'Cloak Privacy is not fully connected / Could not reach the Solana RPC' banner. Reroute browser RPC calls (fetch + WebSocket) through the healthy backend proxy /api/chain/*. The direct rpc.veilit.xyz calls are CORS-blocked and the backend already proxies via publicnode.",
+    "MINOR: /api/chain/stats should prefer native source when native.ok=true (currently returns upstream-relay).",
+    "RETEST after fixes: complete vault creation → dashboard → Pay form validation (recipient 9DMUQ…pump, amount 0.5, verify 'Insufficient balance' graceful message), Cloak deposit, Trade swap, Receive cloak2 QR, Withdraw, Burner addresses, Key ring, Private route quote, Track order fake-id."
+  ],
+  "critical_code_review_comments": [
+    "Frontend should never call rpc.veilit.xyz directly from the browser — CORS + wss 403 will always fail. Use REACT_APP_BACKEND_URL + /api/chain/{health,stats,feed} which already work.",
+    "Modal flakiness on 'Connect wallet' points to a mount/unmount race driven by the connection-error effect; isolate modal from RPC health state.",
+    "chain_native.py stats path: when both native + relay return, native values should win so UI chip 'SOLANA MAINNET' stays truthful (iter_40 had source=native)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (health + feed verified; stats degraded but 200)", "frontend": "~55% (dock, nav, More sheet, X link, hood logo, landing OK; vault-create → Pay form flow BLOCKED by modal regression; connection banner spam)"},
+  "test_credentials": "Vault password: regression10x (fresh profile). Could not reach recovery-key screen this iteration.",
+  "seed_data_creation": "none",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Blocked at vault creation. The two fixes needed before retest: (1) stop calling rpc.veilit.xyz from the browser — route via /api/chain/* which is healthy; this will also kill the ugly 'not fully connected' banner. (2) Fix the Connect-wallet modal flakiness — on mobile 390 it never appears, on desktop 1366 it only appeared on 1/4 attempts. Once those are fixed, re-run the mobile 390 flow: Connect wallet → Cloak Wallet card → password 'regression10x' x2 → Create vault → recovery screen (cloaksk2… prefix) → check 'I saved' → Open Cloak Privacy → dashboard with $0.00 balance → Pay dock → recipient '9DMUQbHWth5TtdSPZ1pRPsLTxsfYfM97n7K6x1MLpump', amount 0.5, verify Insufficient-balance graceful message. Backend chain endpoints are live.",
+  "rca of the issue": "RPC banner: frontend bundle still ships direct rpc.veilit.xyz client (fetch+WebSocket) and does not fall through to the healthy backend proxy /api/chain/*. Browser enforces CORS so every call fails, surfacing the connection banner app-wide. Fix: swap the frontend's RPC client to call `${REACT_APP_BACKEND_URL}/api/chain/{health,stats,feed}` and drop the direct wss. Modal flakiness RCA (hypothesis): the connection-error effect toggles a global modal portal; when RPC calls error, the error toast/banner mounts and the Connect modal is either unmounted mid-render or receives pointer-events: none from the banner overlay. Reproduction: open https://maker-hub-325.preview.emergentagent.com/api/bifrost/v1/app/ at 390x844, wait for banner, click 'Connect wallet' — modal never appears. At 1366x900, click repeatedly — 1 in 4 attempts shows modal."
+}
