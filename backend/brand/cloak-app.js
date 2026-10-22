@@ -1947,7 +1947,16 @@
       copy.parentNode.insertBefore(b, copy.nextSibling);
     }
   }
-  function tick() { ensureBalanceShown(); suppressCopyToast(); scrubBits(); polishAddFunds(); orderNav(); ensureX(); ensureTagline(); fixTaglineOverlap(); syncIntro(); ensureMore(); fitNav(); ensureFoot(); ensureWalletBtn(); ensureDock(); ensurePitch(); ensureSplash(); ensureFees(); ensureWalletGroup(); hideExtWalletOriginals(); }
+  /* ---- brand hygiene: never show the hosting URL, always cloakprivacy.app ---- */
+  function ensureDomain() {
+    var b = document.querySelector('header .brand');
+    if (b) {
+      var al = b.getAttribute('aria-label') || '';
+      var fixed = al.replace(/\([^)]*emergent[^)]*\)/i, '(cloakprivacy.app)').replace(/maker-hub-[^\s)]+/i, 'cloakprivacy.app');
+      if (fixed !== al) b.setAttribute('aria-label', fixed);
+    }
+  }
+  function tick() { ensureBalanceShown(); suppressCopyToast(); scrubBits(); polishAddFunds(); ensureDomain(); orderNav(); ensureX(); ensureTagline(); fixTaglineOverlap(); syncIntro(); ensureMore(); fitNav(); ensureFoot(); ensureWalletBtn(); ensureDock(); ensurePitch(); ensureSplash(); ensureFees(); ensureWalletGroup(); hideExtWalletOriginals(); }
   setTimeout(function () { if (document.querySelector('main.main')) showTour(false); }, 1400);
   function boot() { ensure(); sync(); tick(); setInterval(tick, 700); document.addEventListener('click', function () { setTimeout(tick, 60); }, true); window.addEventListener('hashchange', function () { setTimeout(tick, 60); }); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

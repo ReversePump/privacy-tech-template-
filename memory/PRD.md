@@ -346,3 +346,12 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
   test_privacy_swap_full_flow) currently blocked by an UPSTREAM incident: near/orders returns
   503 "active incident … new orders conservatively paused" (external, transient; same code passed this
   morning; private-route order test passed in between). Not caused by this change (diff is brand JS/CSS only).
+
+## Iteration 31 — Custom domain prep (Oct 2026)
+- User: "opening the app shows emergent host url, link cloakprivacy.app".
+- cloak-app.js: new ensureDomain() in tick() rewrites any emergent host inside the app brand aria-label to
+  cloakprivacy.app (verified live: "Cloak Privacy: what it is (cloakprivacy.app)"). All other in-app links
+  already derive from location.host, so they resolve correctly automatically once the domain is connected.
+- Actual domain connection is a platform action by the user: Deployments → Publish/Republish → Manage
+  Publishes → Domain tab → Auto-link (email code) or manual A records 162.159.142.117 / 172.66.2.113 +
+  CNAME www. SSL automatic via Cloudflare. Relayed to user verbatim from support_agent.
