@@ -767,3 +767,8 @@ aside.rail.lv, aside.rail, .lv-h { display: none !important; }
   animation: cc-chip-pulse 2.2s ease-in-out infinite;
 }
 @keyframes cc-chip-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* $CLOAK chip: button behavior */
+button.cc-cloak-chip { cursor: pointer; transition: border-color .18s ease, color .18s ease; }
+button.cc-cloak-chip:hover { border-color: rgba(169, 231, 192, 0.6); }
+button.cc-cloak-chip.copied { border-color: #7fd7a0; background: #122018; color: #c8f3d8; }

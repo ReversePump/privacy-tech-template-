@@ -1992,18 +1992,35 @@
     var sl = document.querySelectorAll('a[href*="/api/bifrost/v1/site"]');
     for (var s = 0; s < sl.length; s++) sl[s].setAttribute('href', '/');
   }
-  /* ---- $CLOAK token chip: fixed in the header on every page ---- */
+  /* ---- $CLOAK token chip: fixed in the header on every page, tap to copy CA ---- */
+  var CLOAK_CA = 'FX1nYoan17vnNAafdCGdzbRsYySfunNh4pktT4bapump';
   function ensureCloakChip() {
     var hdr = document.querySelector('header.top') || document.querySelector('header');
     if (!hdr) return;
     var chip = hdr.querySelector('.cc-cloak-chip');
     var right = hdr.querySelector('.top-right') || hdr;
     if (!chip) {
-      chip = document.createElement('span');
+      chip = document.createElement('button');
+      chip.type = 'button';
       chip.className = 'cc-cloak-chip';
       chip.setAttribute('data-testid', 'cc-cloak-chip');
-      chip.setAttribute('aria-label', '$CLOAK token');
+      chip.setAttribute('aria-label', '$CLOAK token — copy contract address');
+      chip.title = CLOAK_CA;
       chip.innerHTML = '<i></i>$CLOAK';
+      chip.addEventListener('click', function () {
+        function done() {
+          chip.classList.add('copied');
+          chip.innerHTML = '<i></i>CA copied';
+          setTimeout(function () { chip.classList.remove('copied'); chip.innerHTML = '<i></i>$CLOAK'; }, 1600);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(CLOAK_CA).then(done, done);
+        else {
+          var ta = document.createElement('textarea'); ta.value = CLOAK_CA;
+          document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); } catch (e) {}
+          ta.remove(); done();
+        }
+      });
       right.insertBefore(chip, right.firstChild);
     } else if (chip.parentNode !== right) {
       right.insertBefore(chip, right.firstChild);

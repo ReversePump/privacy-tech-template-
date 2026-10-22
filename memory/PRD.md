@@ -416,3 +416,11 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
   (routes to #private-route). Verified PC + mobile.
 - Verified: app PC (chip x1050, no tagline overlap), app mobile, landing PC + mobile, docs PC — chip
   visible everywhere; zero visible brand leaks in sweep.
+
+## Iteration 35 — $CLOAK CA wired (Oct 2026)
+- User provided CA: FX1nYoan17vnNAafdCGdzbRsYySfunNh4pktT4bapump (pump.fun).
+- Chip is now a tap-to-copy button everywhere: app header (cloak-app.js, CLOAK_CA const, full CA in title
+  tooltip, "CA copied" inline feedback 1.6s, clipboard API + textarea fallback) and landing/docs TopNav
+  (CloakChip button, useState copied feedback, same CA). Square chip styling unchanged.
+- Verified on app + landing, PC: click -> "CA copied" state renders; hover shows full CA. (Headless browser
+  denies clipboard *read*, write path exercised via feedback state.)

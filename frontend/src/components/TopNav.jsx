@@ -3,12 +3,33 @@ import Logo from './Logo';
 
 export const APP_URL = '/api/bifrost/v1/app/';
 
-export const CloakChip = ({ className = '', mobile = false }) => (
-  <span data-testid={mobile ? 'nav-cloak-chip-mobile' : 'nav-cloak-chip'} aria-label="$CLOAK token"
-    className={`inline-flex h-10 shrink-0 items-center gap-2 rounded-none border border-[#a9e7c0]/25 bg-[#0c120e] px-3.5 font-mono text-[12px] font-semibold tracking-[.14em] text-[#a9e7c0] ${className}`}>
-    <i className="h-1.5 w-1.5 animate-pulse bg-[#7fd7a0]" />$CLOAK
-  </span>
-);
+const CLOAK_CA = 'FX1nYoan17vnNAafdCGdzbRsYySfunNh4pktT4bapump';
+
+export const CloakChip = ({ className = '', mobile = false }) => {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(CLOAK_CA);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = CLOAK_CA;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch { /* noop */ }
+      ta.remove();
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1600);
+  };
+  return (
+    <button type="button" onClick={copy} title={CLOAK_CA}
+      data-testid={mobile ? 'nav-cloak-chip-mobile' : 'nav-cloak-chip'}
+      aria-label="$CLOAK token — copy contract address"
+      className={`inline-flex h-10 shrink-0 cursor-pointer items-center gap-2 rounded-none border px-3.5 font-mono text-[12px] font-semibold tracking-[.14em] transition-colors ${copied ? 'border-[#7fd7a0] bg-[#122018] text-[#c8f3d8]' : 'border-[#a9e7c0]/25 bg-[#0c120e] text-[#a9e7c0] hover:border-[#a9e7c0]/60'} ${className}`}>
+      <i className="h-1.5 w-1.5 animate-pulse bg-[#7fd7a0]" />{copied ? 'CA copied' : '$CLOAK'}
+    </button>
+  );
+};
 
 export default function TopNav() {
   const [open, setOpen] = useState(false);
