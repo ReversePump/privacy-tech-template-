@@ -37,7 +37,7 @@ export const JOURNEY = [
 
 export const SEEN = [
   { a: 'Shielding', out: 'Your public wallet, the coin and the amount going in', inn: 'Everything that follows' },
-  { a: 'Paying someone', out: 'A transfer took place, its relayer fee, how many notes were spent', inn: 'Payer, payee, amount, and the coin if fees are paid in private SOL' },
+  { a: 'Paying someone', out: 'A transfer took place, its network fee, how many notes were spent', inn: 'Payer, payee, amount, and the coin if fees are paid in private SOL' },
   { a: 'Trading', out: 'The pool swapped through an approved venue', inn: 'Which person and which notes' },
   { a: 'Cashing out', out: 'A one-time address received funds', inn: 'Who funded it and from which notes' },
   { a: 'Going cross-chain', out: 'A Solana deposit and a payout on the far side', inn: 'The processing itself and any link to your wallet' },
@@ -79,9 +79,9 @@ export const QA = [
 // Main tech, one line each: the spec and why it matters.
 export const TECH = [
   ['Groth16 · BN254', 'Every move is proven, and checked on-chain in one transaction'],
-  ['Poseidon tree · 26 levels', 'Room for 67M notes in one shared crowd'],
+  ['Poseidon tree · 26 levels', 'Room for 67M notes in one shared pool'],
   ['Nullifiers', 'No double-spends, no trail back to you'],
   ['PBKDF2 600k + AES-GCM', 'Vault locked on your device, never on a server'],
-  ['Relayer-paid gas', 'No wallet pop-ups that give you away'],
+  ['Sponsored gas', 'Private spends need no wallet signature'],
   ['Any chain', 'Exit anywhere, without a wallet link'],
 ];

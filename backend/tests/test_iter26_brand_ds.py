@@ -62,7 +62,7 @@ def test_manifest(s):
     r = s.get(f"{BASE_URL}/api/bifrost/v1/app/manifest.webmanifest", timeout=30)
     assert r.status_code == 200
     j = r.json()
-    assert j["name"] == "Cloak Privacy · Private money on Solana"
+    assert j["name"] == "Cloak Privacy · ZK shield on Solana"
     assert j["short_name"] == "Cloak Privacy"
     assert all(i["src"].startswith("/api/bifrost/v1/_brand/") for i in j["icons"])
     for i in j["icons"]:

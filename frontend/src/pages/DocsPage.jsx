@@ -106,7 +106,7 @@ export default function DocsPage() {
         <header className="border-b border-white/15 pb-8">
           <div className="font-mono text-[11px] uppercase tracking-[.18em] text-white/60">Cloak Privacy · documentation</div>
           <h1 className="cx-h mt-3 text-[40px] font-semibold leading-[1.04] tracking-[-0.03em] sm:text-[60px]">The manual.</h1>
-          <p className="mt-3 max-w-[620px] text-[17px] leading-[1.6] text-white/75">Everything about how Cloak Privacy seals, moves and releases money, from the first click to the circuit.</p>
+          <p className="mt-3 max-w-[620px] text-[17px] leading-[1.6] text-white/75">The full protocol reference — shielded deposits, Groth16 proofs, nullifiers, routes and the circuits underneath.</p>
           <div className="mt-6 md:hidden">
             <select value={active} onChange={(e) => go(e.target.value)} data-testid="docs-select"
               className="w-full rounded-none border border-[#08090c] bg-[#0b0c10] px-3 py-3 text-[15px]">

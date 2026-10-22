@@ -138,9 +138,9 @@ function PulseRings() {
 
 /* ---------------- content ---------------- */
 const STEPS = [
-  { n: '01', t: 'Cloak in', d: 'Deposit any Solana token. It becomes a sealed note inside a shared zero-knowledge pool — one shape in a crowd of thousands.', sketch: <PoolSketch /> },
-  { n: '02', t: 'Move unseen', d: 'Pay, trade or exit while the pool signs for you. Every move is a Groth16 proof: valid, verified, and empty of you.', sketch: <ProofSketch /> },
-  { n: '03', t: 'Surface anywhere', d: 'Leave to a fresh Solana address or another chain entirely. Nothing connects where you entered to where you appear.', sketch: <NullifierSketch /> },
+  { n: '01', t: 'Shield', d: 'Deposit any SPL token. The program inserts a Poseidon commitment — token, amount, owner key, blinding — as a leaf in the pool Merkle tree, one leaf among thousands.', sketch: <PoolSketch /> },
+  { n: '02', t: 'Prove', d: 'Pay, swap or exit with a Groth16 proof generated in your browser. Solana verifies the proof on-chain and learns nothing about the note, the sender or the history.', sketch: <ProofSketch /> },
+  { n: '03', t: 'Withdraw', d: 'Withdraw to any Solana address or route to another chain. The published nullifier blocks double-spends and carries no link back to the deposit.', sketch: <NullifierSketch /> },
 ];
 
 const MODEL = [
@@ -150,17 +150,17 @@ const MODEL = [
 ];
 
 const FEES = [
-  ['Cloak in', '0.3%', 'your wallet pays Solana gas'],
-  ['Private payment', 'free', 'gas covered by the relayer'],
-  ['Private trade', '0.3% of input', 'gas covered by the relayer'],
-  ['Exit to Solana', '0.3% of amount', 'relayer signs, you stay unnamed'],
+  ['Shielded deposit', '0.3%', 'your wallet pays Solana gas'],
+  ['Private payment', 'free', 'gas covered for you'],
+  ['ZK shield swap', '0.3% of input', 'gas covered for you'],
+  ['Exit to Solana', '0.3% of amount', 'settled without your wallet signing'],
   ['Cross-chain route', 'in the quote', 'one deposit, any chain'],
 ];
 
 const FAQS = [
   ['Who holds my keys?', 'Only you. Keys are derived and encrypted on your device — nothing to reset, nothing we can touch.'],
   ['Do I need a wallet to use routes?', 'No. Private route and Privacy swap work from any sender: pick tokens, paste a destination, send one deposit.'],
-  ['Am I fully anonymous?', 'The on-chain link between your deposit and your later moves is gone. Timing and amounts are your own craft.'],
+  ['Am I fully anonymous?', 'The on-chain link between your deposit and your later moves is broken. Deposit and exit amounts stay visible at the edges — spread timing and amounts for stronger privacy.'],
   ['What if I lose my recovery key?', 'Nobody can recover the vault — that is the point. Write it down, keep it offline.'],
 ];
 
@@ -187,25 +187,26 @@ export default function LandingPage() {
             <Reveal delay={90}>
               <h1 className="mt-6 text-[44px] leading-[1.02] tracking-[-0.01em] text-[#eef6f0] sm:text-[64px] lg:text-[76px]"
                 style={serif} data-testid="hero-headline">
-                Disappear from the{' '}
-                <em className="text-[#a9e7c0]">public ledger.</em>
+                ZK-shielded swaps and
+                payments on{' '}
+                <em className="text-[#a9e7c0]">Solana.</em>
               </h1>
             </Reveal>
             <Reveal delay={180}>
               <p className="mt-6 max-w-[520px] text-[15px] leading-relaxed text-[#8fa695] sm:text-[17px]">
-                Cloak Privacy seals your tokens inside a shared zero-knowledge pool on Solana.
-                Pay, trade and exit anywhere — sender and receiver stay masked, and your balance stays yours alone.
+                Cloak Privacy is a Groth16 shielded pool on Solana mainnet.
+                Deposit, pay and swap through zero-knowledge proofs — the chain verifies every move without learning the sender, recipient or history.
               </p>
             </Reveal>
             <Reveal delay={260}>
               <div className="mt-9 flex flex-wrap items-center gap-3.5">
                 <a href={APP_URL} data-testid="hero-cta-open"
                   className="group inline-flex h-12 items-center gap-2 rounded-full bg-gradient-to-b from-[#c8f3d8] to-[#a9e7c0] px-7 text-[15px] font-semibold text-[#07130c] transition hover:shadow-[0_14px_36px_-10px_rgba(169,231,192,.5)]">
-                  Enter the pool <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              Open the vault <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </a>
                 <a href="#flow" data-testid="hero-cta-docs"
                   className="inline-flex h-12 items-center gap-2 rounded-full border border-[#a9e7c0]/25 px-7 text-[15px] text-[#c9d8cc] transition hover:border-[#a9e7c0]/55 hover:text-white">
-                  How the cloak works
+                  How it works
                 </a>
               </div>
             </Reveal>
@@ -246,7 +247,7 @@ export default function LandingPage() {
         <Reveal><Eyebrow>The protocol flow</Eyebrow></Reveal>
         <Reveal delay={80}>
           <h2 className="mt-5 max-w-[620px] text-[32px] leading-[1.06] sm:text-[46px]" style={serif}>
-            Three moves. <em className="text-[#a9e7c0]">No trace.</em>
+            Three steps. <em className="text-[#a9e7c0]">Shield, prove, withdraw.</em>
           </h2>
         </Reveal>
         <div className="mt-12 space-y-px overflow-hidden rounded-2xl border border-[#a9e7c0]/12">
@@ -268,7 +269,7 @@ export default function LandingPage() {
 
       {/* ---------- privacy model ---------- */}
       <section id="zk" className="relative mx-auto mt-28 max-w-6xl scroll-mt-24 px-4 sm:px-6">
-        <Reveal><Eyebrow>Under the cloak</Eyebrow></Reveal>
+        <Reveal><Eyebrow>The cryptography</Eyebrow></Reveal>
         <div className="mt-5 grid gap-10 lg:grid-cols-[1fr_1.2fr]">
           <Reveal>
             <h2 className="text-[32px] leading-[1.06] sm:text-[46px]" style={serif}>
@@ -310,11 +311,11 @@ export default function LandingPage() {
                 First Alpenglow-era ZK shield on Solana
               </div>
               <h2 className="mt-5 text-[30px] leading-[1.06] sm:text-[42px]" style={serif}>
-                Final before you <em className="text-[#a9e7c0]">blink twice.</em>
+                Groth16 proofs settle in <em className="text-[#a9e7c0]">~150 ms.</em>
               </h2>
               <p className="mt-4 max-w-[560px] text-[14.5px] leading-relaxed text-[#8fa695]">
                 Alpenglow is Solana's new consensus engine — Votor and Rotor — pushing finality to roughly
-                150 milliseconds. Cloak Privacy is built for it: proofs land, settle and vanish in a blink.
+                150 milliseconds. Cloak Privacy is built for it: proof verification and settlement complete inside a single slot.
               </p>
               <a href={ALPENGLOW_POST} target="_blank" rel="noopener noreferrer" data-testid="alpenglow-link"
                 className="mt-5 inline-flex items-center gap-1.5 text-[13.5px] text-[#a9e7c0] transition hover:text-[#c8f3d8]">
@@ -327,10 +328,10 @@ export default function LandingPage() {
 
       {/* ---------- fees ---------- */}
       <section id="fees" className="relative mx-auto mt-28 max-w-6xl scroll-mt-24 px-4 sm:px-6">
-        <Reveal><Eyebrow>Honest arithmetic</Eyebrow></Reveal>
+        <Reveal><Eyebrow>Fee schedule</Eyebrow></Reveal>
         <Reveal delay={80}>
           <h2 className="mt-5 text-[32px] leading-[1.06] sm:text-[46px]" style={serif}>
-            Fees you can <em className="text-[#a9e7c0]">read.</em>
+            Flat fees, <em className="text-[#a9e7c0]">on the record.</em>
           </h2>
         </Reveal>
         <Reveal delay={140}>
@@ -348,7 +349,7 @@ export default function LandingPage() {
 
       {/* ---------- faq ---------- */}
       <section className="relative mx-auto mt-28 max-w-3xl px-4 sm:px-6">
-        <Reveal><Eyebrow>Quiet answers</Eyebrow></Reveal>
+        <Reveal><Eyebrow>Frequently asked</Eyebrow></Reveal>
         <div className="mt-8 divide-y divide-[#a9e7c0]/10 rounded-2xl border border-[#a9e7c0]/12" data-testid="faq-list">
           {FAQS.map(([q, a], i) => (
             <details key={q} className="group bg-[#0d140e] px-6 py-5 open:bg-[#111a13]" data-testid={`faq-${i}`}>
@@ -367,10 +368,10 @@ export default function LandingPage() {
         <Reveal>
           <div className="ck-cta relative overflow-hidden rounded-3xl border border-[#a9e7c0]/16 px-8 py-16 text-center sm:py-20">
             <h2 className="mx-auto max-w-[640px] text-[34px] leading-[1.05] sm:text-[52px]" style={serif}>
-              The crowd is waiting. <em className="text-[#a9e7c0]">Blend in.</em>
+              Shield your first <em className="text-[#a9e7c0]">deposit.</em>
             </h2>
             <p className="mx-auto mt-5 max-w-[460px] text-[14.5px] text-[#8fa695]">
-              Open the vault, cloak your first tokens, and move like nobody is watching.
+              Create a vault in your browser, shield tokens in one transaction, and spend them with zero-knowledge proofs.
             </p>
             <div className="mt-9 flex flex-wrap items-center justify-center gap-3.5">
               <a href={APP_URL} data-testid="bottom-cta-launch-app"
@@ -391,7 +392,7 @@ export default function LandingPage() {
         <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
             <div className="text-[19px] text-[#eef6f0]" style={serif}>Cloak <span className="text-[#7fb894]">Privacy</span></div>
-            <p className="mt-1.5 text-[12.5px] text-[#566b5c]">Private money on Solana. Proofs in, nothing out.</p>
+            <p className="mt-1.5 text-[12.5px] text-[#566b5c]">ZK shielding on Solana mainnet — Groth16 proofs, Poseidon commitments.</p>
           </div>
           <nav className="flex flex-wrap gap-x-7 gap-y-3 text-[13px] text-[#8fa695]" data-testid="footer-links">
             <a href="/#flow" className="transition hover:text-white">How it works</a>

@@ -10,7 +10,7 @@
   "An address I paste": "Paste an address",
   "Ask the recipient for their Cloak Privacy address from Receive.": "Ask the receiver to share their Cloak Privacy address (Receive tab).",
   "Balances are read from your RPC, which sees these addresses queried together. Refresh only when you need to.": "Balances come from your RPC node, which can see these addresses being checked together. Refresh only when necessary.",
-  "Bring friends to privacy.": "Invite friends into the vanishing act.",
+  "Bring friends to privacy.": "Invite friends with your personal link.",
   "Cloak Privacy fee (included)": "Cloak Privacy fee (already included)",
   "Copy viewing key": "Copy view-only key",
   "Counted at their first shield": "Counts from their first shield",

@@ -23,7 +23,7 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#080c09" />
-        <meta name="description" content="Cloak Privacy — private money on Solana. A zero-knowledge shielded pool plus private cross-chain routes: pay, trade and exit with your balance off the public record." />
+        <meta name="description" content="Cloak Privacy — ZK-shielded pool on Solana. Groth16 proofs, Poseidon commitments and nullifiers: shielded swaps, private payments and cross-chain routes on mainnet." />
         <link rel="icon" href="%PUBLIC_URL%/favicon.ico?v=6" sizes="any" />
         <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/brand/cloak-favicon.png?v=6" />
         <link rel="icon" type="image/png" sizes="192x192" href="%PUBLIC_URL%/brand/cloak-favicon.png?v=6" />
@@ -34,13 +34,13 @@
         <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
         <!-- Open Graph -->
-        <meta property="og:title" content="Cloak Privacy | Private money on Solana" />
-        <meta property="og:description" content="A zero-knowledge shielded pool on Solana: cloaked balances, private payments and cross-chain exits." />
+        <meta property="og:title" content="Cloak Privacy | ZK-shielded pool on Solana" />
+        <meta property="og:description" content="A Groth16 zero-knowledge shielded pool on Solana: shielded balances, private payments and cross-chain routes." />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="%PUBLIC_URL%/brand/cloak-favicon.png" />
         <meta name="twitter:card" content="summary" />
 
-        <title>Cloak Privacy | Private money on Solana</title>
+        <title>Cloak Privacy | ZK-shielded pool on Solana</title>
         <script>window.addEventListener("error",function(e){if(e.error instanceof DOMException&&e.error.name==="DataCloneError"&&e.message&&e.message.includes("PerformanceServerTiming")){e.stopImmediatePropagation();e.preventDefault()}},true);</script>
     </head>
     <body>
@@ -60,9 +60,9 @@
           @keyframes ncbF{from{opacity:0}to{opacity:1}}
           @media (prefers-reduced-motion:reduce){#cc-boot .hood img,#cc-boot .hood i{animation:none}}
         </style>
-        <div id="root"><div id="cc-boot" data-testid="cc-boot" role="status" aria-label="Loading Cloak Privacy"><div class="c"><div class="hood"><img src="%PUBLIC_URL%/brand/cloak-mark.png?v=6" alt="" /><i></i><i></i></div><b id="cc-boot-act">Drawing the cloak&hellip;</b></div></div></div>
+        <div id="root"><div id="cc-boot" data-testid="cc-boot" role="status" aria-label="Loading Cloak Privacy"><div class="c"><div class="hood"><img src="%PUBLIC_URL%/brand/cloak-mark.png?v=6" alt="" /><i></i><i></i></div><b id="cc-boot-act">Deriving shielded keys&hellip;</b></div></div></div>
         <script>
-          (function(){var a=['Drawing the cloak…','Forging keys…','Sealing notes…','Syncing the pool…','Scrambling traces…','Going dark…'],i=0,el=document.getElementById('cc-boot-act');
+          (function(){var a=['Deriving shielded keys…','Building Merkle proof…','Sealing commitments…','Indexing nullifiers…','Verifying circuit…','Syncing pool state…'],i=0,el=document.getElementById('cc-boot-act');
           if(el)setInterval(function(){i=(i+1)%a.length;el.style.animation='none';void el.offsetWidth;el.style.animation='';el.textContent=a[i];},1300);})();
         </script>
     </body>

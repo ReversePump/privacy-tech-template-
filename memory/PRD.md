@@ -307,3 +307,25 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
   Ledger native (SOLANA MAINNET chip, 8,093 sealed notes, 1,994 nullifiers, real USDC rows), hood logo
   everywhere, X -> cloakprvt, no Camo/Veil text, no console page errors, mobile dock + More sheet full.
   Private-route quote-to-order needs the To-token dropdown (recommended: data-testid for stable testing).
+
+## Iteration 29 — Technical copy pass (Oct 2026)
+- User request: replace all "money off the books"-style marketing lines with technical ZK language on every page.
+- LandingPage.jsx: hero H1 now "ZK-shielded swaps and payments on Solana."; sub rewritten around Groth16 proofs;
+  steps renamed Shield / Prove / Withdraw with commitment/proof/nullifier descriptions; eyebrows now "The
+  cryptography", "Fee schedule", "Frequently asked"; fees table uses Shielded deposit / ZK shield swap and no
+  longer mentions relayer ("gas covered for you", "settled without your wallet signing"); Alpenglow H2
+  "Groth16 proofs settle in ~150 ms."; final CTA "Shield your first deposit."; footer tagline
+  "ZK shielding on Solana mainnet — Groth16 proofs, Poseidon commitments."
+- index.html: title/og/meta description switched to "ZK-shielded pool on Solana"; boot loader actions now
+  Deriving shielded keys / Building Merkle proof / Sealing commitments / Indexing nullifiers / Verifying
+  circuit / Syncing pool state.
+- cloak-app.js: SHORT per-tab lines rewritten technical (e.g. Trade = "ZK shield swap inside the pool.",
+  Withdraw = "Nullifier-verified exits."); welcome tour copy rewritten; app splash actions match boot loader;
+  Ledger + Vault intros de-poeticized.
+- bifrost_brand.py manifest name -> "Cloak Privacy · ZK shield on Solana" (test updated accordingly).
+- paraphrase.json: "vanishing act" invite line -> "Invite friends with your personal link."
+- landingCopy.js: SEEN "relayer fee" -> "network fee"; TECH "shared crowd" -> "shared pool",
+  "Relayer-paid gas" -> "Sponsored gas / Private spends need no wallet signature".
+- Verified: brand suite 12 passed; full backend suite 131 passed, 1 skipped; landing + app screenshots show
+  new copy live (tour, vault intro, fees table, CTA, footer, tab title). Docs relayer mentions intentionally
+  kept — they document the protocol's real trust model.

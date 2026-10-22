@@ -296,7 +296,7 @@ _ICON_V = "6"
 def cloak_manifest():
     b = "/api/bifrost/v1/_brand/"
     return {
-        "name": "Cloak Privacy · Private money on Solana",
+        "name": "Cloak Privacy · ZK shield on Solana",
         "short_name": "Cloak Privacy",
         "description": "Private balances, transfers, trades and swaps on Solana.",
         "id": "/app",

@@ -1307,7 +1307,7 @@
     'dk:private': ['Private route · no wallet needed', 'Swap from Solana to any chain without connecting a wallet. Cloak Privacy compares several multi-hop routes, you pick one and send a single deposit to a one-time address; the route converts and delivers to your destination address. Nothing links your Solana wallet to the receiving address beyond the route itself.', ['No wallet connection', 'Multi-hop routing', 'One deposit']],
     'dk:privacy': ['Privacy swap · no wallet needed', 'Intent-based confidential swap. You state what you want (send X, receive at least Y on chain Z); a competitive solver network fills it and settlement runs through confidential processing. Refunds return to your Solana refund address if the intent is not filled.', ['Solver competition', 'Confidential settlement', 'Auto refund']],
     'dk:track': ['Track order', 'Paste an order ID to see its live status, from waiting for deposit through confirmation, exchange and delivery. Orders created on this device are listed below.', ['Live status', 'Local order list']],
-    'home': ['Vault', 'Your cloaked balance, recent activity and quick actions. Everything here is decrypted locally from your notes; on-chain it is just another shape in the crowd. Alpenglow-era finality: every move settles in about 150 ms.', ['Local decryption', 'Notes', 'Alpenglow finality', 'No tracking']],
+    'home': ['Vault', 'Your shielded balance, recent activity and quick actions. Everything here is decrypted locally from your notes; on-chain it appears only as commitments and nullifiers. Alpenglow-era finality: every move settles in about 150 ms.', ['Local decryption', 'Notes', 'Alpenglow finality', 'No tracking']],
     'shield': ['Cloak · ZK-shielded deposit', 'Yes, this is real zero-knowledge. Cloaking moves public tokens from a Solana wallet into the shielded pool: the program stores a Poseidon commitment to (token, amount, owner key, blinding) as a leaf in a 2^26 Merkle tree. From then on the funds are notes only you can open. Every later spend is a Groth16 proof (BN254) that the note exists in the tree and that you hold its key, checked on-chain without revealing which note.', ['Groth16 / BN254', 'Poseidon Merkle tree', 'Nullifiers block double-spends']],
     'swap': ['Trade · private swap inside the pool', 'Trade one shielded token for another without leaving the pool. A proof spends your input note, the program routes the trade through on-chain liquidity and writes the output as a new note. Outside observers see a pool trade happen, not who made it or how big it was.', ['Proof-bound terms', 'Gas covered for you', 'Output lands as a note']],
     'bridge': ['Bridge', 'Exit the shielded pool directly to another network. The proof binds the destination chain, address and minimum output, so nobody can change where funds go.', ['Bound destination', 'Cross-chain exit', 'Submitted for you']],
@@ -1319,7 +1319,7 @@
     'addresses': ['Burner addresses', 'One-time Solana addresses derived from your vault, used once for a cash out or a payment so exits do not cluster on one public address.', ['Derived from vault', 'Single use', 'Breaks clustering']],
     'invite': ['Invite', 'Invite friends with your personal link and track rewards earned from their activity.', ['Personal link', 'Rewards']],
     'keys': ['Key ring & vault', 'Your spending key, viewing key and recovery key, all derived from one 32-byte root encrypted on this device (PBKDF2 · AES-GCM). Back up the recovery key offline; nobody can reset it.', ['Never leaves device', 'Recovery key', 'Viewing key export']],
-    'dk:chain': ['Ledger · live pool record', 'Every cloak and exit, the current Merkle root, sealed notes and spent nullifiers — streamed live from Solana mainnet. Watch the crowd you blend into grow in real time.', ['Live feed', 'Merkle root', 'Nullifiers']]
+    'dk:chain': ['Ledger · live pool record', 'Every cloak and exit, the current Merkle root, sealed notes and spent nullifiers — streamed live from Solana mainnet, read directly from the program accounts.', ['Live feed', 'Merkle root', 'Nullifiers']]
   };
   function activeLabel() {
     var on = document.querySelector('nav.side .nav-i.on:not(.gx-nav)') || document.querySelector('nav.tabbar .nav-i.on:not(.gx-nav)');
@@ -1495,10 +1495,10 @@
   /* ---- Cloak Privacy: welcome tour (first visit) ---- */
   var TOUR_KEY = 'cc-tour-v2';
   var TOUR = [
-    ['Welcome to Cloak Privacy', 'Private money on Solana.', 'Shield your tokens into a zero-knowledge pool — your balance vanishes into the crowd.', 'mark'],
-    ['Cloak, pay, trade', 'Every move off the record.', 'Pay anyone, trade tokens and earn yield with proofs instead of public transfers. Nobody sees who, what or how much.', '<path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/>'],
-    ['No wallet? No problem', 'Private route & Privacy swap.', 'One deposit to a burn-after-use address moves value to any chain. Track every order live.', '<path d="M7 7h11l-3-3M17 17H6l3 3"/>'],
-    ['Your keys, your device', 'Nothing to reset, nothing to leak.', 'Keys are forged and encrypted on this device alone. Guard your recovery key — nobody can reset it for you.', '<circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.2-8.2M16 7l2 2M14 9l2 2"/>']
+    ['Welcome to Cloak Privacy', 'ZK-shielded pool on Solana.', 'Deposit tokens into the shielded pool — your balance becomes a sealed commitment in the Merkle tree.', 'mark'],
+    ['Cloak, pay, trade', 'Groth16 proofs, not public transfers.', 'Pay anyone, swap tokens and earn yield from inside the pool. Observers see validity proofs — never the sender, amount or recipient.', '<path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/>'],
+    ['No wallet? No problem', 'Private route & Privacy swap.', 'One deposit to a one-time address routes value to any chain. Track every order live.', '<path d="M7 7h11l-3-3M17 17H6l3 3"/>'],
+    ['Your keys, your device', 'Client-side key custody.', 'Keys are derived and encrypted on this device alone (PBKDF2 · AES-GCM). Guard your recovery key — nobody can reset it for you.', '<circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.2-8.2M16 7l2 2M14 9l2 2"/>']
   ];
   function showTour(force) {
     try { if (!force && localStorage.getItem(TOUR_KEY)) return; } catch (e) {}
@@ -1658,12 +1658,12 @@
 
   /* ---- Cloak Privacy: explain first, connect last ---- */
   var SHORT = {
-    home: ['Vault', 'Your money, off the books.'], shield: ['Cloak', 'Wrap your tokens in zero knowledge.'],
-    send: ['Pay', 'Deliver value. Leave no trace.'], swap: ['Trade', 'Swap inside the dark pool.'],
-    bridge: ['Bridge', 'Slip out to any chain.'], receive: ['Receive', 'Get paid off the radar.'],
-    withdraw: ['Withdraw', 'Cash out, no fingerprints.'], earn: ['Earn', 'Yield under cover.'],
-    history: ['History', 'For your eyes only.'], addresses: ['Addresses', 'Burn-after-use exits.'],
-    invite: ['Invite', 'Recruit and earn.'], keys: ['Keys', 'Your keys, your command.']
+    home: ['Vault', 'Zero-knowledge vault on Solana.'], shield: ['Cloak', 'Groth16-shielded token deposits.'],
+    send: ['Pay', 'ZK-shielded transfers.'], swap: ['Trade', 'ZK shield swap inside the pool.'],
+    bridge: ['Bridge', 'Proof-bound cross-chain routes.'], receive: ['Receive', 'Stealth addresses via viewing key.'],
+    withdraw: ['Withdraw', 'Nullifier-verified exits.'], earn: ['Earn', 'Shielded on-chain yield.'],
+    history: ['History', 'Locally decrypted activity.'], addresses: ['Addresses', 'One-time vault-derived addresses.'],
+    invite: ['Invite', 'On-chain referral rewards.'], keys: ['Keys', 'Spending, viewing and recovery keys.']
   };
   var GET = {
     home: ['Cloaked balance', 'Local activity', 'All tools unlocked'], shield: ['Sealed notes', 'Hidden amounts', 'Unlinked wallet'],
@@ -1794,9 +1794,9 @@
     var shownAt = performance.now(), MIN_MS = 1500, leaving = false;
     box.innerHTML = '<div class="sp-card sp-mini">'
       + '<div class="sp-hood"><img src="/api/bifrost/v1/_brand/mark-white-256.png" alt="Cloak Privacy" draggable="false" /><i class="sp-halo"></i><i class="sp-halo sp-halo2"></i></div>'
-      + '<b id="sp-act" class="in">Drawing the cloak&hellip;</b></div>';
+      + '<b id="sp-act" class="in">Deriving keys&hellip;</b></div>';
     document.body.appendChild(box);
-    var acts = ['Drawing the cloak\u2026', 'Forging keys\u2026', 'Sealing notes\u2026', 'Syncing the pool\u2026', 'Scrambling traces\u2026', 'Going dark\u2026'];
+    var acts = ['Deriving keys\u2026', 'Building Merkle proof\u2026', 'Sealing commitments\u2026', 'Indexing nullifiers\u2026', 'Verifying circuit\u2026', 'Syncing pool state\u2026'];
     var ai = 0, act = box.querySelector('#sp-act');
     var at = setInterval(function () {
       ai = (ai + 1) % acts.length;
