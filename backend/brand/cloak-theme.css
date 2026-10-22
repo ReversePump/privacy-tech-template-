@@ -736,3 +736,34 @@ input,textarea,select,[class*="field"],[class*="input"]{border-radius:6px!import
 .sheet .lw-add .cc-find-btn {
   margin-top: 10px;
 }
+
+/* ---- brand safety: upstream token rail never renders ---- */
+aside.rail.lv, aside.rail, .lv-h { display: none !important; }
+
+/* ---- $CLOAK header chip: square, fixed, always visible ---- */
+.cc-cloak-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  margin-right: 10px;
+  border: 1px solid rgba(169, 231, 192, 0.25);
+  background: #0c120e;
+  color: #a9e7c0;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  border-radius: 4px;
+  white-space: nowrap;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+.cc-cloak-chip i {
+  width: 6px;
+  height: 6px;
+  background: #7fd7a0;
+  display: inline-block;
+  animation: cc-chip-pulse 2.2s ease-in-out infinite;
+}
+@keyframes cc-chip-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }

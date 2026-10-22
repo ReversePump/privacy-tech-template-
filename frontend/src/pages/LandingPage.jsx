@@ -2,8 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import TopNav, { APP_URL } from '../components/TopNav';
 
-const BACKEND = process.env.REACT_APP_BACKEND_URL || '';
-const BF = `${BACKEND}/api/bifrost/v1`;
+const BF = '/api/bifrost/v1';
 const ALPENGLOW_POST = 'https://x.com/solana_devs/status/2112892922136055937';
 
 /* ---------------- live pool data ---------------- */

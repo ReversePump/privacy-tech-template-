@@ -400,3 +400,19 @@ Clone DarkSwap /swap with sleek frontend and both live swap methods (Private rou
 - Privacy-swap order creation still provider-paused (NEAR Intents incident) — rechecked, quotes work,
   orders 503 "new orders conservatively paused". Everything else green: suite 127 passed, 2 skipped.
 - solders==0.29.0 added to requirements.txt.
+
+## Iteration 34 — $CLOAK header chip + final brand-leak masks (Oct 2026)
+- $CLOAK chip added, fixed in the header on every page: app header (cloak-app.js ensureCloakChip, square
+  chip with pulsing dot, data-testid cc-cloak-chip, inserted into header .top-right before the wallet
+  button, re-pinned every tick so React can't drop it) and landing/docs TopNav (CloakChip component,
+  nav-cloak-chip desktop + nav-cloak-chip-mobile). fixTaglineOverlap now accounts for chip width so the
+  Alpenglow strip never overlaps it. CA wiring pending — user will provide the token address later.
+- Brand-leak audit + masks: hidden upstream rail aside.rail.lv ("$VEIL creator fees" + revenue dashboard
+  link) now display:none via JS tick AND cloak-theme.css !important rule; its title attr host rewritten to
+  cloakprivacy.app; any $VEIL/veilit text node auto-hidden each tick; header .brand href and the "About"
+  top-link pointed away from the upstream site mirror to "/" (site mirror still contains veil strings —
+  users no longer reach it from the app). Relay health all 200 after changes.
+- Pitch link text changed: "No wallet? Swap instantly →" -> "No wallet? Try confidential intents →"
+  (routes to #private-route). Verified PC + mobile.
+- Verified: app PC (chip x1050, no tagline overlap), app mobile, landing PC + mobile, docs PC — chip
+  visible everywhere; zero visible brand leaks in sweep.

@@ -1373,7 +1373,9 @@
     var t = document.getElementById('cc-tagline'); if (!t) return;
     var wb = document.querySelector('header .wallet-btn');
     var w = wb ? Math.round(wb.getBoundingClientRect().width) : 190;
-    var right = w + 52;
+    var chip = document.querySelector('.cc-cloak-chip');
+    var cw = chip ? Math.round(chip.getBoundingClientRect().width) + 10 : 0;
+    var right = w + 52 + cw;
     if (t.style.right !== right + 'px') t.style.right = right + 'px';
     var connected = wb && /\u00b7/.test(wb.textContent || '');
     var show = connected ? 'none' : '';
@@ -1718,7 +1720,7 @@
     p.innerHTML = '<i class="np-ico">' + dsv(PITCH_ICO[k] || 'wallet', 28) + '</i><span class="np-k">' + esc(it[0]) + '</span><h2>' + esc(it[1]) + '</h2>' +
       '<p class="np-sentence">' + esc(get.join(' \u00b7 ')) + '.</p>' +
       '<button class="np-cta" data-testid="cc-pitch-connect">Connect wallet</button>' +
-      '<a class="np-alt" href="#private-route" data-testid="cc-pitch-private">No wallet? Swap instantly →</a>';
+      '<a class="np-alt" href="#private-route" data-testid="cc-pitch-private">No wallet? Try confidential intents →</a>';
     p.querySelector('.np-cta').addEventListener('click', openOnb);
   }
 
@@ -1963,8 +1965,51 @@
       var fixed = al.replace(/\([^)]*emergent[^)]*\)/i, '(cloakprivacy.app)').replace(/maker-hub-[^\s)]+/i, 'cloakprivacy.app');
       if (fixed !== al) b.setAttribute('aria-label', fixed);
     }
+    var attrs = document.querySelectorAll('[title*="emergentagent"], [title*="maker-hub"], [aria-label*="emergentagent"], [aria-label*="maker-hub"]');
+    for (var i = 0; i < attrs.length; i++) {
+      ['title', 'aria-label'].forEach(function (k) {
+        var v = attrs[i].getAttribute(k);
+        if (v && /emergentagent|maker-hub/i.test(v)) attrs[i].setAttribute(k, v.replace(/[a-z0-9.-]*(emergentagent|emergent)\.[a-z.]+|maker-hub-[a-z0-9.-]+/gi, 'cloakprivacy.app'));
+      });
+    }
+    // upstream token rail ($VEIL creator fees / revenue dashboard) — never part of Cloak Privacy
+    var rail = document.querySelector('aside.rail.lv, aside.rail, a.lv-h');
+    if (rail) {
+      var host = rail.closest('aside') || rail;
+      if (host.style.display !== 'none') host.style.display = 'none';
+    }
+    var w2 = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), tn2, veilNodes = [];
+    while ((tn2 = w2.nextNode())) {
+      if (/\$VEIL|veilit/i.test(tn2.textContent || '')) veilNodes.push(tn2);
+      if (veilNodes.length > 6) break;
+    }
+    veilNodes.forEach(function (nd) {
+      var sec = nd.parentElement && nd.parentElement.closest('aside, a, div');
+      if (sec && sec.style.display !== 'none') sec.style.display = 'none';
+    });
+    var brand2 = document.querySelector('header .brand');
+    if (brand2 && brand2.getAttribute('href') !== '/') brand2.setAttribute('href', '/');
+    var sl = document.querySelectorAll('a[href*="/api/bifrost/v1/site"]');
+    for (var s = 0; s < sl.length; s++) sl[s].setAttribute('href', '/');
   }
-  function tick() { ensureBalanceShown(); suppressCopyToast(); scrubBits(); polishAddFunds(); ensureDomain(); orderNav(); ensureX(); ensureTagline(); fixTaglineOverlap(); syncIntro(); ensureMore(); fitNav(); ensureFoot(); ensureWalletBtn(); ensureDock(); ensurePitch(); ensureSplash(); ensureFees(); ensureWalletGroup(); hideExtWalletOriginals(); }
+  /* ---- $CLOAK token chip: fixed in the header on every page ---- */
+  function ensureCloakChip() {
+    var hdr = document.querySelector('header.top') || document.querySelector('header');
+    if (!hdr) return;
+    var chip = hdr.querySelector('.cc-cloak-chip');
+    var right = hdr.querySelector('.top-right') || hdr;
+    if (!chip) {
+      chip = document.createElement('span');
+      chip.className = 'cc-cloak-chip';
+      chip.setAttribute('data-testid', 'cc-cloak-chip');
+      chip.setAttribute('aria-label', '$CLOAK token');
+      chip.innerHTML = '<i></i>$CLOAK';
+      right.insertBefore(chip, right.firstChild);
+    } else if (chip.parentNode !== right) {
+      right.insertBefore(chip, right.firstChild);
+    }
+  }
+  function tick() { ensureBalanceShown(); suppressCopyToast(); scrubBits(); polishAddFunds(); ensureDomain(); ensureCloakChip(); orderNav(); ensureX(); ensureTagline(); fixTaglineOverlap(); syncIntro(); ensureMore(); fitNav(); ensureFoot(); ensureWalletBtn(); ensureDock(); ensurePitch(); ensureSplash(); ensureFees(); ensureWalletGroup(); hideExtWalletOriginals(); }
   setTimeout(function () { if (document.querySelector('main.main')) showTour(false); }, 1400);
   function boot() { ensure(); sync(); tick(); setInterval(tick, 700); document.addEventListener('click', function () { setTimeout(tick, 60); }, true); window.addEventListener('hashchange', function () { setTimeout(tick, 60); }); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

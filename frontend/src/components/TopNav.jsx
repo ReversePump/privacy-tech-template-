@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import Logo from './Logo';
 
-export const APP_URL = `${process.env.REACT_APP_BACKEND_URL || ''}/api/bifrost/v1/app/`;
+export const APP_URL = '/api/bifrost/v1/app/';
+
+export const CloakChip = ({ className = '', mobile = false }) => (
+  <span data-testid={mobile ? 'nav-cloak-chip-mobile' : 'nav-cloak-chip'} aria-label="$CLOAK token"
+    className={`inline-flex h-10 shrink-0 items-center gap-2 rounded-none border border-[#a9e7c0]/25 bg-[#0c120e] px-3.5 font-mono text-[12px] font-semibold tracking-[.14em] text-[#a9e7c0] ${className}`}>
+    <i className="h-1.5 w-1.5 animate-pulse bg-[#7fd7a0]" />$CLOAK
+  </span>
+);
 
 export default function TopNav() {
   const [open, setOpen] = useState(false);
@@ -29,14 +36,16 @@ export default function TopNav() {
             className="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#a9e7c0]/20 text-[#8fa695] transition hover:border-[#a9e7c0]/55 hover:text-white">
             <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
           </a>
+          <CloakChip className="ml-2" />
           <a href={APP_URL} data-testid="nav-app-button"
             className="ml-2 inline-flex h-10 items-center rounded-full bg-gradient-to-b from-[#c8f3d8] to-[#a9e7c0] px-5 text-[14px] font-semibold text-[#07130c] transition hover:shadow-[0_10px_28px_-10px_rgba(169,231,192,.55)]">
             Open app
           </a>
         </nav>
+        <CloakChip className="ml-auto md:hidden" mobile />
         <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} data-testid="nav-menu-toggle"
           aria-label={open ? 'Close menu' : 'Open menu'}
-          className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#a9e7c0]/20 text-[#eef6f0] md:hidden">
+          className="ml-2 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#a9e7c0]/20 text-[#eef6f0] md:hidden">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             {open ? <path d="M6 6l12 12M18 6 6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
           </svg>

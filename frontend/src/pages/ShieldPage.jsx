@@ -2,8 +2,7 @@ import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Logo from '../components/Logo';
 
-const BACKEND = process.env.REACT_APP_BACKEND_URL || '';
-const BIFROST = `${BACKEND}/api/bifrost/v1`;
+const BIFROST = '/api/bifrost/v1';
 
 // Map any pretty site URL to the Bifrost v1 upstream mirror (one single site):
 //   /                -> app  /            (Cloak Privacy app: wallet, shield, trade, swaps...)
